@@ -6,6 +6,7 @@ const warnings = require('../warnings');
 const tracker = require('../update-tracker');
 const TinyDb = require('../../db/tiny-db');
 const config = require('../../config');
+const util = require('../../util');
 const _ = require('lodash');
 const { retryUntilSuccess } = require('../../helpers/retry');
 const clientApp = require('../client-app');
@@ -46,6 +47,21 @@ class FileStore {
     @computed get visibleFiles() {
         return this.files.filter(f => f.show);
     }
+
+    /**
+     * Human readable maximum auto-expandable inline image size limit
+     * @readonly
+     * @memberof FileStore
+     */
+    inlineImageSizeLimitFormatted = util.formatBytes(config.chat.inlineImageSizeLimit);
+
+    /**
+     * Human readable maximum cutoff inline image size limit
+     * @readonly
+     * @memberof FileStore
+     */
+    inlineImageSizeLimitCutoffFormatted = util.formatBytes(config.chat.inlineImageSizeLimitCutoff);
+
     /**
      * Store is loading full file list for the first time.
      * @member {boolean} loading

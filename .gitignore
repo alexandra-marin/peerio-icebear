@@ -11,3 +11,4 @@ build
 .nyc_output
 .vscode
 .opt-in
+.package.json.md5

@@ -1,9 +1,10 @@
 const socket = require('../../network/socket');
 const { secret, sign, cryptoUtil } = require('../../crypto');
 const { AntiTamperError, ServerError } = require('../../errors');
-const { observable } = require('mobx');
+const { observable, action } = require('mobx');
 const { getContactStore } = require('../../helpers/di-contact-store');
 const { getUser } = require('../../helpers/di-current-user');
+const { asPromiseMultiValue } = require('../../helpers/prombservable');
 
 let temporaryKegId = 0;
 function getTemporaryKegId() {
@@ -228,12 +229,21 @@ class Keg {
      * @returns {Promise}
      * @private
      */
-    internalSave(cleanShareData) {
+    internalSave() {
         let payload, props, lastVersion, signingPromise = Promise.resolve(true);
         try {
             payload = this.serializeKegPayload();
             props = this.serializeProps();
-            if (cleanShareData) {
+            // existence of these properties means this keg was shared with us and we haven't re-encrypted it yet
+            if (this.pendingReEncryption) {
+                // we don't want to save (re-encrypt and loose original sharing data) before we validate the keg
+                if (this.validatingKeg) {
+                    return asPromiseMultiValue(this, 'sharedKegError', [true, false])
+                        .then(() => this.internalSave());
+                }
+                if (this.sharedKegError || this.signatureError) {
+                    throw new Error('Not allowed to save a keg with sharedKegError or signatureError', this.id);
+                }
                 props.sharedKegSenderPK = null;
                 props.sharedKegRecipientPK = null;
                 props.encryptedPayloadKey = null;
@@ -279,6 +289,7 @@ class Keg {
                 format: this.format
             }
         })).then(resp => {
+            this.pendingReEncryption = false;
             this.dirty = false;
             this.collectionVersion = resp.collectionVersion;
             // in case this keg was already updated through other code paths we change version in a smart way
@@ -389,13 +400,13 @@ class Keg {
             if (this.forceSign || (!this.plaintext && this.db.id !== 'SELF')) {
                 this.verifyKegSignature(payload, keg.props);
             }
-            const pendingReEncryption = !!(keg.props.sharedBy && keg.props.sharedKegSenderPK);
+            this.pendingReEncryption = !!(keg.props.sharedBy && keg.props.sharedKegSenderPK);
             // is this keg shared with us and needs re-encryption?
             // sharedKegSenderPK is used here to detect keg that still needs re-encryption
             // the property will get deleted after re-encryption
             // we can't introduce additional flag because props are not being deleted on keg delete
             // to allow re-sharing of the same file keg
-            if (!this.plaintext && pendingReEncryption) {
+            if (!this.plaintext && this.pendingReEncryption) {
                 // async call, changes state of the keg in case of issues
                 this.validateAndReEncryptSharedKeg(keg.props);
                 // todo: when we'll have key change, this should use secret key corresponding to sharedKegRecipientPK
@@ -419,7 +430,7 @@ class Keg {
                 payload = secret.decryptString(payload, decryptionKey);
             }
             payload = JSON.parse(payload);
-            if (!this.ignoreAntiTamperProtection && (this.forceSign || !(this.plaintext || pendingReEncryption))) {
+            if (!this.ignoreAntiTamperProtection && (this.forceSign || !(this.plaintext || this.pendingReEncryption))) {
                 this.detectTampering(payload);
             }
             this.deserializeKegPayload(payload);
@@ -439,9 +450,13 @@ class Keg {
      * @private
      */
     validateAndReEncryptSharedKeg(kegProps) {
+        this.sharedKegError = null;
+        this.signatureError = null;
+        this.validatingKeg = true;
         // we need to make sure that sender's public key really belongs to him
         const contact = getContactStore().getContact(kegProps.sharedBy);
-        contact.whenLoaded(() => {
+        contact.whenLoaded(action(() => {
+            this.validatingKeg = false;
             if (cryptoUtil.bytesToB64(contact.encryptionPublicKey) !== kegProps.sharedKegSenderPK) {
                 this.sharedKegError = true;
                 this.signatureError = true;
@@ -450,9 +465,8 @@ class Keg {
             this.sharedKegError = false;
             this.signatureError = false;
             // we don't care much if this fails because next time it will get re-saved
-            // todo: temporarily disabled, until cassandra is in play
-            // this.saveToServer(true);
-        });
+            this.saveToServer();
+        }));
     }
 
     /**

@@ -1,11 +1,11 @@
 {
   "name": "peerio-icebear",
-  "version": "3.0.10",
+  "version": "3.1.1",
   "description": "Peerio Icebear client library",
   "main": "src/index.js",
   "scripts": {
     "=== HOOKS ===": "",
-    "postinstall": "node ./scripts/store_package_json_hash.js",
+    "postinstall": "opt --in npm-install --exec \"node ./scripts/store_package_json_hash.js\"",
     "postcheckout": "npm run opt-in-npm-install",
     "postmerge": "npm run opt-in-npm-install",
     "precommit": "opt --in lint --exec \"npm run code:verify\"",

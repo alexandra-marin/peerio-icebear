@@ -204,6 +204,10 @@ class SocketClient {
     start(url) {
         if (this.started) return;
         console.log(`Starting socket: ${url}`);
+        if (!url) {
+            console.error('Socket server url missing, can not start');
+            return;
+        }
         const self = this;
         this.url = url;
         this.started = true;

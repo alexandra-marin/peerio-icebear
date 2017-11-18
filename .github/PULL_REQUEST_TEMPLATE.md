@@ -1,24 +1,20 @@
-[PR guideline.](https://github.com/PeerioTechnologies/peerio-icebear/blob/dev/docs/CONTRIBUTING.md)
+[PR guideline](https://github.com/PeerioTechnologies/peerio-icebear/blob/dev/docs/CONTRIBUTING.md)
 
-## PR author
-*If something is not applicable to your case - acknowledge the fact by writing n/a.*
+### PR author
 
-|    📝   |
-| ------- |
-| **Relevant issue tracker links:** | 
-| ....... |
-| **Linked PRs in other repos:** | 
-| ....... | 
-| **Manual testing instructions:** | 
-| ....... |
-| **Breaking changes:** | 
-| ....... |
-| **Additional notes:** | 
-| ....... |
+#### Relevant issue tracker links  
+...
+#### Linked PRs in other repos
+... 
+#### Breaking changes  
+...
+#### Manual testing instructions  
+...
+#### Additional notes
+... 
 
-
-
-## Reviewer
+----
+### Reviewer
 
 * Localisation.
 * Architectural decisions.
@@ -30,7 +26,8 @@
 * Are there any bicycles invented that should be replaced with existing code or external libs?
 * Are there unit and e2e tests added?
 
-## Repository owner
+----
+### Repository owner
 
 - [ ] Breaking changes are applied correctly.
 - [ ] At least one approved code review exists.

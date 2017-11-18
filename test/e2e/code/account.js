@@ -1,4 +1,4 @@
-const defineSupportCode = require('cucumber').defineSupportCode;
+const { defineSupportCode } = require('cucumber');
 const { getRandomUsername } = require('./helpers/random-data');
 // const { confirmUserEmail } = require('./helpers/mailinatorHelper');
 

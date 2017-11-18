@@ -61,16 +61,20 @@ module.exports = function mixUserRegisterModule() {
         const activationRequest = {
             username: this.username,
             auth: {
-                token: publicCrypto.decryptCompat(cng.authKey.token,
+                token: publicCrypto.decryptCompat(
+                    cng.authKey.token,
                     cng.authKey.nonce,
                     cng.ephemeralServerPK,
-                    this.authKeys.secretKey).buffer
+                    this.authKeys.secretKey
+                ).buffer
             },
             encryption: {
-                token: publicCrypto.decryptCompat(cng.encryptionKey.token,
+                token: publicCrypto.decryptCompat(
+                    cng.encryptionKey.token,
                     cng.encryptionKey.nonce,
                     cng.ephemeralServerPK,
-                    this.encryptionKeys.secretKey).buffer
+                    this.encryptionKeys.secretKey
+                ).buffer
             },
             signing: {
                 token: cng.signingKey.token.buffer,

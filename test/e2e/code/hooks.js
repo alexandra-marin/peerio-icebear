@@ -1,4 +1,4 @@
-const defineSupportCode = require('cucumber').defineSupportCode;
+const { defineSupportCode } = require('cucumber');
 const App = require('./app');
 
 defineSupportCode(({ setDefaultTimeout, Before, After }) => {

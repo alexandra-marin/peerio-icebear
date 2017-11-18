@@ -38,7 +38,8 @@ function asPromiseMultiValue(object, observableProperty, expectedValues) {
                 }
                 return false;
             },
-            () => setTimeout(resolve));
+            () => setTimeout(resolve)
+        );
     });
 }
 

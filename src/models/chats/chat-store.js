@@ -47,9 +47,7 @@ class ChatStore {
     }
 
     // todo: not sure this little event emitter experiment should live
-    EVENT_TYPES = {
-        messagesReceived: 'messagesReceived'
-    };
+    EVENT_TYPES = { messagesReceived: 'messagesReceived' };
     /**
      * Currently emits just one event - 'messagesReceived' (1 sec. throttled)
      * @member {EventEmitter}
@@ -377,8 +375,7 @@ class ChatStore {
                             if (k++ >= rest) continue;
                             this.addChat(id);
                         }
-                    }))
-            );
+                    })));
         }
         // 5. check if chats were created while we were loading chat list
         // unlikely, but possible

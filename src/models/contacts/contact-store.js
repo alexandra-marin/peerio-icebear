@@ -405,9 +405,7 @@ class ContactStore {
     loadContactsFromTOFUKegs() {
         socket.send('/auth/kegs/db/list-ext', {
             kegDbId: 'SELF',
-            options: {
-                type: 'tofu'
-            }
+            options: { type: 'tofu' }
         }).then(res => {
             if (!res.kegs || !res.kegs.length) return;
             res.kegs.forEach(keg => this.getContact(keg.props.username));

@@ -224,8 +224,10 @@ class SocketClient {
                 return s.call(this, msg);
             };
             setInterval(() => {
-                console.log('SENT:', util.formatBytes(self.bytesSent),
-                    'RECEIVED:', util.formatBytes(self.bytesReceived));
+                console.log(
+                    'SENT:', util.formatBytes(self.bytesSent),
+                    'RECEIVED:', util.formatBytes(self.bytesReceived)
+                );
             }, config.debug.trafficReportInterval);
         }
         // </DEBUG>

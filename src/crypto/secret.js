@@ -128,6 +128,4 @@ function decryptString(cipher, key) {
     return util.bytesToStr(decrypt(cipher, key));
 }
 
-module.exports = {
-    encrypt, encryptString, decrypt, decryptString, NONCE_SIZE
-};
+module.exports = { encrypt, encryptString, decrypt, decryptString, NONCE_SIZE };

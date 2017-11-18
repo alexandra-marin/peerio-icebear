@@ -25,11 +25,7 @@ if (typeof global !== 'undefined') {
 }
 
 // Enables all warnings except forgotten return statements.
-Promise.config({
-    warnings: {
-        wForgottenReturn: false
-    }
-});
+Promise.config({ warnings: { wForgottenReturn: false } });
 
 // @ts-ignore
 // extending native classes

@@ -163,7 +163,7 @@ class MailStore {
         this.updating = true;
         retryUntilSuccess(() => this._getMails(), 'Updating mail list')
             .then(action(resp => {
-                const kegs = resp.kegs;
+                const { kegs } = resp;
                 for (const keg of kegs) {
                     if (keg.collectionVersion > this.knownUpdateId) {
                         this.knownUpdateId = keg.collectionVersion;

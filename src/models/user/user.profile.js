@@ -6,7 +6,7 @@ const tracker = require('../update-tracker');
 const { retryUntilSuccess } = require('../../helpers/retry.js');
 const warnings = require('../warnings');
 const socket = require('../../network/socket');
-const validators = require('../../helpers/validation/field-validation').validators;
+const { validators } = require('../../helpers/validation/field-validation');
 const contactStore = require('../contacts/contact-store');
 
 //

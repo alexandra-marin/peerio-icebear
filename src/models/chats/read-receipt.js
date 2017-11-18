@@ -28,9 +28,7 @@ class ReadReceipt extends Keg {
     }
 
     serializeKegPayload() {
-        return {
-            chatPosition: +this.chatPosition
-        };
+        return { chatPosition: +this.chatPosition };
     }
 
     deserializeKegPayload(payload) {

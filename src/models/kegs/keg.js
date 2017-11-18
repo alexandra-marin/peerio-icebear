@@ -337,9 +337,10 @@ class Keg {
             .then(keg => {
                 const ret = this.loadFromKeg(keg);
                 if (ret === false) {
-                    return Promise.reject(new Error(
+                    const err = new Error(
                         `Failed to hydrate keg id ${this.id} with server data from db ${this.db ? this.db.id : 'null'}`
-                    ));
+                    );
+                    return Promise.reject(err);
                 }
                 return ret;
             }).finally(this.resetLoadingState);
@@ -390,7 +391,7 @@ class Keg {
                 this.lastLoadHadError = true;
                 return false;
             }
-            let payload = keg.payload;
+            let { payload } = keg;
             let payloadKey = null;
 
             if (!this.plaintext) {
@@ -477,7 +478,7 @@ class Keg {
      */
     verifyKegSignature(payload, props) {
         if (!payload || this.lastLoadHadError) return;
-        let signature = props.signature;
+        let { signature } = props;
         if (!signature) {
             this.signatureError = true;
             return;

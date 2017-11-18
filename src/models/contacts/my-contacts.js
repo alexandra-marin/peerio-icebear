@@ -14,9 +14,7 @@ class MyContacts extends SyncedKeg {
     }
 
     serializeKegPayload() {
-        return {
-            contacts: this.contacts
-        };
+        return { contacts: this.contacts };
     }
 
     deserializeKegPayload(payload) {

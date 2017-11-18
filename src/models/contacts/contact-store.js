@@ -411,6 +411,8 @@ class ContactStore {
         }).then(res => {
             if (!res.kegs || !res.kegs.length) return;
             res.kegs.forEach(keg => this.getContact(keg.props.username));
+        }).catch(err => {
+            console.error('Failed to load contacts from tofu kegs', err);
         });
     }
     /**

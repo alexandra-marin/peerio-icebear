@@ -1,4 +1,5 @@
-const usernameChars = '0123456789abcdefghijklmnopqrstuvwxyz';
+
+const usernameChars = '0123456789abcdefghijklmnopqrstuvwxyz_';
 const getRandomUsername = () => {
     let username = '';
     for (let i = 0; i < 30; i++) {

@@ -16,8 +16,8 @@ class Ghost extends Keg {
     @observable sending = false;
     @observable sendError = false;
     @observable subject = '';
-    @observable recipients = observable.shallowArray([]);
-    @observable files = observable.shallowArray([]);
+    @observable.shallow recipients = [];
+    @observable.shallow files = [];
     @observable passphrase = '';
     @observable timestamp = Date.now();
     @observable sent = false;

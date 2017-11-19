@@ -76,7 +76,7 @@ class Chat {
      * @instance
      * @public
      */
-    @observable messages = observable.shallowArray([]);
+    @observable.shallow messages = [];
     /**
      * Render these messages at the bottom of the chat, they don't have Id yet, you can use tempId.
      * @member {ObservableArray<Message>} limboMessages
@@ -84,7 +84,7 @@ class Chat {
      * @instance
      * @public
      */
-    @observable limboMessages = observable.shallowArray([]);
+    @observable.shallow limboMessages = [];
 
     // performance helper, to lookup messages by id and avoid duplicates
     _messageMap = {};
@@ -268,7 +268,7 @@ class Chat {
      * @instance
      * @public
      */
-    @observable uploadQueue = observable.shallowArray([]);
+    @observable.shallow uploadQueue = [];
     /**
      * Unread message count in this chat.
      * @member {number} unreadCount

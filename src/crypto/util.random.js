@@ -139,6 +139,20 @@ function getRandomUserSpecificIdHex(username) {
     return convert.bytesToHex(getRandomUserSpecificIdBytes(username));
 }
 
+/**
+ * Generates hex string of 10-byte unique random id suitable for personal use (one keg db).
+ * @returns {string} 10 bytes id in hex encoding
+ * @memberof crypto/util
+ * @public
+ */
+function getRandomShortIdHex() {
+    const id = new Uint8Array(10);
+    // we take last 4 bytes of current date timestamp
+    id.set(convert.numberToByteArray(Date.now() >>> 32));
+    // and 6 random bytes
+    id.set(getRandomBytes(6), 4);
+    return convert.bytesToHex(id);
+}
 
 module.exports = {
     getRandomBytes,
@@ -146,5 +160,6 @@ module.exports = {
     getRandomNonce,
     getRandomUserSpecificIdBytes,
     getRandomUserSpecificIdB64,
-    getRandomUserSpecificIdHex
+    getRandomUserSpecificIdHex,
+    getRandomShortIdHex
 };

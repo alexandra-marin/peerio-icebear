@@ -8,7 +8,7 @@ const tracker = require('../update-tracker');
 const warnings = require('../warnings');
 
 class GhostStore {
-    @observable ghosts = observable.shallowArray([]); // sorted array
+    @observable.shallow ghosts = []; // sorted array
     @observable ghostMap = observable.shallowMap({}); // ghost by ghostId
     @observable loading = false;
     @observable loaded = false;

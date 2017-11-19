@@ -155,7 +155,7 @@ class Mail extends Keg {
                 // Save an outgoing copy, changing ids.
                 this.sentId = this.messageId;
                 this.messageId = this.cryptoUtil.getRandomUserSpecificIdB64(this.sender);
-                return retryUntilSuccess(() => this.saveToServer(true));
+                return retryUntilSuccess(() => this.saveToServer());
             })
             .finally(action(() => {
                 this.sending = false;

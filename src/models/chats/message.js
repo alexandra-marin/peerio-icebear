@@ -30,6 +30,9 @@ const TaskQueue = require('../../helpers/task-queue');
 class Message extends Keg {
     constructor(db) {
         super(null, 'message', db);
+        // format 1 adds richText property to payload.
+        // this property will be be overwritten when keg is dehydrated from older format data,
+        this.format = 1;
     }
 
     static unfurlQueue = new TaskQueue(5);

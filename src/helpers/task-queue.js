@@ -15,7 +15,7 @@ class TaskQueue {
      * @instance
      * @public
      */
-    @observable tasks = observable.shallowArray([]);
+    @observable.shallow tasks = [];
     /**
      * Amount of currently running tasks
      * @member {Observable<number>} runningTasks

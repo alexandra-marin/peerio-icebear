@@ -37,8 +37,8 @@ jobs:
           name: test
           command: npm test
       - store_artifacts:
-          path: coverage
-          prefix: coverage
+          path: test-results
+          prefix: test-results
   deploy:
     docker:
       - image: circleci/node:8.6

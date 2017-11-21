@@ -7,7 +7,7 @@
 const nacl = require('tweetnacl');
 
 let sign = nacl.sign.detached;
-let verify = nacl.sign.detached.verify;
+let { verify } = nacl.sign.detached;
 
 /**
  * Signs the message with secret key and returns detached signature

@@ -13,6 +13,7 @@ const clientApp = require('../client-app');
 const TaskQueue = require('../../helpers/task-queue');
 const { setFileStore } = require('../../helpers/di-file-store');
 const createMap = require('../../helpers/dynamic-array-map');
+const FileStoreFolders = require('./file-store.folders');
 
 /**
  * File store.
@@ -24,6 +25,7 @@ class FileStore {
         const m = createMap(this.files, 'fileId');
         this.fileMap = m.map;
         this.fileMapObservable = m.observableMap;
+        this.folders = new FileStoreFolders(this);
 
         tracker.onKegTypeUpdated('SELF', 'file', () => {
             console.log('Files update event received');
@@ -37,7 +39,7 @@ class FileStore {
      * @instance
      * @public
      */
-    @observable files = observable.shallowArray([]);
+    @observable.shallow files = [];
 
     /**
      * Subset of files not currently hidden by any applied filters
@@ -46,6 +48,16 @@ class FileStore {
      */
     @computed get visibleFiles() {
         return this.files.filter(f => f.show);
+    }
+
+    /**
+     * Subset of files and folders not currently hidden by any applied filters
+     * @readonly
+     * @memberof FileStore
+     */
+    @computed get visibleFilesAndFolders() {
+        const folders = this.folders.searchAllFoldersByName(this.currentFilter);
+        return folders.concat(this.files.filter(f => f.show));
     }
 
     /**
@@ -303,6 +315,7 @@ class FileStore {
         if (this.loading || this.loaded) return;
         console.time('loadAllFiles');
         this.loading = true;
+
         retryUntilSuccess(() => this._getFiles(), 'Initial file list loading')
             .then(action(kegs => {
                 for (const keg of kegs.kegs) {
@@ -348,11 +361,13 @@ class FileStore {
                         }
                     }
                 });
-                reaction(() => this.unreadFiles === 0 || !clientApp.isInFilesView || !clientApp.isFocused,
+                reaction(
+                    () => this.unreadFiles === 0 || !clientApp.isInFilesView || !clientApp.isFocused,
                     (dontReport) => {
                         if (dontReport) return;
                         tracker.seenThis('SELF', 'file', this.knownUpdateId);
-                    }, { fireImmediately: true, delay: 700 });
+                    }, { fireImmediately: true, delay: 700 }
+                );
                 setTimeout(this.updateFiles);
                 console.timeEnd('loadAllFiles');
             }));
@@ -368,7 +383,7 @@ class FileStore {
         let dirty = false;
         retryUntilSuccess(() => this._getFiles(), 'Updating file list')
             .then(action(resp => {
-                const kegs = resp.kegs;
+                const { kegs } = resp;
                 for (const keg of kegs) {
                     if (keg.collectionVersion > this.knownUpdateId) {
                         this.knownUpdateId = keg.collectionVersion;
@@ -423,8 +438,9 @@ class FileStore {
      * @param {string} [fileName] - if u want to override name in filePath
      * @public
      */
-    upload = (filePath, fileName) => {
+    upload = (filePath, fileName, folderId) => {
         const keg = new File(User.current.kegDb);
+        keg.folderId = folderId;
         config.FileStream.getStat(filePath).then(stat => {
             if (!User.current.canUploadFileSize(stat.size)) {
                 keg.deleted = true;

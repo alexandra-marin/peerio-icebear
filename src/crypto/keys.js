@@ -3,7 +3,7 @@
  * @module crypto/keys
  * @public
  */
-const getScrypt = require('./scrypt-proxy').getScrypt;
+const { getScrypt } = require('./scrypt-proxy');
 const BLAKE2s = require('blake2s-js');
 const nacl = require('tweetnacl');
 const util = require('./util');

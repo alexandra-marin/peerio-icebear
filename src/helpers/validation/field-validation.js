@@ -43,8 +43,9 @@ function addValidation(store, fName, validatorOrArray, positionInForm) {
     store.validatedFields = store.validatedFields || [];
     store.validatedFields.push(fName);
 
-    store.isValid = store.isValid || (() => store.validatedFields.reduce(
-        (acc, field) => acc && !!store[`${field}Valid`], true));
+    store.isValid = store.isValid || (
+        () => store.validatedFields.reduce((acc, field) => acc && !!store[`${field}Valid`], true)
+    );
 
     store.resetValidationState = store.resetValidationState || (
         () => store.validatedFields.forEach(field => {
@@ -111,7 +112,7 @@ function addValidation(store, fName, validatorOrArray, positionInForm) {
             await Promise.all(validationPromises);
         } catch (error) {
             valid = false;
-            message = error.message;
+            ({ message } = error);
         }
 
         // if the state changed during evaluation, abort

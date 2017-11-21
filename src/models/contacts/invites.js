@@ -29,11 +29,9 @@ class Invites extends SyncedKeg {
 
     deserializeKegPayload(payload) {
         this.issued = _.uniqWith(payload.issued, this._compareInvites);
-        this.received = _.uniq(
-            Object.keys(payload.received)
-                .reduce((acc, email) => acc.concat(payload.received[email]), [])
-                .map(item => item.username)
-        );
+        this.received = _.uniq(Object.keys(payload.received)
+            .reduce((acc, email) => acc.concat(payload.received[email]), [])
+            .map(item => item.username));
     }
 
     _compareInvites(a, b) {

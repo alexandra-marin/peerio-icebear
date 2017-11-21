@@ -33,6 +33,10 @@ class TaskPacer {
         }
     }
 
+    logError(err) {
+        console.error(err);
+    }
+
     taskRunner = () => {
         if (!this.queue.length) {
             this.taskRunnerIsUp = false;
@@ -53,9 +57,12 @@ class TaskPacer {
         }
         const task = this.queue.shift();
         try {
-            task();
+            const res = task();
+            if (res instanceof Promise) {
+                res.catch(this.logError);
+            }
         } catch (err) {
-            console.error(err);
+            this.logError(err);
         }
         if (this.queue.length) setTimeout(this.taskRunner);
         else this.taskRunnerIsUp = false;

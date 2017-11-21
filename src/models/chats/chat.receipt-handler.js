@@ -120,7 +120,7 @@ class ChatReceiptHandler {
             },
             filter
         }).then(res => {
-            const kegs = res.kegs;
+            const { kegs } = res;
             if (!kegs || !kegs.length) return;
             for (let i = 0; i < kegs.length; i++) {
                 if (kegs[i].collectionVersion > this.downloadedCollectionVersion) {

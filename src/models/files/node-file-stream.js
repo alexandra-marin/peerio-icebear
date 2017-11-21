@@ -47,7 +47,8 @@ class NodeFileStream extends FileStreamAbstract {
     readInternal(size) {
         return new Promise((resolve, reject) => {
             const buffer = new Uint8Array(size);
-            fs.read(this.fileDescriptor, Buffer.from(buffer.buffer), 0, size, this.nextReadPos,
+            fs.read(
+                this.fileDescriptor, Buffer.from(buffer.buffer), 0, size, this.nextReadPos,
                 (err, bytesRead) => {
                     if (this.checkForError(err, reject)) return;
                     if (this.nextReadPos != null) this.nextReadPos += bytesRead;
@@ -56,17 +57,20 @@ class NodeFileStream extends FileStreamAbstract {
                     } else {
                         resolve(buffer);
                     }
-                });
+                }
+            );
         });
     }
 
     writeInternal(buffer) {
         return new Promise((resolve, reject) => {
-            fs.write(this.fileDescriptor, Buffer.from(buffer), 0, buffer.length, null,
+            fs.write(
+                this.fileDescriptor, Buffer.from(buffer), 0, buffer.length, null,
                 err => {
                     if (this.checkForError(err, reject)) return;
                     resolve(buffer);
-                });
+                }
+            );
         });
     }
 

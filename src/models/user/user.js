@@ -268,8 +268,9 @@ class User {
         if (this.quota == null || !this.quota.resultingQuotas
             || !this.quota.resultingQuotas.file || !this.quota.resultingQuotas.file.length) return 0;
 
-        const found = this.quota.resultingQuotas.file.find(
-            item => item.period === 'total' && item.metric === 'storage');
+        const found = this.quota.resultingQuotas.file
+            .find(item => item.period === 'total' && item.metric === 'storage');
+
         if (!found) return 0;
         if (found.limit == null) return Number.MAX_SAFE_INTEGER;
         return found.limit;
@@ -327,9 +328,8 @@ class User {
             || !this.quota.resultingQuotas.upload
             || !this.quota.resultingQuotas.upload.length) return Number.MAX_SAFE_INTEGER;
 
-        const found = this.quota.resultingQuotas.upload.find(
-            item => item.period === 'total' && item.metric === 'maxSize'
-        );
+        const found = this.quota.resultingQuotas.upload
+            .find(item => item.period === 'total' && item.metric === 'maxSize');
 
         if (!found || found.limit == null) return Number.MAX_SAFE_INTEGER;
         return found.limit;
@@ -390,8 +390,9 @@ class User {
         if (this.quota == null || !this.quota.resultingQuotas
             || !this.quota.resultingQuotas.channel || !this.quota.resultingQuotas.channel.length) return 0;
 
-        const found = this.quota.resultingQuotas.channel.find(
-            item => item.period === 'total' && item.metric === 'participate');
+        const found = this.quota.resultingQuotas.channel
+            .find(item => item.period === 'total' && item.metric === 'participate');
+
         if (!found) return 0;
         if (found.limit == null) return Number.MAX_SAFE_INTEGER;
         return found.limit;
@@ -408,9 +409,9 @@ class User {
         if (this.quota == null || !this.quota.quotasLeft
             || !this.quota.quotasLeft.channel || !this.quota.quotasLeft.channel.length) return 0;
 
-        const found = this.quota.quotasLeft.channel.find(
-            item => item.period === 'total' && item.metric === 'participate'
-        );
+        const found = this.quota.quotasLeft.channel
+            .find(item => item.period === 'total' && item.metric === 'participate');
+
         if (!found) return 0;
         if (found.limit == null) return Number.MAX_SAFE_INTEGER;
         return found.limit;
@@ -493,17 +494,15 @@ class User {
             confirmedEmailBonus,
             userInviteOnboardingBonus
         } = User.current.quota.quotas;
-        return tryToGet(
-            () => [
-                createRoomOnboardingBonus,
-                avatarOnboardingBonus,
-                twofaOnboardingBonus,
-                installsOnboardingBonus,
-                backupOnboardingBonus,
-                confirmedEmailBonus,
-                userInviteOnboardingBonus
-            ].reduce((sum, value) => (sum + Math.ceil(value.bonus.file.limit / 1024 / 1024)), 0), 0
-        );
+        return tryToGet(() => [
+            createRoomOnboardingBonus,
+            avatarOnboardingBonus,
+            twofaOnboardingBonus,
+            installsOnboardingBonus,
+            backupOnboardingBonus,
+            confirmedEmailBonus,
+            userInviteOnboardingBonus
+        ].reduce((sum, value) => (sum + Math.ceil(value.bonus.file.limit / 1024 / 1024)), 0), 0);
     }
 
     /**
@@ -585,8 +584,10 @@ class User {
             .then(() => this._authenticateConnection())
             .then(() => {
                 console.log('Creating boot keg.');
-                return this.kegDb.createBootKeg(this.bootKey, this.signKeys,
-                    this.encryptionKeys, this.kegKey);
+                return this.kegDb.createBootKeg(
+                    this.bootKey, this.signKeys,
+                    this.encryptionKeys, this.kegKey
+                );
             })
             .then(() => this._postAuth())
             .tapCatch(socket.reset);

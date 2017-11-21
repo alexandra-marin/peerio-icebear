@@ -30,6 +30,9 @@ const TaskQueue = require('../../helpers/task-queue');
 class Message extends Keg {
     constructor(db) {
         super(null, 'message', db);
+        // format 1 adds richText property to payload.
+        // this property will be be overwritten when keg is dehydrated from older format data,
+        this.format = 1;
     }
 
     static unfurlQueue = new TaskQueue(5);
@@ -191,9 +194,7 @@ class Message extends Keg {
      * @protected
      */
     setChatCreationFact() {
-        this.systemData = {
-            action: 'create'
-        };
+        this.systemData = { action: 'create' };
     }
     /**
      * Creates system metadata indicating admin sending user invitation to channel.
@@ -211,18 +212,14 @@ class Message extends Keg {
      * @protected
      */
     setChannelJoinFact() {
-        this.systemData = {
-            action: 'join'
-        };
+        this.systemData = { action: 'join' };
     }
     /**
      * Creates system metadata indicating user leaving channel.
      * @protected
      */
     setChannelLeaveFact() {
-        this.systemData = {
-            action: 'leave'
-        };
+        this.systemData = { action: 'leave' };
     }
     /**
      * Creates system metadata indicating admin removing user from a channel.

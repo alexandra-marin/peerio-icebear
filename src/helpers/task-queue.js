@@ -15,7 +15,7 @@ class TaskQueue {
      * @instance
      * @public
      */
-    @observable tasks = observable.shallowArray([]);
+    @observable.shallow tasks = [];
     /**
      * Amount of currently running tasks
      * @member {Observable<number>} runningTasks
@@ -66,7 +66,7 @@ class TaskQueue {
                     if (onSuccess) onSuccess(...finishArgs);
                 },
                 onError: (...errArgs) => {
-                    reject(...errArgs);
+                    reject(...errArgs); // eslint-disable-line prefer-promise-reject-errors
                     if (onError) onError(...errArgs);
                 }
             });

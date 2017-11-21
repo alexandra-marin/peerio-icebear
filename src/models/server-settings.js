@@ -58,8 +58,10 @@ class ServerSettings {
                     this.acceptableClientVersions = res.acceptsClientVersions;
                     this.tag = res.tag;
                     this.maintenanceWindow = res.maintenance;
-                    console.log('Server settings retrieved.', this.tag,
-                        this.avatarServer, this.acceptableClientVersions, this.maintenanceWindow);
+                    console.log(
+                        'Server settings retrieved.', this.tag,
+                        this.avatarServer, this.acceptableClientVersions, this.maintenanceWindow
+                    );
                 });
         }, 'Server Settings Load');
     }

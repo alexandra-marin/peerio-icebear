@@ -89,15 +89,15 @@ module.exports = function mixUserAuthModule() {
 
     this._authenticateAuthToken = data => {
         console.log('Sending auth token back.');
-        const decrypted = publicCrypto.decryptCompat(data.token, data.nonce,
-            data.ephemeralServerPK, this.authKeys.secretKey);
+        const decrypted = publicCrypto.decryptCompat(
+            data.token, data.nonce,
+            data.ephemeralServerPK, this.authKeys.secretKey
+        );
         // 65 84 = 'AT' (access token)
         if (decrypted[0] !== 65 || decrypted[1] !== 84 || decrypted.length !== 32) {
             return Promise.reject(new Error('Auth token plaintext is of invalid format.'));
         }
-        return socket.send('/noauth/authenticate', {
-            decryptedAuthToken: decrypted.buffer
-        })
+        return socket.send('/noauth/authenticate', { decryptedAuthToken: decrypted.buffer })
             .then(resp => {
                 return TinyDb.system.setValue(`${this.username}:deviceToken`, cryptoUtil.bytesToB64(resp.deviceToken));
             });
@@ -163,14 +163,17 @@ module.exports = function mixUserAuthModule() {
      * @public
      */
     this.serializeAuthData = () => {
-        const username = this.username;
         const paddedPassphrase = cryptoUtil.padPassphrase(this.passphrase);
         const authSalt = cryptoUtil.bytesToB64(this.authSalt);
         const bootKey = cryptoUtil.bytesToB64(this.bootKey);
         const secretKey = cryptoUtil.bytesToB64(this.authKeys.secretKey);
         const publicKey = cryptoUtil.bytesToB64(this.authKeys.publicKey);
         const data = JSON.stringify({
-            username, paddedPassphrase, authSalt, bootKey, authKeys: { secretKey, publicKey }
+            username: this.username,
+            paddedPassphrase,
+            authSalt,
+            bootKey,
+            authKeys: { secretKey, publicKey }
         });
         return data;
     };

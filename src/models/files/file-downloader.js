@@ -3,7 +3,7 @@ const secret = require('../../crypto/secret');
 const config = require('../../config');
 const FileProcessor = require('./file-processor');
 
-const CHUNK_OVERHEAD = config.CHUNK_OVERHEAD;
+const { CHUNK_OVERHEAD } = config;
 
 /**
  * Manages file download process.
@@ -94,8 +94,10 @@ class FileDownloader extends FileProcessor {
                 }
                 this.downloadPos += dlChunk.byteLength;
                 for (let i = 0; i < dlChunk.byteLength; i += this.chunkSizeWithOverhead) {
-                    const chunk = new Uint8Array(dlChunk, i,
-                        Math.min(this.chunkSizeWithOverhead, dlChunk.byteLength - i));
+                    const chunk = new Uint8Array(
+                        dlChunk, i,
+                        Math.min(this.chunkSizeWithOverhead, dlChunk.byteLength - i)
+                    );
                     this.decryptQueue.push(chunk);
                 }
                 if (this.downloadPos >= this.file.sizeWithOverhead) {

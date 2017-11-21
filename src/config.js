@@ -97,22 +97,22 @@ class UploadConfig {
 const config = new class {
     sdkVersion = _sdkVersion;
 
-    debug = {
-        /**
-         * Traffic stat summary will be logged with this interval (ms.)
-         * @member {number} debug.trafficReportInterval
-         * @memberof config
-         * @public
-         */
-        trafficReportInterval: 5 * 60 * 1000,
-        /**
-         * All socket messages will be logged if set to `true` before socket is started.
-         * @member {boolean} debug.socketLogEnabled
-         * @memberof config
-         * @public
-         */
-        socketLogEnabled: false
-    };
+    // debug = {
+    //     /**
+    //      * Traffic stat summary will be logged with this interval (ms.)
+    //      * @member {number} debug.trafficReportInterval
+    //      * @memberof config
+    //      * @public
+    //      */
+    //     trafficReportInterval: 5 * 60 * 1000,
+    //     /**
+    //      * All socket messages will be logged if set to `true` before socket is started.
+    //      * @member {boolean} debug.socketLogEnabled
+    //      * @memberof config
+    //      * @public
+    //      */
+    //     socketLogEnabled: false
+    // };
 
     /**
      * App server connection url. (wss://)

@@ -62,9 +62,7 @@ class Tofu extends Keg {
     }
 
     serializeProps() {
-        return {
-            username: this.username
-        };
+        return { username: this.username };
     }
 
     deserializeProps(props) {
@@ -101,9 +99,7 @@ class Tofu extends Keg {
                 type: 'tofu',
                 reverse: false
             },
-            filter: {
-                username
-            }
+            filter: { username }
         }).then(res => {
             if (!res.kegs || !res.kegs.length) return null;
             const keg = new Tofu(getUser().kegDb);

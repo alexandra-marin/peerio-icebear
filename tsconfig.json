@@ -8,8 +8,5 @@
       "dom",
       "esnext"
     ]
-  },
-  "files": [
-    "./src/index.js"
-  ]
+  }
 }

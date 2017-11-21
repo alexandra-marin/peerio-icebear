@@ -2,6 +2,93 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.2.4"></a>
+## [3.2.4](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.2.3...v3.2.4) (2017-11-20)
+
+
+
+<a name="3.2.3"></a>
+## [3.2.3](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.2.2...v3.2.3) (2017-11-19)
+
+
+
+<a name="3.2.2"></a>
+## [3.2.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.2.1...v3.2.2) (2017-11-19)
+
+
+
+<a name="3.2.1"></a>
+## [3.2.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.2.0...v3.2.1) (2017-11-19)
+
+
+
+<a name="3.2.0"></a>
+# [3.2.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.1.1...v3.2.0) (2017-11-19)
+
+
+### Bug Fixes
+
+* account delete ([e054218](https://github.com/PeerioTechnologies/peerio-icebear/commit/e054218))
+* add try catch to json parse result ([77805fa](https://github.com/PeerioTechnologies/peerio-icebear/commit/77805fa))
+* change to right name in before hooks ([7d0b17a](https://github.com/PeerioTechnologies/peerio-icebear/commit/7d0b17a))
+* comment out unused class ([08496d8](https://github.com/PeerioTechnologies/peerio-icebear/commit/08496d8))
+* create new user scenario ([a292a62](https://github.com/PeerioTechnologies/peerio-icebear/commit/a292a62))
+* emails for contacts ([ce2dcc5](https://github.com/PeerioTechnologies/peerio-icebear/commit/ce2dcc5))
+* failing tests ([27f7d12](https://github.com/PeerioTechnologies/peerio-icebear/commit/27f7d12))
+* favorite test ([ea3967b](https://github.com/PeerioTechnologies/peerio-icebear/commit/ea3967b))
+* mark wip ([0f94a12](https://github.com/PeerioTechnologies/peerio-icebear/commit/0f94a12))
+* mark WIP tests and update test run command ([c3b2503](https://github.com/PeerioTechnologies/peerio-icebear/commit/c3b2503))
+* profile tests updated ([0c3be63](https://github.com/PeerioTechnologies/peerio-icebear/commit/0c3be63))
+* proper call to before hook ([08bb12d](https://github.com/PeerioTechnologies/peerio-icebear/commit/08bb12d))
+* put back in required file ([5b8f2b1](https://github.com/PeerioTechnologies/peerio-icebear/commit/5b8f2b1))
+* remove downloaded file ([1716ff5](https://github.com/PeerioTechnologies/peerio-icebear/commit/1716ff5))
+* remove some wip ([9430964](https://github.com/PeerioTechnologies/peerio-icebear/commit/9430964))
+* remove unused timeout ([d4c15bb](https://github.com/PeerioTechnologies/peerio-icebear/commit/d4c15bb))
+* replace avatar test ([deefef4](https://github.com/PeerioTechnologies/peerio-icebear/commit/deefef4))
+* return promise ([bf5d45d](https://github.com/PeerioTechnologies/peerio-icebear/commit/bf5d45d))
+* storage ([5e66c02](https://github.com/PeerioTechnologies/peerio-icebear/commit/5e66c02))
+* tags instead of tag ([8df59d7](https://github.com/PeerioTechnologies/peerio-icebear/commit/8df59d7))
+* typo ([8069fdc](https://github.com/PeerioTechnologies/peerio-icebear/commit/8069fdc))
+* typo ([86cd443](https://github.com/PeerioTechnologies/peerio-icebear/commit/86cd443))
+* update step definitions to cucumber 3 ([a62bd6a](https://github.com/PeerioTechnologies/peerio-icebear/commit/a62bd6a))
+
+
+### Features
+
+* accept and reject room invites ([ed112b9](https://github.com/PeerioTechnologies/peerio-icebear/commit/ed112b9))
+* add formatter for cucumber 3 ([13b131b](https://github.com/PeerioTechnologies/peerio-icebear/commit/13b131b))
+* add test for sharing file in chat ([79855d6](https://github.com/PeerioTechnologies/peerio-icebear/commit/79855d6))
+* bring to front chat ui ([0955628](https://github.com/PeerioTechnologies/peerio-icebear/commit/0955628))
+* favorite, remove extra ([4833f44](https://github.com/PeerioTechnologies/peerio-icebear/commit/4833f44))
+* fix receipts ([becf6eb](https://github.com/PeerioTechnologies/peerio-icebear/commit/becf6eb))
+* leave room ([baa5ae7](https://github.com/PeerioTechnologies/peerio-icebear/commit/baa5ae7))
+* room limit, room members ([e676163](https://github.com/PeerioTechnologies/peerio-icebear/commit/e676163))
+* set default timeout for tests to 10s ([08605c1](https://github.com/PeerioTechnologies/peerio-icebear/commit/08605c1))
+* use otherUser helper in DMs ([9e31d33](https://github.com/PeerioTechnologies/peerio-icebear/commit/9e31d33))
+* use otherUser helper in storage tests ([464d4b4](https://github.com/PeerioTechnologies/peerio-icebear/commit/464d4b4))
+
+
+
+<a name="3.1.1"></a>
+## [3.1.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.1.0...v3.1.1) (2017-11-14)
+
+
+### Bug Fixes
+
+* shared kegs re-encryption is safe and secure now ([965d1ec](https://github.com/PeerioTechnologies/peerio-icebear/commit/965d1ec))
+
+
+
+<a name="3.1.0"></a>
+# [3.1.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.0.10...v3.1.0) (2017-11-14)
+
+
+### Features
+
+* prombservable variation to expect multiple values ([2a776a6](https://github.com/PeerioTechnologies/peerio-icebear/commit/2a776a6))
+
+
+
 <a name="3.0.10"></a>
 ## [3.0.10](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.0.9...v3.0.10) (2017-11-13)
 

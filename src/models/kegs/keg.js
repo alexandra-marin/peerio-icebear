@@ -1,9 +1,10 @@
 const socket = require('../../network/socket');
 const { secret, sign, cryptoUtil } = require('../../crypto');
 const { AntiTamperError, ServerError } = require('../../errors');
-const { observable } = require('mobx');
+const { observable, action } = require('mobx');
 const { getContactStore } = require('../../helpers/di-contact-store');
 const { getUser } = require('../../helpers/di-current-user');
+const { asPromise, asPromiseMultiValue } = require('../../helpers/prombservable');
 
 let temporaryKegId = 0;
 function getTemporaryKegId() {
@@ -198,17 +199,19 @@ class Keg {
 
     /**
      * Saves keg to server, creates keg (reserves id) first if needed
-     * @param {boolean=} cleanShareData - removes shared/sent keg metadata that is not needed after keg is re-encrypted.
      * @returns {Promise}
      * @public
      */
-    saveToServer(cleanShareData) {
+    saveToServer() {
         if (this.loading) {
             console.warn(`Keg ${this.id} ${this.type} is trying to save while already loading.`);
         }
-        if (this.saving) return Promise.reject(new Error('Can not save keg while it is already saving.'));
+        if (this.saving) {
+            return asPromise(this, 'saving', false)
+                .then(() => this.saveToServer());
+        }
         this.saving = true;
-        if (this.id) return this.internalSave(cleanShareData).finally(this.resetSavingState);
+        if (this.id) return this.internalSave().finally(this.resetSavingState);
 
         return socket.send('/auth/kegs/create', {
             kegDbId: this.db.id,
@@ -217,7 +220,7 @@ class Keg {
             this.id = resp.kegId;
             this.version = resp.version;
             this.collectionVersion = resp.collectionVersion;
-            return this.internalSave(cleanShareData);
+            return this.internalSave();
         }).finally(this.resetSavingState);
     }
 
@@ -228,12 +231,21 @@ class Keg {
      * @returns {Promise}
      * @private
      */
-    internalSave(cleanShareData) {
+    internalSave() {
         let payload, props, lastVersion, signingPromise = Promise.resolve(true);
         try {
             payload = this.serializeKegPayload();
             props = this.serializeProps();
-            if (cleanShareData) {
+            // existence of these properties means this keg was shared with us and we haven't re-encrypted it yet
+            if (this.pendingReEncryption) {
+                // we don't want to save (re-encrypt and lose original sharing data) before we validate the keg
+                if (this.validatingKeg) {
+                    return asPromiseMultiValue(this, 'sharedKegError', [true, false])
+                        .then(() => this.internalSave());
+                }
+                if (this.sharedKegError || this.signatureError) {
+                    throw new Error('Not allowed to save a keg with sharedKegError or signatureError', this.id);
+                }
                 props.sharedKegSenderPK = null;
                 props.sharedKegRecipientPK = null;
                 props.encryptedPayloadKey = null;
@@ -279,6 +291,7 @@ class Keg {
                 format: this.format
             }
         })).then(resp => {
+            this.pendingReEncryption = false;
             this.dirty = false;
             this.collectionVersion = resp.collectionVersion;
             // in case this keg was already updated through other code paths we change version in a smart way
@@ -303,8 +316,12 @@ class Keg {
      * @public
      */
     load() {
-        if (this.saving) return Promise.reject(new Error('Can not load keg while it is saving.'));
-        if (this.loading) return Promise.reject(new Error('Can not load keg while it is already loading.'));
+        if (this.saving) {
+            return asPromise(this, 'saving', false).then(() => this.load());
+        }
+        if (this.loading) {
+            return asPromise(this, 'loading', false).then(() => this.load());
+        }
         this.loading = true;
         return socket.send('/auth/kegs/get', {
             kegDbId: this.db.id,
@@ -326,9 +343,10 @@ class Keg {
             .then(keg => {
                 const ret = this.loadFromKeg(keg);
                 if (ret === false) {
-                    return Promise.reject(new Error(
+                    const err = new Error(
                         `Failed to hydrate keg id ${this.id} with server data from db ${this.db ? this.db.id : 'null'}`
-                    ));
+                    );
+                    return Promise.reject(err);
                 }
                 return ret;
             }).finally(this.resetLoadingState);
@@ -379,7 +397,7 @@ class Keg {
                 this.lastLoadHadError = true;
                 return false;
             }
-            let payload = keg.payload;
+            let { payload } = keg;
             let payloadKey = null;
 
             if (!this.plaintext) {
@@ -389,13 +407,13 @@ class Keg {
             if (this.forceSign || (!this.plaintext && this.db.id !== 'SELF')) {
                 this.verifyKegSignature(payload, keg.props);
             }
-            const pendingReEncryption = !!(keg.props.sharedBy && keg.props.sharedKegSenderPK);
+            this.pendingReEncryption = !!(keg.props.sharedBy && keg.props.sharedKegSenderPK);
             // is this keg shared with us and needs re-encryption?
             // sharedKegSenderPK is used here to detect keg that still needs re-encryption
             // the property will get deleted after re-encryption
             // we can't introduce additional flag because props are not being deleted on keg delete
             // to allow re-sharing of the same file keg
-            if (!this.plaintext && pendingReEncryption) {
+            if (!this.plaintext && this.pendingReEncryption) {
                 // async call, changes state of the keg in case of issues
                 this.validateAndReEncryptSharedKeg(keg.props);
                 // todo: when we'll have key change, this should use secret key corresponding to sharedKegRecipientPK
@@ -419,7 +437,7 @@ class Keg {
                 payload = secret.decryptString(payload, decryptionKey);
             }
             payload = JSON.parse(payload);
-            if (!this.ignoreAntiTamperProtection && (this.forceSign || !(this.plaintext || pendingReEncryption))) {
+            if (!this.ignoreAntiTamperProtection && (this.forceSign || !(this.plaintext || this.pendingReEncryption))) {
                 this.detectTampering(payload);
             }
             this.deserializeKegPayload(payload);
@@ -439,9 +457,13 @@ class Keg {
      * @private
      */
     validateAndReEncryptSharedKeg(kegProps) {
+        this.sharedKegError = null;
+        this.signatureError = null;
+        this.validatingKeg = true;
         // we need to make sure that sender's public key really belongs to him
         const contact = getContactStore().getContact(kegProps.sharedBy);
-        contact.whenLoaded(() => {
+        contact.whenLoaded(action(() => {
+            this.validatingKeg = false;
             if (cryptoUtil.bytesToB64(contact.encryptionPublicKey) !== kegProps.sharedKegSenderPK) {
                 this.sharedKegError = true;
                 this.signatureError = true;
@@ -450,9 +472,8 @@ class Keg {
             this.sharedKegError = false;
             this.signatureError = false;
             // we don't care much if this fails because next time it will get re-saved
-            // todo: temporarily disabled, until cassandra is in play
-            // this.saveToServer(true);
-        });
+            this.saveToServer();
+        }));
     }
 
     /**
@@ -463,7 +484,7 @@ class Keg {
      */
     verifyKegSignature(payload, props) {
         if (!payload || this.lastLoadHadError) return;
-        let signature = props.signature;
+        let { signature } = props;
         if (!signature) {
             this.signatureError = true;
             return;

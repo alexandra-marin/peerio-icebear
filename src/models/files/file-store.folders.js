@@ -1,4 +1,4 @@
-const { observable, action, reaction } = require('mobx');
+const { observable, action, reaction, computed } = require('mobx');
 const { getUser } = require('../../helpers/di-current-user');
 const socket = require('../../network/socket');
 const FileFolder = require('./file-folder');
@@ -11,10 +11,7 @@ class FileStoreFolders {
         this.fileStore = fileStore;
         socket.onceAuthenticated(() => {
             this.keg = new FileFoldersKeg(getUser().kegDb);
-            this.keg.onUpdated = () => {
-                console.log('file folders updated');
-                this.sync();
-            };
+            this.keg.onUpdated = () => { this.sync(); };
         });
     }
 
@@ -23,11 +20,11 @@ class FileStoreFolders {
 
     root = new FileFolder('/');
 
-    folderResolveMap = {};
+    @observable folderResolveMap = observable.shallowMap({});
     folderIdReactions = {};
 
     getById(id) {
-        return this.folderResolveMap[id];
+        return this.folderResolveMap.get(id);
     }
 
     _addFile = (file) => {
@@ -71,14 +68,12 @@ class FileStoreFolders {
             } else if (f.folder) f.folder.free(f);
         });
         // remove folders if they aren't present in the keg
-        for (const folderId in folderResolveMap) {
+        folderResolveMap.keys().forEach(folderId => {
             if (!newFolderResolveMap[folderId]) {
-                folderResolveMap[folderId].freeSelf();
+                folderResolveMap.get(folderId).freeSelf();
             }
-        }
-        this.folderResolveMap = newFolderResolveMap;
-        this.folderResolveMapSorted = Object.values(this.folderResolveMap)
-            .sort((f1, f2) => f1.normalizedName > f2.normalizedName);
+        });
+        this.folderResolveMap = observable.shallowMap(newFolderResolveMap);
         files.forEach(this._addFile);
         this._intercept = files.observe(delta => {
             delta.removed.forEach(this._removeFile);
@@ -86,6 +81,11 @@ class FileStoreFolders {
             return delta;
         });
         this.loaded = true;
+    }
+
+    @computed get folderResolveMapSorted() {
+        return this.folderResolveMap.values()
+            .sort((f1, f2) => f1.normalizedName > f2.normalizedName);
     }
 
     searchAllFoldersByName(name) {
@@ -109,7 +109,7 @@ class FileStoreFolders {
         const folderId = cryptoUtil.getRandomShortIdHex(getUser().username);
         folder.folderId = folderId;
         folder.createdAt = Date.now();
-        this.folderResolveMap[folderId] = folder;
+        this.folderResolveMap.set(folderId, folder);
         target.addFolder(folder);
         return folder;
     }

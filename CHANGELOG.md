@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.3.2"></a>
+## [3.3.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.3.1...v3.3.2) (2017-11-22)
+
+
+### Bug Fixes
+
+* add copy for dm ux ([381cc41](https://github.com/PeerioTechnologies/peerio-icebear/commit/381cc41))
+* Add title_with, title_roomParticipants to Copy ([d98c891](https://github.com/PeerioTechnologies/peerio-icebear/commit/d98c891))
+* added parameter for title_channelNameLimit ([5674ae4](https://github.com/PeerioTechnologies/peerio-icebear/commit/5674ae4))
+* dm ux ([eaff7ac](https://github.com/PeerioTechnologies/peerio-icebear/commit/eaff7ac))
+* update title_searchByUsernameOrEmail, title_channelNamePlaceholder, title_channelTopicPlaceholder ([0217aa3](https://github.com/PeerioTechnologies/peerio-icebear/commit/0217aa3))
+
+
+
 <a name="3.3.1"></a>
 ## [3.3.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.3.0...v3.3.1) (2017-11-22)
 

@@ -374,7 +374,7 @@ class Keg {
      * you have to check error flags if you received false return value.
      * @public
      */
-    loadFromKeg(keg) {
+    @action loadFromKeg(keg) {
         try {
             this.lastLoadHadError = false;
             if (this.id && this.id !== keg.kegId) {
@@ -456,7 +456,7 @@ class Keg {
      * @param {Object} kegProps
      * @private
      */
-    validateAndReEncryptSharedKeg(kegProps) {
+    @action validateAndReEncryptSharedKeg(kegProps) {
         this.sharedKegError = null;
         this.signatureError = null;
         this.validatingKeg = true;

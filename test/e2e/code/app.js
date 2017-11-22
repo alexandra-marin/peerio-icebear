@@ -3,6 +3,11 @@ global.XMLHttpRequest = require('w3c-xmlhttprequest').XMLHttpRequest;
 global.WebSocket = require('websocket').w3cwebsocket;
 const safeJsonStringify = require('safe-json-stringify');
 /**
+ * App class is supposed to emulate real-world application (sdk consumer).
+ * It is able to reset current js environment, emulating application restart.
+ *
+ * set SHOW_APP_LOGS=1 env variable to see logs in console when developing
+ *
  * GOTCHAS:
  * 1. Do not require any modules from test files, except cucumber and actual test code.
  * 2. Do not cache any of the things that App exposes, always use fully qualified path (this.ice.socket.connected)
@@ -67,7 +72,17 @@ class App {
             debug: console.debug
         };
         const write = (type, args) => {
-            let line = `${type}${new Date().toISOString()}:`;
+            // DisconnectedError naturally happens all the time during tests.
+            // It generates too much noise and hardly has any value, we can figure
+            // out disconnection event from socket client log.
+            // Sometimes it goes through console.log or warn in the app so we
+            // have to catch it in here.
+            if (args &&
+                (args[0] && args[0].name === 'DisconnectedError')
+                || (args[1] && args[1].name === 'DisconnectedError')
+            ) return;
+
+            let line = `${type}${new Date().toISOString()}: `;
             for (let i = 0; i < args.length; i++) {
                 if (typeof args[i] === 'object') {
                     line += `${safeJsonStringify(args[i])} `;
@@ -76,6 +91,7 @@ class App {
                 }
             }
             this.logs.push(line);
+            if (process.env.SHOW_APP_LOGS) this._consoleBackup.log.call(console, line);
         };
         console.log = function(...args) {
             write('LOG:', args);
@@ -101,6 +117,7 @@ class App {
     // This function emulates application start and should be run before any scenario.
     start() {
         if (this.started) throw new Error('The test app is already started.');
+        console.log('===== STARTING TEST APP =====');
         App.lastInstanceDisposed = false;
         this._setupChai();
         this.world.ice = require('~/');
@@ -130,6 +147,7 @@ class App {
     // This function emulates application termination and should be run after every scenario.
     stop() {
         if (!this.started) throw new Error('The test app is not started.');
+        console.log('===== STOPPING TEST APP =====');
         const { when } = require('mobx');
         // closing connections
         this.world.ice.socket.close();

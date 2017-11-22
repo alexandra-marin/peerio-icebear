@@ -112,7 +112,7 @@ class User {
      * @instance
      * @public
      */
-    @observable primaryAddressConfirmed;
+    @observable primaryAddressConfirmed = false;
     /**
      * @member {boolean} deleted
      * @memberof User

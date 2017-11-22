@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.3.1"></a>
+## [3.3.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.3.0...v3.3.1) (2017-11-22)
+
+
+### Bug Fixes
+
+* search folders computed should update on new folders ([#74](https://github.com/PeerioTechnologies/peerio-icebear/issues/74)) ([ed30606](https://github.com/PeerioTechnologies/peerio-icebear/commit/ed30606))
+
+
+
+<a name="3.3.0"></a>
+# [3.3.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.2.5...v3.3.0) (2017-11-22)
+
+
+### Features
+
+* Add loading screen status messages ([de18c34](https://github.com/PeerioTechnologies/peerio-icebear/commit/de18c34))
+
+
+
 <a name="3.2.5"></a>
 ## [3.2.5](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.2.4...v3.2.5) (2017-11-22)
 

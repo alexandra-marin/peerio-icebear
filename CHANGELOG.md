@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.3.4"></a>
+## [3.3.4](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.3.3...v3.3.4) (2017-11-23)
+
+
+### Bug Fixes
+
+* don't require consumers to have opt installed; ensure all mocha tests run ([#76](https://github.com/PeerioTechnologies/peerio-icebear/issues/76)) ([6f02937](https://github.com/PeerioTechnologies/peerio-icebear/commit/6f02937))
+
+
+
 <a name="3.3.3"></a>
 ## [3.3.3](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.3.2...v3.3.3) (2017-11-22)
 

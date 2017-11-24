@@ -313,7 +313,7 @@ class FileStore {
      */
     loadAllFiles = () => {
         if (this.loading || this.loaded) return;
-        console.time('loadAllFiles');
+        // console.time('loadAllFiles');
         this.loading = true;
 
         retryUntilSuccess(() => this._getFiles(), 'Initial file list loading')
@@ -369,7 +369,7 @@ class FileStore {
                     }, { fireImmediately: true, delay: 700 }
                 );
                 setTimeout(this.updateFiles);
-                console.timeEnd('loadAllFiles');
+                // console.timeEnd('loadAllFiles');
             }));
     };
 

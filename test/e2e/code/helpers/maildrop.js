@@ -1,11 +1,10 @@
 /*
-    maildrop.cc api helper
-
+    maildrop.peerio.com api helper
     API is very simple
 
     1. Get inbox (no body) newest first
 
-        GET https://maildrop.cc/api/inbox/:name
+        GET https://maildrop.peerio.com/api/inbox/:name
         Response:
         [
             {
@@ -19,7 +18,7 @@
 
     2. Get email:
 
-        GET https://maildrop.cc/api/inbox/:name/:id
+        GET https://maildrop.peerio.com/api/inbox/:name/:id
         Response:
         {
             "id": "string",
@@ -31,64 +30,38 @@
         }
  */
 
-const https = require('https');
+const { getUrl } = require('./https');
 
-// fetches json response from maildrop GET api url
-function requestMaildropAPI(url) {
-    console.log('Requesting url', url);
-    return new Promise((resolve, reject) => {
-        https.get(url, (res) => {
-            console.log('Got response to', url);
-            const { statusCode } = res;
-            const contentType = res.headers['content-type'];
 
-            let error;
-            if (statusCode !== 200) {
-                error = new Error(`maildrop: request fail. Status Code: ${statusCode}`);
-            } else if (!contentType.startsWith('application/json')) {
-                error = new Error('maildrop: invalid content-type.\n' +
-                    `Expected application/json but received ${contentType}`);
-            }
-            if (error) {
-                console.error(error.message);
-                res.resume();
-                reject(error);
-                return;
-            }
-
-            res.setEncoding('utf8');
-            let rawData = '';
-            res.on('data', (chunk) => { rawData += chunk; });
-            res.on('end', () => {
-                try {
-                    const parsedData = JSON.parse(rawData);
-                    resolve(parsedData);
-                } catch (e) {
-                    console.error(e);
-                    reject(e);
-                }
-            });
-        }).on('error', (e) => {
-            console.error(e);
-            reject(e);
-        });
-    });
-}
-
-// retrieves inbox json
+/**
+ * Retrieves inbox items
+ * @param {string} name - mailbox name
+ * @returns {Promise<object>}
+ */
 function getInbox(name) {
     console.log(`maildrop: requesting inbox ${name}`);
-    return requestMaildropAPI(`https://maildrop.cc/api/inbox/${name}`);
+    return getUrl(`https://maildrop.peerio.com/api/inbox/${name}`)
+        .then(JSON.parse);
 }
 
-// retrieves email json
+/**
+ * Retrieves an email
+ * @param {string} name - mailbox name
+ * @param {string} id - received email id
+ * @returns {Promise<object>}
+ */
 function getEmail(name, id) {
     console.log(`maildrop: requesting email ${id} in inbox ${name}`);
-    return requestMaildropAPI(`https://maildrop.cc/api/inbox/${name}/${id}`);
+    return getUrl(`https://maildrop.peerio.com/api/inbox/${name}/${id}`)
+        .then(JSON.parse);
 }
 
-// retrieves latest email id with specified subject or null
-// todo: timestamp to search emails after it
+/**
+ * Finds and returns latest email with specific subject.
+ * @param {string} name - mailbox name
+ * @param {string} subject
+ * @returns {Promise<?object>}
+ */
 function findEmailWithSubject(name, subject) {
     return getInbox(name).then(inbox => {
         for (let i = 0; i < inbox.length; i++) {

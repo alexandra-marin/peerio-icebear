@@ -155,7 +155,7 @@ class App {
             when(() => !this.world.ice.socket.connected, () => {
                 this._clearModuleCache();
                 // hell, yeah
-                global.gc();
+                if (global.gc) global.gc();
                 this.started = false;
                 resolve();
             });

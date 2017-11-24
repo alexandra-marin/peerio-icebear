@@ -1,5 +1,10 @@
 const https = require('https');
 
+/**
+ * Makes a GET request, returns a result in a promise.
+ * @param {string} url
+ * @returns {Promise<string>}
+ */
 function getUrl(url) {
     console.log('Requesting url', url);
     return new Promise((resolve, reject) => {

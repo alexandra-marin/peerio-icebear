@@ -65,9 +65,13 @@ workflows:
   build-deploy:
     jobs:
       - build
+      - confirm_deploy:
+         type: approval
+         requires:
+           - build
       - deploy:
           requires:
-            - build
+            - confirm_deploy
           filters:
             branches:
               only: dev

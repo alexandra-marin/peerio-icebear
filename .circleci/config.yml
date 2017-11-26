@@ -74,5 +74,8 @@ workflows:
             - confirm_deploy
           filters:
             branches:
-              only: dev
+              only:
+                - dev
+                - master
+                - /release-.*/
 

@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.5.1"></a>
+## [3.5.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.5.0...v3.5.1) (2017-11-26)
+
+
+### Bug Fixes
+
+* prevent tinydb crash on file data corruption ([4222ba7](https://github.com/PeerioTechnologies/peerio-icebear/commit/4222ba7))
+
+
+
 <a name="3.5.0"></a>
 # [3.5.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.3.5...v3.5.0) (2017-11-26)
 

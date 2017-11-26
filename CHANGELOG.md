@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.5.0"></a>
+# [3.5.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.3.5...v3.5.0) (2017-11-26)
+
+
+### Bug Fixes
+
+* do not allow unhandled promise rejections in update-tracker ([62f57d3](https://github.com/PeerioTechnologies/peerio-icebear/commit/62f57d3))
+* User#addEmail returned promise resolving was inconsistent ([5da993c](https://github.com/PeerioTechnologies/peerio-icebear/commit/5da993c))
+
+
+### Features
+
+* add copy title_TryUsernameOrEmail ([#78](https://github.com/PeerioTechnologies/peerio-icebear/issues/78)) ([3ef1883](https://github.com/PeerioTechnologies/peerio-icebear/commit/3ef1883))
+* Add title_noFilesMatchSearch ([#77](https://github.com/PeerioTechnologies/peerio-icebear/issues/77)) ([050c119](https://github.com/PeerioTechnologies/peerio-icebear/commit/050c119))
+* negative condition support for prombservable ([a3977ab](https://github.com/PeerioTechnologies/peerio-icebear/commit/a3977ab))
+* pause support for TaskQueue ([a0db03f](https://github.com/PeerioTechnologies/peerio-icebear/commit/a0db03f))
+* store and log more data about awaiting socket reauests ([09fddf8](https://github.com/PeerioTechnologies/peerio-icebear/commit/09fddf8))
+
+
+
 <a name="3.4.0"></a>
 # [3.4.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.3.5...v3.4.0) (2017-11-25)
 

@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.5.2"></a>
+## [3.5.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.5.1...v3.5.2) (2017-11-26)
+
+
+### Bug Fixes
+
+* hotfix for changed platform on devices ([#80](https://github.com/PeerioTechnologies/peerio-icebear/issues/80)) ([2e5ac1a](https://github.com/PeerioTechnologies/peerio-icebear/commit/2e5ac1a))
+
+
+
 <a name="3.5.1"></a>
 ## [3.5.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.5.0...v3.5.1) (2017-11-26)
 

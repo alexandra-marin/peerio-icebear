@@ -2,16 +2,13 @@ const { defineSupportCode } = require('cucumber');
 const { waitForEmail } = require('../helpers/maildrop');
 const { getUrl } = require('../helpers/https');
 const quotedPrintable = require('quoted-printable');
-
-// todo: conditional '(Staging)' based on testing env
-const mailConfirmSubject = 'Welcome to Peerio (Staging)! Confirm your account.';
-const mailConfirmUrlRegex = /"(https:\/\/hocuspocus\.peerio\.com\/confirm-address\/.*?)"/;
+const testConfig = require('../test-config');
 
 defineSupportCode(({ Given, When, Then }) => {
     Given('I confirm my primary email', { timeout: 30000 }, async function() {
-        const email = await waitForEmail(this.username, mailConfirmSubject);
+        const email = await waitForEmail(this.username, testConfig.primaryEmailConfirmSubject);
         email.body = quotedPrintable.decode(email.body);
-        const url = mailConfirmUrlRegex.exec(email.body)[1];
+        const url = testConfig.emailConfirmUrlRegex.exec(email.body)[1];
         await getUrl(url);
         // giving confirmed status a chance to propagate
         return this.waitForObservable(() => this.ice.User.current.primaryAddressConfirmed === true, 5000);

@@ -44,6 +44,7 @@ class App {
         const FileStream = require('~/models/files/node-file-stream');
         const StorageEngine = require('~/models/storage/node-json-storage');
         const cfg = this.world.ice.config;
+        const testConfig = require('./test-config');
         // todo: make special test platform?
         cfg.appVersion = '2.37.1';
         cfg.clientVersion = '2.9.0';
@@ -53,7 +54,7 @@ class App {
         cfg.FileStream = FileStream;
         cfg.StorageEngine = StorageEngine;
         cfg.StorageEngine.storageFolder = path.join(os.homedir(), '.peerio-icebear-tests');
-        cfg.socketServerUrl = 'wss://hocuspocus.peerio.com';
+        cfg.socketServerUrl = testConfig.socketServerUrl;
     }
 
     // Add additional modules you want to expose to tests in here.

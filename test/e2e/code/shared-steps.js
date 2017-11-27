@@ -1,5 +1,6 @@
 const { defineSupportCode } = require('cucumber');
 const { getRandomUsername } = require('./helpers/random-data');
+const testConfig = require('./test-config');
 
 defineSupportCode(({ Given, When, Then }) => {
     Given('I create an account', async function() {
@@ -7,17 +8,18 @@ defineSupportCode(({ Given, When, Then }) => {
 
         const u = new this.ice.User();
         u.username = getRandomUsername();
-        u.email = `${u.username}@test.lan`;
+        u.email = `${u.username}@${testConfig.emailDomain}`;
         u.firstName = 'Firstname';
         u.lastName = 'Lastname';
         u.locale = 'en';
-        u.passphrase = 'passphrase';
+        u.passphrase = testConfig.defaultPassphrase;
         this.ice.User.current = u;
         this.username = u.username;
         this.passphrase = u.passphrase;
         console.log(`creating user username: ${this.username} passphrase: ${this.passphrase}`);
 
-        return u.createAccountAndLogin();
+        await u.createAccountAndLogin();
+        return this.waitForAccountDataInit();
     });
 
     When('I login', function() {

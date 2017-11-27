@@ -23,7 +23,15 @@ class PeerioAppWorld {
         u.username = this.username;
         u.passphrase = this.passphrase;
         this.ice.User.current = u;
-        return u.login();
+        await u.login();
+        return this.waitForAccountDataInit();
+    }
+
+    waitForAccountDataInit = async () => {
+        const { asPromise, asPromiseNegative } = this.libs.prombservable;
+        await asPromise(this.ice.User.current, 'profileLoaded', true);
+        await asPromiseNegative(this.ice.User.current, 'quota', null);
+        await asPromise(this.ice.User.current.settings, 'loaded', true);
     }
 }
 

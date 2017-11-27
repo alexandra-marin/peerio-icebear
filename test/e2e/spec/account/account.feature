@@ -9,6 +9,7 @@ Feature: User account
     TODO: make sure email confirmation warning arrives
     TODO: all kinds of validations
     TODO: attempt to register existing username with different key and check if it doesn't mess it up
+    TODO: attempt to login with wrong passphrase
 
     Background:
         Given I create an account

@@ -4,7 +4,7 @@ const { getUrl } = require('../helpers/https');
 const testConfig = require('../test-config');
 
 defineSupportCode(({ Given, When, Then }) => {
-    Given('I confirm my primary email', { timeout: 30000 }, async function() {
+    Given('I confirm my primary email', { timeout: 45000 }, async function() {
         const email = await waitForEmail(this.username, testConfig.primaryEmailConfirmSubject);
         const url = testConfig.emailConfirmUrlRegex.exec(email.body)[1];
         await getUrl(url);

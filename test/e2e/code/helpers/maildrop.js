@@ -97,7 +97,7 @@ function normalizeName(name) {
  * @param {string} subject
  * @param {number} [timeout=15000]
  */
-function waitForEmail(name, subject, timeout = 25000) {
+function waitForEmail(name, subject, timeout = 37000) {
     name = normalizeName(name); // eslint-disable-line no-param-reassign
     const start = Date.now();
     return new Promise((resolve, reject) => {

@@ -1,5 +1,5 @@
 const https = require('https');
-
+const request = require('request');
 /**
  * Makes a GET request, returns a result in a promise.
  * @param {string} url
@@ -33,4 +33,14 @@ function getUrl(url) {
     });
 }
 
-module.exports = { getUrl };
+function deleteRequest(url) {
+    console.log('Sending delete request', url);
+    return new Promise((resolve, reject) => {
+        request.del(url, (err) => {
+            if (err) reject(err);
+            else resolve();
+        });
+    });
+}
+
+module.exports = { getUrl, deleteRequest };

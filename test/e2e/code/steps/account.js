@@ -1,13 +1,11 @@
 const { defineSupportCode } = require('cucumber');
 const { waitForEmail } = require('../helpers/maildrop');
 const { getUrl } = require('../helpers/https');
-const quotedPrintable = require('quoted-printable');
 const testConfig = require('../test-config');
 
 defineSupportCode(({ Given, When, Then }) => {
     Given('I confirm my primary email', { timeout: 30000 }, async function() {
         const email = await waitForEmail(this.username, testConfig.primaryEmailConfirmSubject);
-        email.body = quotedPrintable.decode(email.body);
         const url = testConfig.emailConfirmUrlRegex.exec(email.body)[1];
         await getUrl(url);
         // giving confirmed status a chance to propagate

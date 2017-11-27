@@ -28,9 +28,14 @@
             "date": 1511117201000,
             "body": "string"
         }
+
+    3. Delete email
+
+        DELETE https://maildrop.peerio.com/api/inbox/:name/:id
  */
 
-const { getUrl } = require('./https');
+const { getUrl, deleteRequest } = require('./https');
+const quotedPrintable = require('quoted-printable');
 
 
 /**
@@ -53,7 +58,16 @@ function getInbox(name) {
 function getEmail(name, id) {
     console.log(`maildrop: requesting email ${id} in inbox ${name}`);
     return getUrl(`https://maildrop.peerio.com/api/inbox/${name}/${id}`)
-        .then(JSON.parse);
+        .then(JSON.parse)
+        .then(email => {
+            email.body = quotedPrintable.decode(email.body);
+            return email;
+        });
+}
+
+function deleteEmail(name, id) {
+    name = normalizeName(name); // eslint-disable-line no-param-reassign
+    return deleteRequest(`https://maildrop.peerio.com/api/inbox/${name}/${id}`);
 }
 
 /**
@@ -71,13 +85,20 @@ function findEmailWithSubject(name, subject) {
     });
 }
 
+function normalizeName(name) {
+    if (name.includes('@')) {
+        return name.substring(0, name.indexOf('@'));
+    }
+    return name;
+}
 /**
  * Makes several attempts to retrieve an email with specific subject during set timeout
- * @param {string} name - mailbox name
+ * @param {string} name - mailbox name or full email
  * @param {string} subject
  * @param {number} [timeout=15000]
  */
 function waitForEmail(name, subject, timeout = 25000) {
+    name = normalizeName(name); // eslint-disable-line no-param-reassign
     const start = Date.now();
     return new Promise((resolve, reject) => {
         function makeAttempt() {
@@ -100,4 +121,4 @@ function waitForEmail(name, subject, timeout = 25000) {
     });
 }
 
-module.exports = { waitForEmail };
+module.exports = { waitForEmail, deleteEmail };

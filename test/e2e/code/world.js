@@ -29,8 +29,11 @@ class PeerioAppWorld {
 
     waitForAccountDataInit = async () => {
         const { asPromise, asPromiseNegative } = this.libs.prombservable;
+        console.log('Account init: waiting for profile to load');
         await asPromise(this.ice.User.current, 'profileLoaded', true);
+        console.log('Account init: waiting for quota to load');
         await asPromiseNegative(this.ice.User.current, 'quota', null);
+        console.log('Account init: waiting for settings to load');
         await asPromise(this.ice.User.current.settings, 'loaded', true);
     }
 }

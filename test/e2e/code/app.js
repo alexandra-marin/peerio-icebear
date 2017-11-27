@@ -55,6 +55,9 @@ class App {
         cfg.StorageEngine = StorageEngine;
         cfg.StorageEngine.storageFolder = path.join(os.homedir(), '.peerio-icebear-tests');
         cfg.socketServerUrl = testConfig.socketServerUrl;
+        if (testConfig.logSocketMessages) {
+            cfg.debug = { trafficReportInterval: 5000, socketLogEnabled: true };
+        }
     }
 
     // Add additional modules you want to expose to tests in here.

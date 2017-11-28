@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.7.0"></a>
+# [3.7.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.6.0...v3.7.0) (2017-11-28)
+
+
+### Features
+
+* Add title_noFilesMatchSearch ([#83](https://github.com/PeerioTechnologies/peerio-icebear/issues/83)) ([a5607c5](https://github.com/PeerioTechnologies/peerio-icebear/commit/a5607c5))
+
+
+
 <a name="3.6.0"></a>
 # [3.6.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.5.2...v3.6.0) (2017-11-28)
 

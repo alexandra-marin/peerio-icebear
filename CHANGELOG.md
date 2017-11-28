@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.6.0"></a>
+# [3.6.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.5.2...v3.6.0) (2017-11-28)
+
+
+### Bug Fixes
+
+* possible bug fix for sporadically failing test step ([0c230e8](https://github.com/PeerioTechnologies/peerio-icebear/commit/0c230e8))
+
+
+### Features
+
+* retry unfurls failed due to disconnection ([#79](https://github.com/PeerioTechnologies/peerio-icebear/issues/79)) ([f937c6c](https://github.com/PeerioTechnologies/peerio-icebear/commit/f937c6c))
+* **jitsi:** create, send, receive and open jitsi links ([#60](https://github.com/PeerioTechnologies/peerio-icebear/issues/60)) ([ec9d699](https://github.com/PeerioTechnologies/peerio-icebear/commit/ec9d699))
+
+
+
 <a name="3.5.2"></a>
 ## [3.5.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.5.1...v3.5.2) (2017-11-26)
 

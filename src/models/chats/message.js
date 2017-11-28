@@ -1,6 +1,6 @@
 // @ts-check
 
-const { observable, computed } = require('mobx');
+const { observable, computed, when } = require('mobx');
 const contactStore = require('./../contacts/contact-store');
 const User = require('./../user/user');
 const Keg = require('./../kegs/keg');
@@ -11,6 +11,7 @@ const unfurl = require('../../helpers/unfurl');
 const config = require('../../config');
 const clientApp = require('../client-app');
 const TaskQueue = require('../../helpers/task-queue');
+const socket = require('../../network/socket');
 
 /**
  * @typedef {{
@@ -297,7 +298,29 @@ class Message extends Keg {
     _queueUnfurl(url) {
         Message.unfurlQueue.addTask(() => {
             return unfurl.getContentHeaders(url)
-                .then((headers) => this._processUrlHeaders(url, headers));
+                .catch(err => {
+                    console.error(err);
+                    // There's no reliable way to know if XMLHttpRequest has failed due to disconnection.
+                    // Also, socket.connected is usually updated with a little delay,
+                    // so we rely on this hacky way to postpone the connection check.
+                    // We wait for socket to disconnect and will assume our headers request failed
+                    // due to disconnection if socket disconnects within next few seconds.
+                    // False positives are possible but harmless.
+                    const dispose = when(
+                        () => !socket.connected,
+                        () => {
+                            const queue = Message.unfurlQueue;
+                            if (!queue.paused) {
+                                when(() => socket.connected, () => queue.resume());
+                                queue.pause();
+                            }
+                            this._queueUnfurl(url);
+                        });
+                    setTimeout(dispose, 2000);
+                })
+                .then(headers => {
+                    if (headers) this._processUrlHeaders(url, headers);
+                });
         });
     }
 

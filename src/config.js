@@ -336,6 +336,8 @@ const config = new class {
             'image/png': true
         }
     };
+
+    unfurlTimeout = 30000;
 }();
 
 

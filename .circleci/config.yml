@@ -58,20 +58,16 @@ jobs:
           paths:
             - ./node_modules
       - run: ./.circleci/create-netrc.sh
-      - run: ./.circleci/dev-release.sh
+      - run: ./.circleci/release.sh
 
 workflows:
   version: 2
   build-deploy:
     jobs:
       - build
-      - confirm_deploy:
-         type: approval
-         requires:
-           - build
       - deploy:
           requires:
-            - confirm_deploy
+            - build
           filters:
             branches:
               only:

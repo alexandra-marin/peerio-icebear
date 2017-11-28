@@ -31,7 +31,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PeerioTechnologies/peerio-icebear.git"
+    "url": "https://github.com/PeerioTechnologies/peerio-icebear.git"
   },
   "author": "",
   "license": "ISC",
@@ -48,11 +48,11 @@
     "mobx": "3.3.1",
     "moment": "2.19.2",
     "peerio-translator": "github:PeerioTechnologies/peerio-translator#v1.0.0",
+    "safe-json-stringify": "1.0.4",
     "scrypt-async": "1.3.1",
     "socket.io-client": "2.0.4",
     "tweetnacl": "1.0.0",
-    "url-regex": "4.1.1",
-    "safe-json-stringify": "1.0.4"
+    "url-regex": "4.1.1"
   },
   "devDependencies": {
     "@types/bluebird-global": "3.5.3",
@@ -110,6 +110,7 @@
   },
   "standard-version": {
     "scripts": {
+      "prebump": "node ./scripts/prebump.js",
       "postbump": "node ./scripts/postbump.js"
     }
   },

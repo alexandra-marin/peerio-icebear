@@ -9,7 +9,6 @@
     "postcheckout": "npm run opt-in-npm-install",
     "postmerge": "npm run opt-in-npm-install",
     "precommit": "opt --in lint --exec \"npm run code:verify\"",
-    "prepush": "git fetch --prune origin '+refs/tags/*:refs/tags/*'",
     "commitmsg": "validate-commit-msg",
     "=== TESTS ===": "",
     "mocha": "mocha \"test/**/*.test.js\" --require babel-register --require test/unit/unit-global-setup --timeout 15000",

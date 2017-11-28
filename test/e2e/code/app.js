@@ -2,6 +2,9 @@ if (!console.debug) console.debug = console.log.bind(console);
 global.XMLHttpRequest = require('w3c-xmlhttprequest').XMLHttpRequest;
 global.WebSocket = require('websocket').w3cwebsocket;
 const safeJsonStringify = require('safe-json-stringify');
+const testConfig = require('./test-config');
+
+
 /**
  * App class is supposed to emulate real-world application (sdk consumer).
  * It is able to reset current js environment, emulating application restart.
@@ -44,7 +47,6 @@ class App {
         const FileStream = require('~/models/files/node-file-stream');
         const StorageEngine = require('~/models/storage/node-json-storage');
         const cfg = this.world.ice.config;
-        const testConfig = require('./test-config');
         // todo: make special test platform?
         cfg.appVersion = '2.37.1';
         cfg.clientVersion = '2.9.0';
@@ -95,7 +97,7 @@ class App {
                 }
             }
             this.logs.push(line);
-            if (process.env.SHOW_APP_LOGS) this._consoleBackup.log.call(console, line);
+            if (testConfig.showAppLogs) this._consoleBackup.log.call(console, line);
         };
         console.log = function(...args) {
             write('LOG:', args);

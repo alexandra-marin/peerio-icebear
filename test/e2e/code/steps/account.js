@@ -25,14 +25,12 @@ defineSupportCode(({ Given, When, Then }) => {
         return this.login().should.be.rejected;
     });
 
-    Then('I should not have paid plans', async function() {
-        await this.waitForObservable(() => ice.User.current.quota !== null, 5000);
+    Then('I should not have paid plans', function() {
         this.ice.User.current.hasActivePlans.should.be.false;
     });
 
     Then('I should have default account settings', async function() {
         const { settings } = this.ice.User.current;
-        await this.waitForObservable(() => settings.loaded, 5000);
         settings.contactNotifications.should.be.false;
         settings.contactRequestNotifications.should.be.false;
         settings.messageNotifications.should.be.true;
@@ -43,7 +41,6 @@ defineSupportCode(({ Given, When, Then }) => {
 
     When('I change my account settings', async function() {
         const { settings } = this.ice.User.current;
-        await this.waitForObservable(() => settings.loaded, 5000);
         settings.contactNotifications = true;
         settings.contactRequestNotifications = true;
         settings.messageNotifications = false;
@@ -56,7 +53,6 @@ defineSupportCode(({ Given, When, Then }) => {
 
     Then('my account settings are changed', async function() {
         const { settings } = this.ice.User.current;
-        await this.waitForObservable(() => settings.loaded, 5000);
         settings.contactNotifications.should.be.true;
         settings.contactRequestNotifications.should.be.true;
         settings.messageNotifications.should.be.false;

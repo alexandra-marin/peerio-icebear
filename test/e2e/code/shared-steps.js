@@ -14,8 +14,10 @@ defineSupportCode(({ Given, When, Then }) => {
         u.locale = 'en';
         u.passphrase = testConfig.defaultPassphrase;
         this.ice.User.current = u;
+
         this.username = u.username;
         this.passphrase = u.passphrase;
+
         console.log(`creating user username: ${this.username} passphrase: ${this.passphrase}`);
 
         await u.createAccountAndLogin();

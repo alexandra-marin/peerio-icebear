@@ -56,4 +56,15 @@ defineSupportCode(({ Given, When, Then }) => {
     When('I request confirmation email resend', function() {
         return this.ice.User.current.resendEmailConfirmation(this.lastAddedEmail);
     });
+
+    When('I change my primary email', function() {
+        return this.ice.User.current.makeEmailPrimary(this.lastAddedEmail);
+    });
+
+    Then('my primary email has been changed', { timeout: 15000 }, function() {
+        return this.waitForObservable(() => {
+            return this.ice.User.current.email === this.lastAddedEmail;
+        }, 5000);
+    });
 });
+

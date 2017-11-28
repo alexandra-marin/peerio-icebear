@@ -1,11 +1,19 @@
 const { defineSupportCode } = require('cucumber');
 
+/**
+ * Cucumber creates an instance of this class for each scenario.
+ * Each scenario step runs in context of the PeerioAppWorld instance,
+ * meaning you can access it with 'this' keyword.
+ */
 class PeerioAppWorld {
     constructor({ attach, parameters }) {
         this.attach = attach;
         this.parameters = parameters;
     }
 
+    /**
+     * Waits for mobx `when` to get executed for a specific amount of time and timeouts.
+     */
     waitForObservable = (lambda, timeout = 5000) => {
         let resolve;
         const promise = new Promise((_resolve) => { resolve = _resolve; });

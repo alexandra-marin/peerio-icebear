@@ -13,6 +13,8 @@ module.exports = {
     newEmailConfirmSubject: 'Please confirm your new address',
     // how to find confirmation link inside confirm email body
     emailConfirmUrlRegex: /"(https:\/\/hocuspocus\.peerio\.com\/confirm-address\/.*?)"/,
-    // will output every websocket message, incoming and outgoing
-    logSocketMessages: false
+    // will output every websocket message, incoming and outgoing to console
+    logSocketMessages: false,
+    // will output application logs to console
+    showAppLogs: !!process.env.SHOW_APP_LOGS
 };

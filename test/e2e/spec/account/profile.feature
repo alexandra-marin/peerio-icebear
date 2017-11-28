@@ -34,8 +34,16 @@ Feature: User profile
         And   I confirm my new email
         Then  my new email is confirmed
 
-    @wip
     Scenario: Change primary email
+        Given I confirm my primary email
+        And   I add a new email
+        And   I confirm my new email
+        And   my new email is confirmed
+        When  I change my primary email
+        Then  my primary email has been changed
+        When  I restart
+        And   I login
+        Then  my primary email has been changed
 
-    @wip
-    Scenario: Remove email
+    #@wip
+    #Scenario: Remove email

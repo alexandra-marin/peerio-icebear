@@ -3,7 +3,7 @@ const { getRandomUsername } = require('./helpers/random-data');
 const testConfig = require('./test-config');
 
 defineSupportCode(({ Given, When, Then }) => {
-    Given('I create an account', { timeout: 20000 }, async function() {
+    Given('I create an account', { timeout: 40000 }, async function() {
         await this.libs.prombservable.asPromise(this.ice.socket, 'connected', true);
 
         const u = new this.ice.User();
@@ -23,7 +23,7 @@ defineSupportCode(({ Given, When, Then }) => {
         return this.waitForAccountDataInit();
     });
 
-    When('I login', function() {
+    When('I login', { timeout: 25000 }, function() {
         return this.login();
     });
 

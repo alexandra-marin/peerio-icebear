@@ -26,12 +26,16 @@ Feature: User profile
         Then  my new email is confirmed
         When  I add a new email
         And   I confirm my new email
+        Then  my new email is confirmed
 
     Scenario: Resend comfirmation email
         Given I add a new email
         And   I delete confirmation email
         When  I request confirmation email resend
         And   I confirm my new email
+        Then  my new email is confirmed
+        When  I restart
+        And   I login
         Then  my new email is confirmed
 
     Scenario: Change primary email

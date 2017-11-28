@@ -263,6 +263,18 @@ class Message extends Keg {
     }
 
     /**
+     * Sends a message containing jitsi link to the channel
+     * @param {string} link
+     * @memberof Message
+     */
+    sendVideoLink(link) {
+        this.systemData = {
+            action: 'videoCall',
+            link
+        };
+    }
+
+    /**
      * Parses message to find urls or file attachments.
      * Verifies external url type and size and fills this.inlineImages.
      * @memberof Message

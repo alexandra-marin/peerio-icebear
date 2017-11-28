@@ -412,6 +412,31 @@ class Chat {
     }
 
     /**
+     * User should not be able to send multiple video call messages in a row. Similar setup to ack throttling.
+     * @member {boolean} canSendJitsi
+     * @memberof Chat
+     * @instance
+     * @public
+     */
+    @computed get canSendJitsi() {
+        if (this.limboMessages.length) {
+            for (let i = 0; i < this.limboMessages.length; i++) {
+                if (this.limboMessages[i].systemData && this.limboMessages[i].systemData.action === 'videoCall') {
+                    return false;
+                }
+            }
+        }
+        if (!this.initialPageLoaded) return false;
+        if (this.canGoDown) return true;
+        if (!this.messages.length) return true;
+        const lastmsg = this.messages[this.messages.length - 1];
+        if (lastmsg.sender.username !== User.current.username) return true;
+        if (lastmsg.systemData && lastmsg.systemData.action === 'videoCall') return false;
+        return true;
+    }
+
+
+    /**
      * Don't render message marker if this is false.
      * @member {boolean} showNewMessagesMarker
      * @memberof Chat
@@ -1159,6 +1184,15 @@ class Chat {
     sendJoinMessage() {
         const m = new Message(this.db);
         m.setChannelJoinFact();
+        this._sendMessage(m);
+    }
+
+    /**
+    * Sends jitsi link and message to the chat.
+    */
+    createVideoCall(link) {
+        const m = new Message(this.db);
+        m.sendVideoLink(link);
         this._sendMessage(m);
     }
 

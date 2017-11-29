@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.8.0"></a>
+# [3.8.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.7.1...v3.8.0) (2017-11-29)
+
+
+### Bug Fixes
+
+* add force flag ([8aa470e](https://github.com/PeerioTechnologies/peerio-icebear/commit/8aa470e))
+* delete nested files properly ([4433088](https://github.com/PeerioTechnologies/peerio-icebear/commit/4433088))
+* don't automatically save file folderId when processing new file updates ([5a111ce](https://github.com/PeerioTechnologies/peerio-icebear/commit/5a111ce))
+* file folders move rejection ([892cf5e](https://github.com/PeerioTechnologies/peerio-icebear/commit/892cf5e))
+* moving folders around on sync ([a452847](https://github.com/PeerioTechnologies/peerio-icebear/commit/a452847))
+* proper recovery from failed file folders keg save ([5c6ab63](https://github.com/PeerioTechnologies/peerio-icebear/commit/5c6ab63))
+* root folder ([8adbeb3](https://github.com/PeerioTechnologies/peerio-icebear/commit/8adbeb3))
+* shame, shame ([34718ec](https://github.com/PeerioTechnologies/peerio-icebear/commit/34718ec))
+* tests ([669a4a1](https://github.com/PeerioTechnologies/peerio-icebear/commit/669a4a1))
+* typo ([f6df3a9](https://github.com/PeerioTechnologies/peerio-icebear/commit/f6df3a9))
+* typo ([d87d080](https://github.com/PeerioTechnologies/peerio-icebear/commit/d87d080))
+
+
+### Features
+
+* add createdAt field for future use ([0a3cf29](https://github.com/PeerioTechnologies/peerio-icebear/commit/0a3cf29))
+* enqueue parallel keg save/load instead of rejecting ([e43a7b2](https://github.com/PeerioTechnologies/peerio-icebear/commit/e43a7b2))
+* refactor SDK to store fileId in file kegs ([91540e2](https://github.com/PeerioTechnologies/peerio-icebear/commit/91540e2))
+* rename oversized to match file property. add oversizeCutoff ([e2f22fb](https://github.com/PeerioTechnologies/peerio-icebear/commit/e2f22fb))
+* search over folders ([33971ac](https://github.com/PeerioTechnologies/peerio-icebear/commit/33971ac))
+
+
+
 <a name="3.7.1"></a>
 ## [3.7.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.7.0...v3.7.1) (2017-11-28)
 

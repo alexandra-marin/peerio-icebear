@@ -272,9 +272,7 @@ class ChatBootKeg extends SyncedKeg {
         const ephemeralKeyPair = keys.generateEncryptionKeyPair();
         const ret = {};
         ret.publicKey = cryptoUtil.bytesToB64(ephemeralKeyPair.publicKey);
-        ret.roles = {
-            admin: this.admins.map(c => c.username)
-        };
+        ret.roles = { admin: this.admins.map(c => c.username) };
         const k = ret.encryptedKeys = {};
         for (const id in this.keys) {
             const keyData = this.keys[id];

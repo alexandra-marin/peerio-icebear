@@ -17,9 +17,7 @@ class SystemWarning {
      * @memberof SystemWarning
      * @protected
      */
-    static STATES = {
-        QUEUED: 0, /* WILL_SHOW: 1, */ SHOWING: 2, WILL_DISMISS: 3, DISMISSED: 4
-    };
+    static STATES = { QUEUED: 0, /* WILL_SHOW: 1, */ SHOWING: 2, WILL_DISMISS: 3, DISMISSED: 4 };
 
     /**
      * Observable current life cycle state.

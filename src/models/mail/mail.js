@@ -131,9 +131,7 @@ class Mail extends Keg {
             recipients[contact.username] = {
                 publicKey: cryptoUtil.bytesToB64(contact.encryptionPublicKey),
                 encryptedPayloadKey: cryptoUtil.bytesToB64(
-                    secret.encryptString(
-                        payloadKey, getUser().getSharedKey(contact.encryptionPublicKey)
-                    )
+                    secret.encryptString(payloadKey, getUser().getSharedKey(contact.encryptionPublicKey))
                 )
             };
         });

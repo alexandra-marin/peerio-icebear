@@ -15,6 +15,7 @@ const { getUser } = require('../../helpers/di-current-user');
 const warnings = require('../warnings');
 const { setChatStore } = require('../../helpers/di-chat-store');
 const { getFileStore } = require('../../helpers/di-file-store');
+const { cryptoUtil } = require('../../crypto');
 
 // Used for typechecking
 // eslint-disable-next-line no-unused-vars
@@ -47,9 +48,7 @@ class ChatStore {
     }
 
     // todo: not sure this little event emitter experiment should live
-    EVENT_TYPES = {
-        messagesReceived: 'messagesReceived'
-    };
+    EVENT_TYPES = { messagesReceived: 'messagesReceived' };
     /**
      * Currently emits just one event - 'messagesReceived' (1 sec. throttled)
      * @member {EventEmitter}
@@ -276,6 +275,11 @@ class ChatStore {
         this.events.emit(this.EVENT_TYPES.messagesReceived, props);
     }, 1000);
 
+    generateJitsiUrl() {
+        const id = cryptoUtil.getRandomGlobalUrlSafeShortIdB64();
+        return `https://meet.jit.si/${id}`;
+    }
+
     /**
      * Adds chat to the list.
      * @function addChat
@@ -377,8 +381,7 @@ class ChatStore {
                             if (k++ >= rest) continue;
                             this.addChat(id);
                         }
-                    }))
-            );
+                    })));
         }
         // 5. check if chats were created while we were loading chat list
         // unlikely, but possible

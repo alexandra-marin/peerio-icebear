@@ -77,9 +77,7 @@ class Ghost extends Keg {
      * @returns {{ghostId: (String|*)}}
      */
     serializeProps() {
-        return {
-            ghostId: this.ghostId
-        };
+        return { ghostId: this.ghostId };
     }
 
     /*

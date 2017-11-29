@@ -343,9 +343,10 @@ class Keg {
             .then(keg => {
                 const ret = this.loadFromKeg(keg);
                 if (ret === false) {
-                    return Promise.reject(new Error(
+                    const err = new Error(
                         `Failed to hydrate keg id ${this.id} with server data from db ${this.db ? this.db.id : 'null'}`
-                    ));
+                    );
+                    return Promise.reject(err);
                 }
                 return ret;
             }).finally(this.resetLoadingState);
@@ -373,7 +374,7 @@ class Keg {
      * you have to check error flags if you received false return value.
      * @public
      */
-    loadFromKeg(keg) {
+    @action loadFromKeg(keg) {
         try {
             this.lastLoadHadError = false;
             if (this.id && this.id !== keg.kegId) {
@@ -396,7 +397,7 @@ class Keg {
                 this.lastLoadHadError = true;
                 return false;
             }
-            let payload = keg.payload;
+            let { payload } = keg;
             let payloadKey = null;
 
             if (!this.plaintext) {
@@ -455,7 +456,7 @@ class Keg {
      * @param {Object} kegProps
      * @private
      */
-    validateAndReEncryptSharedKeg(kegProps) {
+    @action validateAndReEncryptSharedKeg(kegProps) {
         this.sharedKegError = null;
         this.signatureError = null;
         this.validatingKeg = true;
@@ -483,7 +484,7 @@ class Keg {
      */
     verifyKegSignature(payload, props) {
         if (!payload || this.lastLoadHadError) return;
-        let signature = props.signature;
+        let { signature } = props;
         if (!signature) {
             this.signatureError = true;
             return;

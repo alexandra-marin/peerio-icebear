@@ -140,6 +140,18 @@ function getRandomUserSpecificIdHex(username) {
 }
 
 /**
+ * 16 random bytes in hex, can work as global id
+ */
+function getRandomGlobalShortIdHex() {
+    return convert.bytesToHex(getRandomBytes(16));
+}
+
+function getRandomGlobalUrlSafeShortIdB64() {
+    return convert.bytesToB64(getRandomBytes(16))
+        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+/**
  * Generates hex string of 10-byte unique random id suitable for personal use (one keg db).
  * @returns {string} 10 bytes id in hex encoding
  * @memberof crypto/util
@@ -161,5 +173,8 @@ module.exports = {
     getRandomUserSpecificIdBytes,
     getRandomUserSpecificIdB64,
     getRandomUserSpecificIdHex,
-    getRandomShortIdHex
+    getRandomGlobalShortIdHex,
+    getRandomShortIdHex,
+    getRandomGlobalUrlSafeShortIdB64
+
 };

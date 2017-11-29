@@ -1,7 +1,7 @@
 //
 // Conversion part of Peerio crypto utilities module.
 //
-const Buffer = require('buffer/').Buffer;
+const { Buffer } = require('buffer/');
 
 const HAS_TEXT_ENCODER = (typeof TextEncoder !== 'undefined') && (typeof TextDecoder !== 'undefined');
 const textEncoder = HAS_TEXT_ENCODER ? new TextEncoder('utf-8') : null;

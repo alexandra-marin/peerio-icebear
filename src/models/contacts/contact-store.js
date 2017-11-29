@@ -181,20 +181,25 @@ class ContactStore {
 
     applyInvitesData = action(() => {
         this.invitedContacts = this.invites.issued;
-        when(() => this.invites.loaded, () => {
-            Promise.each(this.invitedContacts, c => {
-                if (c.username) {
-                    return this.addContact(c.username)
-                        .then(() => this.removeInvite(c.email));
-                }
-                return null;
-            }).then(() => {
-                return Promise.each(this.invites.received, username => {
-                    return this.addContact(username)
-                        .then(() => this.removeReceivedInvite(username));
+        when(
+            () => this.invites.loaded,
+            () => {
+                Promise.each(this.invitedContacts, c => {
+                    if (c.username) {
+                        return this.addContact(c.username)
+                            .then(() => this.removeInvite(c.email));
+                    }
+                    return null;
+                }).then(() => {
+                    return Promise.each(this.invites.received, username => {
+                        return this.addContact(username)
+                            .then(() => this.removeReceivedInvite(username));
+                    });
+                }).catch(err => {
+                    console.error('Error applying contact invites', err);
                 });
-            });
-        });
+            }
+        );
     });
 
     /**
@@ -405,12 +410,12 @@ class ContactStore {
     loadContactsFromTOFUKegs() {
         socket.send('/auth/kegs/db/list-ext', {
             kegDbId: 'SELF',
-            options: {
-                type: 'tofu'
-            }
+            options: { type: 'tofu' }
         }).then(res => {
             if (!res.kegs || !res.kegs.length) return;
             res.kegs.forEach(keg => this.getContact(keg.props.username));
+        }).catch(err => {
+            console.error('Failed to load contacts from tofu kegs', err);
         });
     }
     /**

@@ -106,8 +106,10 @@ class ChatFileHandler {
 
     getRecentFiles() {
         return retryUntilSuccess(() => {
-            return socket.send('/auth/kegs/db/files/latest',
-                { kegDbId: this.chat.id, count: config.chat.recentFilesDisplayLimit })
+            return socket.send(
+                '/auth/kegs/db/files/latest',
+                { kegDbId: this.chat.id, count: config.chat.recentFilesDisplayLimit }
+            )
                 .then(res => {
                     const ids = [];
                     res.forEach(raw => {

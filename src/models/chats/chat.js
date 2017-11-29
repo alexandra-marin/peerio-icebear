@@ -412,6 +412,31 @@ class Chat {
     }
 
     /**
+     * User should not be able to send multiple video call messages in a row. Similar setup to ack throttling.
+     * @member {boolean} canSendJitsi
+     * @memberof Chat
+     * @instance
+     * @public
+     */
+    @computed get canSendJitsi() {
+        if (this.limboMessages.length) {
+            for (let i = 0; i < this.limboMessages.length; i++) {
+                if (this.limboMessages[i].systemData && this.limboMessages[i].systemData.action === 'videoCall') {
+                    return false;
+                }
+            }
+        }
+        if (!this.initialPageLoaded) return false;
+        if (this.canGoDown) return true;
+        if (!this.messages.length) return true;
+        const lastmsg = this.messages[this.messages.length - 1];
+        if (lastmsg.sender.username !== User.current.username) return true;
+        if (lastmsg.systemData && lastmsg.systemData.action === 'videoCall') return false;
+        return true;
+    }
+
+
+    /**
      * Don't render message marker if this is false.
      * @member {boolean} showNewMessagesMarker
      * @memberof Chat
@@ -859,7 +884,7 @@ class Chat {
      */
     toggleFavoriteState = () => {
         this.changingFavState = true;
-        const myChats = this.store.myChats;
+        const { myChats } = this.store;
         const newVal = !this.isFavorite;
         myChats.save(
             () => {
@@ -1001,10 +1026,10 @@ class Chat {
      */
     addParticipants(participants) {
         if (!participants || !participants.length) return Promise.resolve();
-        if (!this.isChannel) return Promise.reject("Can't add participants to a DM chat");
+        if (!this.isChannel) return Promise.reject(new Error('Can not add participants to a DM chat'));
         const contacts = participants.map(p => (typeof p === 'string' ? contactStore.getContact(p) : p));
         return Contact.ensureAllLoaded(contacts).then(() => {
-            const boot = this.db.boot;
+            const { boot } = this.db;
             return boot.save(
                 () => {
                     contacts.forEach(c => boot.addParticipant(c));
@@ -1038,7 +1063,7 @@ class Chat {
         if (this.db.admins.includes(contact)) {
             return Promise.reject(new Error('Attempt to promote user who is already an admin.'));
         }
-        const boot = this.db.boot;
+        const { boot } = this.db;
         return boot.save(
             () => {
                 boot.assignRole(contact, 'admin');
@@ -1069,7 +1094,7 @@ class Chat {
             return Promise.reject(new Error('Attempt to demote user who is not an admin.'));
         }
 
-        const boot = this.db.boot;
+        const { boot } = this.db;
         return boot.save(
             () => {
                 boot.unassignRole(contact, 'admin');
@@ -1110,7 +1135,7 @@ class Chat {
             // we don't really care if it's loaded or not, we just need Contact instance
             contact = contactStore.getContact(contact);
         }
-        const boot = this.db.boot;
+        const { boot } = this.db;
         const wasAdmin = boot.admins.includes(contact);
         return contact.ensureLoaded().then(() =>
             boot.save(
@@ -1124,8 +1149,7 @@ class Chat {
                     if (wasAdmin) boot.assignRole(contact, 'admin');
                 },
                 'error_removeParticipant'
-            )
-        ).then(() => {
+            )).then(() => {
             if (!isUserKick) return;
             const m = new Message(this.db);
             // @ts-ignore
@@ -1164,6 +1188,15 @@ class Chat {
     }
 
     /**
+    * Sends jitsi link and message to the chat.
+    */
+    createVideoCall(link) {
+        const m = new Message(this.db);
+        m.sendVideoLink(link);
+        this._sendMessage(m);
+    }
+
+    /**
      * Checks if there are any file attachments in new message batch and adds them to _recentFiles if needed.
      * @private
      */
@@ -1172,7 +1205,7 @@ class Chat {
             this._recentFiles = [];
         }
         for (let i = 0; i < messages.length; i++) {
-            const files = messages[i].files;
+            const { files } = messages[i];
             if (!files || !files.length) continue;
             for (let j = 0; j < files.length; j++) {
                 if (!this._recentFiles.includes(files[j])) this._recentFiles.unshift(files[j]);

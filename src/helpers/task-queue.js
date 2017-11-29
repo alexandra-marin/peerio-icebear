@@ -9,6 +9,10 @@ const { computed, observable, action } = require('mobx');
  */
 class TaskQueue {
     /**
+     * @readonly
+     */
+    paused = false;
+    /**
      * List of tasks in queue. Running tasks are not here.
      * @member {ObservableArray<function>} tasks
      * @memberof TaskQueue
@@ -66,11 +70,11 @@ class TaskQueue {
                     if (onSuccess) onSuccess(...finishArgs);
                 },
                 onError: (...errArgs) => {
-                    reject(...errArgs);
+                    reject(...errArgs); // eslint-disable-line prefer-promise-reject-errors
                     if (onError) onError(...errArgs);
                 }
             });
-            setTimeout(this.runTask, this.throttle);
+            if (!this.paused) setTimeout(this.runTask, this.throttle);
         });
     }
 
@@ -82,6 +86,7 @@ class TaskQueue {
      * @private
      */
     @action.bound runTask() {
+        if (this.paused) return;
         // if reached the limit of parallel running tasks or no tasks left - doing nothing
         if (this.parallelism <= this.runningTasks || this.tasks.length === 0) return;
         this.runningTasks++;
@@ -116,6 +121,18 @@ class TaskQueue {
      */
     @action.bound onTaskComplete() {
         this.runningTasks--;
+        if (this.paused) return;
+        for (let i = this.runningTasks; i < this.parallelism; i++) {
+            setTimeout(this.runTask, this.throttle);
+        }
+    }
+
+    pause() {
+        this.paused = true;
+    }
+    resume() {
+        if (!this.paused) return;
+        this.paused = false;
         for (let i = this.runningTasks; i < this.parallelism; i++) {
             setTimeout(this.runTask, this.throttle);
         }

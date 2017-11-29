@@ -6,7 +6,7 @@
 */
 
 const urlRegex = require('url-regex')();
-
+const config = require('../config');
 // url : headers
 const urlCache = {};
 // url : promise
@@ -49,9 +49,9 @@ function getContentHeaders(url) {
                 default: break;
             }
         };
+        req.timeout = config.unfurlTimeout;
         req.open('GET', url);
-    }).timeout(20000)
-        .finally(() => delete urlsInProgress[url]);
+    }).finally(() => delete urlsInProgress[url]);
 
     urlsInProgress[url] = promise;
     return promise;

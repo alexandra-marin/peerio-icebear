@@ -1,4 +1,4 @@
-const execSync = require('child_process').execSync;
+const { execSync } = require('child_process');
 const fs = require('fs');
 
 const sdkFilePath = './src/__sdk.js';

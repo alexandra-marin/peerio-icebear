@@ -38,18 +38,20 @@ class ChatMessageHandler {
                 this.chat.updatedAfterReconnect = false;
             }
         }));
-        this._reactionsToDispose.push(reaction(() =>
-            socket.authenticated && clientApp.isFocused && clientApp.isInChatsView && this.chat.active,
-        (userIsReading) => {
-            if (userIsReading) {
-                this.markAllAsSeen();
-                this.removeMaker();
-            } else if (!this.chat.newMessagesMarkerPos && this.chat.messages.length) {
-                this.cancelTimers();
-                const lastId = this.chat.messages[this.chat.messages.length - 1].id;
-                this.chat.newMessagesMarkerPos = lastId;
+        this._reactionsToDispose.push(reaction(
+            () =>
+                socket.authenticated && clientApp.isFocused && clientApp.isInChatsView && this.chat.active,
+            (userIsReading) => {
+                if (userIsReading) {
+                    this.markAllAsSeen();
+                    this.removeMaker();
+                } else if (!this.chat.newMessagesMarkerPos && this.chat.messages.length) {
+                    this.cancelTimers();
+                    const lastId = this.chat.messages[this.chat.messages.length - 1].id;
+                    this.chat.newMessagesMarkerPos = lastId;
+                }
             }
-        }));
+        ));
     }
 
     maxUpdateId = '';
@@ -96,7 +98,7 @@ class ChatMessageHandler {
         }
         this._loadingUpdates = true;
 
-        console.log('Getting updates for chat', this.chat.id);
+        // console.log('Getting updates for chat', this.chat.id);
         const filter = this.downloadedUpdateId ? { minCollectionVersion: this.downloadedUpdateId } : {};
         socket.send('/auth/kegs/db/list-ext', {
             kegDbId: this.chat.id,
@@ -244,9 +246,11 @@ class ChatMessageHandler {
                     throw err;
                 }
             }).then(action(resp => {
-                console.debug('Received page', pagingUp ? 'UP' : 'DOWN',
+                console.debug(
+                    'Received page', pagingUp ? 'UP' : 'DOWN',
                     pagingUp && this.chat._cancelTopPageLoad
-                        || !pagingUp && this.chat._cancelBottomPageLoad ? 'and discarded' : '');
+                        || !pagingUp && this.chat._cancelBottomPageLoad ? 'and discarded' : ''
+                );
                 if (pagingUp) {
                     if (this.chat._cancelTopPageLoad) return;
                     this.chat.canGoUp = resp.hasMore;

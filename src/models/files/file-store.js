@@ -313,7 +313,7 @@ class FileStore {
      */
     loadAllFiles = () => {
         if (this.loading || this.loaded) return;
-        console.time('loadAllFiles');
+        // console.time('loadAllFiles');
         this.loading = true;
 
         retryUntilSuccess(() => this._getFiles(), 'Initial file list loading')
@@ -361,13 +361,15 @@ class FileStore {
                         }
                     }
                 });
-                reaction(() => this.unreadFiles === 0 || !clientApp.isInFilesView || !clientApp.isFocused,
+                reaction(
+                    () => this.unreadFiles === 0 || !clientApp.isInFilesView || !clientApp.isFocused,
                     (dontReport) => {
                         if (dontReport) return;
                         tracker.seenThis('SELF', 'file', this.knownUpdateId);
-                    }, { fireImmediately: true, delay: 700 });
+                    }, { fireImmediately: true, delay: 700 }
+                );
                 setTimeout(this.updateFiles);
-                console.timeEnd('loadAllFiles');
+                // console.timeEnd('loadAllFiles');
             }));
     };
 
@@ -381,7 +383,7 @@ class FileStore {
         let dirty = false;
         retryUntilSuccess(() => this._getFiles(), 'Updating file list')
             .then(action(resp => {
-                const kegs = resp.kegs;
+                const { kegs } = resp;
                 for (const keg of kegs) {
                     if (keg.collectionVersion > this.knownUpdateId) {
                         this.knownUpdateId = keg.collectionVersion;

@@ -63,7 +63,6 @@ class FileFolder {
     addFolder(folder) {
         if (folder.parent === this) return folder;
         if (this.folderMap[folder.folderId]) {
-            console.error('folder already exists here');
             return folder;
         }
         if (folder.parent) {

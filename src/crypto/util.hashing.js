@@ -3,7 +3,7 @@
 //
 
 const BLAKE2s = require('blake2s-js');
-const getScrypt = require('./scrypt-proxy').getScrypt;
+const { getScrypt } = require('./scrypt-proxy');
 const convert = require('./util.conversion');
 const padding = require('./util.padding');
 

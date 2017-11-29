@@ -1,5 +1,5 @@
 node_modules
-coverage
+test-results
 dist
 npm-debug.log
 tests/config/.chrome_dev_user

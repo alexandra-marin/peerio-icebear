@@ -37,8 +37,8 @@ jobs:
           name: test
           command: npm test
       - store_artifacts:
-          path: coverage
-          prefix: coverage
+          path: test-results
+          prefix: test-results
   deploy:
     docker:
       - image: circleci/node:8.6
@@ -58,7 +58,7 @@ jobs:
           paths:
             - ./node_modules
       - run: ./.circleci/create-netrc.sh
-      - run: ./.circleci/dev-release.sh
+      - run: ./.circleci/release.sh
 
 workflows:
   version: 2
@@ -70,5 +70,8 @@ workflows:
             - build
           filters:
             branches:
-              only: dev
+              only:
+                - dev
+                - master
+                - /release-.*/
 

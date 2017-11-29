@@ -89,7 +89,8 @@ module.exports = function mixUser2faModule() {
      */
     this._handle2faOnLogin = () => {
         return new Promise((resolve, reject) => {
-            clientApp.create2FARequest('login',
+            clientApp.create2FARequest(
+                'login',
                 (code, trustDevice = false) => {
                     code = sanitizeCode(code); //eslint-disable-line
                     const req = {
@@ -98,8 +99,10 @@ module.exports = function mixUser2faModule() {
                     };
                     socket.send('/noauth/2fa/authenticate', req)
                         .then(resp => {
-                            return TinyDb.system.setValue(`${this.username}:deviceToken`,
-                                cryptoUtil.bytesToB64(resp.deviceToken));
+                            return TinyDb.system.setValue(
+                                `${this.username}:deviceToken`,
+                                cryptoUtil.bytesToB64(resp.deviceToken)
+                            );
                         })
                         .then(resolve)
                         .catch(reject);
@@ -110,19 +113,19 @@ module.exports = function mixUser2faModule() {
 
     function verifyProtectedAction(type) {
         return new Promise((resolve, reject) => {
-            clientApp.create2FARequest(type,
+            clientApp.create2FARequest(
+                type,
                 (code) => {
                     code = sanitizeCode(code); //eslint-disable-line
-                    const req = {
-                        [code.length === 6 ? 'TOTPCode' : 'backupCode']: code
-                    };
+                    const req = { [code.length === 6 ? 'TOTPCode' : 'backupCode']: code };
                     socket.send('/auth/2fa/verify', req)
                         .then(resolve)
                         .catch(reject);
                 },
                 () => {
                     console.log('User cancelled protected 2fa operation:', type);
-                });
+                }
+            );
         });
     }
 

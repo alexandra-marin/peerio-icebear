@@ -204,6 +204,10 @@ class SocketClient {
     start(url) {
         if (this.started) return;
         console.log(`Starting socket: ${url}`);
+        if (!url) {
+            console.error('Socket server url missing, can not start');
+            return;
+        }
         const self = this;
         this.url = url;
         this.started = true;
@@ -220,8 +224,10 @@ class SocketClient {
                 return s.call(this, msg);
             };
             setInterval(() => {
-                console.log('SENT:', util.formatBytes(self.bytesSent),
-                    'RECEIVED:', util.formatBytes(self.bytesReceived));
+                console.log(
+                    'SENT:', util.formatBytes(self.bytesSent),
+                    'RECEIVED:', util.formatBytes(self.bytesReceived)
+                );
             }, config.debug.trafficReportInterval);
         }
         // </DEBUG>
@@ -385,7 +391,7 @@ class SocketClient {
     send(name, data) {
         const id = this.requestId++;
         return new Promise((resolve, reject) => {
-            this.awaitingRequests[id] = reject;
+            this.awaitingRequests[id] = { name, data, reject };
             this.taskPacer.run(() => {
                 if (!this.awaitingRequests[id]) {
                     // promise timed out while waiting in queue
@@ -434,7 +440,9 @@ class SocketClient {
     cancelAwaitingRequests() {
         const err = new DisconnectedError();
         for (const id in this.awaitingRequests) {
-            this.awaitingRequests[id](err);
+            const req = this.awaitingRequests[id];
+            console.warn('Cancelling awaiting request', req.name, req.data);
+            req.reject(err);
         }
         this.awaitingRequests = {};
     }

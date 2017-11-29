@@ -52,6 +52,8 @@ class Settings extends Keg {
      */
     @observable subscribeToPromoEmails = false;
 
+    @observable loaded = false;
+
     constructor(user) {
         super('settings', 'settings', user.kegDb, true);
         this.user = user;

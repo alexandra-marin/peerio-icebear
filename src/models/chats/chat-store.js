@@ -276,7 +276,7 @@ class ChatStore {
     }, 1000);
 
     generateJitsiUrl() {
-        const id = cryptoUtil.getRandomGlobalUrlSafeShortIdB64();
+        const id = cryptoUtil.getRandomGlobalShortIdHex();
         return `https://meet.jit.si/${id}`;
     }
 

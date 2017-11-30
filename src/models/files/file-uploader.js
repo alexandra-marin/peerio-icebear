@@ -27,7 +27,7 @@ class FileUploader extends FileProcessor {
             stream.seek(startFromChunk * file.chunkSize);
             console.log(`Upload continues from ${stream.nextReadPos}`);
         }
-        socket.onDisconnect(this._error);
+        // socket.onDisconnect(this._error);
     }
 
     /**
@@ -67,7 +67,7 @@ class FileUploader extends FileProcessor {
     chunksWaitingForResponse = 0;
 
     cleanup() {
-        socket.unsubscribe(socket.SOCKET_EVENTS.disconnect, this._error);
+        // socket.unsubscribe(socket.SOCKET_EVENTS.disconnect, this._error);
     }
 
     get _isEncryptQueueFull() {

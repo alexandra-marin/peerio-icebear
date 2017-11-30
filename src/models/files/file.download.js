@@ -9,6 +9,7 @@ const cryptoUtil = require('../../crypto/util');
 const FileNonceGenerator = require('./file-nonce-generator');
 const TinyDb = require('../../db/tiny-db');
 const { action } = require('mobx');
+const socket = require('../../network/socket');
 
 function _getDlResumeParams(path) {
     return config.FileStream.getStat(path)
@@ -86,7 +87,7 @@ function download(filePath, resume, isTmpCacheDownload) {
                     if (err.name === 'UserCancelError') {
                         return Promise.reject(err);
                     }
-                    if (err.name === 'DisconnectedError') {
+                    if (!socket.authenticated || err.name === 'DisconnectedError') {
                         this._resetDownloadState();
                         return Promise.reject(err);
                     }

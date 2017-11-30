@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.9.0"></a>
+# [3.9.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.8.0...v3.9.0) (2017-11-30)
+
+
+### Features
+
+* Add folder search based on filter ([#81](https://github.com/PeerioTechnologies/peerio-icebear/issues/81)) ([2f18828](https://github.com/PeerioTechnologies/peerio-icebear/commit/2f18828))
+
+
+
 <a name="3.8.0"></a>
 # [3.8.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.7.1...v3.8.0) (2017-11-29)
 

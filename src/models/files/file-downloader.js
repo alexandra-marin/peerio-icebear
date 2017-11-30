@@ -2,6 +2,7 @@ const socket = require('../../network/socket');
 const secret = require('../../crypto/secret');
 const config = require('../../config');
 const FileProcessor = require('./file-processor');
+const { DisconnectedError } = require('../../errors');
 
 const { CHUNK_OVERHEAD } = config;
 
@@ -29,7 +30,7 @@ class FileDownloader extends FileProcessor {
             this.file.progress = this.chunkSizeWithOverhead * resumeParams.wholeChunks;
             this.downloadPos = this.chunkSizeWithOverhead * resumeParams.wholeChunks;
         }
-        socket.onDisconnect(this._abortXhr);
+        // socket.onDisconnect(this._abortXhr);
     }
 
     /**
@@ -75,7 +76,7 @@ class FileDownloader extends FileProcessor {
 
     cleanup() {
         this._abortXhr();
-        socket.unsubscribe(socket.SOCKET_EVENTS.disconnect, this._abortXhr);
+        // socket.unsubscribe(socket.SOCKET_EVENTS.disconnect, this._abortXhr);
     }
 
     // downloads config.download.chunkSize size chunk and stores it in parseQueue
@@ -187,7 +188,7 @@ class FileDownloader extends FileProcessor {
                 }
                 console.error('Download blob error: ', this.status);
                 if (!p.isRejected()) {
-                    if (!trySend()) reject();
+                    if (!trySend()) reject(socket.authenticated ? undefined : new DisconnectedError());
                 }
             };
 

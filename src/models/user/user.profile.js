@@ -65,7 +65,7 @@ module.exports = function mixUserProfileModule() {
 
     function loadSimpleKeg(keg) {
         const digest = tracker.getDigest('SELF', keg.type);
-        if (digest.maxUpdateId !== '' && digest.maxUpdateId <= keg.collectionVersion) {
+        if (keg.loaded && digest.maxUpdateId !== '' && digest.maxUpdateId <= keg.collectionVersion) {
             if (digest.maxUpdateId !== digest.knownUpdateId) {
                 tracker.seenThis('SELF', keg.type, digest.maxUpdateId);
             }
@@ -144,20 +144,19 @@ module.exports = function mixUserProfileModule() {
         return validators.emailAvailability.action(email).then(available => {
             if (!available) {
                 warnings.addSevere('error_emailTaken', 'title_error');
-                return Promise.resolve();
+                return Promise.reject(new Error(`Email ${email} already taken`));
             }
             return socket.send('/auth/address/add', {
                 address: {
                     type: 'email',
                     value: email
                 }
-            })
-                .then(() => {
-                    warnings.add('warning_emailConfirmationSent');
-                });
-        }).tapCatch(err => {
-            console.error(err);
-            warnings.add('error_saveSettings');
+            }).then(() => {
+                warnings.add('warning_emailConfirmationSent');
+            }).tapCatch(err => {
+                console.error(err);
+                warnings.add('error_saveSettings');
+            });
         });
     };
 

@@ -55,7 +55,13 @@ class NodeJsonStorage {
     }
 
     load() {
-        return JSON.parse(fs.readFileSync(this.filePath, fileOptions));
+        try {
+            return JSON.parse(fs.readFileSync(this.filePath, fileOptions));
+        } catch (err) {
+            console.error(err);
+            console.log(`Failed to read tinydb file ${this.filePath}`);
+            return {};
+        }
     }
 
     save(data) {

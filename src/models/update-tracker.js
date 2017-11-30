@@ -315,11 +315,17 @@ class UpdateTracker {
         if (!updateId) return;
         const digest = this.getDigest(id, type);
         if (digest.knownUpdateId >= updateId) return;
+        // consumers should not care if this call fails, it makes things simpler.
+        // to cover failure cases, consumers should activate 'mark as read' logic after every reconnect
         socket.send('/auth/kegs/updates/last-known-version', {
             kegDbId: id,
             type,
             lastKnownVersion: updateId
-        });
+        }).catch(this.logSeenThisError);
+    }
+
+    logSeenThisError(err) {
+        console.error(err);
     }
 }
 

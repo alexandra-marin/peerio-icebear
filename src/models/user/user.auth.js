@@ -21,6 +21,7 @@ module.exports = function mixUserAuthModule() {
                 // eslint-disable-next-line default-case
                 switch (e.code) {
                     case errors.ServerError.codes.invalidDeviceToken:
+                    case errors.ServerError.codes.malformedRequest:
                         console.log('Bad deviceToken, reauthenticating without one.');
                         return TinyDb.system.removeValue(`${this.username}:deviceToken`)
                             .then(this._authenticateConnection);

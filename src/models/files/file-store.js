@@ -61,6 +61,24 @@ class FileStore {
     }
 
     /**
+     * Filter to apply when computing visible folders
+     * @member {string} folderFilter
+     * @memberof FileStore
+     * @instance
+     * @public
+     */
+    @observable folderFilter = '';
+
+    /**
+     * Subset of folders not currently hidden by any applied filters
+     * @readonly
+     * @memberof FileStore
+     */
+    @computed get visibleFolders() {
+        return this.folders.searchAllFoldersByName(this.folderFilter);
+    }
+
+    /**
      * Human readable maximum auto-expandable inline image size limit
      * @readonly
      * @memberof FileStore
@@ -313,7 +331,7 @@ class FileStore {
      */
     loadAllFiles = () => {
         if (this.loading || this.loaded) return;
-        console.time('loadAllFiles');
+        // console.time('loadAllFiles');
         this.loading = true;
 
         retryUntilSuccess(() => this._getFiles(), 'Initial file list loading')
@@ -369,7 +387,7 @@ class FileStore {
                     }, { fireImmediately: true, delay: 700 }
                 );
                 setTimeout(this.updateFiles);
-                console.timeEnd('loadAllFiles');
+                // console.timeEnd('loadAllFiles');
             }));
     };
 

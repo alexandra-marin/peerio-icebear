@@ -112,7 +112,7 @@ class User {
      * @instance
      * @public
      */
-    @observable primaryAddressConfirmed;
+    @observable primaryAddressConfirmed = false;
     /**
      * @member {boolean} deleted
      * @memberof User
@@ -233,7 +233,6 @@ class User {
     emojiMRU = new MRUList('emojiPicker', 30);
 
     constructor() {
-        this.login = this.login.bind(this);
         this.kegDb = new KegDb('SELF');
         // this is not really extending prototype, but we don't care because User is almost a singleton
         // (new instance created on every initial login attempt only)
@@ -605,7 +604,7 @@ class User {
      * @returns {Promise}
      * @public
      */
-    login() {
+    login = () => {
         console.log('Starting login sequence');
         return this._preAuth()
             .then(() => this._authenticateConnection())
@@ -630,7 +629,7 @@ class User {
                 }
                 return Promise.reject(e);
             });
-    }
+    };
 
     _postAuth() {
         socket.setAuthenticatedState();

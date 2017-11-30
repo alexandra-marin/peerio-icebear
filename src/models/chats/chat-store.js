@@ -15,6 +15,7 @@ const { getUser } = require('../../helpers/di-current-user');
 const warnings = require('../warnings');
 const { setChatStore } = require('../../helpers/di-chat-store');
 const { getFileStore } = require('../../helpers/di-file-store');
+const { cryptoUtil } = require('../../crypto');
 
 // Used for typechecking
 // eslint-disable-next-line no-unused-vars
@@ -273,6 +274,11 @@ class ChatStore {
     onNewMessages = _.throttle((props) => {
         this.events.emit(this.EVENT_TYPES.messagesReceived, props);
     }, 1000);
+
+    generateJitsiUrl() {
+        const id = cryptoUtil.getRandomGlobalShortIdHex();
+        return `https://meet.jit.si/${id}`;
+    }
 
     /**
      * Adds chat to the list.

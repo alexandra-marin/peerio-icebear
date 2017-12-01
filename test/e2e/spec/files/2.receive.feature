@@ -1,17 +1,18 @@
 Feature: Receiving and accepting
 
-    Receiving a file in a chat (room or DM) is considered an invitation to share a file.
+    Receiving a file in a chat (room or DM) is considered an invitation to have a file.
     This invitation is extended with some privileges, by default "editor". 
 
     There are currently three roles:
 
-    - Editors can view and re-share a file. 
     - Owners can view and re-share as well as edit the list of users with access to the file. 
+    - Editors can view and re-share a file. 
     - Viewers can only view and download the file.
 
-    Invitations to files are implicitly accepted when resharing a file (and added to "my drive"), 
-    but not when viewing it. However, additional owners of a file will immediately have files
-    they are made owners of added to their drive.
+    Invitations to files are implicitly accepted when resharing a file, 
+    but not when viewing it. Accepting an invitation is the same thing as "adding to your drive".
+    However, additional owners of a file will immediately have files they are made owners of added 
+    to their drive.
 
     Background: 
         Given I am logged in

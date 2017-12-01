@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.9.3"></a>
+## [3.9.3](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.9.2...v3.9.3) (2017-12-01)
+
+
+### Bug Fixes
+
+* change copy for loading screen as per ticket 7758 ([#85](https://github.com/PeerioTechnologies/peerio-icebear/issues/85)) ([d126332](https://github.com/PeerioTechnologies/peerio-icebear/commit/d126332))
+
+
+
 <a name="3.9.2"></a>
 ## [3.9.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.9.1...v3.9.2) (2017-11-30)
 

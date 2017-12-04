@@ -236,7 +236,7 @@
   "title_queuedFiles": "Uploading {name} | {remaining} files in queue",
   "title_shareFromFiles": "Share from my files",
   "title_uploadAndShare": "Upload and share",
-  "title_addMessage": "Add message (optional)",
+  "title_addMessage": "Add message <i>(optional)</>",
   "title_confirmCancelUpload": "Cancel upload?",
   "title_confirmRemoveEmail": "Remove email?",
   "title_confirmRemoveFiles": "Remove {count} file(s)?",

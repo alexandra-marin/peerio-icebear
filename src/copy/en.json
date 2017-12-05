@@ -281,7 +281,7 @@
   "title_settings": "Settings",
   "title_settingsPreferences": "Preferences",
   "title_settingsAccount": "Account",
-  "title_settingsProfile": "Profile",
+  "title_settingsProfile": "Public Profile",
   "title_publicKey": "Peerio ID#",
   "error_saveSettings": "Unable to save changes",
   "error_emailTaken": "This email is already registered to a Peerio account. Please contact support if you think this is a mistake.",

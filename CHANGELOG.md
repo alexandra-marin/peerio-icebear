@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.10.2"></a>
+## [3.10.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.10.1...v3.10.2) (2017-12-05)
+
+
+### Bug Fixes
+
+* **copy:** clarify that profile info is publix ([0df5c88](https://github.com/PeerioTechnologies/peerio-icebear/commit/0df5c88))
+
+
+
 <a name="3.10.1"></a>
 ## [3.10.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.10.0...v3.10.1) (2017-12-05)
 

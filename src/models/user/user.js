@@ -162,6 +162,18 @@ class User {
      */
     @observable twoFAEnabled = false;
 
+
+    /**
+     * Indicates device trust if 2fa is enabled.
+     *
+     * @member {boolean|undefined} trustedDevice
+     * @memberof User
+     * @instance
+     * @readonly
+     * @public
+     */
+    @observable trustedDevice = undefined;
+
     /**
      * Computed `firstName+' '+lastName`
      * @member {string} fullName
@@ -593,6 +605,7 @@ class User {
     };
 
     _preAuth() {
+        this.trustedDevice = undefined;
         if (this._firstLoginInSession) {
             return this._checkForPasscode();
         }

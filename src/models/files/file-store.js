@@ -61,6 +61,24 @@ class FileStore {
     }
 
     /**
+     * Filter to apply when computing visible folders
+     * @member {string} folderFilter
+     * @memberof FileStore
+     * @instance
+     * @public
+     */
+    @observable folderFilter = '';
+
+    /**
+     * Subset of folders not currently hidden by any applied filters
+     * @readonly
+     * @memberof FileStore
+     */
+    @computed get visibleFolders() {
+        return this.folders.searchAllFoldersByName(this.folderFilter);
+    }
+
+    /**
      * Human readable maximum auto-expandable inline image size limit
      * @readonly
      * @memberof FileStore

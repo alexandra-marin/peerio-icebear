@@ -113,7 +113,7 @@ function upload(filePath, fileName, resume) {
                     if (err.name === 'UserCancelError') {
                         return Promise.reject(err);
                     }
-                    if (err.name === 'DisconnectedError') {
+                    if (!socket.authenticated || err.name === 'DisconnectedError') {
                         this._resetUploadState();
                         return Promise.reject(err);
                     }

@@ -2,6 +2,115 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.11.0"></a>
+# [3.11.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.10.2...v3.11.0) (2017-12-05)
+
+
+### Features
+
+* limit size of temp cache folder ([#86](https://github.com/PeerioTechnologies/peerio-icebear/issues/86)) ([4c4baac](https://github.com/PeerioTechnologies/peerio-icebear/commit/4c4baac))
+
+
+
+<a name="3.10.2"></a>
+## [3.10.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.10.1...v3.10.2) (2017-12-05)
+
+
+### Bug Fixes
+
+* **copy:** clarify that profile info is publix ([0df5c88](https://github.com/PeerioTechnologies/peerio-icebear/commit/0df5c88))
+
+
+
+<a name="3.10.1"></a>
+## [3.10.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.10.0...v3.10.1) (2017-12-05)
+
+
+### Bug Fixes
+
+* handle broader spectrum of reconnect errors ([080d706](https://github.com/PeerioTechnologies/peerio-icebear/commit/080d706))
+
+
+
+<a name="3.10.0"></a>
+# [3.10.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.9.3...v3.10.0) (2017-12-05)
+
+
+### Features
+
+* new 2FA implementation ([#71](https://github.com/PeerioTechnologies/peerio-icebear/issues/71)) ([aa20a80](https://github.com/PeerioTechnologies/peerio-icebear/commit/aa20a80))
+
+
+
+<a name="3.9.3"></a>
+## [3.9.3](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.9.2...v3.9.3) (2017-12-01)
+
+
+### Bug Fixes
+
+* change copy for loading screen as per ticket 7758 ([#85](https://github.com/PeerioTechnologies/peerio-icebear/issues/85)) ([d126332](https://github.com/PeerioTechnologies/peerio-icebear/commit/d126332))
+
+
+
+<a name="3.9.2"></a>
+## [3.9.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.9.1...v3.9.2) (2017-11-30)
+
+
+
+<a name="3.9.1"></a>
+## [3.9.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.9.0...v3.9.1) (2017-11-30)
+
+
+### Bug Fixes
+
+* file up/download resume wasn't working properly under specific conditions ([bc41eaf](https://github.com/PeerioTechnologies/peerio-icebear/commit/bc41eaf))
+
+
+
+<a name="3.9.0"></a>
+# [3.9.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.8.0...v3.9.0) (2017-11-30)
+
+
+### Features
+
+* Add folder search based on filter ([#81](https://github.com/PeerioTechnologies/peerio-icebear/issues/81)) ([2f18828](https://github.com/PeerioTechnologies/peerio-icebear/commit/2f18828))
+
+
+
+<a name="3.8.0"></a>
+# [3.8.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.7.1...v3.8.0) (2017-11-29)
+
+
+### Bug Fixes
+
+* add force flag ([8aa470e](https://github.com/PeerioTechnologies/peerio-icebear/commit/8aa470e))
+* delete nested files properly ([4433088](https://github.com/PeerioTechnologies/peerio-icebear/commit/4433088))
+* don't automatically save file folderId when processing new file updates ([5a111ce](https://github.com/PeerioTechnologies/peerio-icebear/commit/5a111ce))
+* file folders move rejection ([892cf5e](https://github.com/PeerioTechnologies/peerio-icebear/commit/892cf5e))
+* moving folders around on sync ([a452847](https://github.com/PeerioTechnologies/peerio-icebear/commit/a452847))
+* proper recovery from failed file folders keg save ([5c6ab63](https://github.com/PeerioTechnologies/peerio-icebear/commit/5c6ab63))
+* root folder ([8adbeb3](https://github.com/PeerioTechnologies/peerio-icebear/commit/8adbeb3))
+* shame, shame ([34718ec](https://github.com/PeerioTechnologies/peerio-icebear/commit/34718ec))
+* tests ([669a4a1](https://github.com/PeerioTechnologies/peerio-icebear/commit/669a4a1))
+* typo ([f6df3a9](https://github.com/PeerioTechnologies/peerio-icebear/commit/f6df3a9))
+* typo ([d87d080](https://github.com/PeerioTechnologies/peerio-icebear/commit/d87d080))
+
+
+### Features
+
+* add createdAt field for future use ([0a3cf29](https://github.com/PeerioTechnologies/peerio-icebear/commit/0a3cf29))
+* enqueue parallel keg save/load instead of rejecting ([e43a7b2](https://github.com/PeerioTechnologies/peerio-icebear/commit/e43a7b2))
+* refactor SDK to store fileId in file kegs ([91540e2](https://github.com/PeerioTechnologies/peerio-icebear/commit/91540e2))
+* rename oversized to match file property. add oversizeCutoff ([e2f22fb](https://github.com/PeerioTechnologies/peerio-icebear/commit/e2f22fb))
+* search over folders ([33971ac](https://github.com/PeerioTechnologies/peerio-icebear/commit/33971ac))
+
+
+
+<a name="3.7.1"></a>
+## [3.7.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.7.0...v3.7.1) (2017-11-28)
+
+
+
 <a name="3.7.0"></a>
 # [3.7.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.6.0...v3.7.0) (2017-11-28)
 

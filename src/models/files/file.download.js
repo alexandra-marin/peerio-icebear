@@ -5,10 +5,12 @@
 const config = require('../../config');
 const warnings = require('./../warnings');
 const FileDownloader = require('./file-downloader');
+const FileCacheHandler = require('./file-cache-handler');
 const cryptoUtil = require('../../crypto/util');
 const FileNonceGenerator = require('./file-nonce-generator');
 const TinyDb = require('../../db/tiny-db');
 const { action } = require('mobx');
+const socket = require('../../network/socket');
 
 function _getDlResumeParams(path) {
     return config.FileStream.getStat(path)
@@ -28,6 +30,7 @@ function _getDlResumeParams(path) {
 
 function downloadToTmpCache() {
     return this.download(this.tmpCachePath, undefined, true)
+        .then(() => FileCacheHandler.cacheMonitor(this))
         .tapCatch(() => { this.cachingFailed = true; });
 }
 
@@ -86,7 +89,7 @@ function download(filePath, resume, isTmpCacheDownload) {
                     if (err.name === 'UserCancelError') {
                         return Promise.reject(err);
                     }
-                    if (err.name === 'DisconnectedError') {
+                    if (!socket.authenticated || err.name === 'DisconnectedError') {
                         this._resetDownloadState();
                         return Promise.reject(err);
                     }
@@ -116,12 +119,32 @@ function cancelDownload() {
     this._resetDownloadState();
 }
 
+/**
+ * Removes download cache if it exists
+ * @returns {Promise}
+ * @instance
+ * @memberof File
+ * @public
+ */
+function removeCache() {
+    return Promise.resolve((async () => {
+        if (!this.tmpCached) return;
+        try {
+            await config.FileStream.delete(this.tmpCachePath);
+        } catch (e) {
+            console.error(e);
+        }
+        this.tmpCached = false;
+    })());
+}
+
 function _saveDownloadStartFact(path) {
     TinyDb.user.setValue(`DOWNLOAD:${this.fileId}`, {
         fileId: this.fileId,
         path
     });
 }
+
 function _saveDownloadEndFact() {
     TinyDb.user.removeValue(`DOWNLOAD:${this.fileId}`);
 }
@@ -147,6 +170,7 @@ module.exports = function(File) {
     File.prototype.download = download;
     File.prototype.downloadToTmpCache = downloadToTmpCache;
     File.prototype.cancelDownload = cancelDownload;
+    File.prototype.removeCache = removeCache;
     File.prototype._saveDownloadStartFact = _saveDownloadStartFact;
     File.prototype._saveDownloadEndFact = _saveDownloadEndFact;
     File.prototype._resetDownloadState = _resetDownloadState;

@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.10.0"></a>
+# [3.10.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.9.3...v3.10.0) (2017-12-05)
+
+
+### Features
+
+* new 2FA implementation ([#71](https://github.com/PeerioTechnologies/peerio-icebear/issues/71)) ([aa20a80](https://github.com/PeerioTechnologies/peerio-icebear/commit/aa20a80))
+
+
+
 <a name="3.9.3"></a>
 ## [3.9.3](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.9.2...v3.9.3) (2017-12-01)
 

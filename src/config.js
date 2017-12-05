@@ -352,6 +352,11 @@ const config = new class {
     };
 
     unfurlTimeout = 30000;
+
+    /**
+     * Maximum total size of cached images which we store before we start deleting the least recent ones
+     */
+    temporaryCacheLimit = 1000 * 1024 * 1024;
 }();
 
 

@@ -169,6 +169,15 @@ class File extends Keg {
      */
     @observable shared = false;
 
+    /**
+     * Amount of visual components which display this file currently
+     * @member {number} visibleCounter
+     * @memberof File
+     * @instance
+     * @public
+     */
+    @observable visibleCounter = 0;
+
     // -- computed properties ------------------------------------------------------------------------------------
     /**
      * file extension
@@ -221,6 +230,9 @@ class File extends Keg {
         return cryptoUtil.getHexHash(16, cryptoUtil.b64ToBytes(this.fileId));
     }
     @computed get tmpCachePath() {
+        /* TODO: testing only, remove before merge */
+        console.log(`Temp file location: ${config.FileStream.getTempCachePath(`${this.fsSafeUid}.${this.ext}`)}`);
+
         return config.FileStream.getTempCachePath(`${this.fsSafeUid}.${this.ext}`);
     }
     /**

@@ -36,6 +36,7 @@
   "title_dontShowAgain": "Don't show this again",
   "title_gotYourKeys": "Got your keys?",
   "title_signOutConfirmKeys": "You’re about to lock the door to your Peerio account. You will need your account key when you return.",
+  "title_stopTrustingThisDevice": "Stop trusting this device",
   "button_CreateAccount": "Create account",
   "button_next": "Next",
   "button_back": "Back",

@@ -2,6 +2,7 @@ const socket = require('../../network/socket');
 const warnings = require('../warnings');
 const clientApp = require('../client-app');
 const TinyDb = require('../../db/tiny-db');
+const config = require('../../config');
 const { cryptoUtil } = require('../../crypto/index');
 
 module.exports = function mixUser2faModule() {
@@ -84,6 +85,49 @@ module.exports = function mixUser2faModule() {
     };
 
     /**
+     * Stores 2fa cookie and device trust in system database.
+     * @param {{cookie, trusted}} data
+     * @returns {Promise<void>}
+     */
+    this._set2faCookieData = (data) => {
+        return TinyDb.system.setValue(`${this.username}:twoFACookie`, data);
+    };
+
+    /**
+     * Retrieves 2fa cookie and device trust from system database.
+     * If there's no cookie, returns a promise resolving to undefined.
+     * @returns {Promise<{cookie, trusted}|undefined>}
+     */
+    this._get2faCookieData = () => {
+        return TinyDb.system.getValue(`${this.username}:twoFACookie`);
+    };
+
+    /**
+     * Deletes 2fa cookie from the system database.
+     * @returns {Promise<void>}
+     */
+    this._delete2faCookieData = () => {
+        return TinyDb.system.removeValue(`${this.username}:twoFACookie`);
+    };
+
+    /**
+     * Returns deviceId from system database.
+     * If there's no deviceId stored, it generates a new one, stores it, and returns.
+     * @returns {Promise<string>}
+     */
+    this._getDeviceId = () => {
+        const key = `${this.username}:deviceId`;
+        return TinyDb.system.getValue(key).then(deviceId => {
+            // Found it.
+            if (deviceId) return deviceId;
+
+            // Not found, generate a new one and save it.
+            deviceId = cryptoUtil.getDeviceId(this.username, config.deviceUID); // eslint-disable-line no-param-reassign
+            return TinyDb.system.setValue(key, deviceId).return(deviceId);
+        });
+    };
+
+    /**
      * When server returns 2fa error (requests 2fa) on login, this function is called from the login handler
      * to perform 2fa.
      */
@@ -92,17 +136,31 @@ module.exports = function mixUser2faModule() {
             clientApp.create2FARequest(
                 'login',
                 (code, trustDevice = false) => {
-                    code = sanitizeCode(code); //eslint-disable-line
-                    const req = {
-                        [code.length === 6 ? 'TOTPCode' : 'backupCode']: code,
-                        trustDevice
-                    };
-                    socket.send('/noauth/2fa/authenticate', req)
-                        .then(resp => {
-                            return TinyDb.system.setValue(
-                                `${this.username}:deviceToken`,
-                                cryptoUtil.bytesToB64(resp.deviceToken)
-                            );
+                    this._getDeviceId()
+                        .then(deviceId => {
+                            code = sanitizeCode(code); //eslint-disable-line
+                            const req = {
+                                username: this.username,
+                                deviceId,
+                                [code.length === 6 ? 'TOTPCode' : 'backupCode']: code,
+                                trustDevice
+                            };
+                            return socket.send('/noauth/2fa/authenticate', req)
+                                .then(resp => {
+                                    if (resp.twoFACookie) {
+                                        return this._set2faCookieData({
+                                            cookie: resp.twoFACookie,
+                                            trusted: trustDevice
+                                        })
+                                            .then(() => TinyDb.system.removeValue(`${this.username}:deviceToken`));
+                                        // ^ won't need last line after switching to new server
+                                    }
+                                    // Old 2FA implementation
+                                    return TinyDb.system.setValue(
+                                        `${this.username}:deviceToken`,
+                                        cryptoUtil.bytesToB64(resp.deviceToken)
+                                    );
+                                });
                         })
                         .then(resolve)
                         .catch(reject);

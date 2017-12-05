@@ -157,6 +157,20 @@ const config = new class {
     platform = '';
 
     /**
+     * Unique device identifying string (optional).
+     *
+     * If set, it should uniquely, globally identify the device (some device UUID is fine).
+     *
+     * Used only once to derive deviceId, which is later stored in the local database.
+     * If not set, deviceId is generated from a random value.
+     *
+     * @member {string | undefined}
+     * @memberof config
+     * @public
+     */
+    deviceUID = null;
+
+    /**
      * For reference. Amount of bytes added to every file chunk in encrypted state.
      * DO NOT change this value unless you really know what you're doing.
      * @returns {number} 32

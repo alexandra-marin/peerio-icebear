@@ -166,6 +166,27 @@ function getRandomShortIdHex() {
     return convert.bytesToHex(id);
 }
 
+
+/**
+ * Calculates deviceId from username and an optional device unique identifier.
+ * If device unique identifier is not specified, a random value is used.
+ *
+ * @param {string} username
+ * @param {[string]} deviceUID
+ */
+function getDeviceId(username, deviceUID) {
+    const h = hashing.getHashObject(32, convert.strToBytes(username), 'PRIDevId');
+    if (deviceUID && deviceUID.length > 0) {
+        h.update(convert.strToBytes(deviceUID));
+    } else {
+        // We can just return random bytes as deviceId, but
+        // let's follow the same path of getting a hash of it.
+        // It's useful to avoid exposing plain PRNG output to server.
+        h.update(getRandomBytes(32));
+    }
+    return convert.bytesToB64(h.digest());
+}
+
 module.exports = {
     getRandomBytes,
     getRandomNumber,
@@ -175,6 +196,6 @@ module.exports = {
     getRandomUserSpecificIdHex,
     getRandomGlobalShortIdHex,
     getRandomShortIdHex,
-    getRandomGlobalUrlSafeShortIdB64
-
+    getRandomGlobalUrlSafeShortIdB64,
+    getDeviceId
 };

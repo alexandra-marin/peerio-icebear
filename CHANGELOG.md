@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.12.0"></a>
+# [3.12.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.11.0...v3.12.0) (2017-12-05)
+
+
+### Bug Fixes
+
+* title_poorConnectionInlineImage ([b298f97](https://github.com/PeerioTechnologies/peerio-icebear/commit/b298f97))
+* undo italicize ([0d92015](https://github.com/PeerioTechnologies/peerio-icebear/commit/0d92015))
+
+
+### Features
+
+* Add title_addMessage ([f637a0f](https://github.com/PeerioTechnologies/peerio-icebear/commit/f637a0f))
+* copy title_poorConnectionInlineImage ([cba0e49](https://github.com/PeerioTechnologies/peerio-icebear/commit/cba0e49))
+* italicize title_addMessage ([8d31670](https://github.com/PeerioTechnologies/peerio-icebear/commit/8d31670))
+* title_poorConnectionExternalURL ([cd6245b](https://github.com/PeerioTechnologies/peerio-icebear/commit/cd6245b))
+* title_stopTrustingThisDevice ([c19c0f2](https://github.com/PeerioTechnologies/peerio-icebear/commit/c19c0f2))
+
+
+
 <a name="3.11.0"></a>
 # [3.11.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.10.2...v3.11.0) (2017-12-05)
 

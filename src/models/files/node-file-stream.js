@@ -97,6 +97,15 @@ class NodeFileStream extends FileStreamAbstract {
         });
     }
 
+    static rename(oldPath, newPath) {
+        return new Promise((resolve, reject) => {
+            fs.rename(oldPath, newPath, err => {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
+    }
+
     static getTempCachePath(name) {
         return path.join(os.tmpdir(), name);
     }

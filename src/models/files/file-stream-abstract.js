@@ -211,6 +211,20 @@ class FileStreamAbstract {
     }
 
     /**
+     * Override. Renames old path to new path.
+     * @static
+     * @param {string} oldPath
+     * @param {string} newPath
+     * @returns {Promise}
+     * @memberof FileStreamAbstract
+     * @abstract
+     * @public
+     */
+    static rename(oldPath, newPath) {
+        throw new AbstractCallError();
+    }
+
+    /**
      * Override. Returns a path for storing temporarily downloaded(cached) files.
      * @static
      * @memberof FileStreamAbstract

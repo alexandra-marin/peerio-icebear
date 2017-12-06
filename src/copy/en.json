@@ -619,5 +619,7 @@
   "error_messageErrorMessageRichtext": "Message Rich Text",
   "error_messageErrorAdditionalInfo": "Additional information about this error",
   "error_messageErrorNotAvailable": "Not available",
-  "title_verifyUserIdentity": "You can verify any user’s identity with their Peerio ID#. <a-identityVerification>Show me how</>"
+  "title_shareUsage": "Help improve Peerio",
+  "title_shareUsageDetails": "By sharing some geeky stats with us, such as navigation preferences and performance indicators, you greatly help our designers and developers improve Peerio 🤓.\n\nSince all your messages and files are always encrypted, we will not (and cannot) collect any of your personal content.\n\n",
+  "button_shareUsage": "Share usage data"
 }

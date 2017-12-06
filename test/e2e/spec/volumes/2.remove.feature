@@ -28,7 +28,7 @@ Feature: Removing files from volumes
         And I uploaded some files into the volume
         When I remove the file from the volume
         Then the file will be removed from the volume
-        And my contact will not see it in their drive
+        And my contact will not see it in their drive root
 
     @owner 
     Scenario: Unshare my file from a volume as owner

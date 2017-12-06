@@ -51,7 +51,7 @@ function download(filePath, resume, isTmpCacheDownload) {
         this.progress = 0;
         this._resetDownloadState();
         this.downloading = true;
-        let tempPath;
+        let tempPath = filePath;
         if (!isTmpCacheDownload) {
             this._saveDownloadStartFact(filePath);
             tempPath = `${filePath}.peeriodownload`;

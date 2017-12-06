@@ -1,5 +1,6 @@
 const Keg = require('../kegs/keg');
-const { observable } = require('mobx');
+const { observable, computed } = require('mobx');
+const moment = require('moment');
 
 /**
  * Plaintext named system keg, server controlled.
@@ -53,6 +54,19 @@ class Settings extends Keg {
     @observable subscribeToPromoEmails = false;
 
     @observable loaded = false;
+
+    /**
+     * Checks if prompt for anonymous data collection
+     * should be shown after 7 days of app usage
+     * @member {boolean} shouldPromptDataCollection
+     * @memberof Settings
+     * @public
+     */
+    @computed get shouldPromptDataCollection() {
+        return !this.dataCollection &&
+            !this.errorTracking &&
+            moment(Date.now()) > moment(this.user.createAt).add(7, 'days');
+    }
 
     constructor(user) {
         super('settings', 'settings', user.kegDb, true);

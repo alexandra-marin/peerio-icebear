@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.12.1"></a>
+## [3.12.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.12.0...v3.12.1) (2017-12-06)
+
+
+### Bug Fixes
+
+* **download:** wait for file to close before returning and ensure we catch close error ([#88](https://github.com/PeerioTechnologies/peerio-icebear/issues/88)) ([60de18f](https://github.com/PeerioTechnologies/peerio-icebear/commit/60de18f))
+* more accurate basic kegs loading to fix tests ([336ce7f](https://github.com/PeerioTechnologies/peerio-icebear/commit/336ce7f))
+
+
+
 <a name="3.12.0"></a>
 # [3.12.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.11.0...v3.12.0) (2017-12-05)
 

@@ -283,12 +283,16 @@ class SocketClient {
             this.latency = latency;
         });
 
-        socket.on('reconnect_error', () => {
+        this.handleReconnectError = () => {
             this.reconnecting = false;
             // HACK: backoff.duration() will increase attempt count, so we balance that
             this.socket.io.backoff.attempts--;
             this.reconnectTimer.countDown(this.socket.io.backoff.duration() / 1000);
-        });
+        };
+
+        socket.on('connect_error', this.handleReconnectError);
+        socket.on('reconnect_error', this.handleReconnectError);
+        socket.on('error', this.handleReconnectError);
 
         socket.open();
 

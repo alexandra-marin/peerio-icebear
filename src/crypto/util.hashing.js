@@ -83,6 +83,7 @@ function fingerprintToStr(bytes) {
 }
 
 module.exports = {
+    getHashObject,
     getHexHash,
     getByteHash,
     getFingerprint

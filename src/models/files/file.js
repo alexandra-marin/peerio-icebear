@@ -169,6 +169,15 @@ class File extends Keg {
      */
     @observable shared = false;
 
+    /**
+     * Amount of visual components which display this file currently
+     * @member {number} visibleCounter
+     * @memberof File
+     * @instance
+     * @public
+     */
+    @observable visibleCounter = 0;
+
     // -- computed properties ------------------------------------------------------------------------------------
     /**
      * file extension

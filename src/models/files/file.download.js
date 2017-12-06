@@ -5,6 +5,7 @@
 const config = require('../../config');
 const warnings = require('./../warnings');
 const FileDownloader = require('./file-downloader');
+const FileCacheHandler = require('./file-cache-handler');
 const cryptoUtil = require('../../crypto/util');
 const FileNonceGenerator = require('./file-nonce-generator');
 const TinyDb = require('../../db/tiny-db');
@@ -29,6 +30,7 @@ function _getDlResumeParams(path) {
 
 function downloadToTmpCache() {
     return this.download(this.tmpCachePath, undefined, true)
+        .then(() => FileCacheHandler.cacheMonitor(this))
         .tapCatch(() => { this.cachingFailed = true; });
 }
 
@@ -49,7 +51,11 @@ function download(filePath, resume, isTmpCacheDownload) {
         this.progress = 0;
         this._resetDownloadState();
         this.downloading = true;
-        if (!isTmpCacheDownload) this._saveDownloadStartFact(filePath);
+        let tempPath = filePath;
+        if (!isTmpCacheDownload) {
+            this._saveDownloadStartFact(filePath);
+            tempPath = `${filePath}.peeriodownload`;
+        }
         const nonceGen = new FileNonceGenerator(0, this.chunksCount - 1, cryptoUtil.b64ToBytes(this.nonce));
         let stream, mode = 'write';
         let p = Promise.resolve(true);
@@ -63,7 +69,7 @@ function download(filePath, resume, isTmpCacheDownload) {
                     mode = 'append';
                 } else resumeParams = null; // eslint-disable-line
 
-                stream = new config.FileStream(filePath, mode);
+                stream = new config.FileStream(tempPath, mode);
                 // eslint-disable-next-line consistent-return
                 return stream.open()
                     .then(() => {
@@ -71,9 +77,17 @@ function download(filePath, resume, isTmpCacheDownload) {
                         return this.downloader.start();
                     });
             })
-            .then(action(() => {
-                if (!isTmpCacheDownload) this._saveDownloadEndFact();
+            .then(() => {
+                if (!isTmpCacheDownload) {
+                    this._saveDownloadEndFact();
+                }
                 this._resetDownloadState(stream);
+                if (tempPath) {
+                    return config.FileStream.rename(tempPath, filePath);
+                }
+                return undefined; // for eslint
+            })
+            .then(action(() => {
                 if (!isTmpCacheDownload) {
                     this.cached = true; // currently for mobile only
                     warnings.add('snackbar_downloadComplete');
@@ -117,12 +131,32 @@ function cancelDownload() {
     this._resetDownloadState();
 }
 
+/**
+ * Removes download cache if it exists
+ * @returns {Promise}
+ * @instance
+ * @memberof File
+ * @public
+ */
+function removeCache() {
+    return Promise.resolve((async () => {
+        if (!this.tmpCached) return;
+        try {
+            await config.FileStream.delete(this.tmpCachePath);
+        } catch (e) {
+            console.error(e);
+        }
+        this.tmpCached = false;
+    })());
+}
+
 function _saveDownloadStartFact(path) {
     TinyDb.user.setValue(`DOWNLOAD:${this.fileId}`, {
         fileId: this.fileId,
         path
     });
 }
+
 function _saveDownloadEndFact() {
     TinyDb.user.removeValue(`DOWNLOAD:${this.fileId}`);
 }
@@ -148,6 +182,7 @@ module.exports = function(File) {
     File.prototype.download = download;
     File.prototype.downloadToTmpCache = downloadToTmpCache;
     File.prototype.cancelDownload = cancelDownload;
+    File.prototype.removeCache = removeCache;
     File.prototype._saveDownloadStartFact = _saveDownloadStartFact;
     File.prototype._saveDownloadEndFact = _saveDownloadEndFact;
     File.prototype._resetDownloadState = _resetDownloadState;

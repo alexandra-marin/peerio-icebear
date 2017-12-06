@@ -4,7 +4,6 @@ const { retryUntilSuccess } = require('../../helpers/retry');
 const TaskQueue = require('../../helpers/task-queue');
 const Keg = require('./keg.js');
 const warnings = require('../warnings');
-const { observable } = require('mobx');
 
 /**
  * This class allows named kegs to share sync/save logic.
@@ -27,14 +26,6 @@ class SyncedKeg extends Keg {
     }
 
     _syncQueue = new TaskQueue(1, 0);
-    /**
-     * Sets to true when keg is loaded for the first time.
-     * @member {boolean} loaded
-     * @memberof SyncedKeg
-     * @instance
-     * @public
-     */
-    @observable loaded = false;
 
     _enqueueLoad = () => {
         return this._syncQueue.addTask(this._loadKeg);
@@ -75,7 +66,6 @@ class SyncedKeg extends Keg {
     reload = () => {
         return this.load()
             .then(() => {
-                this.loaded = true;
                 this.onUpdated();
                 // this will make sure that we get any updates we possibly got notified about
                 // while finishing current operation

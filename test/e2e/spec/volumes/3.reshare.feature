@@ -8,10 +8,7 @@ Feature: Sharing volumes
 
     Individual shares, even when temporarily redundant (due to membership in a volume or room), will be added to 
     the permissions matrix of a file. Thus, a file shared with a volume and then shared with a user who at the time
-    has access to the volume, would receive an additional entry in the permissions matrix for the individual user.
-
-    Since during the MVP we will not have reworked ndividual sharing of files, it is acceptable to have duplication in 
-    the user's drive when re-sharing a file that is also in a volume. 
+    has access to the volume, would receive an additional entry in the permissions matrix for the individual user
 
     Background:
         Given I am logged in
@@ -40,10 +37,10 @@ Feature: Sharing volumes
         Then the user will receive a DM referencing the file
         And the file will be shared with the contact
         And the file will be shared with the volume
-        And the contact sees a duplicate reference to the file in their drive
+        But the contact will not see the file in their drive root
         When the contact removes the volume from their drive
-        Then they will no longer see the volume in their drive
-        But they will still see the file in their drive
+        Then the contact will no longer see the volume in their drive
+        But the contact will see the file in their drive root
 
     Scenario: Sharing a file from a volume with a user who has been invited to the volume
         When I share a volume with a contact
@@ -52,12 +49,13 @@ Feature: Sharing volumes
         Then the user will receive a DM referencing the file
         And the file will be shared with the user
         And the file will be shared with the volume
-        And the contact sees a duplicate reference to the file in their drive
+        And the contact will see the file in their drive root
 
     Scenario: Sharing a file from a volume with a user who does not share the volume
-        When I share a file from a volume with a user who isn't in the volume
-        Then the user will receive the file
-        But the user will not be invited to the volume
-        And the file will be shared with the user
-        But the volume will not be shared with the user
+        When I share a file from a volume with a contact who isn't in the volume
+        Then the contact will receive the file
+        And the contact will see the file in their drive root
+        But the contact will not be invited to the volume
+        And the file will be shared with the contact
+        But the volume will not be shared with the contact
         

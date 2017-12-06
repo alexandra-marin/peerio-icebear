@@ -82,7 +82,7 @@ Feature: Inviting users to volumes
 
     @viewer 
     Scenario: Cannot invite editors to volume 
-         Given I have joined a volume as a viewer
+        Given I have joined a volume as a viewer
         When I invite a contact to the volume as an editor
         Then the operation will fail
         And the contact will not be invited

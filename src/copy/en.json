@@ -36,7 +36,6 @@
   "title_dontShowAgain": "Don't show this again",
   "title_gotYourKeys": "Got your keys?",
   "title_signOutConfirmKeys": "You’re about to lock the door to your Peerio account. You will need your account key when you return.",
-  "title_stopTrustingThisDevice": "Stop trusting this device",
   "button_CreateAccount": "Create account",
   "button_next": "Next",
   "button_back": "Back",
@@ -65,7 +64,6 @@
   "title_signupStep1": "Signup (1 of 2)",
   "title_signupStep2": "Signup (2 of 2)",
   "title_avatarInstructions": "Add photo",
-  "title_optional": "(optional)",
   "title_createAccount": "Create Account",
   "title_TOSRequestText": "By creating a Peerio account, you agree to our <tosButton>terms of use.</>",
   "title_username": "Username",
@@ -181,7 +179,6 @@
   "error_messageSendFail": "Unable to send your message",
   "error_chatRename": "Unable to change chat title",
   "error_chatPurposeChange": "Unable to change chat purpose",
-  "title_purpose": "Room purpose",
   "error_invalidMessageSignature": "The message's signature is invalid. It may be a forgery.",
   "error_invalidFileSignature": "The file's signature is invalid. It may be a forgery.",
   "error_invalidFileSignatureLong": "This file signature could not be verified. It is possible that the file was forged by a third party.",
@@ -623,5 +620,6 @@
   "error_messageErrorMessageRichtext": "Message Rich Text",
   "error_messageErrorAdditionalInfo": "Additional information about this error",
   "error_messageErrorNotAvailable": "Not available",
-  "title_verifyUserIdentity": "You can verify any user’s identity with their Peerio ID#. <a-identityVerification>Show me how</>"
+  "title_verifyUserIdentity": "You can verify any user’s identity with their Peerio ID#. <a-identityVerification>Show me how</>",
+  "title_addPeopleToRoom": "Add people to this room"
 }

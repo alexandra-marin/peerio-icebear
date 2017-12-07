@@ -1,6 +1,4 @@
-[PR guideline](https://github.com/PeerioTechnologies/peerio-icebear/blob/dev/docs/CONTRIBUTING.md)
-
-#### Relevant issue and PR links 
+#### Relevant info and issue/PR links 
  
 #### Testing instructions  
 
@@ -10,3 +8,5 @@
 
 - [ ] Was tested and can be merged.
 - [ ] PR name follows conventional changelog format.
+
+[PR guideline](https://github.com/PeerioTechnologies/peerio-icebear/blob/dev/docs/CONTRIBUTING.md)

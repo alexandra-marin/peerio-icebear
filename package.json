@@ -2,7 +2,7 @@
   "name": "peerio-icebear",
   "version": "3.12.5",
   "description": "Peerio Icebear client library",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "=== HOOKS ===": "",
     "postinstall": "[ `which opt` ] && opt --in npm-install --exec \"node ./scripts/store_package_json_hash.js\" || true",

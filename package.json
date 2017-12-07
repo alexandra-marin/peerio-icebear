@@ -61,6 +61,7 @@
     "babel-cli": "6.26.0",
     "babel-eslint": "8.0.2",
     "babel-plugin-console-kungfu": "github:PeerioTechnologies/babel-plugin-console-kungfu#v1.0.0",
+    "babel-plugin-transform-async-to-bluebird": "1.1.1",
     "babel-plugin-transform-class-properties": "6.24.1",
     "babel-plugin-transform-decorators-legacy": "1.3.4",
     "babel-plugin-transform-es2015-modules-commonjs": "6.26.0",

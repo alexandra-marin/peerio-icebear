@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.13.0"></a>
+# [3.13.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.12.9...v3.13.0) (2017-12-11)
+
+
+### Features
+
+* create and delete image temp cache folder ([#82](https://github.com/PeerioTechnologies/peerio-icebear/issues/82)) ([78b981f](https://github.com/PeerioTechnologies/peerio-icebear/commit/78b981f))
+
+
+
 <a name="3.12.9"></a>
 ## [3.12.9](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.12.8...v3.12.9) (2017-12-11)
 

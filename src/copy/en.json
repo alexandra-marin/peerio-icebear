@@ -344,6 +344,7 @@
   "title_onlyFromFavourites": "Only from Favourites",
   "title_EnableUrlPreviewWarning": "Enabling URL Preview may increase the chance of tracking by third party web services.",
   "title_learnMore": "<a-learnUrlTracking>Learn more.</>",
+  "button_learnMore": "Learn more",
   "title_forAllContacts": "For all contacts",
   "title_forFavouriteContactsOnly": "For favourite contacts only",
   "title_dndMode": "Do not disturb mode",

@@ -273,6 +273,7 @@
   "error_uploadFailed": "Upload failed",
   "error_downloadFailed": "Download failed",
   "error_fileRemoved": "File unavailable",
+  "error_fileDeleted": "This file has been deleted",
   "error_fileSizeChanged": "File size has changed, can't resume upload.",
   "error_folderAlreadyExists": "Folder with this name already exists.",
   "error_savingFileFolders": "Error saving folder changes, please try again.",

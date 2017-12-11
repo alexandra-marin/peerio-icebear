@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.12.9"></a>
+## [3.12.9](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.12.8...v3.12.9) (2017-12-11)
+
+
+### Bug Fixes
+
+* some content-types contain encoding after ; ([#95](https://github.com/PeerioTechnologies/peerio-icebear/issues/95)) ([2593835](https://github.com/PeerioTechnologies/peerio-icebear/commit/2593835))
+
+
+
 <a name="3.12.8"></a>
 ## [3.12.8](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.12.7...v3.12.8) (2017-12-07)
 

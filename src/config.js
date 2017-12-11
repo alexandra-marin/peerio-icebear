@@ -135,6 +135,11 @@ const config = new class {
     ghostFrontendUrl = 'https://';
 
     /**
+     * Application name
+     */
+    appId = 'peerio';
+
+    /**
      * Application version (semver).
      * Will be used by server to detect deprecated client versions.
      *

@@ -1,8 +1,9 @@
 const FileStreamAbstract = require('./file-stream-abstract');
 const errors = require('../../errors');
 const fs = require('fs');
-const os = require('os');
 const path = require('path');
+const mkdirp = require('mkdirp');
+const rimraf = require('rimraf');
 
 /**
  * FileStreamAbstract implementation for nodejs, see {@link FileStreamAbstract} for docs.
@@ -107,11 +108,48 @@ class NodeFileStream extends FileStreamAbstract {
     }
 
     static getTempCachePath(name) {
-        return path.join(os.tmpdir(), name);
+        if (!this.storageFolder) {
+            throw new Error('Must set FileStream.storageFolder');
+        }
+        return path.join(this.storageFolder, name);
     }
 
     static exists(filePath) {
         return Promise.resolve(fs.existsSync(filePath));
+    }
+
+    static createDir(folderPath) {
+        return new Promise((resolve, reject) => {
+            mkdirp(folderPath, err => {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
+    }
+
+    static removeDir(folderPath) {
+        return new Promise((resolve, reject) => {
+            rimraf(folderPath, { disableGlob: true }, err => {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
+    }
+
+    static async createTempCache() {
+        console.log(`Initializing temporary path ${this.storageFolder}`);
+        try {
+            await this.createDir(this.storageFolder);
+            console.log(`Successfully set TMP ROOT to ${this.storageFolder}`);
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    static deleteTempCache() {
+        console.log(`Deleting temporary path ${this.storageFolder}`);
+        return this.removeDir(this.storageFolder)
+            .catch(e => void console.error(e));
     }
 }
 

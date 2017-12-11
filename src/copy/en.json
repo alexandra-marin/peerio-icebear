@@ -461,6 +461,7 @@
   "title_limitDialogText1": "Your account allows for only {limit} Rooms at a time",
   "title_limitDialogText2": "If you wish to join or create another Room, please delete an existing one or upgrade your account",
   "dialog_chatZeroState": "Use the <plusIcon>+</> to start a direct message, or create a Room to meet with a group.",
+  "title_welcomeZeroChatState": "Welcome to secure chats",
   "button_createChannel": "Create Room",
   "button_deleteChannel": "Delete Room",
   "button_inviteToChannel": "Add members",

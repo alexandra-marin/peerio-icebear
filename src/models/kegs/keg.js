@@ -157,6 +157,14 @@ class Keg {
      */
     @observable dirty = false;
     /**
+     * Sets to true when keg is loaded for the first time.
+     * @member {boolean} loaded
+     * @memberof Keg
+     * @instance
+     * @public
+     */
+    @observable loaded = false;
+    /**
      * @member {boolean} lastLoadHadError
      * @memberof Keg
      * @instance
@@ -393,7 +401,10 @@ class Keg {
             if (keg.props) this.deserializeProps(keg.props);
             //  is this an empty keg? probably just created.
             if (!keg.payload) {
-                if (this.allowEmpty) return this;
+                if (this.allowEmpty) {
+                    this.loaded = true;
+                    return this;
+                }
                 this.lastLoadHadError = true;
                 return false;
             }
@@ -442,6 +453,7 @@ class Keg {
             }
             this.deserializeKegPayload(payload);
             if (this.afterLoad) this.afterLoad();
+            this.loaded = true;
             return this;
         } catch (err) {
             console.error(err, this.id);

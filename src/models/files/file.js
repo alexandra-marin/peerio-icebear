@@ -230,9 +230,6 @@ class File extends Keg {
         return cryptoUtil.getHexHash(16, cryptoUtil.b64ToBytes(this.fileId));
     }
     @computed get tmpCachePath() {
-        /* TODO: testing only, remove before merge */
-        console.log(`Temp file location: ${config.FileStream.getTempCachePath(`${this.fsSafeUid}.${this.ext}`)}`);
-
         return config.FileStream.getTempCachePath(`${this.fsSafeUid}.${this.ext}`);
     }
     /**

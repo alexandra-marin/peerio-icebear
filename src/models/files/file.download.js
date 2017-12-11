@@ -51,7 +51,11 @@ function download(filePath, resume, isTmpCacheDownload) {
         this.progress = 0;
         this._resetDownloadState();
         this.downloading = true;
-        if (!isTmpCacheDownload) this._saveDownloadStartFact(filePath);
+        let tempPath = filePath;
+        if (!isTmpCacheDownload) {
+            this._saveDownloadStartFact(filePath);
+            tempPath = `${filePath}.peeriodownload`;
+        }
         const nonceGen = new FileNonceGenerator(0, this.chunksCount - 1, cryptoUtil.b64ToBytes(this.nonce));
         let stream, mode = 'write';
         let p = Promise.resolve(true);
@@ -65,7 +69,7 @@ function download(filePath, resume, isTmpCacheDownload) {
                     mode = 'append';
                 } else resumeParams = null; // eslint-disable-line
 
-                stream = new config.FileStream(filePath, mode);
+                stream = new config.FileStream(tempPath, mode);
                 // eslint-disable-next-line consistent-return
                 return stream.open()
                     .then(() => {
@@ -73,9 +77,17 @@ function download(filePath, resume, isTmpCacheDownload) {
                         return this.downloader.start();
                     });
             })
-            .then(action(() => {
-                if (!isTmpCacheDownload) this._saveDownloadEndFact();
+            .then(() => {
+                if (!isTmpCacheDownload) {
+                    this._saveDownloadEndFact();
+                }
                 this._resetDownloadState(stream);
+                if (tempPath) {
+                    return config.FileStream.rename(tempPath, filePath);
+                }
+                return undefined; // for eslint
+            })
+            .then(action(() => {
                 if (!isTmpCacheDownload) {
                     this.cached = true; // currently for mobile only
                     warnings.add('snackbar_downloadComplete');

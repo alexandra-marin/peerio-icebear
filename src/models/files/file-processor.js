@@ -60,19 +60,25 @@ class FileProcessor {
         if (this.processFinished) return;
         this.processFinished = true;
         this.stopped = true; // bcs in case of error some calls might be scheduled
-        try {
-            this.stream.close();
-        } catch (e) {
-            // really don't care
-        }
-        this.cleanup();
-        if (err) {
-            console.log(`Failed to ${this.processType} file ${this.file.fileId}.`, err);
-            this.reject(errors.normalize(err));
-            return;
-        }
-        console.log(`${this.processType} success: ${this.file.fileId}`, this.toString());
-        this.resolve();
+        this.stream.close()
+            .then(() => {
+                this.cleanup();
+                if (err) {
+                    console.log(`Failed to ${this.processType} file ${this.file.fileId}.`, err);
+                    this.reject(errors.normalize(err));
+                    return;
+                }
+                console.log(`${this.processType} success: ${this.file.fileId}`, this.toString());
+                this.resolve();
+            })
+            .catch(closeErr => {
+                this.cleanup();
+                if (closeErr) {
+                    // File may be not written completely.
+                    console.log(`Failed to ${this.processType} file ${this.file.fileId}.`, err);
+                    this.reject(errors.normalize(closeErr));
+                }
+            });
     }
 
     // shortcut to finish process with error

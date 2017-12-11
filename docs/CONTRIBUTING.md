@@ -57,3 +57,16 @@ Cucumber ftw. Lots of useful info [in this doc](https://github.com/PeerioTechnol
 
 #### Think about performance.
 No need to go over the top, but try to figure which parts of your code are likely to get executed a lot and make them performant.
+
+## Reviewer should look for
+
+* Localisation.
+* Architectural decisions.
+* Performance.
+* Comments.
+* Big feature tech design documentation.
+* Readability.
+* DRY.
+* Can we extract something to SDK?
+* Are there any bicycles invented that should be replaced with existing SDK
+* Are there unit and e2e tests added?

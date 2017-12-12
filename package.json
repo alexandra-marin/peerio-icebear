@@ -19,7 +19,7 @@
     "test:e2e:debug": "./test/e2e/debug.sh",
     "testRunner": "mocha test/e2e/runner.js --timeout 10000000",
     "=== VALIDATION ===": "",
-    "code:lint": "eslint . --fix --ext .js",
+    "code:lint": "eslint . --fix --ext .js && ./scripts/lint-copy.sh",
     "code:verify": "eslint . --ext .js --max-warnings 0",
     "=== RELEASE ===": "",
     "release": "./scripts/release.sh",

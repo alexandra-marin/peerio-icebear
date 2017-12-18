@@ -7,6 +7,7 @@ class FileFolder {
     @observable.shallow folders = [];
     @observable name;
     @observable createdAt;
+    @observable isDeleted;
 
     @computed get normalizedName() {
         return this.name ? this.name.toLowerCase() : '';
@@ -110,6 +111,7 @@ class FileFolder {
         this.folders.forEach(folder => folder.freeSelf());
         this.folders = [];
         this.parent && this.parent.freeFolder(this);
+        this.isDeleted = true;
     }
 
     moveInto(file) {

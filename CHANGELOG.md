@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.1.0"></a>
+# [4.1.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.0.2...v4.1.0) (2017-12-19)
+
+
+### Features
+
+* new upload dialog ([#103](https://github.com/PeerioTechnologies/peerio-icebear/issues/103)) ([645fc84](https://github.com/PeerioTechnologies/peerio-icebear/commit/645fc84))
+
+
+
 <a name="4.0.2"></a>
 ## [4.0.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.0.1...v4.0.2) (2017-12-19)
 

@@ -12,7 +12,6 @@ const { retryUntilSuccess } = require('../../helpers/retry');
 const { ServerError } = require('../../errors');
 const clientApp = require('../client-app');
 
-const IMAGE_EXTS = { png: true, jpg: true, jpeg: true, bmp: true, gif: true };
 /**
  * File keg and model.
  * @param {KegDb} db
@@ -223,7 +222,7 @@ class File extends Keg {
     }
 
     @computed get isImage() {
-        return !!IMAGE_EXTS[this.ext];
+        return fileHelper.isImage(this.ext);
     }
 
     @computed get fsSafeUid() {

@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.0.1"></a>
+## [4.0.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.0.0...v4.0.1) (2017-12-19)
+
+
+### Bug Fixes
+
+* **download:** avoid renaming to the same name ([#104](https://github.com/PeerioTechnologies/peerio-icebear/issues/104)) ([ba1f8ff](https://github.com/PeerioTechnologies/peerio-icebear/commit/ba1f8ff))
+
+
+
 <a name="4.0.0"></a>
 # [4.0.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.13.4...v4.0.0) (2017-12-19)
 

@@ -232,6 +232,24 @@ class FileStreamAbstract {
     static getTempCachePath(name) {
         throw new AbstractCallError();
     }
+
+    /**
+     * Override. Creates a directory at "path".
+     * @static
+     * @memberof FileStreamAbstract
+     */
+    static createDir(path) {
+        throw new AbstractCallError();
+    }
+
+    /**
+     * Override. Empties and them removes a directory at "path".
+     * @static
+     * @memberof FileStreamAbstract
+     */
+    static removeDir(path) {
+        throw new AbstractCallError();
+    }
 }
 
 module.exports = FileStreamAbstract;

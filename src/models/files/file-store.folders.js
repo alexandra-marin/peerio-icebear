@@ -6,6 +6,8 @@ const FileFoldersKeg = require('./file-folders-keg');
 const cryptoUtil = require('../../crypto/util');
 const warnings = require('../warnings');
 
+const ROOT_FOLDER = new FileFolder('/');
+
 class FileStoreFolders {
     constructor(fileStore) {
         this.fileStore = fileStore;
@@ -13,14 +15,18 @@ class FileStoreFolders {
             this.keg = new FileFoldersKeg(getUser().kegDb);
             this.keg.onUpdated = () => { this.sync(); };
         });
+        reaction(() => this.currentFolder.isDeleted, deleted => {
+            if (deleted) this.currentFolder = ROOT_FOLDER;
+        });
     }
 
     @observable loaded = false;
     @observable keg = null;
 
-    root = new FileFolder('/');
+    root = ROOT_FOLDER;
+    @observable currentFolder = ROOT_FOLDER;
 
-    @observable folderResolveMap = observable.shallowMap({});
+    folderResolveMap = observable.shallowMap({});
     folderIdReactions = {};
 
     getById(id) {
@@ -73,7 +79,11 @@ class FileStoreFolders {
                 folderResolveMap.get(folderId).freeSelf();
             }
         });
-        this.folderResolveMap = observable.shallowMap(newFolderResolveMap);
+        Object.keys(newFolderResolveMap).forEach(folderId => {
+            if (!folderResolveMap.has(folderId)) {
+                folderResolveMap.set(folderId, newFolderResolveMap[folderId]);
+            }
+        });
         files.forEach(this._addFile);
         this._intercept = files.observe(delta => {
             delta.removed.forEach(this._removeFile);

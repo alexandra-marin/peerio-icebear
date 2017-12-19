@@ -2,6 +2,75 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.0.0"></a>
+# [4.0.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.13.4...v4.0.0) (2017-12-19)
+
+
+### Chores
+
+* add allParticipants computed value to chat.js ([#100](https://github.com/PeerioTechnologies/peerio-icebear/issues/100)) ([1ae1333](https://github.com/PeerioTechnologies/peerio-icebear/commit/1ae1333))
+
+
+### BREAKING CHANGES
+
+* Chat#participants renamed to Chat#otherParticipants
+
+* chore: add allParticipants computed value to chat.js
+
+* chore: separate joinedParticipants, allJoinedParticipants
+
+* refactor: more efficient participants, joinedParticipants functions
+
+* chore: remove unnecessary existence check
+
+* chore: displayParticipants based on isChannel
+
+* chore: displayParticipants logic was backwards
+
+* refactor: participants api
+
+
+
+<a name="3.13.4"></a>
+## [3.13.4](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.13.3...v3.13.4) (2017-12-18)
+
+
+
+<a name="3.13.3"></a>
+## [3.13.3](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.13.2...v3.13.3) (2017-12-18)
+
+
+
+<a name="3.13.2"></a>
+## [3.13.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.13.1...v3.13.2) (2017-12-18)
+
+
+
+<a name="3.13.1"></a>
+## [3.13.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.13.0...v3.13.1) (2017-12-18)
+
+
+
+<a name="3.13.0"></a>
+# [3.13.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.12.9...v3.13.0) (2017-12-11)
+
+
+### Features
+
+* create and delete image temp cache folder ([#82](https://github.com/PeerioTechnologies/peerio-icebear/issues/82)) ([78b981f](https://github.com/PeerioTechnologies/peerio-icebear/commit/78b981f))
+
+
+
+<a name="3.12.9"></a>
+## [3.12.9](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.12.8...v3.12.9) (2017-12-11)
+
+
+### Bug Fixes
+
+* some content-types contain encoding after ; ([#95](https://github.com/PeerioTechnologies/peerio-icebear/issues/95)) ([2593835](https://github.com/PeerioTechnologies/peerio-icebear/commit/2593835))
+
+
+
 <a name="3.12.8"></a>
 ## [3.12.8](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.12.7...v3.12.8) (2017-12-07)
 

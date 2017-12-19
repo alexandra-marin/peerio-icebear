@@ -98,7 +98,7 @@ class ChatFileHandler {
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
             // todo: handle failure
-            file.share(this.chat.participants);
+            file.share(this.chat.otherParticipants);
             ids.push(file.fileId);
         }
         return ids;

@@ -480,6 +480,10 @@ class FileStore {
                 when(() => keg.readyForDownload, () => {
                     disposer();
                 });
+                // move file into folder as soon as we have file id
+                if (folderId) {
+                    when(() => keg.fileId, () => this.folders.getById(folderId).moveInto(keg));
+                }
                 return ret;
             });
         });

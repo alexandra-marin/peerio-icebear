@@ -337,9 +337,9 @@ class Message extends Keg {
     }
 
     _processUrlHeaders(url, headers) {
-        if (!headers) return;
+        if (!headers || !headers['content-type']) return;
 
-        const type = headers['content-type'];
+        const type = headers['content-type'].split(';')[0];
         const length = +(headers['content-length'] || 0);// careful, +undefined is NaN
 
         if (!config.chat.allowedInlineContentTypes[type]) return;

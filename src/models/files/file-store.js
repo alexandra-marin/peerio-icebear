@@ -313,83 +313,107 @@ class FileStore {
 
     _getFiles() {
         const filter = this.knownUpdateId ? { minCollectionVersion: this.knownUpdateId } : {};
-        if (this.knownUpdateId === '') filter.deleted = false;
-
+        // this is naturally paged because every update calls another update in the end
+        // until all update pages are loaded
         return socket.send('/auth/kegs/db/list-ext', {
             kegDbId: 'SELF',
             options: {
                 type: 'file',
-                reverse: false
+                reverse: false,
+                count: 50
             },
             filter
         });
+    }
+
+    @action _loadPage(fromKegId) {
+        return retryUntilSuccess(
+            () => socket.send('/auth/kegs/db/list-ext', {
+                kegDbId: 'SELF',
+                options: {
+                    type: 'file',
+                    reverse: false,
+                    fromKegId,
+                    count: 50
+                },
+                filter: {
+                    deleted: false
+                }
+            }),
+            'Initial file list loading'
+        ).then(action(kegs => {
+            for (const keg of kegs.kegs) {
+                const file = new File(User.current.kegDb);
+                if (keg.collectionVersion > this.maxUpdateId) {
+                    this.maxUpdateId = keg.collectionVersion;
+                }
+                if (keg.collectionVersion > this.knownUpdateId) {
+                    this.knownUpdateId = keg.collectionVersion;
+                }
+                if (file.loadFromKeg(keg)) {
+                    if (!file.fileId) {
+                        console.error('File keg missing fileId', file.id);
+                        continue;
+                    }
+                    if (this.fileMap[file.fileId]) {
+                        console.error('File keg has duplicate fileId', file.id);
+                        continue;
+                    }
+                    this.files.unshift(file);
+                } else {
+                    console.error('Failed to load file keg', keg.kegId);
+                    continue;
+                }
+            }
+            const size = kegs.kegs.length;
+            return { size, maxId: size > 0 ? kegs.kegs[0].kegId : 0 };
+        }));
+    }
+
+    @action _finishLoading() {
+        this.loading = false;
+        this.loaded = true;
+        this.resumeBrokenDownloads();
+        this.resumeBrokenUploads();
+        this.detectCachedFiles();
+        socket.onDisconnect(() => { this.updatedAfterReconnect = false; });
+        socket.onAuthenticated(() => {
+            this.onFileDigestUpdate();
+            setTimeout(() => {
+                if (socket.authenticated) {
+                    this.resumeBrokenDownloads();
+                    this.resumeBrokenUploads();
+                }
+            }, 3000);
+            for (let i = 0; i < this.files.length; i++) {
+                if (this.files[i].cachingFailed) {
+                    this.files[i].cachingFailed = false;
+                }
+            }
+        });
+        reaction(
+            () => this.unreadFiles === 0 || !clientApp.isInFilesView || !clientApp.isFocused,
+            (dontReport) => {
+                if (dontReport) return;
+                tracker.seenThis('SELF', 'file', this.knownUpdateId);
+            }, { fireImmediately: true, delay: 700 }
+        );
+        setTimeout(this.updateFiles);
     }
 
     /**
      * Call at least once from UI.
      * @public
      */
-    loadAllFiles = () => {
+    loadAllFiles = Promise.method(async () => {
         if (this.loading || this.loaded) return;
-        // console.time('loadAllFiles');
         this.loading = true;
-
-        retryUntilSuccess(() => this._getFiles(), 'Initial file list loading')
-            .then(action(kegs => {
-                for (const keg of kegs.kegs) {
-                    const file = new File(User.current.kegDb);
-                    if (keg.collectionVersion > this.maxUpdateId) {
-                        this.maxUpdateId = keg.collectionVersion;
-                    }
-                    if (keg.collectionVersion > this.knownUpdateId) {
-                        this.knownUpdateId = keg.collectionVersion;
-                    }
-                    if (file.loadFromKeg(keg)) {
-                        if (!file.fileId) {
-                            console.error('File keg missing fileId', file.id);
-                            continue;
-                        }
-                        if (this.fileMap[file.fileId]) {
-                            console.error('File keg has duplicate fileId', file.id);
-                            continue;
-                        }
-                        this.files.unshift(file);
-                    } else {
-                        console.error('Failed to load file keg', keg.kegId);
-                        continue;
-                    }
-                }
-                this.loading = false;
-                this.loaded = true;
-                this.resumeBrokenDownloads();
-                this.resumeBrokenUploads();
-                this.detectCachedFiles();
-                socket.onDisconnect(() => { this.updatedAfterReconnect = false; });
-                socket.onAuthenticated(() => {
-                    this.onFileDigestUpdate();
-                    setTimeout(() => {
-                        if (socket.authenticated) {
-                            this.resumeBrokenDownloads();
-                            this.resumeBrokenUploads();
-                        }
-                    }, 3000);
-                    for (let i = 0; i < this.files.length; i++) {
-                        if (this.files[i].cachingFailed) {
-                            this.files[i].cachingFailed = false;
-                        }
-                    }
-                });
-                reaction(
-                    () => this.unreadFiles === 0 || !clientApp.isInFilesView || !clientApp.isFocused,
-                    (dontReport) => {
-                        if (dontReport) return;
-                        tracker.seenThis('SELF', 'file', this.knownUpdateId);
-                    }, { fireImmediately: true, delay: 700 }
-                );
-                setTimeout(this.updateFiles);
-                // console.timeEnd('loadAllFiles');
-            }));
-    };
+        let lastPage = { maxId: '1001' };
+        do {
+            lastPage = await this._loadPage(lastPage.maxId); // eslint-disable-line no-await-in-loop
+        } while (lastPage.size > 0);
+        this._finishLoading();
+    });
 
     // this essentially does the same as loadAllFiles but with filter,
     // we reserve this way of updating anyway for future, when we'll not gonna load entire file list on start

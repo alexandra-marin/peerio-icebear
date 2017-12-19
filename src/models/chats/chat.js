@@ -89,19 +89,6 @@ class Chat {
     // performance helper, to lookup messages by id and avoid duplicates
     _messageMap = {};
 
-    /**
-     * Does not include current user. Includes participants that are just invited but not joined too.
-     * @member {ObservableArray<Contact>} participants
-     * @memberof Chat
-     * @instance
-     * @public
-     * @readonly
-     */
-    @computed get participants() {
-        if (!this.db.boot || !this.db.boot.participants) return [];
-        return this.db.boot.participants.filter(p => p.username !== User.current.username).sort(this.compareContacts);
-    }
-
     compareContacts = (c1, c2) => {
         if (this.isAdmin(c1) && !this.isAdmin(c2)) return -1;
         if (!this.isAdmin(c1) && this.isAdmin(c2)) return 1;
@@ -109,31 +96,55 @@ class Chat {
     }
 
     /**
-     * Does not include current user. Includes participants that are just invited but not joined too.
-     * @member {Array<Contact>} participants
+     * All participants, including awaiting for invite accept or removal after leave.
+     * Including current user.
+     * @member {ObservableArray<Contact>} allParticipants
      * @memberof Chat
      * @instance
      * @public
      * @readonly
      */
-    @computed get joinedParticipants() {
-        const filtered = this.participants.slice();
-        if (!this.isChannel) return filtered;
-        const invited = chatInviteStore.sent.get(this.id);
-        const rejected = chatInviteStore.rejected.get(this.id);
-        const left = chatInviteStore.left.get(this.id);
-        const filter = (i) => {
-            const ind = filtered.findIndex(p => p.username === i.username);
-            if (ind >= 0) {
-                filtered.splice(ind, 1);
-            }
-        };
-        // TODO: is this really faster then Array#filter?
-        if (invited) invited.forEach(filter);
-        if (rejected) rejected.forEach(filter);
-        if (left) left.forEach(filter);
-        return filtered;
+    @computed get allParticipants() {
+        if (!this.db.boot || !this.db.boot.participants) return [];
+        return this.db.boot.participants.sort(this.compareContacts);
     }
+
+    /**
+     * Participants, including awaiting for invite accept or removal after leave.
+     * Excluding current user.
+     * @member {ObservableArray<Contact>} otherParticipants
+     * @memberof Chat
+     * @instance
+     * @public
+     * @readonly
+     */
+    @computed get otherParticipants() {
+        return this.allParticipants.filter(p => p.username !== User.current.username);
+    }
+
+    /**
+     * Room api. For DM will work too, but doesn't make sense, just use 'allParticipants'
+     * Includes only currently joined room participants and current user.
+     * Excludes users awaiting to accept invite or get removed after leave.
+     * @member {Array<Contact>} allJoinedParticipants
+     * @memberof Chat
+     * @instance
+     * @public
+     * @readonly
+     */
+    @computed get allJoinedParticipants() {
+        const filtered = this.allParticipants.slice();
+        if (!this.isChannel) return filtered;
+
+        const invited = chatInviteStore.sent.get(this.id) || [];
+        const rejected = chatInviteStore.rejected.get(this.id) || [];
+        const left = chatInviteStore.left.get(this.id) || [];
+
+        const excluded = invited.concat(rejected).concat(left).map(p => p.username);
+
+        return filtered.filter(p => !excluded.includes(p.username));
+    }
+
     /**
      * If true - chat is not ready for anything yet.
      * @member {boolean} loadingMeta
@@ -340,8 +351,8 @@ class Chat {
      */
     @computed get isReadOnly() {
         if (this.isChannel) return false;
-        return this.participants.length > 0
-            && this.participants.filter(p => p.isDeleted).length === this.participants.length;
+        return this.otherParticipants.length > 0
+            && this.otherParticipants.filter(p => p.isDeleted).length === this.otherParticipants.length;
     }
 
     /**
@@ -352,8 +363,7 @@ class Chat {
      * @public
      */
     @computed get participantUsernames() {
-        // if (!this.participants) return null;
-        return this.participants.map(p => p.username);
+        return this.otherParticipants.map(p => p.username);
     }
 
     /**
@@ -364,9 +374,9 @@ class Chat {
      */
     @computed get name() {
         if (this.isChannel && this.chatHead && this.chatHead.chatName) return this.chatHead.chatName;
-        return this.participants.length === 0
+        return this.otherParticipants.length === 0
             ? (User.current.fullName || User.current.username)
-            : this.participants.map(p => p.fullName || p.username).join(', ');
+            : this.otherParticipants.map(p => p.fullName || p.username).join(', ');
     }
 
     /**
@@ -775,10 +785,10 @@ class Chat {
      * @protected
      */
     hasSameParticipants(participants) {
-        if (this.participants.length !== participants.length) return false;
+        if (this.otherParticipants.length !== participants.length) return false;
 
         for (const p of participants) {
-            if (!this.participants.includes(p)) return false;
+            if (!this.otherParticipants.includes(p)) return false;
         }
         return true;
     }
@@ -1057,7 +1067,7 @@ class Chat {
      * @public
      */
     promoteToAdmin(contact) {
-        if (!this.participants.includes(contact)) {
+        if (!this.otherParticipants.includes(contact)) {
             return Promise.reject(new Error('Attempt to promote user who is not a participant'));
         }
         if (this.db.admins.includes(contact)) {
@@ -1087,7 +1097,7 @@ class Chat {
      * @public
      */
     demoteAdmin(contact) {
-        if (!this.participants.includes(contact)) {
+        if (!this.otherParticipants.includes(contact)) {
             return Promise.reject(new Error('Attempt to demote user who is not a participant'));
         }
         if (!this.db.admins.includes(contact)) {

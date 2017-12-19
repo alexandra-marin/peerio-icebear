@@ -82,7 +82,7 @@ function download(filePath, resume, isTmpCacheDownload) {
                     this._saveDownloadEndFact();
                 }
                 this._resetDownloadState(stream);
-                if (tempPath) {
+                if (tempPath && tempPath !== filePath) {
                     return config.FileStream.rename(tempPath, filePath);
                 }
                 return undefined; // for eslint

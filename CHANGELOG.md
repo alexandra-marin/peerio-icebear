@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.0.0"></a>
+# [4.0.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.13.4...v4.0.0) (2017-12-19)
+
+
+### Chores
+
+* add allParticipants computed value to chat.js ([#100](https://github.com/PeerioTechnologies/peerio-icebear/issues/100)) ([1ae1333](https://github.com/PeerioTechnologies/peerio-icebear/commit/1ae1333))
+
+
+### BREAKING CHANGES
+
+* Chat#participants renamed to Chat#otherParticipants
+
+* chore: add allParticipants computed value to chat.js
+
+* chore: separate joinedParticipants, allJoinedParticipants
+
+* refactor: more efficient participants, joinedParticipants functions
+
+* chore: remove unnecessary existence check
+
+* chore: displayParticipants based on isChannel
+
+* chore: displayParticipants logic was backwards
+
+* refactor: participants api
+
+
+
 <a name="3.13.4"></a>
 ## [3.13.4](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.13.3...v3.13.4) (2017-12-18)
 

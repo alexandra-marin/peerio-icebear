@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.1.1"></a>
+## [4.1.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.1.0...v4.1.1) (2017-12-20)
+
+
+### Performance Improvements
+
+* don't wait for files to load before showing chats ([a466973](https://github.com/PeerioTechnologies/peerio-icebear/commit/a466973))
+
+
+
 <a name="4.1.0"></a>
 # [4.1.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.0.2...v4.1.0) (2017-12-19)
 

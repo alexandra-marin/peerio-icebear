@@ -513,7 +513,7 @@
   "title_channelRecentInvitations": "Recent Invitations",
   "title_confirmChannelDelete": "Are you sure you want to delete this Room?",
   "title_confirmChannelLeave": "Are you sure you want to leave this Room?",
-  "error_confirmChannelLeave": "Unable to leave Room.",
+  "error_channelLeave": "Unable to leave Room.",
   "error_channelDelete": "Unable to delete Room.",
   "error_channelLimitReached": "Room limit reached.",
   "error_acceptChannel": "Unable to join Room.",

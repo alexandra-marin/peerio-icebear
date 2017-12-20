@@ -33,12 +33,17 @@ class GhostStore {
      * @private
      */
     _getGhosts(minCollectionVersion = '') {
-        const query = { type: 'ghost' };
-        if (minCollectionVersion === '') query.deleted = false;
-        return socket.send('/auth/kegs/query', { // TODO: SWITCH TO LIST-EXT API
+        const filter = { minCollectionVersion };
+        if (minCollectionVersion === '') {
+            filter.deleted = false;
+        }
+        return socket.send('/auth/kegs/db/list-ext', {
             kegDbId: 'SELF',
-            minCollectionVersion,
-            query
+            options: {
+                type: 'ghost',
+                reverse: false
+            },
+            filter
         });
     }
 
@@ -49,7 +54,8 @@ class GhostStore {
         if (this.loading || this.loaded) return;
         this.loading = true;
         this._getGhosts()
-            .then(action(kegs => {
+            .then(action(resp => {
+                const { kegs } = resp;
                 console.log('there are mail kegs', kegs.length);
                 for (const keg of kegs) {
                     const ghost = new Ghost(User.current.kegDb);

@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.1.3"></a>
+## [4.1.3](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.1.1...v4.1.3) (2017-12-20)
+
+
+### Bug Fixes
+
+* locale key error_channelLeave ([bbd1761](https://github.com/PeerioTechnologies/peerio-icebear/commit/bbd1761))
+* **ghosts:** switch ghost loading to list-ext API ([#106](https://github.com/PeerioTechnologies/peerio-icebear/issues/106)) ([ec1732e](https://github.com/PeerioTechnologies/peerio-icebear/commit/ec1732e))
+
+
+
 <a name="4.1.1"></a>
 ## [4.1.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.1.0...v4.1.1) (2017-12-20)
 

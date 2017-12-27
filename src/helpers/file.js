@@ -69,4 +69,10 @@ function getFileIconType(ext) {
     return fileIconType[ext] ? fileIconType[ext] : 'other';
 }
 
-module.exports = { getFileName, getFileExtension, getFileNameWithoutExtension, getFileIconType };
+const IMAGE_EXTS = { png: true, jpg: true, jpeg: true, bmp: true, gif: true };
+
+function isImage(ext) {
+    return !!IMAGE_EXTS[ext.toLowerCase().trim()];
+}
+
+module.exports = { getFileName, getFileExtension, getFileNameWithoutExtension, getFileIconType, isImage };

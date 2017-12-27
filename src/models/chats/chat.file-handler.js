@@ -42,10 +42,11 @@ class ChatFileHandler {
      * @param {boolean} [deleteAfterUpload=false] - delete local file after successful upload
      * @param {function} [beforeShareCallback=null] - function returning Promise which will be waited for
      *                                                before file is shared. We need this to finish keg preparations.
+     * @param {string} [message=null] - message to attach to file
      * @returns {File}
      * @public
      */
-    uploadAndShare(path, name, deleteAfterUpload = false, beforeShareCallback = null) {
+    uploadAndShare(path, name, deleteAfterUpload = false, beforeShareCallback = null, message) {
         const file = fileStore.upload(path, name);
         file.uploadQueue = this.chat.uploadQueue; // todo: change, this is dirty
         this.chat.uploadQueue.push(file);
@@ -57,7 +58,7 @@ class ChatFileHandler {
             if (beforeShareCallback) {
                 beforeShareCallback().then(() => this.share([file]));
             } else {
-                this.share([file]);
+                this.share([file], message);
             }
             if (deleteAfterUpload) {
                 config.FileStream.delete(path);
@@ -71,14 +72,15 @@ class ChatFileHandler {
     /**
      * Shares previously uploaded files to chat.
      * @param {Array<File>} files
+     * @param {string} [message = ''] message to attach to file
      * @returns {Promise}
      */
-    share(files) {
+    share(files, message = '') {
         // @ts-ignore no bluebird-promise assignability with jsdoc
         return Promise.map(files, (f) => {
             return this.shareQueue.addTask(() => {
                 const ids = this.shareFileKegs([f]);
-                return this.chat.sendMessage('', ids);
+                return this.chat.sendMessage(message, ids);
             });
         });
     }

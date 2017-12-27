@@ -2,6 +2,57 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.1.3"></a>
+## [4.1.3](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.1.1...v4.1.3) (2017-12-20)
+
+
+### Bug Fixes
+
+* locale key error_channelLeave ([bbd1761](https://github.com/PeerioTechnologies/peerio-icebear/commit/bbd1761))
+* **ghosts:** switch ghost loading to list-ext API ([#106](https://github.com/PeerioTechnologies/peerio-icebear/issues/106)) ([ec1732e](https://github.com/PeerioTechnologies/peerio-icebear/commit/ec1732e))
+
+
+
+<a name="4.1.1"></a>
+## [4.1.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.1.0...v4.1.1) (2017-12-20)
+
+
+### Performance Improvements
+
+* don't wait for files to load before showing chats ([a466973](https://github.com/PeerioTechnologies/peerio-icebear/commit/a466973))
+
+
+
+<a name="4.1.0"></a>
+# [4.1.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.0.2...v4.1.0) (2017-12-19)
+
+
+### Features
+
+* new upload dialog ([#103](https://github.com/PeerioTechnologies/peerio-icebear/issues/103)) ([645fc84](https://github.com/PeerioTechnologies/peerio-icebear/commit/645fc84))
+
+
+
+<a name="4.0.2"></a>
+## [4.0.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.0.1...v4.0.2) (2017-12-19)
+
+
+### Performance Improvements
+
+* load files in pages ([fca324f](https://github.com/PeerioTechnologies/peerio-icebear/commit/fca324f))
+
+
+
+<a name="4.0.1"></a>
+## [4.0.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.0.0...v4.0.1) (2017-12-19)
+
+
+### Bug Fixes
+
+* **download:** avoid renaming to the same name ([#104](https://github.com/PeerioTechnologies/peerio-icebear/issues/104)) ([ba1f8ff](https://github.com/PeerioTechnologies/peerio-icebear/commit/ba1f8ff))
+
+
+
 <a name="4.0.0"></a>
 # [4.0.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v3.13.4...v4.0.0) (2017-12-19)
 

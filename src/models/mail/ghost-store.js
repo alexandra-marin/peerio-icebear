@@ -33,12 +33,17 @@ class GhostStore {
      * @private
      */
     _getGhosts(minCollectionVersion = '') {
-        const query = { type: 'ghost' };
-        if (minCollectionVersion === '') query.deleted = false;
-        return socket.send('/auth/kegs/query', { // TODO: SWITCH TO LIST-EXT API
+        const filter = { minCollectionVersion };
+        if (minCollectionVersion === '') {
+            filter.deleted = false;
+        }
+        return socket.send('/auth/kegs/db/list-ext', {
             kegDbId: 'SELF',
-            minCollectionVersion,
-            query
+            options: {
+                type: 'ghost',
+                reverse: false
+            },
+            filter
         });
     }
 
@@ -48,23 +53,28 @@ class GhostStore {
     loadAllGhosts() {
         if (this.loading || this.loaded) return;
         this.loading = true;
-        this._getGhosts().then(action(kegs => {
-            console.log('there are mail kegs', kegs.length);
-            for (const keg of kegs) {
-                const ghost = new Ghost(User.current.kegDb);
-                if (keg.collectionVersion > this.knownCollectionVersion) {
-                    this.knownCollectionVersion = keg.collectionVersion;
+        this._getGhosts()
+            .then(action(resp => {
+                const { kegs } = resp;
+                console.log('there are mail kegs', kegs.length);
+                for (const keg of kegs) {
+                    const ghost = new Ghost(User.current.kegDb);
+                    if (keg.collectionVersion > this.knownCollectionVersion) {
+                        this.knownCollectionVersion = keg.collectionVersion;
+                    }
+                    if (ghost.loadFromKeg(keg)) {
+                        console.log('loading ghost', ghost.ghostId);
+                        this.ghostMap.set(ghost.ghostId, ghost);
+                    }
                 }
-                if (ghost.loadFromKeg(keg)) {
-                    console.log('loading ghost', ghost.ghostId);
-                    this.ghostMap.set(ghost.ghostId, ghost);
-                }
-            }
-            this.sort(this.selectedSort);
-            this.loading = false;
-            this.loaded = true;
-            tracker.onKegTypeUpdated('SELF', 'ghost', this.updateGhosts);
-        }));
+                this.sort(this.selectedSort);
+                this.loading = false;
+                this.loaded = true;
+                tracker.onKegTypeUpdated('SELF', 'ghost', this.updateGhosts);
+            }))
+            .catch(err => {
+                console.error('Failed to load ghosts:', err);
+            });
     }
 
     /*

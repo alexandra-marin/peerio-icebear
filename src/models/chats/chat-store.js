@@ -432,7 +432,10 @@ class ChatStore {
         await Promise.map(this.chats, chat => asPromise(chat, 'headLoaded', true))
             .timeout(5000)
             .catch(() => { /* well, the rest will trigger re-render */ })
-            .then(getFileStore().loadAllFiles);
+            .then(() => {
+                // not returning promise because don't want to wait
+                getFileStore().loadAllFiles();
+            });
 
         // 9. find out which chat to activate.
         const lastUsed = await TinyDb.user.getValue('lastUsedChat');

@@ -227,7 +227,7 @@ class ContactStore {
                     ).then(() => {
                         // because own keg writes don't trigger digest update
                         this.applyMyContactsData();
-                        warnings.add('snackbar_contactAdded');
+                        warnings.add('snackbar_contactFavourited');
                         resolve(true);
                     }).catch(reject);
                 }
@@ -319,7 +319,7 @@ class ContactStore {
                 ).then(() => {
                     // because own keg writes don't trigger digest update
                     this.applyMyContactsData();
-                    warnings.add('snackbar_contactRemoved');
+                    warnings.add('snackbar_contactRemovedFavourite');
                 });
             }
         });

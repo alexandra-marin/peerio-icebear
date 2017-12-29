@@ -59,6 +59,11 @@ class Contact {
      */
     usernameTag;
     /**
+     * @member {array<string>} addresses
+     * @public
+     */
+    addresses = [];
+    /**
      * @memberof Contact
      * @member {string} firstName
      * @instance
@@ -356,6 +361,7 @@ class Contact {
                 this.urlSalt = profile.urlSalt;
                 this.hasAvatar = profile.hasAvatar;
                 this.isDeleted = !!profile.isDeleted;
+                this.addresses = profile.addresses || [];
                 this.mentionRegex = new RegExp(`@${this.username}`, 'gi');
 
                 // this is server - controlled data, so we don't account for cases when it's invalid

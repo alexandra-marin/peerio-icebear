@@ -253,6 +253,7 @@
   "title_imagePreviewWarning": "Preview images will be downloaded and saved to your device without encryption, and will be removed as soon as you quit or signout of Peerio.<br/><br/>Would you like to enable previews?",
   "title_previewUnavailable": "Preview unavailable",
   "title_shareWith": "Share with",
+  "title_enterRoomOrContact": "Enter Room or contact",
   "title_addComment": "Add a comment",
   "title_forAllImages": "For all images",
   "title_forImagesUnder10": "For images under 10 MB",

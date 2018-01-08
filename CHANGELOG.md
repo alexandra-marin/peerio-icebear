@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.2.4"></a>
+## [4.2.4](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.2.3...v4.2.4) (2018-01-08)
+
+
+### Bug Fixes
+
+* deserialize profile version ([40c1dee](https://github.com/PeerioTechnologies/peerio-icebear/commit/40c1dee))
+
+
+
 <a name="4.2.3"></a>
 ## [4.2.3](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.2.2...v4.2.3) (2018-01-08)
 

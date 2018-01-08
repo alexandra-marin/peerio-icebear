@@ -259,7 +259,7 @@
   "title_forImagesUnder10": "For images under 10 MB",
   "button_displayThisImage": "Display this image",
   "title_poorConnectionInlineImage": "Poor connection. Still working...",
-  "title_poorConnectionExternalURL": "Preview failed, due to poor connection",
+  "title_poorConnectionExternalURL": "Nothing to see here quite yet, folks",
   "title_imageSizeWarning": "Images larger than {size} are not displayed.",
   "button_displayThisImageAfterWarning": "Display this image anyway",
   "title_EnableUrlPreviews": "Enable URL previews",

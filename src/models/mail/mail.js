@@ -71,6 +71,7 @@ class Mail extends Keg {
         };
         if (this.sentId) ret.sentId = this.sentId;
         if (this.replyId) ret.replyId = this.replyId;
+        return ret;
     }
 
     @action deserializeKegPayload(data) {

@@ -9,6 +9,7 @@ class PeerioAppWorld {
     constructor({ attach, parameters }) {
         this.attach = attach;
         this.parameters = parameters;
+        this.filesToCleanup = [];
     }
 
     /**

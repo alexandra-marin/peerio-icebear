@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.2.7"></a>
+## [4.2.7](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.2.6...v4.2.7) (2018-01-10)
+
+
+### Bug Fixes
+
+* **mail:** cryptoUtil call ([#118](https://github.com/PeerioTechnologies/peerio-icebear/issues/118)) ([5829850](https://github.com/PeerioTechnologies/peerio-icebear/commit/5829850))
+
+
+
 <a name="4.2.6"></a>
 ## [4.2.6](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.2.5...v4.2.6) (2018-01-09)
 

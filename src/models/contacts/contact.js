@@ -116,11 +116,11 @@ class Contact {
     @observable urlSalt = null;
     /**
      * @memberof Contact
-     * @member {boolean} profileVersion
+     * @member {string} profileVersion
      * @instance
      * @public
      */
-    @observable profileVersion = 0;
+    @observable profileVersion;
     /**
      * @memberof Contact
      * @member {boolean} hasAvatar

@@ -218,7 +218,9 @@ module.exports = function mixUserProfileModule() {
             });
         }).finally(() => {
             const c = contactStore.getContact(this.username);
-            c.profileVersion++;
+            // TODO: currently we don't receive updates from server
+            // and profile version is not int so we bump it manually
+            c.profileVersion = Date.now();
             c.hasAvatar = !!blobs;
             this.savingAvatar = false;
         });

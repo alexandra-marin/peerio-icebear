@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.3.0"></a>
+# [4.3.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.2.9...v4.3.0) (2018-01-15)
+
+
+### Features
+
+* **mail:** add mailStore.remove ([#121](https://github.com/PeerioTechnologies/peerio-icebear/issues/121)) ([e115e8f](https://github.com/PeerioTechnologies/peerio-icebear/commit/e115e8f))
+
+
+
 <a name="4.2.9"></a>
 ## [4.2.9](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.2.8...v4.2.9) (2018-01-14)
 

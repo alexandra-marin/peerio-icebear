@@ -225,6 +225,20 @@ class MailStore {
 
         return keg;
     }
+
+    /*
+     * Remove message.
+     *
+     * @param {Mail} mail
+     */
+    remove(m) {
+        if (!m.id) {
+            const i = this.mails.indexOf(m);
+            (i !== -1) && this.mails.splice(i, 1);
+            return Promise.resolve();
+        }
+        return m.remove();
+    }
 }
 
 module.exports = new MailStore();

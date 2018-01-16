@@ -188,6 +188,17 @@ const config = new class {
 
     download = {
         /**
+         * Parallelism (must be at least 1).
+         *
+         * Note that maxDownloadChunkSize and maxDecryptBufferSize will be
+         * multiplied by parallelism factor.
+         * @member {number} download.parallelism
+         * @memberof config
+         * @public
+         */
+        parallelism: 1,
+
+        /**
          * Max amount of bytes to download at once for further processing.
          * File gets downloaded in 'downloadChunks' and then broken down to the chunk size it was uploaded with.
          * This number can't be less than maximum chunk size.

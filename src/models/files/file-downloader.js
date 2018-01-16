@@ -18,19 +18,20 @@ const { CHUNK_OVERHEAD } = config;
 class FileDownloader extends FileProcessor {
     constructor(file, stream, nonceGenerator, resumeParams) {
         super(file, stream, nonceGenerator, 'download');
+
         // total amount to download and save to disk
         this.file.progressMax = file.sizeWithOverhead;
         this.getUrlParams = { fileId: file.fileId };
         this.chunkSizeWithOverhead = file.chunkSize + CHUNK_OVERHEAD;
         this.downloadChunkSize = Math.floor(config.download.maxDownloadChunkSize / this.chunkSizeWithOverhead)
             * this.chunkSizeWithOverhead;
+
         if (resumeParams) {
             this.partialChunkSize = resumeParams.partialChunkSize;
             nonceGenerator.chunkId = resumeParams.wholeChunks;
             this.file.progress = this.chunkSizeWithOverhead * resumeParams.wholeChunks;
             this.downloadPos = this.chunkSizeWithOverhead * resumeParams.wholeChunks;
         }
-        // socket.onDisconnect(this._abortXhr);
     }
 
     /**
@@ -40,17 +41,22 @@ class FileDownloader extends FileProcessor {
      */
     decryptQueue = [];
     /**
+     * Number of active downloads.
+     * @member {number}
+     * @protected
+     */
+    activeDownloads = 0;
+    /**
+     * Download processing chain.
+     * @member {Promise}
+     */
+    downloadChain = Promise.resolve();
+    /**
      * Flag to indicate that chunk is currently waiting for write promise resolve to avoid parallel writes.
      * @member {boolean}
      * @protected
      */
     writing = false;
-    /**
-     * Avoid parallel downloads
-     * @member {boolean}
-     * @protected
-     */
-    downloading = false;
     /**
      *  position of the blob as it is stored in the cloud
      * @member {number}
@@ -58,42 +64,72 @@ class FileDownloader extends FileProcessor {
      */
     downloadPos = 0;
     /**
+     * Indicates that there are no more chunks to download.
+     * @member {boolean}
+     * @protected
+     */
+    noMoreChunks = false;
+    /**
      * blob was fully read
      * @member {boolean}
      * @protected
      */
     downloadEof = false;
-
+    /**
+     * Array of active XMLHttpRequests.
+     * @member {Array<XMLHttpRequest>}
+     * @private
+     */
+    currentXhrs = [];
 
     get _isDecryptQueueFull() {
         return (this.decryptQueue.length * (this.chunkSizeWithOverhead + 1))
-            > config.download.maxDecryptBufferSize;
+            > config.download.maxDecryptBufferSize * config.download.parallelism;
     }
 
     _abortXhr = () => {
-        if (this.currentXhr) this.currentXhr.abort();
+        this.currentXhrs.forEach(xhr => xhr.abort());
     };
 
     cleanup() {
         this._abortXhr();
-        // socket.unsubscribe(socket.SOCKET_EVENTS.disconnect, this._abortXhr);
     }
 
-    // downloads config.download.chunkSize size chunk and stores it in parseQueue
     _downloadChunk() {
-        if (this.stopped || this.downloading || this.downloadEof || this._isDecryptQueueFull) return;
+        if (this.stopped || this.noMoreChunks || this.downloadEof || this._isDecryptQueueFull) return;
 
-        this.downloading = true;
-        this._getChunkUrl(this.downloadPos, this.downloadPos + this.downloadChunkSize - 1)
-            .then(this._download)
+        if (this.activeDownloads >= config.download.parallelism) return;
+
+        const pos = this.downloadPos;
+        const size = Math.min(this.downloadChunkSize, this.file.sizeWithOverhead - pos);
+        if (size === 0) {
+            this.noMoreChunks = true;
+            this.downloadChain = this.downloadChain.then(() => {
+                this.downloadEof = true;
+                this._tick();
+            });
+            return;
+        }
+        console.log(`Downloading chunk at ${pos} (size: ${size}))`);
+        this.downloadPos += size;
+
+        // Start download.
+        this.activeDownloads++;
+        const promise = new Promise((resolve, reject) => {
+            this._getChunkUrl(pos, pos + size - 1)
+                .then(url => this._download(url, size))
+                .then(resolve)
+                .catch(reject);
+        });
+
+        // Add download result processing to the chain.
+        this.downloadChain = this.downloadChain
+            .then(() => promise)
             .then(dlChunk => {
+                if (this.stopped) return; // download was cancelled or errored
                 if (dlChunk.byteLength === 0) {
-                    this.downloadEof = true;
-                    this.downloading = false;
-                    this._tick();
-                    return;
+                    throw new Error('Unexpected zero-length chunk');
                 }
-                this.downloadPos += dlChunk.byteLength;
                 for (let i = 0; i < dlChunk.byteLength; i += this.chunkSizeWithOverhead) {
                     const chunk = new Uint8Array(
                         dlChunk, i,
@@ -101,10 +137,7 @@ class FileDownloader extends FileProcessor {
                     );
                     this.decryptQueue.push(chunk);
                 }
-                if (this.downloadPos >= this.file.sizeWithOverhead) {
-                    this.downloadEof = true;
-                }
-                this.downloading = false;
+                this.activeDownloads--;
                 this._tick();
             })
             .catch(this._error);
@@ -112,6 +145,7 @@ class FileDownloader extends FileProcessor {
 
     _decryptChunk() {
         if (this.stopped || this.writing || !this.decryptQueue.length) return;
+
         let chunk = this.decryptQueue.shift();
         const nonce = this.nonceGenerator.getNextNonce();
         chunk = secret.decrypt(chunk, this.fileKey, nonce, false);
@@ -152,18 +186,18 @@ class FileDownloader extends FileProcessor {
             .then(f => `${f.url}?rangeStart=${from}&rangeEnd=${to}`);
     }
 
-    // if enabling support for parallel XHR requests - convert this to array
-    currentXhr = null;
-
-    _download = (url) => {
+    _download = (url, expectedSize) => {
+        const LOADING = 3, DONE = 4; // XMLHttpRequest readyState constants.
         const self = this;
         let lastLoaded = 0;
         let totalLoaded = 0;
         let retryCount = 0;
+        let xhr;
         // For refactoring lovers: (yes, @anri, you)
         // - don't convert event handlers to arrow functions
         const p = new Promise((resolve, reject) => {
-            const xhr = this.currentXhr = new XMLHttpRequest();
+            xhr = new XMLHttpRequest();
+            self.currentXhrs.push(xhr);
 
             const trySend = () => {
                 self.file.progress -= totalLoaded;
@@ -181,12 +215,32 @@ class FileDownloader extends FileProcessor {
             };
 
             xhr.onreadystatechange = function() {
-                if (this.readyState !== 4) return;
-                if (this.status === 200 || this.status === 206) {
-                    resolve(this.response);
+                if (this.readyState === LOADING) {
+                    // Download started, maybe start
+                    // other parallel downloads now.
+                    self._tick();
                     return;
                 }
-                console.error('Download blob error: ', this.status);
+                if (this.readyState !== DONE) {
+                    // We're interested only in download completion now.
+                    return;
+                }
+                if (this.status === 0) {
+                    console.error('Blob download cancelled.');
+                    reject();
+                    return;
+                }
+                if ((this.status === 200 || this.status === 206) &&
+                    this.response.byteLength === expectedSize) {
+                    resolve(this.response); // success
+                    return;
+                }
+                if ((this.status === 200 || this.status === 206) &&
+                    this.response.byteLength !== expectedSize) {
+                    console.error(`Download blob error: size ${this.response.byteLength}, expected ${expectedSize}`);
+                } else {
+                    console.error('Download blob error: ', this.status);
+                }
                 if (!p.isRejected()) {
                     if (!trySend()) reject(socket.authenticated ? undefined : new DisconnectedError());
                 }
@@ -204,7 +258,12 @@ class FileDownloader extends FileProcessor {
             };
 
             trySend();
-        }).finally(() => { this.currentXhr = null; });
+        }).finally(() => {
+            if (xhr) {
+                const index = self.currentXhrs.indexOf(xhr);
+                if (index >= 0) self.currentXhrs.splice(index, 1);
+            }
+        });
 
         return p;
     };

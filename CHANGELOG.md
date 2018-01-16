@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.4.1"></a>
+## [4.4.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.4.0...v4.4.1) (2018-01-16)
+
+
+
 <a name="4.4.0"></a>
 # [4.4.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.3.2...v4.4.0) (2018-01-16)
 

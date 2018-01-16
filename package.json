@@ -59,9 +59,9 @@
   },
   "devDependencies": {
     "@types/bluebird-global": "3.5.3",
-    "@types/node": "8.5.7",
+    "@types/node": "9.3.0",
     "babel-cli": "6.26.0",
-    "babel-eslint": "8.1.2",
+    "babel-eslint": "8.2.1",
     "babel-plugin-console-kungfu": "github:PeerioTechnologies/babel-plugin-console-kungfu#v1.0.0",
     "babel-plugin-transform-async-to-bluebird": "1.1.1",
     "babel-plugin-transform-class-properties": "6.24.1",

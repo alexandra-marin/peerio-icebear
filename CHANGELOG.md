@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.4.0"></a>
+# [4.4.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.3.2...v4.4.0) (2018-01-16)
+
+
+### Features
+
+* parallelize chunk download ([#113](https://github.com/PeerioTechnologies/peerio-icebear/issues/113)) ([94ea508](https://github.com/PeerioTechnologies/peerio-icebear/commit/94ea508))
+
+
+
 <a name="4.3.2"></a>
 ## [4.3.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.3.1...v4.3.2) (2018-01-15)
 

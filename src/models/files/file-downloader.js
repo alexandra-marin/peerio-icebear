@@ -190,7 +190,6 @@ class FileDownloader extends FileProcessor {
         const LOADING = 3, DONE = 4; // XMLHttpRequest readyState constants.
         const self = this;
         let lastLoaded = 0;
-        let totalLoaded = 0;
         let retryCount = 0;
         let xhr;
         // For refactoring lovers: (yes, @anri, you)
@@ -200,7 +199,6 @@ class FileDownloader extends FileProcessor {
             self.currentXhrs.push(xhr);
 
             const trySend = () => {
-                self.file.progress -= totalLoaded;
                 // had to do this bcs uploaded blob takes some time to propagate through cloud
                 if (retryCount++ >= 5) return false;
                 if (retryCount > 0) {
@@ -248,9 +246,10 @@ class FileDownloader extends FileProcessor {
 
             xhr.onprogress = function(event) {
                 if (p.isRejected()) return;
-                self.file.progress += event.loaded - lastLoaded;
-                lastLoaded = event.loaded;
-                totalLoaded += lastLoaded;
+                if (event.loaded > lastLoaded) {
+                    self.file.progress += event.loaded - lastLoaded;
+                    lastLoaded = event.loaded;
+                }
             };
 
             xhr.ontimeout = xhr.onabort = xhr.onerror = function() {

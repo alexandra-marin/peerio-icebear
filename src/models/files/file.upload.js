@@ -12,7 +12,6 @@ const fileHelper = require('../../helpers/file');
 const FileNonceGenerator = require('./file-nonce-generator');
 const TinyDb = require('../../db/tiny-db');
 const User = require('../user/user');
-const { getFileStore } = require('../../helpers/di-file-store');
 
 function _getUlResumeParams(path) {
     return config.FileStream.getStat(path)

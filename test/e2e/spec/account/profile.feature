@@ -19,7 +19,7 @@ Feature: User profile
         And   my last name should be "TestLastName2"
 
     # TODO: when server adds limit on the amount of emails you can have - check that limit
-    Scenario: Add and confim maximum allowed emails
+    Scenario: Add and confirm maximum allowed emails
         When  I add a new email
         And   I confirm my new email
         Then  my new email is confirmed

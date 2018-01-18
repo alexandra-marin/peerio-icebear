@@ -103,8 +103,6 @@ function upload(filePath, fileName, resume) {
             .then(() => {
                 this._saveUploadEndFact();
                 this._resetUploadState(stream);
-                // 1 means there's only current task in queue
-                if (getFileStore().uploadQueue.length === 1) warnings.add('snackbar_uploadComplete');
             })
             .catch(err => {
                 console.error(err);

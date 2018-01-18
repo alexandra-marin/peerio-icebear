@@ -15,7 +15,6 @@ Feature: User profile
         Then  my first name should be "TestFirstName2"
         And   my last name should be "TestLastName2"
         When  I restart
-        And   I login
         Then  my first name should be "TestFirstName2"
         And   my last name should be "TestLastName2"
 
@@ -35,7 +34,6 @@ Feature: User profile
         And   I confirm my new email
         Then  my new email is confirmed
         When  I restart
-        And   I login
         Then  my new email is confirmed
 
     Scenario: Change primary email
@@ -46,7 +44,6 @@ Feature: User profile
         When  I change my primary email
         Then  my primary email has been changed
         When  I restart
-        And   I login
         Then  my primary email has been changed
 
     #@wip

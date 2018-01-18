@@ -3,6 +3,7 @@ const path = require('path');
 const crypto = require('crypto');
 const Promise = require('bluebird');
 const fs = Promise.promisifyAll(require('fs'));
+const https = require('https');
 
 /**
  * Synchronously deletes file at the given path.
@@ -109,9 +110,31 @@ const filesEqual = async (filename1, filename2) => {
     }
 };
 
+/**
+ * Downloads a file
+ *
+ * @param {string} filename path where to save the file
+ * @param {string} url URL to download from
+ * @returns Promise<file>
+ */
+const downloadFile = (filename, url) => {
+    return new Promise((resolve, reject) => {
+        const file = fs.createWriteStream(filename);
+        https.get(url, (response) => {
+            response.pipe(file);
+            return file.on('finish', () => {
+                file.close();
+                console.log('Test helper downloaded file', file);
+                resolve(file);
+            });
+        }).on('error', reject);
+    });
+};
+
 module.exports = {
     getTempFileName,
     createRandomTempFile,
     deleteFile,
-    filesEqual
+    filesEqual,
+    downloadFile
 };

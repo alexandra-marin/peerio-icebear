@@ -8,6 +8,7 @@ const Invites = require('../contacts/invites');
 const warnings = require('../warnings');
 const createMap = require('../../helpers/dynamic-array-map');
 const { getFirstLetterUpperCase } = require('./../../helpers/string');
+const { getUser } = require('../../helpers/di-current-user');
 
 /**
  * Contact store handles all Peerio users you(your app) are in some contact with,
@@ -83,6 +84,12 @@ class ContactStore {
      * @public
      */
     @observable uiViewSearchQuery = '';
+
+    /**
+     * Contact object instance for current user
+     * @member {Contact} currentUser
+     */
+    currentUser;
 
     _checkSortValue(change) {
         switch (change.newValue) {
@@ -167,6 +174,7 @@ class ContactStore {
             this.invites = new Invites();
             this.invites.onUpdated = this.applyInvitesData;
             this.loadContactsFromTOFUKegs();
+            this.currentUser = this.getContact(getUser().username);
         });
     }
 

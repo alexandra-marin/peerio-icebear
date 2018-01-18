@@ -229,8 +229,7 @@ class ChatKegDb {
     createBootKeg() {
         console.log(`Creating chat boot keg for ${this.id}, isChannel:${this.isChannel}`);
         const participants = this.participantsToCreateWith.slice();
-        const selfContact = contactStore.getContact(User.current.username);
-        participants.push(selfContact);
+        participants.push(contactStore.currentUser);
         return Contact.ensureAllLoaded(participants)
             .then(() => {
                 // keg key for this db
@@ -240,7 +239,7 @@ class ChatKegDb {
                     boot.addParticipant(p);
                 });
                 if (this.isChannel) {
-                    boot.assignRole(selfContact, 'admin');
+                    boot.assignRole(contactStore.currentUser, 'admin');
                 }
 
                 // saving bootkeg

@@ -44,6 +44,8 @@ class PeerioAppWorld {
         await asPromiseNegative(this.ice.User.current, 'quota', null);
         console.log('Account init: waiting for settings to load');
         await asPromise(this.ice.User.current.settings, 'loaded', true);
+        console.log('Account init: waiting self contact info to load');
+        await this.ice.contactStore.currentUser.ensureLoaded();
     }
 }
 

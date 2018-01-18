@@ -151,7 +151,7 @@ class Message extends Keg {
         if (!this.tempId) this.assignTemporaryId();
         this.id = null;
         this.version = 0;
-        this.sender = contactStore.getContact(User.current.username);
+        this.sender = contactStore.currentUser;
         this.timestamp = new Date();
 
         // @ts-ignore we can't use jsdoc annotations to make bluebird promises assignable to global promises!

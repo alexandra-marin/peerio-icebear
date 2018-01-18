@@ -470,7 +470,7 @@ class Chat {
      */
     @computed get canIAdmin() {
         if (!this.isChannel) return true;
-        if (!this.db.boot || !this.db.boot.admins.includes(contactStore.getContact(User.current.username))) {
+        if (!this.db.boot || !this.db.boot.admins.includes(contactStore.currentUser)) {
             return false;
         }
         return true;

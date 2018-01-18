@@ -38,7 +38,12 @@ defineSupportCode(({ Given, When, Then }) => {
         expect(this.ice.socket.authenticated).to.be.false;
     });
 
-    When('I restart', function() {
+    When('I restart', { timeout: 60000 }, async function() {
+        await this.app.restart();
+        return this.login();
+    });
+
+    When('I restart without login', function() {
         return this.app.restart();
     });
 });

@@ -19,7 +19,6 @@ Feature: User account
         And   I should have default account settings
         And   I should not have paid plans
         When  I restart
-        And   I login
         Then  I am authenticated
         And   I should have default account settings
         And   I should not have paid plans
@@ -29,13 +28,12 @@ Feature: User account
         Then  my primary email is confirmed
         When  I delete my account
         Then  I am not authenticated
-        When  I restart
+        When  I restart without login
         Then  I am not able to login
 
     Scenario: user modifies account settings
         When  I change my account settings
         Then  my account settings are changed
         When  I restart
-        And   I login
         Then  I am authenticated
         Then  my account settings are changed

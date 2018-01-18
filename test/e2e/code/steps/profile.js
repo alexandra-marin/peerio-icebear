@@ -3,7 +3,21 @@ const { waitForEmail, deleteEmail } = require('../helpers/maildrop');
 const { getUrl } = require('../helpers/https');
 const { getRandomEmail } = require('../helpers/random-data');
 const testConfig = require('../test-config');
+const { getTempFileName, filesEqual, downloadFile, createRandomTempFile } = require('../helpers/files');
+const fs = require('fs');
 
+/**
+ * Creates a random file and populates an array with it
+ * The array will be passed as avatar upload parameter
+ */
+async function createAvatarPayload(world) {
+    const name = await createRandomTempFile(42);
+    world.filesToCleanup.push(name);
+    world.avatarFileName = name;
+
+    const file = fs.readFileSync(name);
+    return [new Uint8Array(file).buffer, new Uint8Array(file).buffer];
+}
 
 defineSupportCode(({ Given, When, Then }) => {
     When('I change my first name to {string}', function(string) {
@@ -65,6 +79,39 @@ defineSupportCode(({ Given, When, Then }) => {
         return this.waitForObservable(() => {
             return this.ice.User.current.email === this.lastAddedEmail;
         }, 5000);
+    });
+
+    When('I upload an avatar', async function() {
+        this.lastProfileVersion = this.ice.contactStore.currentUser.profileVersion;
+        const blobs = await createAvatarPayload(this);
+        return this.ice.User.current.saveAvatar(blobs).should.be.fulfilled;
+    });
+
+    Then('the avatar should appear in my profile', function() {
+        this.ice.contactStore.currentUser.hasAvatar.should.be.true;
+        this.ice.contactStore.currentUser.profileVersion.should.be.equal(this.lastProfileVersion + 1);
+
+        const fileName = getTempFileName();
+        this.filesToCleanup.push(fileName);
+        return downloadFile(fileName, this.ice.contactStore.currentUser.largeAvatarUrl)
+            .then(file => filesEqual(this.avatarFileName, file.path).should.eventually.be.true);
+    });
+
+    Given('I start uploading an avatar and do not wait to finish', async function() {
+        const blob = await createAvatarPayload(this);
+        this.ice.User.current.saveAvatar(blob); // return early
+    });
+
+    Then('saving a new avatar should throw an error', function() {
+        return this.ice.User.current.saveAvatar(null).should.be.rejected;
+    });
+
+    When('I delete my avatar', function() {
+        return this.ice.User.current.saveAvatar(null).should.be.fulfilled;
+    });
+
+    Then('my avatar should be empty', function() {
+        this.ice.contactStore.currentUser.hasAvatar.should.be.false;
     });
 });
 

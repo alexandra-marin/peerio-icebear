@@ -20,11 +20,6 @@ module.exports = function mixUserAuthModule() {
             .catch(e => {
                 // eslint-disable-next-line default-case
                 switch (e.code) {
-                    case errors.ServerError.codes.invalidDeviceToken:
-                    case errors.ServerError.codes.malformedRequest:
-                        console.log('Bad deviceToken, reauthenticating without one.');
-                        return TinyDb.system.removeValue(`${this.username}:deviceToken`)
-                            .then(this._authenticateConnection);
                     case errors.ServerError.codes.sdkVersionDeprecated:
                     case errors.ServerError.codes.clientVersionDeprecated:
                         warnings.addSevere('warning_deprecated');
@@ -72,11 +67,9 @@ module.exports = function mixUserAuthModule() {
     this._getAuthToken = () => {
         console.log('Requesting auth token.');
         return Promise.all([
-            TinyDb.system.getValue(`${this.username}:deviceToken`) // for compatibility with older server
-                .then(s => s ? cryptoUtil.b64ToBytes(s).buffer : undefined),
             this._getDeviceId(),
             this._get2faCookieData()
-        ]).then(([deviceToken, deviceId, cookieData]) => {
+        ]).then(([deviceId, cookieData]) => {
             const req = {
                 username: this.username,
                 authSalt: this.authSalt.buffer,
@@ -92,8 +85,6 @@ module.exports = function mixUserAuthModule() {
             if (cookieData && cookieData.cookie) {
                 this.trustedDevice = cookieData.trusted;
                 req.twoFACookie = cookieData.cookie;
-            } else if (deviceToken) {
-                req.deviceToken = deviceToken; // for compatibility with older server
             }
             return socket.send('/noauth/auth-token/get', req);
         })
@@ -112,10 +103,6 @@ module.exports = function mixUserAuthModule() {
         }
         return socket.send('/noauth/authenticate', { decryptedAuthToken: decrypted.buffer })
             .then(resp => {
-                if (!resp.deviceToken) return Promise.resolve(); // new server sends empty reponse
-                // older server sends deviceToken, which we should remember
-                return TinyDb.system.setValue(`${this.username}:deviceToken`,
-                    cryptoUtil.bytesToB64(resp.deviceToken));
             });
     };
 

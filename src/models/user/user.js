@@ -760,8 +760,7 @@ class User {
     clearFromTinyDb() {
         return Promise.all([
             TinyDb.user.clear(),
-            User.removeLastAuthenticated(),
-            TinyDb.system.removeValue(`${User.current.username}:deviceToken`)
+            User.removeLastAuthenticated()
         ]);
     }
 }

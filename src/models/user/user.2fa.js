@@ -147,19 +147,11 @@ module.exports = function mixUser2faModule() {
                             };
                             return socket.send('/noauth/2fa/authenticate', req)
                                 .then(resp => {
-                                    if (resp.twoFACookie) {
-                                        return this._set2faCookieData({
-                                            cookie: resp.twoFACookie,
-                                            trusted: trustDevice
-                                        })
-                                            .then(() => TinyDb.system.removeValue(`${this.username}:deviceToken`));
-                                        // ^ won't need last line after switching to new server
-                                    }
-                                    // Old 2FA implementation
-                                    return TinyDb.system.setValue(
-                                        `${this.username}:deviceToken`,
-                                        cryptoUtil.bytesToB64(resp.deviceToken)
-                                    );
+                                    if (!resp.twoFACookie) return null;
+                                    return this._set2faCookieData({
+                                        cookie: resp.twoFACookie,
+                                        trusted: trustDevice
+                                    });
                                 });
                         })
                         .then(resolve)

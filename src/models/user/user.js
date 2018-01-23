@@ -643,7 +643,7 @@ class User {
                             return this.createAccountAndLogin();
                         });
                 }
-                if (!socket.authenticated && !clientApp.clientVersionDeprecated) {
+                if (!socket.authenticated && !clientApp.clientVersionDeprecated && !clientApp.clientSessionExpired) {
                     socket.reset();
                 }
                 return Promise.reject(e);

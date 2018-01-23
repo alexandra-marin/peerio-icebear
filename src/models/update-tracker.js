@@ -317,7 +317,7 @@ class UpdateTracker {
         if (digest.knownUpdateId >= updateId) return;
         // consumers should not care if this call fails, it makes things simpler.
         // to cover failure cases, consumers should activate 'mark as read' logic after every reconnect
-        socket.send('/auth/kegs/updates/last-known-version', {
+        socket.send('/auth/updates/last-known-version', {
             kegDbId: id,
             type,
             lastKnownVersion: updateId

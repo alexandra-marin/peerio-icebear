@@ -104,7 +104,13 @@ module.exports = function mixUserAuthModule() {
         }
         return socket.send('/noauth/authenticate', { decryptedAuthToken: decrypted.buffer })
             .then(resp => {
+                if (this.sessionId /* && resp.sessionId !== this.sessionId */) {
+                    console.log('Digest session has expired.');
+                    clientApp.clientSessionExpired = true;
+                    return Promise.reject(new Error('Digest session was expired, application restart is needed.'));
+                }
                 this.sessionId = resp.sessionId;
+                return null;
             });
     };
 

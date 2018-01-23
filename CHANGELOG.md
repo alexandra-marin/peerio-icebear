@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.5.0"></a>
+# [4.5.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.4.3...v4.5.0) (2018-01-23)
+
+
+### Bug Fixes
+
+* remove unused reference ([#126](https://github.com/PeerioTechnologies/peerio-icebear/issues/126)) ([ceba3e7](https://github.com/PeerioTechnologies/peerio-icebear/commit/ceba3e7))
+
+
+### Features
+
+* no upload snackbars on upload complete ([#125](https://github.com/PeerioTechnologies/peerio-icebear/issues/125)) ([cdcd7fc](https://github.com/PeerioTechnologies/peerio-icebear/commit/cdcd7fc))
+
+
+
 <a name="4.4.3"></a>
 ## [4.4.3](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.4.2...v4.4.3) (2018-01-18)
 

@@ -89,7 +89,7 @@ defineSupportCode(({ Given, When, Then }) => {
 
     Then('the avatar should appear in my profile', function() {
         this.ice.contactStore.currentUser.hasAvatar.should.be.true;
-        this.ice.contactStore.currentUser.profileVersion.should.be.equal(this.lastProfileVersion + 1);
+        this.ice.contactStore.currentUser.profileVersion.should.be.above(this.lastProfileVersion);
 
         const fileName = getTempFileName();
         this.filesToCleanup.push(fileName);

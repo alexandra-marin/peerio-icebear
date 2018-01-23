@@ -78,7 +78,9 @@ module.exports = function mixUserAuthModule() {
                 arch: config.arch,
                 clientVersion: config.appVersion,
                 sdkVersion: config.sdkVersion,
-                sessionId: this.sessionId
+                // sending whatever string in the beginning to let server know we are
+                // a new, cool client which is gonna use sessions
+                sessionId: this.sessionId || 'initialize'
             };
             if (deviceId) {
                 req.deviceId = deviceId;
@@ -104,7 +106,7 @@ module.exports = function mixUserAuthModule() {
         }
         return socket.send('/noauth/authenticate', { decryptedAuthToken: decrypted.buffer })
             .then(resp => {
-                if (this.sessionId /* && resp.sessionId !== this.sessionId */) {
+                if (this.sessionId && resp.sessionId !== this.sessionId) {
                     console.log('Digest session has expired.');
                     clientApp.clientSessionExpired = true;
                     return Promise.reject(new Error('Digest session was expired, application restart is needed.'));

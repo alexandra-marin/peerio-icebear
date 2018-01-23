@@ -59,7 +59,7 @@ class UpdateTracker {
 
     constructor() {
         socket.onceStarted(() => {
-            socket.subscribe(socket.APP_EVENTS.kegsUpdate, this.processDigestEvent.bind(this));
+            socket.subscribe(socket.APP_EVENTS.kegsUpdateTwo, this.processDigestEvent.bind(this));
             socket.subscribe(socket.APP_EVENTS.channelDeleted, this.processChannelDeletedEvent.bind(this));
             socket.onAuthenticated(this.loadDigest);
             // when disconnected, we know that reconnect will trigger digest reload

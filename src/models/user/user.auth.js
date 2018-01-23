@@ -77,7 +77,8 @@ module.exports = function mixUserAuthModule() {
                 platform: config.platform,
                 arch: config.arch,
                 clientVersion: config.appVersion,
-                sdkVersion: config.sdkVersion
+                sdkVersion: config.sdkVersion,
+                sessionId: this.sessionId
             };
             if (deviceId) {
                 req.deviceId = deviceId;
@@ -103,6 +104,7 @@ module.exports = function mixUserAuthModule() {
         }
         return socket.send('/noauth/authenticate', { decryptedAuthToken: decrypted.buffer })
             .then(resp => {
+                this.sessionId = resp.sessionId;
             });
     };
 

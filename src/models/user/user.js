@@ -234,6 +234,12 @@ class User {
      * @protected
      */
     kegKey;
+    /**
+     * Automatically managed by authentication code.
+     * Session id is generated and expired by server.
+     * @type {string}
+     * */
+    sessionId;
     // -- flags
     _firstLoginInSession = true;
 

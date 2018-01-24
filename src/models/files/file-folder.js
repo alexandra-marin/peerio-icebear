@@ -1,6 +1,7 @@
 const { observable, computed } = require('mobx');
 const createMap = require('../../helpers/dynamic-array-map');
 const warnings = require('../warnings');
+const util = require('../../util');
 
 class FileFolder {
     @observable.shallow files = [];
@@ -24,6 +25,21 @@ class FileFolder {
     @computed get foldersAndFilesDefaultSorting() {
         const { foldersSortedByName, filesSortedByDate } = this;
         return foldersSortedByName.concat(filesSortedByDate);
+    }
+
+    @computed get size() {
+        let currentSize = 0;
+        for (const folder of this.folders) {
+            currentSize += folder.size;
+        }
+        for (const file of this.files) {
+            currentSize += file.size;
+        }
+        return currentSize;
+    }
+
+    @computed get sizeFormatted() {
+        return util.formatBytes(this.size);
     }
 
     @observable parent = null;

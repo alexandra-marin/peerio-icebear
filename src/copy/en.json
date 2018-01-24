@@ -195,6 +195,7 @@
   "title_folderName": "Folder name",
   "title_deleteFolder": "Are you sure you want to delete {folderName}?",
   "title_noFilesInFolder": "No files in this folder",
+  "title_searchAllFiles": "Search all files",
   "title_noFilesMatchSearch": "No files match your search",
   "button_create": "Create",
   "title_fileSize": "File size",

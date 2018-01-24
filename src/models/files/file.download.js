@@ -34,6 +34,7 @@ function downloadToTmpCache() {
         .tapCatch(() => { this.cachingFailed = true; });
 }
 
+const tempExt = '.peeriodownload';
 /**
  * Starts download.
  * @param {string} filePath - where to store file (including name)
@@ -44,6 +45,10 @@ function downloadToTmpCache() {
  * @public
  */
 function download(filePath, resume, isTmpCacheDownload) {
+    // we need this check because resume process will pass temp file name
+    if (!filePath.endsWith(tempExt)) {
+        filePath = `${filePath}${tempExt}`; // eslint-disable-line no-param-reassign
+    }
     if (this.downloading || this.uploading) {
         return Promise.reject(new Error(`File is already ${this.downloading ? 'downloading' : 'uploading'}`));
     }
@@ -51,10 +56,8 @@ function download(filePath, resume, isTmpCacheDownload) {
         this.progress = 0;
         this._resetDownloadState();
         this.downloading = true;
-        let tempPath = filePath;
         if (!isTmpCacheDownload) {
             this._saveDownloadStartFact(filePath);
-            tempPath = `${filePath}.peeriodownload`;
         }
         const nonceGen = new FileNonceGenerator(0, this.chunksCount - 1, cryptoUtil.b64ToBytes(this.nonce));
         let stream, mode = 'write';
@@ -64,13 +67,12 @@ function download(filePath, resume, isTmpCacheDownload) {
         }
         return p
             .then(resumeParams => {
-                if (resumeParams === false) return;
+                if (resumeParams === false) return null;
                 if (resumeParams !== true) {
                     mode = 'append';
-                } else resumeParams = null; // eslint-disable-line
+                } else resumeParams = null; // eslint-disable-line no-param-reassign
 
-                stream = new config.FileStream(tempPath, mode);
-                // eslint-disable-next-line consistent-return
+                stream = new config.FileStream(filePath, mode);
                 return stream.open()
                     .then(() => {
                         this.downloader = new FileDownloader(this, stream, nonceGen, resumeParams);
@@ -82,10 +84,8 @@ function download(filePath, resume, isTmpCacheDownload) {
                     this._saveDownloadEndFact();
                 }
                 this._resetDownloadState(stream);
-                if (tempPath && tempPath !== filePath) {
-                    return config.FileStream.rename(tempPath, filePath);
-                }
-                return undefined; // for eslint
+                const finalPath = filePath.substr(0, filePath.length - tempExt.length);
+                return config.FileStream.rename(filePath, finalPath);
             })
             .then(action(() => {
                 if (!isTmpCacheDownload) {

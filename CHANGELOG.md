@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.5.1"></a>
+## [4.5.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.5.0...v4.5.1) (2018-01-24)
+
+
+### Bug Fixes
+
+* resume download on tempPath ([#128](https://github.com/PeerioTechnologies/peerio-icebear/issues/128)) ([0a3b902](https://github.com/PeerioTechnologies/peerio-icebear/commit/0a3b902))
+
+
+
 <a name="4.5.0"></a>
 # [4.5.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.4.3...v4.5.0) (2018-01-23)
 

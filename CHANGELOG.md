@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.5.3"></a>
+## [4.5.3](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.5.2...v4.5.3) (2018-01-26)
+
+
+### Bug Fixes
+
+* reconnection stuck / socket.io seems to fail to report some errors now ([eec4ec3](https://github.com/PeerioTechnologies/peerio-icebear/commit/eec4ec3))
+* tests ([9048256](https://github.com/PeerioTechnologies/peerio-icebear/commit/9048256))
+
+
+
 <a name="4.5.2"></a>
 ## [4.5.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.5.1...v4.5.2) (2018-01-24)
 

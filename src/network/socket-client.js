@@ -40,7 +40,7 @@ const SOCKET_EVENTS = {
 
 // application events sent by app server
 const APP_EVENTS = {
-    kegsUpdateTwo: 'kegsUpdateTwo',
+    kegsUpdate: 'kegsUpdate',
     serverWarning: 'serverWarning',
     // clearWarning: 'clearWarning',
     channelInvitesUpdate: 'channelInvitesUpdate',

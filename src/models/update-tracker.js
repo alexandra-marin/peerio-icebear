@@ -145,30 +145,38 @@ class UpdateTracker {
         }
     }
 
-    //  {"kegDbId":"SELF","type":"profile","maxUpdateId":3, knownUpdateId: 0, newKegsCount: 1},
-    processDigestEvent(ev) {
-        ev.maxUpdateId = ev.maxUpdateId || '';
-        ev.knownUpdateId = ev.knownUpdateId || '';
-        // === HACK:
-        // this is a temporary hack to make sure boot kegs don't produce unread keg databases
-        // It's too much hassle to create handlers for this in the kegdb logic
-        // when we introduce key change which can change boot keg - this should go away
-        // NOTE: Commented out because of channels, chat migrations and changing the way digest works with unread data.
-        //       Probably we won't need this anymore.
-        // if (ev.type === 'boot' && ev.maxUpdateId !== ev.knownUpdateId) {
-        //     this.seenThis(ev.kegDbId, 'boot', ev.maxUpdateId);
-        // }
+    /**
 
-        // The same for tofu keg, it's never supposed to be updated atm so we always mark it as read
-        // Tofu kegs are named, names are unique per contact.
-        if (ev.type === 'tofu' && ev.maxUpdateId !== ev.knownUpdateId) {
-            this.seenThis(ev.kegDbId, 'tofu', ev.maxUpdateId);
+["channel:j7mb24p30byk0gm:message", "jbfr36ka02co0n8", "jbfr36ka02co0n8", "jbfr36ka02co0n8", 0],
+["global:fileACL:fileId", "maxId", "knownId", "sessionKnownId"],
+["global:fileDescriptor:new", "maxId", "knownId", "sessionKnownId", 0]
+["global:fileDescriptor:updated", "maxId", "knownId", "sessionKnownId", 0]
+1st element: digest key
+db type or 'global' for non-db entities
+db id or global namespace id
+modificator: key type, entity id or entity kind
+2nd element: maxUpdateId
+3rd element: knownUpdateId
+4th element: sessionKnownUpdateId (if sessionKnownUpdateId === knownUpdateId then sessionKnownUpdateId === '')
+5th element: new entities count in the range of items between knownUpdateId and maxUpdateId
+Nth elements: any additional data needed
+     */
+    processDigestEvent(ev) {
+        /* eslint-disable prefer-const, no-unused-vars */
+        let [id, maxUpdateId, knownUpdateId, sessionUpdateId, newKegsCount] = ev;
+        let [kegDbType, kegDbId, type] = id.split(':');
+        /* eslint-enable prefer-const, no-unused-vars */
+        // shifting values bcs SELF has no kegDbType
+        if (kegDbType === 'SELF') {
+            type = kegDbId;
+            kegDbId = 'SELF';
+        } else {
+            kegDbId = `${kegDbType}:${kegDbId}`;
         }
-        // The same for my_chats keg, we don't rely on its collection version currently
-        if (ev.type === 'my_chats' && ev.maxUpdateId !== ev.knownUpdateId) {
-            this.seenThis(ev.kegDbId, 'my_chats', ev.maxUpdateId);
-        }
-        // === /HACK
+        // against 'null' values (happens with server sometimes), null doesn't compare well with strings
+        maxUpdateId = maxUpdateId || '';
+        knownUpdateId = knownUpdateId || '';
+
 
         // here we want to do 2 things
         // 1. update internal data tracker
@@ -177,44 +185,44 @@ class UpdateTracker {
         let shouldEmitUpdateEvent = false;
 
         // kegDb yet unknown to our digest? consider it just added
-        if (!this.digest[ev.kegDbId]) {
+        if (!this.digest[kegDbId]) {
             shouldEmitUpdateEvent = true;
-            this.digest[ev.kegDbId] = this.digest[ev.kegDbId] || {};
+            this.digest[kegDbId] = this.digest[kegDbId] || {};
             if (this.accumulateEvents) {
-                if (!this.eventCache.add.includes(ev.kegDbId)) {
-                    this.eventCache.add.push(ev.kegDbId);
+                if (!this.eventCache.add.includes(kegDbId)) {
+                    this.eventCache.add.push(kegDbId);
                 }
             } else {
-                this.emitKegDbAddedEvent(ev.kegDbId);
+                this.emitKegDbAddedEvent(kegDbId);
             }
         }
-        const dbDigest = this.digest[ev.kegDbId];
-        if (!dbDigest[ev.type]) {
+        const dbDigest = this.digest[kegDbId];
+        if (!dbDigest[type]) {
             shouldEmitUpdateEvent = true;
-            dbDigest[ev.type] = {};
+            dbDigest[type] = {};
         }
-        const typeDigest = dbDigest[ev.type];
+        const typeDigest = dbDigest[type];
         // if this db and keg type was already known to us
         // we need to check if this event actually brings something new to us,
         // or maybe it was out of order and we don't care for its data
         if (!shouldEmitUpdateEvent
-            && typeDigest.maxUpdateId >= ev.maxUpdateId
-            && typeDigest.knownUpdateId >= ev.knownUpdateId
-            && typeDigest.newKegsCount === ev.newKegsCount) {
+            && typeDigest.maxUpdateId >= maxUpdateId
+            && typeDigest.knownUpdateId >= knownUpdateId
+            && typeDigest.newKegsCount === newKegsCount) {
             return; // known data / not interested
         }
         // storing data in internal digest cache
-        typeDigest.maxUpdateId = ev.maxUpdateId;
-        typeDigest.knownUpdateId = ev.knownUpdateId;
-        typeDigest.newKegsCount = ev.newKegsCount;
+        typeDigest.maxUpdateId = maxUpdateId;
+        typeDigest.knownUpdateId = knownUpdateId;
+        typeDigest.newKegsCount = newKegsCount;
         // creating event
         if (this.accumulateEvents) {
-            const rec = this.eventCache.update[ev.kegDbId] = this.eventCache.update[ev.kegDbId] || [];
-            if (!rec.includes(ev.type)) {
-                rec.push(ev.type);
+            const rec = this.eventCache.update[kegDbId] = this.eventCache.update[kegDbId] || [];
+            if (!rec.includes(type)) {
+                rec.push(type);
             }
         } else {
-            this.emitKegTypeUpdatedEvent(ev.kegDbId, ev.type);
+            this.emitKegTypeUpdatedEvent(kegDbId, type);
         }
     }
 
@@ -290,7 +298,7 @@ class UpdateTracker {
      */
     loadDigest = () => {
         console.log('Requesting full digest');
-        socket.send('/auth/kegs/updates/digest')
+        socket.send('/auth/updates/digest')
             .then(this.processDigestResponse)
             .then(this.flushAccumulatedEvents)
             .then(() => {
@@ -318,8 +326,7 @@ class UpdateTracker {
         // consumers should not care if this call fails, it makes things simpler.
         // to cover failure cases, consumers should activate 'mark as read' logic after every reconnect
         socket.send('/auth/updates/last-known-version', {
-            kegDbId: id,
-            type,
+            path: `${id}:${type}`,
             lastKnownVersion: updateId
         }).catch(this.logSeenThisError);
     }

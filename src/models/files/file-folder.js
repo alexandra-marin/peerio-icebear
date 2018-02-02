@@ -9,6 +9,7 @@ class FileFolder {
     @observable name;
     @observable createdAt;
     @observable isDeleted;
+    @observable selected;
 
     @computed get normalizedName() {
         return this.name ? this.name.toLowerCase() : '';

@@ -210,6 +210,8 @@
   "button_upload": "Upload",
   "button_share": "Share",
   "button_shareViaChat": "Share via chat",
+  "title_sharing": "Sharing",
+  "title_itemsLeft": "{number} items left",
   "title_directMessages": "Direct messages",
   "title_newDirectMessage": "New Direct Message",
   "title_chatWithGroup": "To chat with a group ",

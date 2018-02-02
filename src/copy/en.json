@@ -199,6 +199,7 @@
   "title_noFilesMatchSearch": "No files match your search",
   "button_create": "Create",
   "title_fileSize": "File size",
+  "title_empty": "Empty",
   "title_selectedFiles": "Selected file(s)",
   "title_invalidFileSignature": "Invalid file signature",
   "title_filesNull1": "Let's encrypt a file.",

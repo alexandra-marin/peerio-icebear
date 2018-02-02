@@ -9,7 +9,10 @@ class FileFolder {
     @observable name;
     @observable createdAt;
     @observable isDeleted;
+
+    // Variables for bulk actions and share-related actions
     @observable selected;
+    @observable shareProgress;
 
     @computed get normalizedName() {
         return this.name ? this.name.toLowerCase() : '';

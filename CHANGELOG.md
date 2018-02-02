@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.6.0"></a>
+# [4.6.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.5.5...v4.6.0) (2018-02-02)
+
+
+### Features
+
+* add new jitsi text ([#134](https://github.com/PeerioTechnologies/peerio-icebear/issues/134)) ([8b8a00e](https://github.com/PeerioTechnologies/peerio-icebear/commit/8b8a00e))
+
+
+
 <a name="4.5.5"></a>
 ## [4.5.5](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.5.4...v4.5.5) (2018-02-02)
 

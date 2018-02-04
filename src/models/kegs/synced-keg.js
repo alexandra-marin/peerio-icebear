@@ -66,6 +66,7 @@ class SyncedKeg extends Keg {
     reload = () => {
         return this.load()
             .then(() => {
+                tracker.seenThis(this.db.id, this.type, this.collectionVersion);
                 this.onUpdated();
                 // this will make sure that we get any updates we possibly got notified about
                 // while finishing current operation

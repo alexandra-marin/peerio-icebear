@@ -225,7 +225,7 @@ class FileDownloader extends FileProcessor {
                 }
                 if (this.status === 0) {
                     console.error('Blob download cancelled.');
-                    reject();
+                    reject(new Error(`Blob download cancelled: ${url}`));
                     return;
                 }
                 if ((this.status === 200 || this.status === 206) &&
@@ -240,7 +240,12 @@ class FileDownloader extends FileProcessor {
                     console.error('Download blob error: ', this.status);
                 }
                 if (!p.isRejected()) {
-                    if (!trySend()) reject(socket.authenticated ? undefined : new DisconnectedError());
+                    if (!trySend()) {
+                        const reason = socket.authenticated
+                            ? new Error(`Blob download error: ${url}`)
+                            : new DisconnectedError();
+                        reject(reason);
+                    }
                 }
             };
 
@@ -253,7 +258,7 @@ class FileDownloader extends FileProcessor {
             };
 
             xhr.ontimeout = xhr.onabort = xhr.onerror = function() {
-                if (!p.isRejected() && !trySend()) reject();
+                if (!p.isRejected() && !trySend()) reject(new Error(`Blob download error: ${url}`));
             };
 
             trySend();

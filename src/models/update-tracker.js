@@ -59,7 +59,7 @@ class UpdateTracker {
 
     constructor() {
         socket.onceStarted(() => {
-            socket.subscribe(socket.APP_EVENTS.kegsUpdateTwo, this.processDigestEvent.bind(this));
+            socket.subscribe(socket.APP_EVENTS.kegsUpdateTwo, data => this.processDigestEvent(data[0], data[1]));
             socket.subscribe(socket.APP_EVENTS.channelDeleted, this.processChannelDeletedEvent.bind(this));
             socket.onAuthenticated(this.loadDigest);
             // when disconnected, we know that reconnect will trigger digest reload
@@ -161,21 +161,21 @@ modificator: key type, entity id or entity kind
 5th element: new entities count in the range of items between knownUpdateId and maxUpdateId
 Nth elements: any additional data needed
      */
-    processDigestEvent(ev) {
+    processDigestEvent(kegDbId, ev) {
+        console.log(kegDbId, ev);
         /* eslint-disable prefer-const, no-unused-vars */
-        let [id, maxUpdateId, knownUpdateId, sessionUpdateId, newKegsCount] = ev;
-        let [kegDbType, kegDbId, type] = id.split(':');
+        let [kegType, maxUpdateId, sessionUpdateId, newKegsCount] = ev;
+        // temporary check to make sure issue is resolved
+        if (sessionUpdateId === null) {
+            // console.log(kegDbId, ev);
+            // throw new Error('Server returned null session id');
+            sessionUpdateId = '';
+        }
         /* eslint-enable prefer-const, no-unused-vars */
         // shifting values bcs SELF has no kegDbType
-        if (kegDbType === 'SELF') {
-            type = kegDbId;
-            kegDbId = 'SELF';
-        } else {
-            kegDbId = `${kegDbType}:${kegDbId}`;
-        }
         // against 'null' values (happens with server sometimes), null doesn't compare well with strings
         maxUpdateId = maxUpdateId || '';
-        knownUpdateId = knownUpdateId || '';
+        sessionUpdateId = sessionUpdateId === 0 ? maxUpdateId : sessionUpdateId;
 
 
         // here we want to do 2 things
@@ -197,32 +197,32 @@ Nth elements: any additional data needed
             }
         }
         const dbDigest = this.digest[kegDbId];
-        if (!dbDigest[type]) {
+        if (!dbDigest[kegType]) {
             shouldEmitUpdateEvent = true;
-            dbDigest[type] = {};
+            dbDigest[kegType] = {};
         }
-        const typeDigest = dbDigest[type];
+        const typeDigest = dbDigest[kegType];
         // if this db and keg type was already known to us
         // we need to check if this event actually brings something new to us,
         // or maybe it was out of order and we don't care for its data
         if (!shouldEmitUpdateEvent
             && typeDigest.maxUpdateId >= maxUpdateId
-            && typeDigest.knownUpdateId >= knownUpdateId
+            && typeDigest.knownUpdateId >= sessionUpdateId
             && typeDigest.newKegsCount === newKegsCount) {
             return; // known data / not interested
         }
         // storing data in internal digest cache
         typeDigest.maxUpdateId = maxUpdateId;
-        typeDigest.knownUpdateId = knownUpdateId;
+        typeDigest.knownUpdateId = sessionUpdateId;
         typeDigest.newKegsCount = newKegsCount;
         // creating event
         if (this.accumulateEvents) {
             const rec = this.eventCache.update[kegDbId] = this.eventCache.update[kegDbId] || [];
-            if (!rec.includes(type)) {
-                rec.push(type);
+            if (!rec.includes(kegType)) {
+                rec.push(kegType);
             }
         } else {
-            this.emitKegTypeUpdatedEvent(kegDbId, type);
+            this.emitKegTypeUpdatedEvent(kegDbId, kegType);
         }
     }
 
@@ -282,11 +282,15 @@ Nth elements: any additional data needed
      */
     processDigestResponse = digest => {
         console.debug('Processing digest response');
+        const dbList = Object.keys(digest);
         try {
-            for (let i = 0; i < digest.length; i++) {
-                // console.debug(JSON.stringify(digest[i], null, 1));
-                this.processDigestEvent(digest[i]);
+            for (let i = 0; i < dbList.length; i++) {
+                const events = digest[dbList[i]];
+                for (let j = 0; j < events.length; j++) {
+                    this.processDigestEvent(dbList[i], events[j]);
+                }
             }
+            console.debug('Digest has been loaded.');
         } catch (err) {
             console.error(err);
         }
@@ -298,7 +302,7 @@ Nth elements: any additional data needed
      */
     loadDigest = () => {
         console.log('Requesting full digest');
-        socket.send('/auth/updates/digest')
+        socket.send('/auth/updates/digest', { unread: true })
             .then(this.processDigestResponse)
             .then(this.flushAccumulatedEvents)
             .then(() => {
@@ -321,8 +325,20 @@ Nth elements: any additional data needed
      */
     seenThis(id, type, updateId) {
         if (!updateId) return;
-        const digest = this.getDigest(id, type);
+        let digest = this.getDigest(id, type);
+        if (digest === this.zeroDigest) {
+            // if we don't have digest loaded, we assume that's because there was no unread items in it
+            // so we create digest record locally without requesting it from server
+            if (!this.digest[id]) this.digest[id] = {};
+            digest = {
+                maxUpdateId: updateId,
+                knownUpdateId: updateId,
+                newKegsCount: 0
+            };
+            this.digest[id][type] = digest;
+        }
         if (digest.knownUpdateId >= updateId) return;
+        console.debug('SEEN THIS', id, type, updateId);
         // consumers should not care if this call fails, it makes things simpler.
         // to cover failure cases, consumers should activate 'mark as read' logic after every reconnect
         socket.send('/auth/updates/last-known-version', {

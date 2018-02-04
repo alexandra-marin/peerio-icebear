@@ -119,14 +119,6 @@ class SocketClient {
      */
     @observable reconnectAttempt = 0;
     /**
-     * Observable. Shows if reconnecting process is in progress.
-     * @member {boolean} reconnecting
-     * @instance
-     * @memberof SocketClient
-     * @public
-     */
-    @observable reconnecting = false;
-    /**
      * Observable. Shows current server response time in milliseconds. This is not a network ping,
      * this is a time needed for a websocket message to do a round trip.
      * @member {number} latency
@@ -255,7 +247,6 @@ class SocketClient {
             clearBuffers();
             this.configureDebugLogger();
             this.connected = true;
-            this.reconnecting = false;
         });
 
         socket.on('disconnect', () => {
@@ -263,7 +254,6 @@ class SocketClient {
             this.preauthenticated = false;
             this.authenticated = false;
             this.connected = false;
-            this.reconnecting = true;
             clearBuffers();
             this.cancelAwaitingRequests();
         });
@@ -276,7 +266,6 @@ class SocketClient {
             } else {
                 this.reconnectAttempt = num;
             }
-            this.reconnecting = true;
         });
 
         socket.on('pong', latency => {
@@ -284,7 +273,6 @@ class SocketClient {
         });
 
         this.handleReconnectError = () => {
-            this.reconnecting = false;
             // HACK: backoff.duration() will increase attempt count, so we balance that
             this.socket.io.backoff.attempts--;
             this.reconnectTimer.countDown(this.socket.io.backoff.duration() / 1000);
@@ -544,7 +532,7 @@ class SocketClient {
      * @private
      */
     resetReconnectTimer = () => {
-        if (this.connected || this.reconnecting) return;
+        if (this.connected) return;
         this.backupAttempts = this.socket.io.backoff.attempts;
         this.reset();
     }
@@ -557,7 +545,6 @@ class SocketClient {
         if (this.resetting) return;
         this.resetting = true;
 
-        this.reconnecting = true;
         this.reconnectTimer.stop();
 
         setTimeout(this.close);

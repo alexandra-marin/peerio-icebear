@@ -98,14 +98,12 @@ class User {
      */
     @observable profileLoaded = false;
     /**
-     * Quota object as received from server, it has complex and weird format.
-     * You don't need to use this directly, use computed properties that are based on this.
      * @member {Array<Address>} addresses
      * @memberof User
      * @instance
      * @protected
      */
-    @observable.ref addresses;
+    @observable.ref addresses = [];
     /**
      * @member {boolean} primaryAddressConfirmed
      * @memberof User

@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.7.1"></a>
+## [4.7.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.7.0...v4.7.1) (2018-02-05)
+
+
+### Bug Fixes
+
+* update tryToCacheTemporarily() conditions to let force download work ([#138](https://github.com/PeerioTechnologies/peerio-icebear/issues/138)) ([75474fe](https://github.com/PeerioTechnologies/peerio-icebear/commit/75474fe))
+
+
+
 <a name="4.7.0"></a>
 # [4.7.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.6.2...v4.7.0) (2018-02-05)
 

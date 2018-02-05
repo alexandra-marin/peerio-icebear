@@ -148,7 +148,7 @@ class ChatBootKeg extends SyncedKeg {
         if (this.dirty) throw new Error('Can not add key to chat boot keg because unsaved key exists.');
         // NOTE: if this is not the first key, we intentionally do not update `this.kegKey` and `this.kegKeyId`,
         // because it's dangerous to encrypt with the key that has not been saved yet.
-        // Fields will get updated after boot keg is saved.
+        // Fields will get updated after boot keg is saved and reloaded.
         const key = keys.generateEncryptionKey();
         const ids = Object.keys(this.keys).map(id => +id);
         const maxId = (ids.length ? Math.max(...ids) + 1 : 0).toString();
@@ -160,6 +160,18 @@ class ChatBootKeg extends SyncedKeg {
         if (maxId === '0') {
             this.kegKey = this.keys[maxId].key;
             this.kegKeyId = maxId;
+        }
+    }
+
+    /**
+     * This is a helper method to perform rollback after failed keg save.
+     */
+    removeUnsavedKey() {
+        const ids = Object.keys(this.keys).map(id => +id);
+        const maxId = (ids.length ? Math.max(...ids) + 1 : 0);
+        if (+this.kegKeyId < maxId) {
+            delete this.keys[maxId.toString()];
+            this.dirty = false;
         }
     }
 

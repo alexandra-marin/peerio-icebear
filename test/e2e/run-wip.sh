@@ -4,3 +4,4 @@ node --expose-gc ./node_modules/.bin/cucumber-js test/e2e/spec \
         --require-module babel-register \
         --format node_modules/cucumber-pretty \
         --tags '@wip'
+        --exit

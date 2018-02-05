@@ -14,3 +14,4 @@ node --expose-gc ./node_modules/.bin/cucumber-js test/e2e/spec \
         --format usage:./test-results/e2e/usage.txt \
         --format json:./test-results/e2e/result.json \
         --tags "$tags"
+        --exit

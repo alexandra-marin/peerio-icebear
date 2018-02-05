@@ -1,4 +1,4 @@
-const { defineSupportCode } = require('cucumber');
+const { setWorldConstructor } = require('cucumber');
 
 /**
  * Cucumber creates an instance of this class for each scenario.
@@ -49,6 +49,6 @@ class PeerioAppWorld {
     }
 }
 
-defineSupportCode(({ setWorldConstructor }) => {
-    setWorldConstructor(PeerioAppWorld);
-});
+
+setWorldConstructor(PeerioAppWorld);
+

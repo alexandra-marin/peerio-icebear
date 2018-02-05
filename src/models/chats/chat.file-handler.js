@@ -50,19 +50,21 @@ class ChatFileHandler {
         const file = fileStore.upload(path, name);
         file.uploadQueue = this.chat.uploadQueue; // todo: change, this is dirty
         this.chat.uploadQueue.push(file);
-        const deletedDisposer = when(() => file.deleted, () => {
-            this.chat.uploadQueue.remove(file);
-        });
-        when(() => file.readyForDownload, () => {
-            this.chat.uploadQueue.remove(file);
-            if (beforeShareCallback) {
-                beforeShareCallback().then(() => this.share([file]));
-            } else {
-                this.share([file], message);
+        const removeFileFromQueue = () => this.chat.uploadQueue.remove(file);
+        const deletedDisposer = when(() => file.deleted, removeFileFromQueue);
+        when(() => file.readyForDownload, async () => {
+            try {
+                if (beforeShareCallback) {
+                    await beforeShareCallback();
+                }
+                await this.share([file], message);
+                if (deleteAfterUpload) {
+                    config.FileStream.delete(path);
+                }
+            } catch (e) {
+                console.error(e);
             }
-            if (deleteAfterUpload) {
-                config.FileStream.delete(path);
-            }
+            removeFileFromQueue();
             deletedDisposer();
         });
         return file;

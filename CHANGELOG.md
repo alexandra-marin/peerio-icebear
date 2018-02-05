@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.7.0"></a>
+# [4.7.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.6.2...v4.7.0) (2018-02-05)
+
+
+### Features
+
+* add new key on participant leave ([#127](https://github.com/PeerioTechnologies/peerio-icebear/issues/127)) ([302967b](https://github.com/PeerioTechnologies/peerio-icebear/commit/302967b))
+* no auto adding tofu for encounters ([#130](https://github.com/PeerioTechnologies/peerio-icebear/issues/130)) ([2abf301](https://github.com/PeerioTechnologies/peerio-icebear/commit/2abf301))
+* wait for file to be shared before removing upload indicator [branch ch1671] ([#132](https://github.com/PeerioTechnologies/peerio-icebear/issues/132)) ([bbc874a](https://github.com/PeerioTechnologies/peerio-icebear/commit/bbc874a))
+
+
+
 <a name="4.6.2"></a>
 ## [4.6.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.6.1...v4.6.2) (2018-02-05)
 

@@ -61,7 +61,7 @@ class ChatKegDb {
             usernames.splice(ind, 1);
             console.warn('ChatKegDb constructor received participant list containing current user.');
         }
-        this.participantsToCreateWith = usernames.map(p => contactStore.getContact(p));
+        this.participantsToCreateWith = usernames.map(p => contactStore.getContactAndSave(p));
 
         this.isChannel = isChannel;
         // Just to prevent parallel load routines. We can't use chat id because we don't always have it.
@@ -188,7 +188,7 @@ class ChatKegDb {
         this.id = meta.id;
         if (!this.isChannel && meta.permissions && meta.permissions.users) {
             this._metaParticipants = Object.keys(meta.permissions.users)
-                .map(username => contactStore.getContact(username));
+                .map(username => contactStore.getContactAndSave(username));
         }
     }
 

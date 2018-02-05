@@ -516,24 +516,16 @@ class ChatStore {
         // we can't add participants before setting channel name because
         // server will trigger invites and send empty chat name to user
         const chat = new Chat(null, isChannel ? [] : this.getSelflessParticipants(participants), this, isChannel);
-        chat.loadMetadata()
-            .then(() => {
-                this.addChat(chat);
-                this.activate(chat.id);
-            })
-            .then(() => {
-                if (name) return chat.rename(name);
-                return null;
-            })
-            .then(() => {
-                if (purpose) return chat.changePurpose(purpose);
-                return null;
-            })
-            .then(() => {
-                if (isChannel) {
-                    chat.addParticipants(this.getSelflessParticipants(participants));
-                }
-            });
+        (async () => {
+            await chat.loadMetadata();
+            this.addChat(chat);
+            this.activate(chat.id);
+            if (name) await chat.rename(name);
+            if (purpose) await chat.changePurpose(purpose);
+            if (isChannel) {
+                chat.addParticipants(this.getSelflessParticipants(participants));
+            }
+        })();
         return chat;
     }
 

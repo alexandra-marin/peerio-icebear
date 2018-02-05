@@ -9,6 +9,7 @@ const warnings = require('../warnings');
 const createMap = require('../../helpers/dynamic-array-map');
 const { getFirstLetterUpperCase } = require('./../../helpers/string');
 const { getUser } = require('../../helpers/di-current-user');
+const tofuStore = require('./tofu-store');
 
 /**
  * Contact store handles all Peerio users you(your app) are in some contact with,
@@ -180,7 +181,7 @@ class ContactStore {
 
     applyMyContactsData = action(() => {
         Object.keys(this.myContacts.contacts).forEach(username => {
-            this.getContact(username);
+            this.getContactAndSave(username);
         });
         this.contacts.forEach(c => {
             c.isAdded = !!this.myContacts.contacts[c.username];
@@ -364,19 +365,34 @@ class ContactStore {
      * @public
      */
     getContact(username, prefetchedData) {
-        let existing = this._contactMap[username];
-        if (existing) return existing;
-        existing = this._requestMap[username];
+        const existing = this._contactMap[username]
+            || this._requestMap[username];
         if (existing) return existing;
 
         const c = new Contact(username, prefetchedData);
+        // is deleted when contact is added to _contactMap only
+        // see getContactAndSave
         this._requestMap[username] = c;
+        return c;
+    }
 
+    /**
+     * Searches for contact and saves its tofu,
+     * effectively adding it to the contact list
+     * @param {string} username
+     */
+    getContactAndSave(username) {
+        const c = this.getContact(username);
         when(() => !c.loading, () => {
             delete this._requestMap[username];
             if (!c.notFound && !this._contactMap[username]) {
                 this.contacts.unshift(c);
+                // @anri: this is for concurrency, if contacts keg loaded before this contact did - the added flag
+                // will not get set. Probably could convert it to computed tho, but with performance penalty.
                 c.isAdded = this.myContacts ? !!this.myContacts.contacts[c.username] : false;
+                // forcing loadTofu creates a tofu keg, effectively adding the contact
+                // to contact list
+                c.loadTofu();
             }
         });
         return c;
@@ -399,7 +415,7 @@ class ContactStore {
     }
 
     _merge(usernames) {
-        usernames.forEach(u => this.getContact(u));
+        usernames.forEach(u => this.getContactAndSave(u));
     }
 
     loadLegacyContacts() {
@@ -416,14 +432,9 @@ class ContactStore {
      * @protected
      */
     loadContactsFromTOFUKegs() {
-        socket.send('/auth/kegs/db/list-ext', {
-            kegDbId: 'SELF',
-            options: { type: 'tofu' }
-        }).then(res => {
-            if (!res.kegs || !res.kegs.length) return;
-            res.kegs.forEach(keg => this.getContact(keg.props.username));
-        }).catch(err => {
-            console.error('Failed to load contacts from tofu kegs', err);
+        when(() => tofuStore.loaded, () => {
+            tofuStore.usernames.forEach(username => this.getContactAndSave(username));
+            console.log('Loaded contacts from tofu kegs');
         });
     }
     /**

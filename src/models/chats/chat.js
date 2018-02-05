@@ -356,14 +356,14 @@ class Chat {
     }
 
     /**
-     * Excluding current user.
+     * Includes current user.
      * @member {Array<string>} participantUsernames
      * @memberof Chat
      * @instance
      * @public
      */
     @computed get participantUsernames() {
-        return this.otherParticipants.map(p => p.username);
+        return this.allParticipants.map(p => p.username);
     }
 
     /**

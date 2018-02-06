@@ -4,6 +4,7 @@ const { observable, action, when, computed, reaction } = require('mobx');
 const { cryptoUtil } = require('../../crypto/index');
 const { getUser } = require('./../../helpers/di-current-user');
 const Tofu = require('./tofu');
+const tofuStore = require('./tofu-store');
 const { getFirstLetterUpperCase } = require('./../../helpers/string');
 const serverSettings = require('../server-settings');
 const { t } = require('peerio-translator');
@@ -368,12 +369,9 @@ class Contact {
                 // this is server - controlled data, so we don't account for cases when it's invalid
                 this.encryptionPublicKey = new Uint8Array(profile.encryptionPublicKey);
                 this.signingPublicKey = new Uint8Array(profile.signingPublicKey);
-                if (this.username === getUser().username) {
-                    this._waitingForResponse = false;
-                    this.loading = false;
-                }
-                // eslint-disable-next-line consistent-return
-                return this.loadTofu();
+                // HINT: not calling loadTofu automatically anymore
+                this._waitingForResponse = false;
+                this.loading = false;
             }))
             .catch(err => {
                 this._waitingForResponse = false;
@@ -393,7 +391,7 @@ class Contact {
      */
     loadTofu() {
         // console.log('Loading tofu:', this.username);
-        return Tofu.getByUsername(this.username)
+        return tofuStore.getByUsername(this.username)
             .then(action(tofu => {
                 this._waitingForResponse = false;
                 this.loading = false;

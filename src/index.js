@@ -42,6 +42,7 @@ const PhraseDictionary = require('./models/phrase-dictionary');
 const config = require('./config');
 const errors = require('./errors');
 const contactStore = require('./models/contacts/contact-store');
+const tofuStore = require('./models/contacts/tofu-store');
 const chatStore = require('./models/chats/chat-store');
 const fileStore = require('./models/files/file-store');
 const ghostStore = require('./models/mail/ghost-store');
@@ -73,6 +74,7 @@ module.exports = {
     PhraseDictionary,
     TinyDb,
     contactStore,
+    tofuStore,
     chatStore,
     chatInviteStore,
     fileStore,

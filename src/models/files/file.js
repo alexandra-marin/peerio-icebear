@@ -439,7 +439,7 @@ class File extends Keg {
     tryToCacheTemporarily(force) {
         if (this.tmpCached
             || this.downloading
-            || !clientApp.uiUserPrefs.peerioContentEnabled
+            || (!force && !clientApp.uiUserPrefs.peerioContentEnabled)
             || (!force && this.isOverInlineSizeLimit)
             || this.isOversizeCutoff
             || this.cachingFailed) return;

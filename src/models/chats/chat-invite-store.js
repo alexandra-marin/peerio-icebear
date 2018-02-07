@@ -221,6 +221,7 @@ class ChatInviteStore {
                         return chat.metaLoaded;
                     }, () => {
                         getChatStore().chatMap[kegDbId].sendJoinMessage();
+                        getChatStore().activate(kegDbId);
                         resolve();
                     });
                 });

@@ -1153,10 +1153,12 @@ class Chat {
                 () => {
                     if (wasAdmin) boot.unassignRole(contact, 'admin');
                     boot.removeParticipant(contact);
+                    boot.addKey();
                     return true;
                 },
                 () => {
                     boot.addParticipant(contact);
+                    boot.removeUnsavedKey();
                     if (wasAdmin) boot.assignRole(contact, 'admin');
                 },
                 'error_removeParticipant'

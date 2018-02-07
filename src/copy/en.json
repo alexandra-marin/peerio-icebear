@@ -201,6 +201,7 @@
   "button_create": "Create",
   "title_fileSize": "File size",
   "title_empty": "Empty",
+  "title_sharingFolderPercent": "<i>Sharing folder ({progressPercent}%)</>",
   "title_selectedFiles": "Selected file(s)",
   "title_invalidFileSignature": "Invalid file signature",
   "title_filesNull1": "Let's encrypt a file.",

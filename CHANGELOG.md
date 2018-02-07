@@ -2,6 +2,68 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.7.3"></a>
+## [4.7.3](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.7.2...v4.7.3) (2018-02-07)
+
+
+
+<a name="4.7.2"></a>
+## [4.7.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.7.1...v4.7.2) (2018-02-06)
+
+
+
+<a name="4.7.1"></a>
+## [4.7.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.7.0...v4.7.1) (2018-02-05)
+
+
+### Bug Fixes
+
+* update tryToCacheTemporarily() conditions to let force download work ([#138](https://github.com/PeerioTechnologies/peerio-icebear/issues/138)) ([75474fe](https://github.com/PeerioTechnologies/peerio-icebear/commit/75474fe))
+
+
+
+<a name="4.7.0"></a>
+# [4.7.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.6.2...v4.7.0) (2018-02-05)
+
+
+### Features
+
+* add new key on participant leave ([#127](https://github.com/PeerioTechnologies/peerio-icebear/issues/127)) ([302967b](https://github.com/PeerioTechnologies/peerio-icebear/commit/302967b))
+* no auto adding tofu for encounters ([#130](https://github.com/PeerioTechnologies/peerio-icebear/issues/130)) ([2abf301](https://github.com/PeerioTechnologies/peerio-icebear/commit/2abf301))
+* wait for file to be shared before removing upload indicator [branch ch1671] ([#132](https://github.com/PeerioTechnologies/peerio-icebear/issues/132)) ([bbc874a](https://github.com/PeerioTechnologies/peerio-icebear/commit/bbc874a))
+
+
+
+<a name="4.6.2"></a>
+## [4.6.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.6.1...v4.6.2) (2018-02-05)
+
+
+### Bug Fixes
+
+* make participantUsernames include self ([#139](https://github.com/PeerioTechnologies/peerio-icebear/issues/139)) ([5ee2b5d](https://github.com/PeerioTechnologies/peerio-icebear/commit/5ee2b5d))
+
+
+
+<a name="4.6.1"></a>
+## [4.6.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.6.0...v4.6.1) (2018-02-05)
+
+
+### Bug Fixes
+
+* addresses should never be undefined ([9833c54](https://github.com/PeerioTechnologies/peerio-icebear/commit/9833c54))
+
+
+
+<a name="4.6.0"></a>
+# [4.6.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.5.5...v4.6.0) (2018-02-02)
+
+
+### Features
+
+* add new jitsi text ([#134](https://github.com/PeerioTechnologies/peerio-icebear/issues/134)) ([8b8a00e](https://github.com/PeerioTechnologies/peerio-icebear/commit/8b8a00e))
+
+
+
 <a name="4.5.5"></a>
 ## [4.5.5](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.5.4...v4.5.5) (2018-02-02)
 

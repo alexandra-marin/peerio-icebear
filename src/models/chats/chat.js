@@ -356,14 +356,14 @@ class Chat {
     }
 
     /**
-     * Excluding current user.
+     * Includes current user.
      * @member {Array<string>} participantUsernames
      * @memberof Chat
      * @instance
      * @public
      */
     @computed get participantUsernames() {
-        return this.otherParticipants.map(p => p.username);
+        return this.allParticipants.map(p => p.username);
     }
 
     /**
@@ -1038,7 +1038,7 @@ class Chat {
     addParticipants(participants) {
         if (!participants || !participants.length) return Promise.resolve();
         if (!this.isChannel) return Promise.reject(new Error('Can not add participants to a DM chat'));
-        const contacts = participants.map(p => (typeof p === 'string' ? contactStore.getContact(p) : p));
+        const contacts = participants.map(p => (typeof p === 'string' ? contactStore.getContactAndSave(p) : p));
         return Contact.ensureAllLoaded(contacts).then(() => {
             const { boot } = this.db;
             return boot.save(

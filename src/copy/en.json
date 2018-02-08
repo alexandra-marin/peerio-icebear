@@ -507,7 +507,7 @@
   "title_roomInviteHeading": "Behold! You have been invited to join",
   "button_nay": "Nay, decline",
   "button_aye": "Aye, accept",
-  "title_roomInviteUpgradeNotice": "Hi there, basic Peerio accounts have access to <b>3 free channels</>. Check out our upgrade option for more, or decline this room.",
+  "title_roomInviteUpgradeNotice": "Hi there. Basic Peerio accounts have access to <b>3 free rooms</>. Upgrade your account to get more, or decline this invite.",
   "title_hostedBy": "Hosted by",
   "title_whoIsAlreadyIn": "Who is already in",
   "title_userOut": "{name} out! Peace!",

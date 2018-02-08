@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.9.0"></a>
+# [4.9.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.8.1...v4.9.0) (2018-02-08)
+
+
+### Features
+
+* contact added string [ch2770] ([#145](https://github.com/PeerioTechnologies/peerio-icebear/issues/145)) ([f19ad2f](https://github.com/PeerioTechnologies/peerio-icebear/commit/f19ad2f))
+
+
+
 <a name="4.8.1"></a>
 ## [4.8.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.8.0...v4.8.1) (2018-02-07)
 

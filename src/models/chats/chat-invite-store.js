@@ -73,6 +73,36 @@ class ChatInviteStore {
     updating = false;
     updateAgain = false;
 
+    /**
+     * Active invite object { kegDbId, channelName, username }
+     */
+    @observable activeInvite = null;
+
+    /**
+     * Activate invite by id
+     * @param {string} kegDbId
+     */
+    @action.bound activateInvite(kegDbId) {
+        const invite = this.received.find(obj => {
+            return obj.kegDbId === kegDbId;
+        });
+
+        if (!invite) return;
+
+        this.activeInvite = {
+            kegDbId,
+            channelName: invite.channelName,
+            username: invite.username
+        };
+    }
+
+    /**
+     * Deactivate current invite
+     */
+    @action.bound deactivateInvite() {
+        this.activeInvite = null;
+    }
+
     /** @private */
     updateInvitees = () => {
         return socket.send('/auth/kegs/channel/invitees')

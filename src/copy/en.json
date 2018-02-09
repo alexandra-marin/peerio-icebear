@@ -16,6 +16,7 @@
   "button_active": "Active",
   "button_accept": "Accept",
   "button_decline": "Decline",
+  "button_declineInvite": "Decline invite",
   "button_dismiss": "Dismiss",
   "button_remove": "Remove",
   "button_done": "Done",
@@ -200,6 +201,7 @@
   "button_create": "Create",
   "title_fileSize": "File size",
   "title_empty": "Empty",
+  "title_sharingFolderPercent": "<i>Sharing folder ({progressPercent}%)</>",
   "title_selectedFiles": "Selected file(s)",
   "title_invalidFileSignature": "Invalid file signature",
   "title_filesNull1": "Let's encrypt a file.",
@@ -507,6 +509,7 @@
   "title_roomInviteHeading": "Behold! You have been invited to join",
   "button_nay": "Nay, decline",
   "button_aye": "Aye, accept",
+  "title_roomInviteUpgradeNotice": "Hi there. Basic Peerio accounts have access to <b>3 free rooms</>. Upgrade your account to get more, or decline this invite.",
   "title_hostedBy": "Hosted by",
   "title_whoIsAlreadyIn": "Who is already in",
   "title_userOut": "{name} out! Peace!",
@@ -664,5 +667,6 @@
   "error_messageErrorAdditionalInfo": "Additional information about this error",
   "error_messageErrorNotAvailable": "Not available",
   "title_verifyUserIdentity": "You can verify any user’s identity with their Peerio ID#. <a-identityVerification>Show me how</>",
-  "title_addPeopleToRoom": "Add people to this room"
+  "title_addPeopleToRoom": "Add people to this room",
+  "title_contactAdded": "{name} has been added"
 }

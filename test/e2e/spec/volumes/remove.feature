@@ -1,4 +1,4 @@
-@wip
+@off
 Feature: Removing files from volumes
     The owner of a volume should be able to remove files from a volume. When deleting their own files,
     or deleting the volume altogether, files belonging to them should be deleted. However, if they

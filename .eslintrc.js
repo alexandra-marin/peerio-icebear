@@ -9,7 +9,8 @@ module.exports = {
         'no-mixed-operators': 0,
         'no-multi-assign': 0,
         'no-restricted-properties': 1,
-        'no-void': 0
+        'no-void': 0,
+        'prefer-arrow-callback': 0
     },
     globals: {
         TextEncoder: false,

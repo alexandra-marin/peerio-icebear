@@ -1,4 +1,4 @@
-@wip
+@off
 Feature: Resharing
     A user who receives a file with editor privileges may re-share a file with other DMs or rooms.
 

@@ -10,6 +10,7 @@ const createMap = require('../../helpers/dynamic-array-map');
 const { getFirstLetterUpperCase } = require('./../../helpers/string');
 const { getUser } = require('../../helpers/di-current-user');
 const tofuStore = require('./tofu-store');
+const { asPromise } = require('../../helpers/prombservable');
 
 /**
  * Contact store handles all Peerio users you(your app) are in some contact with,
@@ -218,7 +219,7 @@ class ContactStore {
      * @public
      */
     addContact(val) {
-        const c = typeof val === 'string' ? this.getContact(val) : val;
+        const c = typeof val === 'string' ? this.getContactAndSave(val) : val;
         return new Promise((resolve, reject) => {
             when(() => !c.loading, () => {
                 if (c.notFound) {
@@ -316,12 +317,14 @@ class ContactStore {
      */
     removeContact(usernameOrContact) {
         const c = typeof usernameOrContact === 'string' ? this.getContact(usernameOrContact) : usernameOrContact;
-        if (!this.myContacts.contacts[c.username]) return;
-        when(() => !c.loading, () => {
-            if (c.notFound) {
-                warnings.add('error_contactRemoveFail');
-            } else {
-                this.myContacts.save(
+        if (!this.myContacts.contacts[c.username]) return Promise.resolve();
+        return asPromise(c, 'loading', false)
+            .then(() => {
+                if (c.notFound) {
+                    warnings.add('error_contactRemoveFail');
+                    return Promise.reject();
+                }
+                return this.myContacts.save(
                     () => this.myContacts.removeContact(c),
                     () => this.myContacts.addContact(c),
                     'error_contactRemoveFail'
@@ -330,8 +333,7 @@ class ContactStore {
                     this.applyMyContactsData();
                     warnings.add('snackbar_contactRemovedFavourite');
                 });
-            }
-        });
+            });
     }
 
     /**

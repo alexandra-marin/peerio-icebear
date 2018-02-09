@@ -1,7 +1,7 @@
 Feature: Downloading
 
     Background:
-        Given I create an account
+        Given I create my account
 
     Scenario: Download a 1024-byte file
         Given I upload a 1024 byte file

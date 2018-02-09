@@ -1,4 +1,4 @@
-@wip
+@off
 Feature: Files in rooms
     Files may be shared in rooms. When a file is shared in a room, the room as a whole is invited to it.
 

@@ -2,6 +2,41 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.10.0"></a>
+# [4.10.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.9.0...v4.10.0) (2018-02-09)
+
+
+### Features
+
+* add invite sdk functions ([#147](https://github.com/PeerioTechnologies/peerio-icebear/issues/147)) ([6db0f54](https://github.com/PeerioTechnologies/peerio-icebear/commit/6db0f54))
+
+
+
+<a name="4.9.0"></a>
+# [4.9.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.8.1...v4.9.0) (2018-02-08)
+
+
+### Features
+
+* contact added string [ch2770] ([#145](https://github.com/PeerioTechnologies/peerio-icebear/issues/145)) ([f19ad2f](https://github.com/PeerioTechnologies/peerio-icebear/commit/f19ad2f))
+
+
+
+<a name="4.8.1"></a>
+## [4.8.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.8.0...v4.8.1) (2018-02-07)
+
+
+
+<a name="4.8.0"></a>
+# [4.8.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.7.3...v4.8.0) (2018-02-07)
+
+
+### Features
+
+* activate channel on accepting invite ([#142](https://github.com/PeerioTechnologies/peerio-icebear/issues/142)) ([61c9fc0](https://github.com/PeerioTechnologies/peerio-icebear/commit/61c9fc0))
+
+
+
 <a name="4.7.3"></a>
 ## [4.7.3](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.7.2...v4.7.3) (2018-02-07)
 

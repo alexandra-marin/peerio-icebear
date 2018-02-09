@@ -3,7 +3,7 @@ Feature: User profile
     User should be able to change own profile details.
 
     Background:
-        Given I create an account
+        Given I create my account
 
     Scenario: Update names
         When  I change my first name to "TestFirstName1"
@@ -37,7 +37,7 @@ Feature: User profile
         Then  my new email is confirmed
 
     Scenario: Change primary email
-        Given I confirm my primary email
+        Given I confirm the primary email
         And   I add a new email
         And   I confirm my new email
         And   my new email is confirmed

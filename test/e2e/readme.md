@@ -69,10 +69,9 @@ Now add the code implementation in the <i>supportCode</i> folder. Note that runn
 
 Example: myImplementation.js
 ```
-const defineSupportCode = require('cucumber').defineSupportCode;
+const { Given, Then, When } = require('cucumber');
 const expect = require('chai').expect;
 
-defineSupportCode(function({ Given, Then, When }) {
     let answer = 0;
 
     Given('the first number is {int}', (input) => {
@@ -86,7 +85,7 @@ defineSupportCode(function({ Given, Then, When }) {
     Then('the result should be {int}', (input) => {
         expect(answer).to.equal(input);
     });
-});
+
 ```
 
 ## Terms and definitions

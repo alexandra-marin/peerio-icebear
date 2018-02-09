@@ -108,10 +108,10 @@ function waitForEmail(name, subject, timeout = 37000) {
                     if (id) return getEmail(name, id).then(resolve);
                     if (Date.now() - start > timeout) {
                         console.log('Email not arrived. Giving up.');
-                        reject();
+                        reject(new Error('Email not arrived. Giving up.'));
                     } else {
                         console.log('Email not arrived yet, waiting.');
-                        setTimeout(makeAttempt, 2000);
+                        setTimeout(makeAttempt, 1000);
                     }
                     return null;
                 })

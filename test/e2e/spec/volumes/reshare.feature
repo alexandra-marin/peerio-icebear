@@ -1,4 +1,4 @@
-@wip
+@off
 Feature: Sharing volumes
     Invitations to volumes must be accepted wholesale, although it is possible for users to mention
     files within volumes individually. These, however, will not end up in the file stream independently

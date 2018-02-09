@@ -1,4 +1,4 @@
-@wip
+@off
 Feature: Inviting users to volumes
     Users who have created volumes should be able to invite other users, have them join, and
     change their privileges.

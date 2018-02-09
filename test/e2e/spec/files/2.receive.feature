@@ -1,4 +1,4 @@
-@wip
+@off
 Feature: Receiving and accepting
 
     Receiving a file in a chat (room or DM) is considered an invitation to have a file.

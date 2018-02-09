@@ -1,4 +1,4 @@
-@wip
+@off
 Feature: Moving files around volumes
     Owners and editors should be able to reorganize files within volumes, including creating
     subfolders inside them. Viewers should not be able to do so, though they should be able to

@@ -113,7 +113,7 @@ function download(filePath, resume, isTmpCacheDownload) {
                 return Promise.reject(err || new Error('Download failed.'));
             });
     } catch (ex) {
-        this._resetDownloadState();
+        this.cancelDownload();
         console.error(ex);
         return Promise.reject(ex);
     }

@@ -77,6 +77,7 @@ class App {
             error: console.error,
             debug: console.debug
         };
+        console._log = console.log;
         const write = (type, args) => {
             // DisconnectedError naturally happens all the time during tests.
             // It generates too much noise and hardly has any value, we can figure

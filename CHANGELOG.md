@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.11.0"></a>
+# [4.11.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.10.2...v4.11.0) (2018-02-16)
+
+
+### Features
+
+* unit tests for retry.js ([#144](https://github.com/PeerioTechnologies/peerio-icebear/issues/144)) ([7b6e221](https://github.com/PeerioTechnologies/peerio-icebear/commit/7b6e221))
+
+
+
 <a name="4.10.2"></a>
 ## [4.10.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.10.1...v4.10.2) (2018-02-15)
 

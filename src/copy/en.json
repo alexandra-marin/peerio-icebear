@@ -480,6 +480,7 @@
   "title_dmDescription3": "Privately share personal files and folders",
   "title_addRoom": "Add a Room",
   "title_addDirectMessage": "Add direct message",
+  "title_unreadMessages": "Unread messages",
   "title_addedPeopleLimit": "{added}/{limit} people in this chat.",
   "title_goCreateChannel": "If you need to chat with multiple people, try a Room instead.",
   "title_goCreateChat": "Don't need a Room? Use DM instead.",

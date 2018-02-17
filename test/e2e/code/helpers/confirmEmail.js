@@ -1,5 +1,5 @@
-const { waitForEmail } = require('./helpers/maildrop');
-const testConfig = require('./test-config');
+const { waitForEmail } = require('./maildrop');
+const testConfig = require('../test-config');
 const { getUrl } = require('./https');
 
 async function confirmPrimaryEmail(emailAddress) {

@@ -277,7 +277,7 @@ class Contact {
      * @member {boolean}
      * @public
      */
-    notFound = false;
+    @observable notFound = false;
     /**
      * Legacy contacts can't be used so they should treated as 'notFound' but clients can inform user about legacy
      * contact pending migration if this flag is `true` after loading is done.

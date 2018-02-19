@@ -8,10 +8,10 @@ async function findContact(query) {
     return contact;
 }
 
-Then('I can not find unregistered account by random username', async function() {
+Then('I can not find unregistered account by random username', function() {
     const username = getRandomUsername();
     const contact = this.ice.contactStore.getContact(username);
-    await this.waitForObservable(() => contact.notFound === true, 5000);
+    return this.waitForObservable(() => contact.notFound === true, 5000);
 });
 
 Then('I can find the test account by email', async function() {
@@ -57,9 +57,13 @@ When('I create a test account with invited email', function() {
     return this.createTestAccount(null, this.invitedEmail);
 });
 
-Then('the invite is converted to favorite contact', function() {
-    const c = this.ice.contactStore.getContact(this.invitedEmail);
-    return this.waitForObservable(() => c.isAdded, 5000);
+Then('the invite is converted to favorite contact', async function() {
+    let c = this.ice.contactStore.getContact(this.invitedEmail);
+    await this.waitForObservable(() => !c.loading, 5000);
+    c.username.should.equal(this.testAccount.username);
+    // previous instance of c myight be temporary bcs we searched by email
+    c = this.ice.contactStore.getContact(c.username);
+    await this.waitForObservable(() => c.isAdded, 5000);
 });
 
 When('I delete invited random email', function() {

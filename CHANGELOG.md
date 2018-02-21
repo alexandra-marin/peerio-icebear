@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.12.0"></a>
+# [4.12.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.11.1...v4.12.0) (2018-02-21)
+
+
+### Features
+
+* received invites now have observable 'declined' property ([07a66eb](https://github.com/PeerioTechnologies/peerio-icebear/commit/07a66eb))
+
+
+
 <a name="4.11.1"></a>
 ## [4.11.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.11.0...v4.11.1) (2018-02-19)
 

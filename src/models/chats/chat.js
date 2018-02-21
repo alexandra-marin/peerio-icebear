@@ -638,13 +638,15 @@ class Chat {
         if (!this.canGoDown && this.initialPageLoaded) this.detectFileAttachments(accumulator);
         // sort
         this.sortMessages();
-        // updating most recent message
-        for (let i = this.messages.length - 1; i >= 0; i--) {
-            const msg = this.messages[i];
-            if (!this.mostRecentMessage || +this.mostRecentMessage.id < +msg.id) {
-                this.mostRecentMessage = msg;
+        if (!prepend) {
+            // updating most recent message
+            for (let i = this.messages.length - 1; i >= 0; i--) {
+                const msg = this.messages[i];
+                if (!this.mostRecentMessage || +this.mostRecentMessage.id < +msg.id) {
+                    this.mostRecentMessage = msg;
+                }
+                break;
             }
-            break;
         }
 
         const excess = this.messages.length - config.chat.maxLoadedMessages;
@@ -1148,25 +1150,28 @@ class Chat {
         }
         const { boot } = this.db;
         const wasAdmin = boot.admins.includes(contact);
-        return contact.ensureLoaded().then(() =>
-            boot.save(
-                () => {
-                    if (wasAdmin) boot.unassignRole(contact, 'admin');
-                    boot.removeParticipant(contact);
-                    return true;
-                },
-                () => {
-                    boot.addParticipant(contact);
-                    if (wasAdmin) boot.assignRole(contact, 'admin');
-                },
-                'error_removeParticipant'
-            )).then(() => {
-            if (!isUserKick) return;
-            const m = new Message(this.db);
-            // @ts-ignore
-            m.setUserKickFact(contact.username);
-            this._sendMessage(m);
-        });
+
+        return contact.ensureLoaded()
+            .then(() => {
+                return boot.save(
+                    () => {
+                        if (wasAdmin) boot.unassignRole(contact, 'admin');
+                        boot.removeParticipant(contact);
+                        return true;
+                    },
+                    () => {
+                        boot.addParticipant(contact);
+                        if (wasAdmin) boot.assignRole(contact, 'admin');
+                    },
+                    'error_removeParticipant'
+                );
+            })
+            .then(() => {
+                if (!isUserKick) return;
+                const m = new Message(this.db);
+                m.setUserKickFact(contact.username);
+                this._sendMessage(m);
+            });
     }
 
     /**

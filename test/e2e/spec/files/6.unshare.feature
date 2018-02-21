@@ -1,4 +1,4 @@
-@wip
+@off
 Feature: Unsharing
 
     Scenario: Cannot unshare from individual in room

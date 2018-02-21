@@ -1,7 +1,7 @@
 Feature: Avatar
 
 Background:
-    Given I create an account
+    Given I create my account
 
     Scenario: Upload avatar successfully
         When I upload an avatar

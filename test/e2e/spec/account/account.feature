@@ -12,7 +12,7 @@ Feature: User account
     TODO: attempt to login with wrong passphrase
 
     Background:
-        Given I create an account
+        Given I create my account
 
     Scenario: user creates an account
         Then  I am authenticated
@@ -24,7 +24,7 @@ Feature: User account
         And   I should not have paid plans
 
     Scenario: user deletes existing account
-        Given I confirm my primary email
+        Given I confirm the primary email
         Then  my primary email is confirmed
         When  I delete my account
         Then  I am not authenticated

@@ -1,4 +1,4 @@
-SHOW_APP_LOGS=1
+export SHOW_APP_LOGS=1
 node --expose-gc ./node_modules/.bin/cucumber-js test/e2e/spec \
         -r test/e2e/code \
         --require-module babel-register \

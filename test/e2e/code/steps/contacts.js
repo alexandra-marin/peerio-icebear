@@ -1,93 +1,75 @@
-// const defineSupportCode = require('cucumber').defineSupportCode;
-// const { receivedEmailInvite, confirmUserEmail } = require('./helpers/mailinatorHelper');
-// const { runFeatureFromUsername, checkResult } = require('./helpers/runFeature');
-// const { asPromise } = require('./../../../src/helpers/prombservable');
-// const client = require('./helpers/client');
-// const { otherUser } = require('./helpers/otherUser');
+const { Then, When } = require('cucumber');
+const { getRandomUsername, getRandomEmail } = require('../helpers/random-data');
 
-// defineSupportCode(({ Given, Then, When }) => {
-//     const store = client.getContactStore();
+async function findContact(query) {
+    const contact = this.ice.contactStore.getContact(query);
+    await this.waitForObservable(() => contact.loading === false, 5000);
+    contact.notFound.should.be.false;
+    return contact;
+}
 
-//     const otherUserEmail = () => `${otherUser.id}@mailinator.com`;
+Then('I can not find unregistered account by random username', function() {
+    const username = getRandomUsername();
+    const contact = this.ice.contactStore.getContact(username);
+    return this.waitForObservable(() => contact.notFound === true, 5000);
+});
 
-//     let contactFromUsername;
-//     const contactLoaded = () => {
-//         contactFromUsername = store.getContact(otherUser.id);
-//         return asPromise(contactFromUsername, 'loading', false).delay(500);
-//     };
+Then('I can find the test account by email', async function() {
+    const contact = await findContact.call(this, this.testAccount.email);
+    contact.username.should.equal(this.testAccount.username);
+});
 
-//     // Scenario: Find contact
-//     Given(/I search for (?:a registered username|a registered email|an unregistered user)/, () => {
-//         return contactLoaded();
-//     });
+Then('I can find the test account by username', async function() {
+    const contact = await findContact.call(this, this.testAccount.username);
+    contact.addresses[0].should.equal(this.testAccount.email);
+});
 
-//     When('the contact exists', () => {
-//         contactFromUsername.notFound.should.be.false;
-//     });
+Then('test account is not added to my contacts', function() {
+    expect(this.ice.contactStore
+        .contacts.find(c => c.username === this.testAccount.username))
+        .to.be.undefined;
+});
 
-//     Then('the contact is added in my contacts', () => {
-//         store.contacts.should.contain(c => c === contactFromUsername);
-//     });
+When('I favorite the test account', function() {
+    return this.ice.contactStore.addContact(this.testAccount.username);
+});
 
+When('I unfavorite the test account', function() {
+    return this.ice.contactStore.removeContact(this.testAccount.username);
+});
 
-//     // Scenario: Send invite email
-//     When('no profiles are found', () => {
-//         contactFromUsername.notFound.should.be.true;
-//     });
+When('the test account is my favorite contact', function() {
+    const c = this.ice.contactStore.getContact(this.testAccount.username);
+    c.isAdded.should.be.true;
+});
 
-//     Then('they are added in my invited contacts', () => {
-//         return contactLoaded()
-//             .then(() => store.invitedContacts.should.contain(c => c === contactFromUsername));
-//     });
+When('the test account is not my favorite contact', function() {
+    const c = this.ice.contactStore.getContact(this.testAccount.username);
+    c.isAdded.should.be.false;
+});
 
-//     Then('they should receive an email invitation', () => {
-//         return receivedEmailInvite(otherUserEmail());
-//     });
+When('I invite random email', function() {
+    this.invitedEmail = getRandomEmail();
+    return this.ice.contactStore.invite(this.invitedEmail);
+});
 
+When('I create a test account with invited email', function() {
+    return this.createTestAccount(null, this.invitedEmail);
+});
 
-//     // Scenario: favorite a contact
-//     When('I favorite a registered user', () => {
-//         return store.addContact(otherUser.id)
-//             .then(result => result.should.be.true);
-//     });
+Then('the invite is converted to favorite contact', async function() {
+    let c = this.ice.contactStore.getContact(this.invitedEmail);
+    await this.waitForObservable(() => !c.loading, 5000);
+    c.username.should.equal(this.testAccount.username);
+    // previous instance of c myight be temporary bcs we searched by email
+    c = this.ice.contactStore.getContact(c.username);
+    await this.waitForObservable(() => c.isAdded, 5000);
+});
 
-//     Then('they will be in my favorite contacts', () => {
-//         return contactLoaded()
-//             .then(() => {
-//                 return asPromise(contactFromUsername, 'isAdded', true)
-//                     .then(() => store.addedContacts.should.contain(contactFromUsername));
-//             });
-//     });
+When('I delete invited random email', function() {
+    return this.ice.contactStore.removeInvite(this.invitedEmail);
+});
 
-
-//     // Scenario: Unfavorite a contact
-//     When('I unfavorite them', () => {
-//         store.removeContact(otherUser.id);
-//     });
-
-//     Then('they will not be in my favorites', () => {
-//         return contactLoaded()
-//             .then(() => store.addedContacts.should.not.contain(contactFromUsername));
-//     });
-
-
-//     // Scenario: Create favorite contact
-//     When(/(?:I invite an unregistered user|I send an invitation to them)/, () => {
-//         return store.invite(otherUserEmail());
-//     });
-
-//     When('they sign up', () => {
-//         return runFeatureFromUsername('Create account with username', otherUser.id)
-//             .then(checkResult);
-//     });
-
-//     When('they confirm their email', () => {
-//         return confirmUserEmail(otherUserEmail());
-//     });
-
-
-//     // Scenario: Remove favorite contact before email confirmation
-//     When('I remove the invitation', () => {
-//         return store.removeInvite(otherUserEmail());
-//     });
-// });
+Then('I don\'t have favorite contacts', function() {
+    Object.keys(this.ice.contactStore.myContacts.contacts).length.should.equal(0);
+});

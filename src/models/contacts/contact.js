@@ -277,7 +277,7 @@ class Contact {
      * @member {boolean}
      * @public
      */
-    notFound = false;
+    @observable notFound = false;
     /**
      * Legacy contacts can't be used so they should treated as 'notFound' but clients can inform user about legacy
      * contact pending migration if this flag is `true` after loading is done.
@@ -404,8 +404,7 @@ class Contact {
                     newTofu.signingPublicKey = cryptoUtil.bytesToB64(this.signingPublicKey);
                     // todo: this has a potential of creating 2+ tofu kegs for same contact
                     // todo: add checks similar to receipt keg dedupe
-                    newTofu.saveToServer();
-                    return;
+                    return newTofu.saveToServer();
                 }
                 // flagging contact
                 if (tofu.encryptionPublicKey !== cryptoUtil.bytesToB64(this.encryptionPublicKey)
@@ -417,6 +416,7 @@ class Contact {
                 // todo: this works only until we implement key change feature
                 this.encryptionPublicKey = cryptoUtil.b64ToBytes(tofu.encryptionPublicKey);
                 this.signingPublicKey = cryptoUtil.b64ToBytes(tofu.signingPublicKey);
+                return null;
             }));
     }
 

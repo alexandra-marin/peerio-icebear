@@ -3,9 +3,9 @@ mkdir -p ./test-results/e2e
 
 if [ $CI ]
 then
-    tags='not @wip and not @long'
+    tags='not @wip and not @long and not @off'
 else
-    tags='not @wip'
+    tags='not @wip and not @off'
 fi
 node --expose-gc ./node_modules/.bin/cucumber-js test/e2e/spec \
         -r test/e2e/code \

@@ -1,5 +1,6 @@
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
+const { Promise } = require('bluebird');
 
 chai.should();
 chai.use(chaiAsPromised);
@@ -9,3 +10,4 @@ if (!console.debug) {
 }
 
 global.expect = chai.expect;
+global.Promise = Promise;

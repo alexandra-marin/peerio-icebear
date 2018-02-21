@@ -4,12 +4,17 @@ const { getUrl } = require('../helpers/https');
 const testConfig = require('../test-config');
 
 
-Given('I confirm my primary email', { timeout: 45000 }, async function() {
-    const email = await waitForEmail(this.username, testConfig.primaryEmailConfirmSubject);
+Given('I confirm the primary email', { timeout: 45000 }, async function() {
+    const email = await waitForEmail(
+        this.ice.User.current.addresses[0].address,
+        testConfig.primaryEmailConfirmSubject
+    );
     const url = testConfig.emailConfirmUrlRegex.exec(email.body)[1];
     await getUrl(url);
     // giving confirmed status a chance to propagate
-    return this.waitForObservable(() => this.ice.User.current.primaryAddressConfirmed === true, 5000);
+    return this.waitForObservable(
+        () => this.ice.User.current.primaryAddressConfirmed === true, 5000
+    );
 });
 
 Then('my primary email is confirmed', function() {

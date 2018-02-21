@@ -1,29 +1,19 @@
 const { Given, When, Then } = require('cucumber');
-const { getRandomUsername } = require('./helpers/random-data');
-const testConfig = require('./test-config');
-
 
 // big timeouts on account creation and login due to scrypt being too heavy for CI container cpu
-Given('I create an account', { timeout: 60000 }, async function() {
-    await this.libs.prombservable.asPromise(this.ice.socket, 'connected', true);
+Given('I create my account', { timeout: 60000 }, async function() {
+    await this.createAccount();
+    if (this.cucumbotClient) this.cucumbotClient.sendReady();
+});
 
-    const u = new this.ice.User();
-    u.username = getRandomUsername();
-    u.email = `${u.username}@${testConfig.emailDomain}`;
-    u.firstName = 'Firstname';
-    u.lastName = 'Lastname';
-    u.locale = 'en';
-    u.passphrase = testConfig.defaultPassphrase;
-    this.ice.User.current = u;
+Given('I create a test account', { timeout: 60000 }, function() {
+    return this.createTestAccount();
+});
 
-    this.username = u.username;
-    this.passphrase = u.passphrase;
-
-    console.log(`creating user username: ${this.username} passphrase: ${this.passphrase}`);
-
-    await u.createAccountAndLogin();
-    console.log('Account created, waiting for initialization.');
-    return this.waitForAccountDataInit();
+Given('I create a test account and my account', { timeout: 120000 }, async function() {
+    await this.createTestAccount();
+    await this.app.restart();
+    return this.createAccount();
 });
 
 When('I login', { timeout: 60000 }, function() {
@@ -38,10 +28,13 @@ Then('I am not authenticated', function() {
     expect(this.ice.socket.authenticated).to.be.false;
 });
 
-When('I restart', { timeout: 60000 }, async function() {
+async function restart() {
     await this.app.restart();
     return this.login();
-});
+}
+
+When('I restart', { timeout: 60000 }, restart);
+When('Cucumbot restarts', { timeout: 60000 }, restart);
 
 When('I restart without login', function() {
     return this.app.restart();

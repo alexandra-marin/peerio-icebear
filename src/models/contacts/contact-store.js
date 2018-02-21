@@ -10,6 +10,7 @@ const createMap = require('../../helpers/dynamic-array-map');
 const { getFirstLetterUpperCase } = require('./../../helpers/string');
 const { getUser } = require('../../helpers/di-current-user');
 const tofuStore = require('./tofu-store');
+const { asPromise } = require('../../helpers/prombservable');
 
 /**
  * Contact store handles all Peerio users you(your app) are in some contact with,
@@ -39,6 +40,7 @@ class ContactStore {
      */
     invites;
     _requestMap = {};
+    _cachedContacts = {}; // the ones that are not in this.contacts, but still valid and requested during session
 
     /**
      * Favorite Contacts.
@@ -218,7 +220,7 @@ class ContactStore {
      * @public
      */
     addContact(val) {
-        const c = typeof val === 'string' ? this.getContact(val) : val;
+        const c = typeof val === 'string' ? this.getContactAndSave(val) : val;
         return new Promise((resolve, reject) => {
             when(() => !c.loading, () => {
                 if (c.notFound) {
@@ -235,6 +237,7 @@ class ContactStore {
                         'error_contactAddFail'
                     ).then(() => {
                         // because own keg writes don't trigger digest update
+                        c.isAdded = true;
                         this.applyMyContactsData();
                         warnings.add('snackbar_contactFavourited');
                         resolve(true);
@@ -316,12 +319,14 @@ class ContactStore {
      */
     removeContact(usernameOrContact) {
         const c = typeof usernameOrContact === 'string' ? this.getContact(usernameOrContact) : usernameOrContact;
-        if (!this.myContacts.contacts[c.username]) return;
-        when(() => !c.loading, () => {
-            if (c.notFound) {
-                warnings.add('error_contactRemoveFail');
-            } else {
-                this.myContacts.save(
+        if (!this.myContacts.contacts[c.username]) return Promise.resolve();
+        return asPromise(c, 'loading', false)
+            .then(() => {
+                if (c.notFound) {
+                    warnings.add('error_contactRemoveFail');
+                    return Promise.reject();
+                }
+                return this.myContacts.save(
                     () => this.myContacts.removeContact(c),
                     () => this.myContacts.addContact(c),
                     'error_contactRemoveFail'
@@ -330,8 +335,7 @@ class ContactStore {
                     this.applyMyContactsData();
                     warnings.add('snackbar_contactRemovedFavourite');
                 });
-            }
-        });
+            });
     }
 
     /**
@@ -359,20 +363,27 @@ class ContactStore {
      * Returns Contact object ether from cache or server.
      * It is important to be aware about `loading` state of contact, it is not guaranteed it will be loaded
      * after this function returns contact.
-     * @param {string} username
+     * @param {string} usernameOrEmail
      * @param {Object} [prefetchedData]
      * @returns {Contact}
      * @public
      */
-    getContact(username, prefetchedData) {
-        const existing = this._contactMap[username]
-            || this._requestMap[username];
+    getContact(usernameOrEmail, prefetchedData) {
+        const existing = this._contactMap[usernameOrEmail]
+            || this._requestMap[usernameOrEmail]
+            || this._cachedContacts[usernameOrEmail];
         if (existing) return existing;
 
-        const c = new Contact(username, prefetchedData);
+        const c = new Contact(usernameOrEmail, prefetchedData);
         // is deleted when contact is added to _contactMap only
         // see getContactAndSave
-        this._requestMap[username] = c;
+        this._requestMap[usernameOrEmail] = c;
+        when(() => !c.loading, () => {
+            delete this._requestMap[usernameOrEmail];
+            if (c.notFound) return;
+            if (this._contactMap[c.username] || this._cachedContacts[c.username]) return;
+            this._cachedContacts[c.username] = c;
+        });
         return c;
     }
 
@@ -381,19 +392,19 @@ class ContactStore {
      * effectively adding it to the contact list
      * @param {string} username
      */
-    getContactAndSave(username) {
-        const c = this.getContact(username);
+    getContactAndSave(usernameOrEmail) {
+        let c = this.getContact(usernameOrEmail);
         when(() => !c.loading, () => {
-            delete this._requestMap[username];
-            if (!c.notFound && !this._contactMap[username]) {
-                this.contacts.unshift(c);
-                // @anri: this is for concurrency, if contacts keg loaded before this contact did - the added flag
-                // will not get set. Probably could convert it to computed tho, but with performance penalty.
-                c.isAdded = this.myContacts ? !!this.myContacts.contacts[c.username] : false;
-                // forcing loadTofu creates a tofu keg, effectively adding the contact
-                // to contact list
-                c.loadTofu();
+            c = this._cachedContacts[c.username] || c;
+            delete this._cachedContacts[c.username];
+            if (c.notFound || this._contactMap[c.username]) return;
+            this.contacts.unshift(c);
+            this._contactMap[c.username] = c;
+            if (this.myContacts && this.myContacts.loaded && this.myContacts.contacts[c.username]) {
+                c.isAdded = true;
             }
+            // forcing loadTofu creates a tofu keg, effectively adding the contact to contact list
+            c.loadTofu();
         });
         return c;
     }

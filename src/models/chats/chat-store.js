@@ -309,6 +309,7 @@ class ChatStore {
         // console.log('Added chat ', c.id);
         if (this.myChats.hidden.includes(c.id)) c.unhide();
         c.loadMetadata().then(() => c.loadMostRecentMessage());
+        if (this.loaded && !this.activeChat) this.activate(c.id);
     };
 
     // takes current fav/hidden lists and makes sure store.chats reflect it
@@ -478,7 +479,7 @@ class ChatStore {
         // we can't add participants before setting channel name because
         // server will trigger invites and send empty chat name to user
         const chat = new Chat(null, isChannel ? [] : this.getSelflessParticipants(participants), this, isChannel);
-        (async () => {
+        runInAction(async () => {
             await chat.loadMetadata();
             this.addChat(chat);
             this.activate(chat.id);
@@ -487,7 +488,7 @@ class ChatStore {
             if (isChannel) {
                 chat.addParticipants(this.getSelflessParticipants(participants));
             }
-        })();
+        });
         return chat;
     }
 

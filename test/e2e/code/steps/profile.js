@@ -87,8 +87,8 @@ When('I upload an avatar', async function() {
     return this.ice.User.current.saveAvatar(blobs).should.be.fulfilled;
 });
 
-Then('the avatar should appear in my profile', function() {
-    this.ice.contactStore.currentUser.hasAvatar.should.be.true;
+Then('the avatar should appear in my profile', async function() {
+    await this.waitForObservable(() => this.ice.contactStore.currentUser.hasAvatar);
     this.ice.contactStore.currentUser.profileVersion.should.be.above(this.lastProfileVersion);
 
     const fileName = getTempFileName();

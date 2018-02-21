@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.12.1"></a>
+## [4.12.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.12.0...v4.12.1) (2018-02-21)
+
+
+### Bug Fixes
+
+* activeInvite now uses an existing object ([3ae4f1c](https://github.com/PeerioTechnologies/peerio-icebear/commit/3ae4f1c))
+
+
+
 <a name="4.12.0"></a>
 # [4.12.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.11.1...v4.12.0) (2018-02-21)
 

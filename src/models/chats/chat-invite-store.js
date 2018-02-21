@@ -96,11 +96,7 @@ class ChatInviteStore {
 
         if (!invite) return;
 
-        this.activeInvite = {
-            kegDbId,
-            channelName: invite.channelName,
-            username: invite.username
-        };
+        this.activeInvite = invite;
     }
 
     /**

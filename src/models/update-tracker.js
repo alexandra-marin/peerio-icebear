@@ -162,7 +162,7 @@ modificator: key type, entity id or entity kind
 Nth elements: any additional data needed
      */
     processDigestEvent(kegDbId, ev) {
-        console.log(kegDbId, ev);
+        // console.log(kegDbId, ev);
         /* eslint-disable prefer-const, no-unused-vars */
         let [kegType, maxUpdateId, sessionUpdateId, newKegsCount] = ev;
         // temporary check to make sure issue is resolved
@@ -281,7 +281,7 @@ Nth elements: any additional data needed
      * @private
      */
     processDigestResponse = digest => {
-        console.debug('Processing digest response');
+        console.log('Processing digest response');
         const dbList = Object.keys(digest);
         try {
             for (let i = 0; i < dbList.length; i++) {
@@ -290,7 +290,7 @@ Nth elements: any additional data needed
                     this.processDigestEvent(dbList[i], events[j]);
                 }
             }
-            console.debug('Digest has been loaded.');
+            console.log('Digest loaded.');
         } catch (err) {
             console.error(err);
         }
@@ -338,7 +338,7 @@ Nth elements: any additional data needed
             this.digest[id][type] = digest;
         }
         if (digest.knownUpdateId >= updateId) return;
-        console.debug('SEEN THIS', id, type, updateId);
+        // console.debug('SEEN THIS', id, type, updateId);
         // consumers should not care if this call fails, it makes things simpler.
         // to cover failure cases, consumers should activate 'mark as read' logic after every reconnect
         socket.send('/auth/updates/last-known-version', {

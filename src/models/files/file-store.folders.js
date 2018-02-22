@@ -5,12 +5,14 @@ const FileFolder = require('./file-folder');
 const FileFoldersKeg = require('./file-folders-keg');
 const cryptoUtil = require('../../crypto/util');
 const warnings = require('../warnings');
+const VolumeStore = require('../volumes/volume-store');
 
 const ROOT_FOLDER = new FileFolder('/');
 
 class FileStoreFolders {
     constructor(fileStore) {
         this.fileStore = fileStore;
+        this.volumeStore = new VolumeStore();
         socket.onceAuthenticated(() => {
             this.keg = new FileFoldersKeg(getUser().kegDb);
             this.keg.onUpdated = () => { this.sync(); };

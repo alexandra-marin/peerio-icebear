@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.13.1"></a>
+## [4.13.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.13.0...v4.13.1) (2018-02-22)
+
+
+### Bug Fixes
+
+* receipts not loading initially ([a233475](https://github.com/PeerioTechnologies/peerio-icebear/commit/a233475))
+
+
+
 <a name="4.13.0"></a>
 # [4.13.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.12.1...v4.13.0) (2018-02-21)
 

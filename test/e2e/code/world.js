@@ -19,7 +19,7 @@ class PeerioAppWorld {
     /**
      * Waits for mobx `when` to get executed for a specific amount of time and timeouts.
      */
-    waitForObservable = (lambda, timeout = 10000) => {
+    waitFor = (lambda, timeout = 10000) => {
         let resolve;
         const promise = new Promise((_resolve) => { resolve = _resolve; });
         const disposeReaction = this.libs.mobx.when(lambda, resolve);

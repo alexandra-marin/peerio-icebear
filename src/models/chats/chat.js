@@ -1182,7 +1182,7 @@ class Chat {
         this.leaving = true;
         const m = new Message(this.db);
         m.setChannelLeaveFact();
-        this._sendMessage(m)
+        return this._sendMessage(m)
             .then(() => socket.send('/auth/kegs/channel/leave', { kegDbId: this.id }))
             .tapCatch(err => {
                 console.error('Failed to leave channel.', this.id, err);

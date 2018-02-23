@@ -678,5 +678,5 @@
   "dialog_unshareTitle": "Unshare all your files?",
   "dialog_unshareText": "You are about to unshare all files you've ever shared. This action cannot be reversed.",
   "button_unshareAll": "Unshare all",
-  "warning_unsharedAll": "All shard files were unshared."
+  "warning_unsharedAll": "All shared files were unshared."
 }

@@ -670,5 +670,13 @@
   "error_messageErrorNotAvailable": "Not available",
   "title_verifyUserIdentity": "You can verify any user’s identity with their Peerio ID#. <a-identityVerification>Show me how</>",
   "title_addPeopleToRoom": "Add people to this room",
-  "title_contactAdded": "{name} has been added"
+  "title_contactAdded": "{name} has been added",
+  "dialog_migrationTitle": "We are upgrading our file sharing security!",
+  "dialog_migrationText": "Choose <b>continue</> to preserve your file sharing relationships or <b>unshare</> to automatically unshare all shared files.<br/><br/>You can review your files and who they've been shared with by downloading this file: <downloadFile>filename</>.",
+  "button_unshare": "Unshare",
+  "warning_sharingHistory": "Your sharing history is kept.",
+  "dialog_unshareTitle": "Unshare all your files?",
+  "dialog_unshareText": "You are about to unshare all files you've ever shared. This action cannot be reversed.",
+  "button_unshareAll": "Unshare all",
+  "warning_unsharedAll": "All shard files were unshared."
 }

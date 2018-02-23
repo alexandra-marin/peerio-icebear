@@ -6,7 +6,7 @@ class CucumbotBase extends EventEmitter {
     hasControl = 0;
     // according to our logic, not more one function (step) can be awaiting control
     controlAwaitingFn = null;
-    otherUsername = '';
+    username = '';
 
     // extend in child classes
     messageHandlers = {
@@ -45,7 +45,7 @@ class CucumbotBase extends EventEmitter {
     }
 
     onReady(msg) {
-        this.otherUsername = msg.data.username;
+        this.username = msg.data.username;
         this.emit('ready');
     }
 

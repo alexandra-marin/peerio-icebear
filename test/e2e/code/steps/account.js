@@ -12,7 +12,7 @@ Given('I confirm the primary email', { timeout: 45000 }, async function() {
     const url = testConfig.emailConfirmUrlRegex.exec(email.body)[1];
     await getUrl(url);
     // giving confirmed status a chance to propagate
-    return this.waitForObservable(
+    return this.waitFor(
         () => this.ice.User.current.primaryAddressConfirmed === true, 5000
     );
 });
@@ -23,7 +23,7 @@ Then('my primary email is confirmed', function() {
 
 When('I delete my account', { timeout: 7000 }, async function() {
     await this.ice.User.current.deleteAccount(this.username);
-    return this.waitForObservable(() => this.ice.socket.authenticated === false, 5000);
+    return this.waitFor(() => this.ice.socket.authenticated === false, 5000);
 });
 
 Then('I am not able to login', function() {
@@ -53,7 +53,7 @@ When('I change my account settings', async function() {
     settings.dataCollection = true;
     settings.subscribeToPromoEmails = true;
     await this.ice.User.current.saveSettings();
-    return this.waitForObservable(() => settings.version === 2, 5000);
+    return this.waitFor(() => settings.version === 2, 5000);
 });
 
 Then('my account settings are changed', async function() {

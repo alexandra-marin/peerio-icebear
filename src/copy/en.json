@@ -120,7 +120,7 @@
   "button_forward": "Forward",
   "button_send": "Send",
   "button_upgrade": "Upgrade",
-  "title_upgradeMessage": "Upgrade to get additional storage, unlimited Rooms, and unlimited archive.",
+  "title_upgradeMessage": "Upgrade to get additional storage, unlimited file upload size, and unlimited archive.",
   "error_fileQuotaExceeded": "You don't have enough space. <a-upgrade>Upgrade</> for more storage.",
   "error_fileUploadSizeExceeded": "The file you are trying to upload is too big. <a-upgrade>Upgrade</> to be able to upload bigger files.",
   "serverWarning_Welcome": "A paid plan has been registered to your account. You can view your plan benefits and learn <a-proWelcome>how to manage your account</>.",

@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.13.4"></a>
+## [4.13.4](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.13.3...v4.13.4) (2018-02-23)
+
+
+### Reverts
+
+* remove string from a different task ([276bcbc](https://github.com/PeerioTechnologies/peerio-icebear/commit/276bcbc))
+
+
+
+<a name="4.13.3"></a>
+## [4.13.3](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.13.2...v4.13.3) (2018-02-23)
+
+
+
+<a name="4.13.2"></a>
+## [4.13.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.13.1...v4.13.2) (2018-02-22)
+
+
+
 <a name="4.13.1"></a>
 ## [4.13.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.13.0...v4.13.1) (2018-02-22)
 

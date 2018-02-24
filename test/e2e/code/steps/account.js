@@ -4,7 +4,7 @@ const { getUrl } = require('../helpers/https');
 const testConfig = require('../test-config');
 
 
-Given('I confirm the primary email', { timeout: 45000 }, async function() {
+Given('I confirm the primary email', { timeout: 120000 }, async function() {
     const email = await waitForEmail(
         this.ice.User.current.addresses[0].address,
         testConfig.primaryEmailConfirmSubject

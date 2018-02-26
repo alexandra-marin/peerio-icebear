@@ -105,6 +105,10 @@ class FileStoreFolders {
             .filter(f => f.normalizedName.includes(q));
     }
 
+    selectedFolders() {
+        return this.folderResolveMapSorted.filter(f => f.selected);
+    }
+
     deleteFolder(folder) {
         folder.freeSelf();
         this.save();

@@ -226,6 +226,15 @@ class FileStore {
     }
 
     /**
+     * Returns currently selected folders (folder.selected == true)
+     * @returns {Array<Folder>}
+     * @public
+     */
+    getSelectedFolders() {
+        return this.folders.selectedFolders();
+    }
+
+    /**
      * Deselects all files
      * @function clearSelection
      * @memberof FileStore

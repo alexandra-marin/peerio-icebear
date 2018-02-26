@@ -10,6 +10,10 @@ class AbstractFolder {
     isFolder = true;
     folderId = null;
 
+    // Variables for bulk actions and share-related actions
+    @observable selected;
+    @observable shareProgress;
+
     @computed get normalizedName() {
         return this.name ? this.name.toLowerCase() : '';
     }

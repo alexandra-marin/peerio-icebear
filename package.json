@@ -83,6 +83,7 @@
     "npm-run-all": "4.1.2",
     "nyc": "11.4.1",
     "opt-cli": "1.6.0",
+    "otplib": "7.0.0",
     "quoted-printable": "1.0.1",
     "request": "2.83.0",
     "standard-version": "4.3.0",

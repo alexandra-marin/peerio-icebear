@@ -95,7 +95,7 @@ function normalizeName(name) {
  * Makes several attempts to retrieve an email with specific subject during set timeout
  * @param {string} name - mailbox name or full email
  * @param {string} subject
- * @param {number} [timeout=37000]
+ * @param {number} [timeout=60000]
  */
 function waitForEmail(name, subject, timeout = 120000) {
     name = normalizeName(name); // eslint-disable-line no-param-reassign

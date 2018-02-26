@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.14.0"></a>
+# [4.14.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.13.4...v4.14.0) (2018-02-26)
+
+
+### Features
+
+* e2e tests onboarding ([#148](https://github.com/PeerioTechnologies/peerio-icebear/issues/148)) ([357a409](https://github.com/PeerioTechnologies/peerio-icebear/commit/357a409))
+
+
+
 <a name="4.13.4"></a>
 ## [4.13.4](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.13.3...v4.13.4) (2018-02-23)
 

@@ -308,24 +308,35 @@ class File extends Keg {
     serializeProps() {
         return {
             fileId: this.fileId,
-            folderId: this.folderId,
-            size: this.size,
-            ext: this.ext, // don't really need to store, since it's computed, but we want to search by extension
-            uploadedAt: this.uploadedAt.valueOf(),
-            chunkSize: this.chunkSize
+            folderId: this.folderId
+            // size: this.size,
+            // ext: this.ext, // don't really need to store, since it's computed, but we want to search by extension
+            // uploadedAt: this.uploadedAt.valueOf(),
+            // chunkSize: this.chunkSize
         };
     }
 
     @action deserializeProps(props) {
         this.fileId = props.fileId;
         this.folderId = props.folderId;
-        this.readyForDownload = props.fileProcessingState === 'ready' || !!props.sharedBy;
-        this.size = +props.size;
-        this.uploadedAt = new Date(+props.uploadedAt);
-        this.fileOwner = props.owner || this.owner;
-        this.sharedBy = props.sharedBy;
-        this.chunkSize = +props.chunkSize;
-        this.shared = props.shared;
+        // this.readyForDownload = props.fileProcessingState === 'ready' || !!props.sharedBy;
+        // this.size = +props.size;
+        // this.uploadedAt = new Date(+props.uploadedAt);
+        // this.fileOwner = props.owner || this.owner;
+        // this.sharedBy = props.sharedBy;
+        // this.chunkSize = +props.chunkSize;
+        // this.shared = props.shared;
+    }
+
+    serializeDescriptor() {
+        return {
+            fileId: this.fileId,
+            owner: this.fileOwner
+        };
+    }
+
+    deserializeDescriptor() {
+
     }
 
     /**

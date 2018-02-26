@@ -7,6 +7,8 @@ class AbstractFolder {
     @observable name;
     @observable createdAt;
     @observable isDeleted;
+    isFolder = true;
+    folderId = null;
 
     @computed get normalizedName() {
         return this.name ? this.name.toLowerCase() : '';
@@ -75,6 +77,14 @@ class AbstractFolder {
 
     rename(/* name */) {
         throw new Error('rename is not implemented');
+    }
+
+    serialize() {
+        throw new Error('serialize is not implemented');
+    }
+
+    deserialize(/* dataItem, parent, folderResolveMap, newFolderResolveMap */) {
+        throw new Error('deserialize is not implemented');
     }
 }
 

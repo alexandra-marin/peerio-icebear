@@ -2,11 +2,12 @@ const { observable, action, reaction, computed } = require('mobx');
 const { getUser } = require('../../helpers/di-current-user');
 const socket = require('../../network/socket');
 const FileFolder = require('./file-folder');
+const RootFolder = require('./root-folder');
 const FileFoldersKeg = require('./file-folders-keg');
 const cryptoUtil = require('../../crypto/util');
 const warnings = require('../warnings');
 
-const ROOT_FOLDER = new FileFolder('/');
+const ROOT_FOLDER = new RootFolder();
 
 class FileStoreFolders {
     constructor(fileStore) {
@@ -116,7 +117,7 @@ class FileStoreFolders {
             throw new Error('error_folderAlreadyExists');
         }
         const folder = new FileFolder(name);
-        const folderId = cryptoUtil.getRandomShortIdHex(getUser().username);
+        const folderId = cryptoUtil.getRandomShortIdHex();
         folder.folderId = folderId;
         folder.createdAt = Date.now();
         this.folderResolveMap.set(folderId, folder);

@@ -130,6 +130,8 @@ class FileStoreFolders {
         return folder;
     }
 
+    // TODO: replace implementation of this mock function
+    // with something that actually works
     shareFolder(folder) {
         folder.isShared = true;
         folder.shareProgress = 50;

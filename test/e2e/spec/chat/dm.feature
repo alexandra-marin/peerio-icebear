@@ -3,8 +3,7 @@ Feature: Direct Messages
     DM-specific cases go here.
     Most of the chat-related scenarios are in the room features.
 
-    # Cucumbot is a keyword, main test process will skip the steps starting with the keyword
-    # the test bot process will only run steps starting with Cucumbot keyword
+    TODO: send file in DM
 
     @BOT_create_and_use_a_dm_chat
     Scenario: Create and use a DM chat
@@ -14,8 +13,11 @@ Feature: Direct Messages
         Then  Cucumbot receives a message "Hi, Cucumbot!"
         When  Cucumbot sends a message "Hello, stranger."
         Then  I receive a message "Hello, stranger."
-        When  I restart
+        When  I restart without login
+        And   Cucumbot sends a message "I see you are offline."
         And   Cucumbot restarts
+        And   I login
         And   Cucumbot starts a DM with me
         Then  Cucumbot receives a message "Hi, Cucumbot!"
-        Then  I receive a message "Hello, stranger."
+        And   I receive a message "Hello, stranger."
+        And   I receive a message "I see you are offline."

@@ -199,6 +199,8 @@ class ChatStore {
      * @protected
      */
     sortChats() {
+        if (this.loading) return;
+        console.log('Chat list sorting.');
         const array = this.chats;
         for (let i = 1; i < array.length; i++) {
             const item = array[i];
@@ -295,11 +297,7 @@ class ChatStore {
         } else {
             c = chat;
             if (this.chatMap[c.id]) {
-                console.error('Trying to add an instance of a chat that already exists.', c.id);
-                // todo: this is questionable. Works for current usage, but might create issues later.
-                // The only realistic case of how we can end up here is if someone creates a chat milliseconds earlier
-                // then us.
-                c.added = true;
+                console.error('Trying to add a copy of an instance of a chat that already exists.', c.id);
                 return;
             }
         }
@@ -309,7 +307,6 @@ class ChatStore {
         this.chats.push(c);
         c.added = true;
         // console.log('Added chat ', c.id);
-        // tracker.registerDbInstance(c.id);
         if (this.myChats.hidden.includes(c.id)) c.unhide();
         c.loadMetadata().then(() => c.loadMostRecentMessage());
         if (this.loaded && !this.activeChat) this.activate(c.id);
@@ -387,49 +384,14 @@ class ChatStore {
         // 5. check if chats were created while we were loading chat list
         // unlikely, but possible
         runInAction(() => {
-            Object.keys(tracker.digest).forEach(id => {
-                if (this.chatMap[id]) return;
-                const digest = tracker.getDigest(id, 'message');
-                if (digest.maxUpdateId <= digest.knownUpdateId) return;
-                this.addChat(id);
-            });
+            Object.keys(tracker.digest).forEach(this.addChat);
         });
         // 6. subscribe to future chats that will be created
         // this should always happen right after adding chats from digest, synchronously,
         // so that there's no new chats that can slip away
-        tracker.onKegDbAdded(id => {
-            // we do this with delay, because there's a possibility of receiving this event
-            // as a reaction to our own request to create a chat (no id yet so can't look it up in the map)
-            // and while it's not an issue and is not going to break anything,
-            // we still want to avoid wasting time on useless routine
-            // todo: i'm not sure this is applicable anymore
-            // setTimeout(() => this.addChat(id), 1000);
-            this.addChat(id);
-        });
+        tracker.onKegDbAdded(this.addChat);
 
-        // 7. Subscribing to all known but not added databases to find out when they will update while this client is
-        // offline. Otherwise messages received on other devices will not trigger chat add after this one reconnects.
-        when(() => tracker.loadedOnce, () => {
-            this.sleeperChatsDigest = {};
-            Object.keys(tracker.digest).forEach(id => {
-                if (this.chatMap[id]) return;
-                const digest = tracker.getDigest(id, 'message');
-                // DO NOT reuse returned digest object, it's persistent and will get updated
-                this.sleeperChatsDigest[id] = { maxUpdateId: digest.maxUpdateId };
-                const handler = () => {
-                    const d = tracker.getDigest(id, 'message');
-                    const stored = this.sleeperChatsDigest[id];
-                    // in case we already unsubscribed but this is a call scheduled before that
-                    if (!stored) return;
-                    if (stored.maxUpdateId >= d.maxUpdateId) return;
-                    this.addChat(id);
-                    tracker.unsubscribe(handler);
-                };
-                tracker.onKegTypeUpdated(id, 'message', handler);
-            });
-        });
-
-        // 8. waiting for most chats to load but up to a reasonable time
+        // 7. waiting for most chats to load but up to a reasonable time
         await Promise.map(this.chats, chat => asPromise(chat, 'headLoaded', true))
             .timeout(5000)
             .catch(() => { /* well, the rest will trigger re-render */ })
@@ -438,7 +400,7 @@ class ChatStore {
                 getFileStore().loadAllFiles();
             });
 
-        // 9. find out which chat to activate.
+        // 8. find out which chat to activate.
         const lastUsed = await TinyDb.user.getValue('lastUsedChat');
         if (lastUsed && this.chatMap[lastUsed]) this.activate(lastUsed);
         else if (this.chats.length) this.activate(this.chats[0].id);
@@ -595,8 +557,6 @@ class ChatStore {
             this.deactivateCurrentChat();
         }
         chat.dispose();
-        // tracker.unregisterDbInstance(chat.id);
-
         delete this.chatMap[chat.id];
         this.chats.remove(chat);
     }

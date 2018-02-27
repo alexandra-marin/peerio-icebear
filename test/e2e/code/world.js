@@ -19,13 +19,12 @@ class PeerioAppWorld {
     /**
      * Waits for mobx `when` to get executed for a specific amount of time and timeouts.
      */
-    waitForObservable = (lambda, timeout = 5000) => {
+    waitFor = (lambda, timeout = 10000) => {
         let resolve;
         const promise = new Promise((_resolve) => { resolve = _resolve; });
         const disposeReaction = this.libs.mobx.when(lambda, resolve);
         return promise.timeout(timeout).catch(err => {
             disposeReaction();
-            if (err && err.name === 'TimeoutError') return Promise.resolve();
             return Promise.reject(err);
         });
     };
@@ -84,7 +83,7 @@ class PeerioAppWorld {
             };
         }
 
-        console.log(`creating user username: ${this.username} passphrase: ${this.passphrase}`);
+        console.log(`creating ${isTestAccount ? 'test ' : ''}user username: ${u.username} passphrase: ${u.passphrase}`);
 
         await u.createAccountAndLogin();
         console.log('Account created, waiting for initialization.');

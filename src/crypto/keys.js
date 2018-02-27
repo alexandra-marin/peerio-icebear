@@ -12,6 +12,15 @@ const errors = require('../errors');
 // ------------------------------------------------------------------------------------------
 // WARNING: changing scrypt params will break compatibility with older scrypt-generated data
 // ------------------------------------------------------------------------------------------
+let SCRYPT_N = 16384;
+try {
+    if (process.env.PEERIO_REDUCE_SCRYPT_FOR_TESTS) {
+        console.log('TEST ENVIRONMENT DETECTED. SCRYPT WILL USE REDUCED COMPLEXITY FOR PERFORMANCE BOOST.');
+        SCRYPT_N = 1024;
+    }
+} catch (ex) {
+    //  meh
+}
 
 /**
  * Promisified scrypt call.
@@ -57,7 +66,7 @@ function prehashPass(value, personalization) {
 function deriveAccountKeys(username, passphrase, randomSalt) {
     try {
         // requesting 64 bytes to split them for 2 keys
-        const scryptOptions = { N: 16384, r: 8, dkLen: 64, interruptStep: 2000 };
+        const scryptOptions = { N: SCRYPT_N, r: 8, dkLen: 64, interruptStep: 2000 };
         // secure salt - contains username
         const salt = util.concatTypedArrays(util.strToBytes(username), randomSalt);
         const pass = prehashPass(passphrase, 'PeerioPH');
@@ -87,7 +96,7 @@ function deriveAccountKeys(username, passphrase, randomSalt) {
  */
 function deriveEphemeralKeys(salt, passphrase) {
     try {
-        const scryptOptions = { N: 16384, r: 8, dkLen: 32, interruptStep: 200, encoding: 'binary' };
+        const scryptOptions = { N: SCRYPT_N, r: 8, dkLen: 32, interruptStep: 200, encoding: 'binary' };
         const pass = prehashPass(passphrase);
         return scryptPromise(pass, salt, scryptOptions)
             .then(keyBytes => nacl.box.keyPair.fromSecretKey(keyBytes));
@@ -105,7 +114,7 @@ function deriveEphemeralKeys(salt, passphrase) {
  */
 function deriveKeyFromPasscode(username, passcode) {
     try {
-        const scryptOptions = { N: 16384, r: 8, dkLen: 32, interruptStep: 2000, encoding: 'binary' };
+        const scryptOptions = { N: SCRYPT_N, r: 8, dkLen: 32, interruptStep: 2000, encoding: 'binary' };
         const salt = util.strToBytes(username);
         const pass = prehashPass(passcode);
 

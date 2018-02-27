@@ -50,7 +50,7 @@ When('I confirm my new email', { timeout: 120000 }, async function() {
     const url = testConfig.emailConfirmUrlRegex.exec(email.body)[1];
     await getUrl(url);
     // giving confirmed status a chance to propagate
-    return this.waitForObservable(() => {
+    return this.waitFor(() => {
         const adr = this.ice.User.current.addresses.find(a => a.address === this.lastAddedEmail);
         if (!adr) return false;
         return adr.confirmed;
@@ -76,7 +76,7 @@ When('I change my primary email', function() {
 });
 
 Then('my primary email has been changed', { timeout: 15000 }, function() {
-    return this.waitForObservable(() => {
+    return this.waitFor(() => {
         return this.ice.User.current.email === this.lastAddedEmail;
     }, 5000);
 });
@@ -87,8 +87,8 @@ When('I upload an avatar', async function() {
     return this.ice.User.current.saveAvatar(blobs).should.be.fulfilled;
 });
 
-Then('the avatar should appear in my profile', function() {
-    this.ice.contactStore.currentUser.hasAvatar.should.be.true;
+Then('the avatar should appear in my profile', async function() {
+    await this.waitFor(() => this.ice.contactStore.currentUser.hasAvatar);
     this.ice.contactStore.currentUser.profileVersion.should.be.above(this.lastProfileVersion);
 
     const fileName = getTempFileName();

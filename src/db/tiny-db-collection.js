@@ -94,7 +94,7 @@ class TinyDbCollection {
      * @public
      */
     clear() {
-        this.engine.clear();
+        return this.engine.clear();
     }
 }
 

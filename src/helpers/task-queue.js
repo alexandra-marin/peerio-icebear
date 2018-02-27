@@ -19,7 +19,7 @@ class TaskQueue {
      * @instance
      * @public
      */
-    @observable.shallow tasks = [];
+    @observable.shallow waitingTasks = [];
     /**
      * Amount of currently running tasks
      * @member {Observable<number>} runningTasks
@@ -36,7 +36,7 @@ class TaskQueue {
      * @public
      */
     @computed get length() {
-        return this.tasks.length + this.runningTasks;
+        return this.waitingTasks.length + this.runningTasks;
     }
 
     constructor(parallelism, throttle) {
@@ -61,7 +61,7 @@ class TaskQueue {
      */
     @action addTask(task, context, args, onSuccess, onError) {
         return new Promise((resolve, reject) => {
-            this.tasks.push({
+            this.waitingTasks.push({
                 task,
                 context,
                 args,
@@ -88,11 +88,11 @@ class TaskQueue {
     @action.bound runTask() {
         if (this.paused) return;
         // if reached the limit of parallel running tasks or no tasks left - doing nothing
-        if (this.parallelism <= this.runningTasks || this.tasks.length === 0) return;
+        if (this.parallelism <= this.runningTasks || this.waitingTasks.length === 0) return;
         this.runningTasks++;
         let t;
         try {
-            t = this.tasks.shift();
+            t = this.waitingTasks.shift();
             let ret = t.task.apply(t.context, t.args);
             if (ret instanceof Promise) {
                 // task is considered done when promise is complete

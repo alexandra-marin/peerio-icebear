@@ -134,6 +134,7 @@ class FileStoreFolders {
     // with something that actually works
     shareFolder(folder) {
         folder.isShared = true;
+        folder.isBlocked = true;
         folder.shareProgress = 50;
     }
 

@@ -234,7 +234,7 @@ class FileStore {
     }
 
     /**
-     * Deselects all files
+     * Deselects all files and folders
      * @function clearSelection
      * @memberof FileStore
      * @instance
@@ -243,6 +243,11 @@ class FileStore {
     @action clearSelection() {
         for (let i = 0; i < this.files.length; i++) {
             this.files[i].selected = false;
+        }
+
+        const selFolders = this.getSelectedFolders();
+        for (let i = 0; i < selFolders.length; i++) {
+            selFolders[i].selected = false;
         }
     }
 

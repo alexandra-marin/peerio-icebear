@@ -8,6 +8,7 @@ class AbstractFolder {
     @observable createdAt;
     @observable isDeleted;
     @observable isShared = false;
+    @observable isBlocked = false;
     isFolder = true;
     folderId = null;
     @observable parent = null;
@@ -62,7 +63,7 @@ class AbstractFolder {
 
     findFolderByName(name) {
         const normalizedName = name.toLowerCase();
-        return this.folders.find(f => f.normalizedName === normalizedName);
+        return this.virtualFolders.find(f => f.normalizedName === normalizedName);
     }
 
     add(/* file, skipSaving */) {

@@ -3,6 +3,7 @@ const { getUser } = require('../../helpers/di-current-user');
 const socket = require('../../network/socket');
 const FileFolder = require('./file-folder');
 const RootFolder = require('./root-folder');
+const volumeStore = require('../volumes/volume-store');
 const FileFoldersKeg = require('./file-folders-keg');
 const cryptoUtil = require('../../crypto/util');
 const warnings = require('../warnings');
@@ -127,6 +128,11 @@ class FileStoreFolders {
         this.folderResolveMap.set(folderId, folder);
         target.addFolder(folder);
         return folder;
+    }
+
+    shareFolder(folder) {
+        folder.isShared = true;
+        folder.shareProgress = 50;
     }
 
     save() {

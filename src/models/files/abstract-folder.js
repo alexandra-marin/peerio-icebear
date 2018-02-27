@@ -7,19 +7,25 @@ class AbstractFolder {
     @observable name;
     @observable createdAt;
     @observable isDeleted;
+    @observable isShared = false;
     isFolder = true;
     folderId = null;
+    @observable parent = null;
 
     // Variables for bulk actions and share-related actions
     @observable selected;
     @observable shareProgress;
+
+    get virtualFolders() {
+        return this.folders;
+    }
 
     @computed get normalizedName() {
         return this.name ? this.name.toLowerCase() : '';
     }
 
     @computed get foldersSortedByName() {
-        return this.folders.sort((f1, f2) => f1.normalizedName > f2.normalizedName);
+        return this.virtualFolders.sort((f1, f2) => f1.normalizedName > f2.normalizedName);
     }
 
     @computed get filesSortedByDate() {
@@ -46,8 +52,12 @@ class AbstractFolder {
         return util.formatBytes(this.size);
     }
 
+    get isRoot() {
+        return !this.parent;
+    }
+
     get hasNested() {
-        return this.folders && this.folders.length;
+        return this.virtualFolders && this.virtualFolders.length;
     }
 
     findFolderByName(name) {

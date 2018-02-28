@@ -273,6 +273,7 @@
   "title_shareWithOthers": "Share with others",
   "title_sharedWith": "Shared with",
   "title_viewSharedWith": "View shared with",
+  "title_unshareUserWarning": "{fileCount} files shared by {user} in this folder will also be removed",
   "title_enterRoomOrContact": "Enter Room or contact",
   "title_addComment": "Add a comment",
   "title_addCommentOptional": "Add a comment (Optional)",

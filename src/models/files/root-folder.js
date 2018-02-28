@@ -27,7 +27,7 @@ class RootFolder extends FileFolder {
     }
 
     @computed get virtualFolders() {
-        return this.folders.concat(volumeStore.volumes);
+        return super.virtualFolders.concat(volumeStore.volumes.slice());
     }
 
     serialize() {
@@ -38,7 +38,7 @@ class RootFolder extends FileFolder {
 
     deserialize(dataItem, parent, folderResolveMap, newFolderResolveMap) {
         console.log(`root-folder: deserialize dummy`);
-        volumeStore.deserialize(this, newFolderResolveMap);
+        volumeStore.deserialize(this);
         return super.deserialize(dataItem, parent, folderResolveMap, newFolderResolveMap);
     }
 }

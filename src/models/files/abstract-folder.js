@@ -9,16 +9,17 @@ class AbstractFolder {
     @observable isDeleted;
     @observable isShared = false;
     @observable isBlocked = false;
+    @observable isHidden = false;
     isFolder = true;
     folderId = null;
     @observable parent = null;
 
     // Variables for bulk actions and share-related actions
-    @observable selected;
-    @observable shareProgress;
+    @observable selected = false;
+    @observable shareProgress = null;
 
     get virtualFolders() {
-        return this.folders;
+        return this.folders.filter(folder => !folder.isHidden);
     }
 
     @computed get normalizedName() {

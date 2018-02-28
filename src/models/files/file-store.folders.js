@@ -7,6 +7,7 @@ const volumeStore = require('../volumes/volume-store');
 const FileFoldersKeg = require('./file-folders-keg');
 const cryptoUtil = require('../../crypto/util');
 const warnings = require('../warnings');
+const folderResolveMap = require('./folder-resolve-map');
 
 const ROOT_FOLDER = new RootFolder();
 
@@ -28,11 +29,10 @@ class FileStoreFolders {
     root = ROOT_FOLDER;
     @observable currentFolder = ROOT_FOLDER;
 
-    folderResolveMap = observable.shallowMap({});
     folderIdReactions = {};
 
     getById(id) {
-        return this.folderResolveMap.get(id);
+        return folderResolveMap.get(id);
     }
 
     _addFile = (file) => {
@@ -65,7 +65,7 @@ class FileStoreFolders {
             this._intercept();
             this._intercept = null;
         }
-        const { folderResolveMap, root } = this;
+        const { root } = this;
         const newFolderResolveMap = {};
         root.deserialize(this.keg, null, folderResolveMap, newFolderResolveMap);
         // remove files from folders if they aren't present in the keg
@@ -75,10 +75,13 @@ class FileStoreFolders {
                 if (folder) folder.moveInto(f);
             } else if (f.folder) f.folder.free(f);
         });
-        // remove folders if they aren't present in the keg
+        // remove folders if they aren't present in the keg and are not volumes
         folderResolveMap.keys().forEach(folderId => {
             if (!newFolderResolveMap[folderId]) {
-                folderResolveMap.get(folderId).freeSelf();
+                const folder = folderResolveMap.get(folderId);
+                if (!folder.isShared) {
+                    folder.freeSelf();
+                }
             }
         });
         Object.keys(newFolderResolveMap).forEach(folderId => {
@@ -96,7 +99,7 @@ class FileStoreFolders {
     }
 
     @computed get folderResolveMapSorted() {
-        return this.folderResolveMap.values()
+        return folderResolveMap.values()
             .sort((f1, f2) => f1.normalizedName > f2.normalizedName);
     }
 
@@ -125,17 +128,13 @@ class FileStoreFolders {
         const folderId = cryptoUtil.getRandomShortIdHex();
         folder.folderId = folderId;
         folder.createdAt = Date.now();
-        this.folderResolveMap.set(folderId, folder);
+        folderResolveMap.set(folderId, folder);
         target.addFolder(folder);
         return folder;
     }
 
-    // TODO: replace implementation of this mock function
-    // with something that actually works
     shareFolder(folder) {
-        folder.isShared = true;
-        folder.isBlocked = true;
-        folder.shareProgress = 50;
+        return volumeStore.shareFolder(folder);
     }
 
     save() {

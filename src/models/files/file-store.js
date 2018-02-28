@@ -169,6 +169,16 @@ class FileStore {
     }
 
     /**
+     * @member {boolean} hasSelectedFilesOrFolders
+     * @memberof FileStore
+     * @instance
+     * @public
+     */
+    @computed get hasSelectedFilesOrFolders() {
+        return this.selectedFilesOrFolders.length;
+    }
+
+    /**
      * @member {boolean} canShareSelectedFiles
      * @memberof FileStore
      * @instance
@@ -229,8 +239,12 @@ class FileStore {
      * @returns {Array<Folder>}
      * @public
      */
-    getSelectedFolders() {
-        return this.folders.selectedFolders();
+    get selectedFolders() {
+        return this.folders.selectedFolders;
+    }
+
+    @computed get selectedFilesOrFolders() {
+        return this.selectedFolders.slice().concat(this.getSelectedFiles());
     }
 
     /**
@@ -245,7 +259,7 @@ class FileStore {
             this.files[i].selected = false;
         }
 
-        const selFolders = this.getSelectedFolders();
+        const selFolders = this.selectedFolders;
         for (let i = 0; i < selFolders.length; i++) {
             selFolders[i].selected = false;
         }

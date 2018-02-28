@@ -16,6 +16,7 @@ const socket = require('../../network/socket');
 const warnings = require('../warnings');
 const Contact = require('../contacts/contact');
 const chatInviteStore = require('../chats/chat-invite-store');
+const volumeStore = require('../volumes/volume-store');
 
 // to assign when sending a message and don't have an id yet
 let temporaryChatId = 0;
@@ -815,6 +816,29 @@ class Chat {
      */
     shareFiles(files) {
         return this._fileHandler.share(files);
+    }
+
+    shareFolders(folders) {
+        folders.forEach(folder => this.uploadQueue.push(folder));
+        return Promise.all(folders.map(async folder => {
+            try {
+                await volumeStore.shareFolder(folder);
+            } catch (e) {
+                console.error(e);
+            }
+            this.uploadQueue.remove(folder);
+        }));
+    }
+
+    async shareFilesAndFolders(filesAndFolders) {
+        const files = filesAndFolders.filter(f => !f.isFolder);
+        const folders = filesAndFolders.filter(f => f.isFolder);
+        if (files.length) {
+            await this.shareFiles(files);
+        }
+        if (folders.length) {
+            await this.shareFolders(folders);
+        }
     }
 
     /**

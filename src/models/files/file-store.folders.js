@@ -109,7 +109,7 @@ class FileStoreFolders {
             .filter(f => f.normalizedName.includes(q));
     }
 
-    selectedFolders() {
+    @computed get selectedFolders() {
         return this.folderResolveMapSorted.filter(f => f.selected);
     }
 

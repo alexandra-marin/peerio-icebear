@@ -84,7 +84,7 @@ class AbstractFolder {
     }
 
     freeSelf() {
-        throw new Error('freeFolder is not implemented');
+        throw new Error('freeSelf is not implemented');
     }
 
     moveInto(/* file */) {

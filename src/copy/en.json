@@ -200,6 +200,8 @@
   "title_deleteFolder": "Are you sure you want to delete {folderName}?",
   "dialog_deleteFolderTitle": "Delete folder and all files?",
   "dialog_deleteFolderText": "By deleting the folder you will delete all files and subfolders within.",
+  "dialog_deleteSharedFolderTitle": "Delete folder",
+  "dialog_deleteSharedFolderText": "All of your files will be deleted, and all members will lose access this folder.",
   "warning_folderDeleted": "{folderName} was deleted.",
   "title_noFilesInFolder": "No files in this folder",
   "title_searchAllFiles": "Search all files",

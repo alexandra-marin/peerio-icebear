@@ -1,6 +1,6 @@
 const Keg = require('./../kegs/keg');
 const { observable, computed, action, isObservableArray } = require('mobx');
-const { cryptoUtil, secret } = require('../../crypto');
+const { cryptoUtil, secret, sign: { signDetached } } = require('../../crypto');
 const fileHelper = require('../../helpers/file');
 const util = require('../../util');
 const config = require('../../config');
@@ -211,6 +211,9 @@ class File extends Keg {
      */
     @observable folder;
 
+
+    descriptorVersion = 0;
+
     /**
      * @member {string} nameWithoutExt
      * @memberof File
@@ -293,16 +296,16 @@ class File extends Keg {
 
     serializeKegPayload() {
         return {
-            name: this.name,
-            key: this.key,
-            nonce: this.nonce
+            // name: this.name,
+            descriptorKey: this.descriptorKey
+            // nonce: this.nonce
         };
     }
 
     @action deserializeKegPayload(data) {
-        this.name = data.name;
-        this.key = data.key;
-        this.nonce = data.nonce;
+        // this.name = data.name;
+        this.descriptorKey = data.descriptorKey;
+        // this.nonce = data.nonce;
     }
 
     serializeProps() {
@@ -328,11 +331,46 @@ class File extends Keg {
         // this.shared = props.shared;
     }
 
-    serializeDescriptor() {
-        return {
-            fileId: this.fileId,
-            owner: this.fileOwner
+    async serializeDescriptor() {
+        let payload = {
+            name: this.name,
+            blobKey: this.blobKey,
+            nonce: this.nonce
         };
+        payload = JSON.stringify(payload);
+        payload = secret.encryptString(payload, this.descriptorKey);
+
+        let signature = await signDetached(payload, getUser().signKeys.secretKey);
+        signature = cryptoUtil.bytesToB64(signature);
+
+        const descriptor = {
+            fileId: this.fileId,
+            payload: payload.buffer,
+            ext: this.ext,
+            format: 1,
+            signature,
+            signedBy: getUser().username
+        };
+        return descriptor;
+    }
+    async createDescriptor() {
+        const descriptor = await this.serializeDescriptor();
+        descriptor.size = this.size;
+        descriptor.chunkSize = this.chunkSize;
+        return socket.send('/auth/file/descriptor/create', descriptor);
+    }
+
+    async updateDescriptor() {
+        const descriptor = await this.serializeDescriptor();
+        const version = this.descriptorVersion + 1;
+        descriptor.version = version;
+        return socket.send('/auth/file/descriptor/update', descriptor)
+            .then(() => {
+                // in case descriptor was updated while waiting for response
+                if (this.descriptorVersion + 1 === version) {
+                    this.descriptorVersion = version;
+                }
+            });
     }
 
     deserializeDescriptor() {
@@ -437,7 +475,7 @@ class File extends Keg {
     rename(newName) {
         return retryUntilSuccess(() => {
             this.name = newName;
-            return this.saveToServer()
+            return this.updateDescriptor()
                 .catch(err => {
                     if (err instanceof ServerError && err.code === ServerError.codes.malformedRequest) {
                         return this.load();

@@ -6,7 +6,7 @@ module.exports = {
     // all new test accounts will be created with this passphrase by default
     defaultPassphrase: 'passphrase',
     // which server to test against
-    socketServerUrl: 'wss://hocuspocus.peerio.com',
+    socketServerUrl: 'wss://treetrunks.peerio.com',
     // what is the subject of confirmation email user receives when creating account
     primaryEmailConfirmSubject: 'Welcome to Peerio (Staging)! Confirm your account.',
     // what is the subject of confirmation email user receives when adding another email to profile
@@ -16,7 +16,7 @@ module.exports = {
     // email subject when receiving a Peerio email invitation to join from another user
     inviteEmailSubject: 'Firstname Lastname has invited you to Peerio (Staging)!',
     // will output every websocket message, incoming and outgoing to console
-    logSocketMessages: false,
+    logSocketMessages: true,
     // will output application logs to console
     showAppLogs: !!process.env.SHOW_APP_LOGS
 };

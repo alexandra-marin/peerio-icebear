@@ -571,6 +571,15 @@ class FileStore {
         };
         checkFile();
     }
+
+    getLegacySharedFiles() {
+        if (this.legacySharedFiles) return Promise.resolve(this.legacySharedFiles);
+        return socket.send('/auth/file/migration/shares')
+            .then(res => {
+                this.legacySharedFiles = res;
+                return res;
+            });
+    }
 }
 const ret = new FileStore();
 setFileStore(ret);

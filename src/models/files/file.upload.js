@@ -73,12 +73,13 @@ function upload(filePath, fileName, resume) {
             if (nextChunkId === null) {
                 this.uploadedAt = new Date(); // todo: should we update this when upload actually finishes?
                 this.name = fileName || this.name || fileHelper.getFileName(filePath);
-                this.key = cryptoUtil.bytesToB64(keys.generateEncryptionKey());
+                this.descriptorKey = cryptoUtil.bytesToB64(keys.generateEncryptionKey());
+                this.blobKey = cryptoUtil.bytesToB64(keys.generateEncryptionKey());
             }
             stream = new config.FileStream(filePath, 'read');
             return stream.open();
         })
-            .then(() => { // eslint-disable-line consistent-return
+            .then(async () => { // eslint-disable-line consistent-return
                 console.log(`File read stream open. File size: ${stream.size}`);
                 if (nextChunkId === null) {
                     this.size = stream.size;
@@ -86,11 +87,14 @@ function upload(filePath, fileName, resume) {
                     this.chunkSize = config.upload.getChunkSize(this.size);
                     nonceGen = new FileNonceGenerator(0, this.chunksCount - 1);
                     this.nonce = cryptoUtil.bytesToB64(nonceGen.nonce);
-                    return this.saveToServer().catch(err => {
+                    try {
+                        await this.createDescriptor();
+                        return this.saveToServer();
+                    } catch (err) {
                         console.error(err);
                         this.remove();
                         return Promise.reject(err);
-                    });
+                    }
                 }
                 nonceGen = new FileNonceGenerator(0, this.chunksCount - 1, cryptoUtil.b64ToBytes(this.nonce));
             })

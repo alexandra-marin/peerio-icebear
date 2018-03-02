@@ -261,8 +261,10 @@ class FileStore {
             this.files[i].selected = false;
         }
 
-        for (let i = 0; i < this.selectedFolders.length; i++) {
-            this.selectedFolders[i].selected = false;
+        // selectedFolders is computable, do not recalculate it
+        const selFolders = this.selectedFolders;
+        for (let i = 0; i < selFolders.length; i++) {
+            selFolders[i].selected = false;
         }
     }
 

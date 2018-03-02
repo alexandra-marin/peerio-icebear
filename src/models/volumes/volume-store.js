@@ -66,8 +66,11 @@ class VolumeStore {
     deserialize(parent) {
         if (this.volumes.length) return;
         this.rootFileFolder = parent;
-        this.attachFolder(mockFolder('Test Shared Folder 1'));
-        this.attachFolder(mockFolder('Test Shared Folder 2'));
+        this.attachFolder(mockFolder('My Shared Folder 1'));
+        this.attachFolder(mockFolder('My Shared Folder 2'));
+        const nonOwnedOne = mockFolder('Foreign Shared Folder 3');
+        nonOwnedOne.isOwner = false;
+        this.attachFolder(nonOwnedOne);
     }
 
     attachFolder(folder) {

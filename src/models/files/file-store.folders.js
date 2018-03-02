@@ -127,6 +127,9 @@ class FileStoreFolders {
         await promise;
         folder.progressMax = null;
         folder.progress = null;
+        // there's a lag between deletion and file disappearance from the
+        // associated folder list. so to prevent confusion we clear files here
+        folder.files = [];
         folder.remove();
         this.save();
     }

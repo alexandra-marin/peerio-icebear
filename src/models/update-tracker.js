@@ -44,29 +44,27 @@ class UpdateTracker {
     @observable updatedAfterReconnect = false;
 
     /**
-     * Current digest
-     * @member {kegDbId:{ kegType: { maxUpdateId: string, knownUpdateId: string, newKegsCount: number }}
-     * @protected
+     * Keg digest
+     * @member {kegDbId:{ kegType: { maxUpdateId: string, knownUpdateId(session): string, newKegsCount: number }}
      */
     digest = {};
-
-    // this flag controls whether updates to digest will immediately fire an event or
-    // will accumulate to allow effective/minimal events generation after large amounts for digest data
-    // has been processed
-    accumulateEvents = true;
-    // accumulated events go here
-    eventCache = { add: [], update: {} };
+    /**
+     * Global digest
+     * @member {path:{ maxUpdateId: string, knownUpdateId(session): string }}
+     */
+    globalDigest = {
+        'global:fileDescriptor:updated': { maxUpdateId: '', knownUpdateId: '' }
+    };
 
     constructor() {
         socket.onceStarted(() => {
-            socket.subscribe(socket.APP_EVENTS.kegsUpdateTwo, data => this.processDigestEvent(data[0], data[1]));
+            socket.subscribe(socket.APP_EVENTS.digestUpdate, data => {
+                this.processDigestEvent(data.kegDbId || data.path, [data.type, data.maxUpdateId], true);
+            });
             socket.subscribe(socket.APP_EVENTS.channelDeleted, this.processChannelDeletedEvent.bind(this));
             socket.onAuthenticated(this.loadDigest);
-            // when disconnected, we know that reconnect will trigger digest reload
-            // and we want to accumulate events during that time
             socket.onDisconnect(() => {
                 this.updatedAfterReconnect = false;
-                this.accumulateEvents = true;
             });
             if (socket.authenticated) this.loadDigest();
         });
@@ -128,6 +126,10 @@ class UpdateTracker {
         this.updateHandlers[kegDbId][kegType].push(handler);
     }
 
+    onGlobalTypeUpdated(path, handler) {
+        this.onKegTypeUpdated(path, 'global', handler);
+    }
+
     /**
      * Unsubscribes handler from all events (onKegTypeUpdated, onKegDbAdded)
      * @param {function} handler
@@ -145,84 +147,40 @@ class UpdateTracker {
         }
     }
 
-    /**
-
-["channel:j7mb24p30byk0gm:message", "jbfr36ka02co0n8", "jbfr36ka02co0n8", "jbfr36ka02co0n8", 0],
-["global:fileACL:fileId", "maxId", "knownId", "sessionKnownId"],
-["global:fileDescriptor:new", "maxId", "knownId", "sessionKnownId", 0]
-["global:fileDescriptor:updated", "maxId", "knownId", "sessionKnownId", 0]
-1st element: digest key
-db type or 'global' for non-db entities
-db id or global namespace id
-modificator: key type, entity id or entity kind
-2nd element: maxUpdateId
-3rd element: knownUpdateId
-4th element: sessionKnownUpdateId (if sessionKnownUpdateId === knownUpdateId then sessionKnownUpdateId === '')
-5th element: new entities count in the range of items between knownUpdateId and maxUpdateId
-Nth elements: any additional data needed
-     */
-    processDigestEvent(kegDbId, ev) {
-        // console.log(kegDbId, ev);
+    processDigestEvent(kegDbId, ev, isFromEvent) {
         /* eslint-disable prefer-const, no-unused-vars */
         let [kegType, maxUpdateId, sessionUpdateId, newKegsCount] = ev;
-        // temporary check to make sure issue is resolved
-        if (sessionUpdateId === null) {
-            // console.log(kegDbId, ev);
-            // throw new Error('Server returned null session id');
-            sessionUpdateId = '';
-        }
-        /* eslint-enable prefer-const, no-unused-vars */
-        // shifting values bcs SELF has no kegDbType
-        // against 'null' values (happens with server sometimes), null doesn't compare well with strings
-        maxUpdateId = maxUpdateId || '';
+        // unpacking
         sessionUpdateId = sessionUpdateId === 0 ? maxUpdateId : sessionUpdateId;
-
-
-        // here we want to do 2 things
-        // 1. update internal data tracker
-        // 2. fire or accumulate events
-
-        let shouldEmitUpdateEvent = false;
-
         // kegDb yet unknown to our digest? consider it just added
-        if (!this.digest[kegDbId]) {
-            shouldEmitUpdateEvent = true;
-            this.digest[kegDbId] = this.digest[kegDbId] || {};
-            if (this.accumulateEvents) {
-                if (!this.eventCache.add.includes(kegDbId)) {
-                    this.eventCache.add.push(kegDbId);
-                }
-            } else {
+        if (kegType) {
+            if (!this.digest[kegDbId]) {
+                this.digest[kegDbId] = {};
                 this.emitKegDbAddedEvent(kegDbId);
             }
-        }
-        const dbDigest = this.digest[kegDbId];
-        if (!dbDigest[kegType]) {
-            shouldEmitUpdateEvent = true;
-            dbDigest[kegType] = {};
-        }
-        const typeDigest = dbDigest[kegType];
-        // if this db and keg type was already known to us
-        // we need to check if this event actually brings something new to us,
-        // or maybe it was out of order and we don't care for its data
-        if (!shouldEmitUpdateEvent
-            && typeDigest.maxUpdateId >= maxUpdateId
-            && typeDigest.knownUpdateId >= sessionUpdateId
-            && typeDigest.newKegsCount === newKegsCount) {
-            return; // known data / not interested
-        }
-        // storing data in internal digest cache
-        typeDigest.maxUpdateId = maxUpdateId;
-        typeDigest.knownUpdateId = sessionUpdateId;
-        typeDigest.newKegsCount = newKegsCount;
-        // creating event
-        if (this.accumulateEvents) {
-            const rec = this.eventCache.update[kegDbId] = this.eventCache.update[kegDbId] || [];
-            if (!rec.includes(kegType)) {
-                rec.push(kegType);
+
+            const dbDigest = this.digest[kegDbId];
+            if (!dbDigest[kegType]) {
+                dbDigest[kegType] = {
+                    knownUpdateId: '',
+                    maxUpdateId: '',
+                    newKegsCount: 0
+                };
             }
-        } else {
+            const typeDigest = dbDigest[kegType];
+            // storing data in internal digest cache
+            typeDigest.maxUpdateId = maxUpdateId;
+            if (!isFromEvent) {
+                typeDigest.knownUpdateId = sessionUpdateId;
+            }
+            typeDigest.newKegsCount = newKegsCount;
+
+
             this.emitKegTypeUpdatedEvent(kegDbId, kegType);
+        } else {
+            const d = this.globalDigest[kegDbId];
+            d.maxUpdateId = maxUpdateId;
+            this.emitKegTypeUpdatedEvent(kegDbId, 'global');
         }
     }
 
@@ -260,23 +218,6 @@ Nth elements: any additional data needed
     }
 
     /**
-     * Emits events in the end of digest reloading cycle.
-     * @private
-     */
-    flushAccumulatedEvents = () => {
-        this.eventCache.add.forEach(id => {
-            this.emitKegDbAddedEvent(id);
-        });
-        for (const id in this.eventCache.update) {
-            this.eventCache.update[id].forEach(type => {
-                this.emitKegTypeUpdatedEvent(id, type);
-            });
-        }
-        this.eventCache = { add: [], update: {} };
-        this.accumulateEvents = false;
-    };
-
-    /**
      * Handles server response to digest query.
      * @private
      */
@@ -304,7 +245,6 @@ Nth elements: any additional data needed
         console.log('Requesting full digest');
         socket.send('/auth/updates/digest', { unread: true })
             .then(this.processDigestResponse)
-            .then(this.flushAccumulatedEvents)
             .then(() => {
                 this.loadedOnce = true;
                 this.updatedAfterReconnect = true;
@@ -344,7 +284,11 @@ Nth elements: any additional data needed
         socket.send('/auth/updates/last-known-version', {
             path: `${id}:${type}`,
             lastKnownVersion: updateId
-        }).catch(this.logSeenThisError);
+        })
+            .then(() => {
+                if (digest.knownUpdateId < updateId) digest.knownUpdateId = updateId;
+            })
+            .catch(this.logSeenThisError);
     }
 
     logSeenThisError(err) {

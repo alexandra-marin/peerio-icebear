@@ -80,7 +80,7 @@ class FileStoreFolders {
             if (!newFolderResolveMap[folderId]) {
                 const folder = folderResolveMap.get(folderId);
                 if (!folder.isShared) {
-                    folder.freeSelf();
+                    folder.remove();
                 }
             }
         });
@@ -113,8 +113,21 @@ class FileStoreFolders {
         return this.folderResolveMapSorted.filter(f => f.selected);
     }
 
-    deleteFolder(folder) {
-        folder.freeSelf();
+    async deleteFolder(folder) {
+        const { files } = folder;
+        folder.progress = 0;
+        folder.progressMax = files.length; // folder.files.length;
+        let promise = Promise.resolve();
+        files.forEach(file => {
+            promise = promise.then(async () => {
+                await file.remove();
+                folder.progress++;
+            });
+        });
+        await promise;
+        folder.progressMax = null;
+        folder.progress = null;
+        folder.remove();
         this.save();
     }
 

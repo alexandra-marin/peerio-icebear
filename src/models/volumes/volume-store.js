@@ -19,17 +19,21 @@ function random(max) {
     return Math.floor(Math.random() * max);
 }
 
-function mockShareProgress(folder) {
+function mockProgress(folder) {
     if (folder.shareTimeout) return Promise.resolve();
-    folder.shareProgress = random(10);
+    folder.progressMax = 100;
+    folder.progress = random(10);
     folder.shareTimeout = setInterval(() => {
-        folder.shareProgress = Math.min(100, folder.shareProgress + random(40));
-        if (folder.shareProgress >= 100) {
+        folder.progress = Math.min(folder.progressMax, folder.progress + random(40));
+        console.log(`progress: ${folder.progress}, ${folder.progressMax}`);
+        if (folder.progress >= folder.progressMax) {
             clearInterval(folder.shareTimeout);
             folder.shareTimeout = undefined;
+            folder.progress = null;
+            folder.progressMax = null;
         }
     }, 500);
-    return new Promise(resolve => when(() => folder.shareProgress === 100, resolve));
+    return new Promise(resolve => when(() => folder.progress === 100, resolve));
 }
 /**
  * Volume store.
@@ -75,7 +79,7 @@ class VolumeStore {
     @action.bound async shareFolder(folder) {
         const newFolder = mockFolder(folder.name);
         folder.isBlocked = true;
-        await mockShareProgress(folder);
+        await mockProgress(folder);
         folder.isHidden = true;
         this.attachFolder(newFolder);
     }

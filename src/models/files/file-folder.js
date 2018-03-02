@@ -68,7 +68,7 @@ class FileFolder extends AbstractFolder {
         }
     }
 
-    freeSelf() {
+    remove() {
         if (this.isRoot) return;
         let root = this;
         while (!root.isRoot) root = root.parent;
@@ -77,7 +77,7 @@ class FileFolder extends AbstractFolder {
             root.add(file);
         });
         this.files = [];
-        this.folders.forEach(folder => folder.freeSelf());
+        this.folders.forEach(folder => folder.remove());
         this.folders = [];
         this.parent && this.parent.freeFolder(this);
         this.isDeleted = true;

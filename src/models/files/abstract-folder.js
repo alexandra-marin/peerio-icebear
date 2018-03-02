@@ -16,7 +16,12 @@ class AbstractFolder {
 
     // Variables for bulk actions and share-related actions
     @observable selected = false;
-    @observable shareProgress = null;
+    @observable progress = null;
+    @observable progressMax = null;
+
+    get progressPercentage() {
+        return Math.ceil(this.progress / (this.progressMax | 1) * 100);
+    }
 
     get virtualFolders() {
         return this.folders.filter(folder => !folder.isHidden);
@@ -83,8 +88,8 @@ class AbstractFolder {
         throw new Error('freeFolder is not implemented');
     }
 
-    freeSelf() {
-        throw new Error('freeSelf is not implemented');
+    remove() {
+        throw new Error('remove is not implemented');
     }
 
     moveInto(/* file */) {

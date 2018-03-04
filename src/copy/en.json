@@ -194,6 +194,7 @@
   "title_moveToSharedFolder": "Move to shared folder?",
   "title_moveToSharedFolderDescription": "You're about to move a file to a shared folder. Anyone that can access this folder will be able to access this file.",
   "title_dontShowMessageAgain": "Don't show this message again",
+  "title_sharedFolderCannotBeMoved": "Shared folders currently cannot be moved into other folders",
   "button_rename": "Rename",
   "button_newFolder": "Add folder",
   "title_folderName": "Folder name",

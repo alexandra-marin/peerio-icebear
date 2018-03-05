@@ -80,6 +80,11 @@ class VolumeStore {
     }
 
     @action.bound async shareFolder(folder) {
+        if (folder.isShared) {
+            // TODO: add participants to folder
+            console.log(`folder is already shared ${folder.name}`);
+            return;
+        }
         const newFolder = mockFolder(folder.name);
         folder.isBlocked = true;
         await mockProgress(folder);

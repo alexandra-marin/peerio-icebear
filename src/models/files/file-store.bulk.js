@@ -4,6 +4,9 @@ const { action, computed } = require('mobx');
  * Extension to operate with selected files and folders in bulk
  */
 class FileStoreBulk {
+    // functor taking items selected as an argument to choose who to share with
+    shareWithSelector = null;
+
     // functor taking folder as an argument to confirm folder deletion
     deleteFolderConfirmator = null;
 
@@ -16,7 +19,7 @@ class FileStoreBulk {
     }
 
     @computed get canMove() {
-        return true;
+        return !this.fileStore.selectedFilesOrFolders.some(f => f.isFolder && f.isShared);
     }
 
     async removeOne(i, batch) {
@@ -44,6 +47,34 @@ class FileStoreBulk {
         });
         await promise;
         this.fileStore.folders.save();
+        this.fileStore.clearSelection();
+    }
+
+    @action.bound async share() {
+        if (!this.shareWithSelector) {
+            console.error(`shareWithSelector has not been set`);
+            return;
+        }
+        const items = this.fileStore.selectedFilesOrFolders;
+        if (!items || !items.length) {
+            console.log('no items selected');
+            return;
+        }
+        const usernamesAccessList = await this.shareWithSelector();
+        console.log(usernamesAccessList);
+        if (!usernamesAccessList || !usernamesAccessList.length) {
+            return;
+        }
+        let promise = Promise.resolve();
+        items.forEach(i => {
+            let operation = Promise.resolve();
+            promise = promise.then(() => { i.selected = false; });
+            if (i.isFolder) {
+                operation = () => this.fileStore.folders.shareFolder(i, usernamesAccessList);
+            }
+            promise = promise.then(operation);
+        });
+        await promise;
         this.fileStore.clearSelection();
     }
 

@@ -11,7 +11,8 @@ class CucumbotBase extends EventEmitter {
     // extend in child classes
     messageHandlers = {
         takeControl: this.takeControl,
-        ready: this.onReady
+        ready: this.onReady,
+        credentials: this.onCredentials
     };
 
     constructor(world) {
@@ -54,6 +55,21 @@ class CucumbotBase extends EventEmitter {
             type: 'ready',
             data: {
                 username: this.world.username
+            }
+        });
+    }
+
+    async onCredentials(msg) {
+        this.world.username = msg.data.username;
+        this.world.passphrase = msg.data.passphrase;
+    }
+
+    sendCredentials(username, passphrase) {
+        this.botProcess.send({
+            type: 'credentials',
+            data: {
+                username,
+                passphrase
             }
         });
     }

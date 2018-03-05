@@ -54,6 +54,10 @@ function startCucumbotBeforeScenario(world) {
     //= = 1. Either we are the cucumbot
     if (process.env.CUCUMBOT) {
         world.cucumbotServer = new CucumbotServer(world);
+        if (process.env.CUCUMBOT_DONT_CREATE_ACCOUNT) {
+            world.cucumbotServer.sendReady();
+            return Promise.resolve();
+        }
         return world.cucumbotServer.createAccount();
     }
     //= = 2. Or we are the cucumbot client
@@ -62,7 +66,7 @@ function startCucumbotBeforeScenario(world) {
         if (tags[i].name.startsWith('@BOT_')) {
             // need to spawn a bot
             world.cucumbotClient = new CucumbotClient(tags[i].name.substring(1), world);
-            return world.cucumbotClient.start();
+            return world.cucumbotClient.start(tags[i].name.startsWith('@BOT_NO_ACCOUNT_'));
         }
     }
     //= = 3. Or we don't need Cucumbot in this scenario

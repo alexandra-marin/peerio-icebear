@@ -20,6 +20,10 @@ When('I login', { timeout: 60000 }, function() {
     return this.login();
 });
 
+When('Cucumbot logs in', { timeout: 60000 }, function() {
+    return this.login();
+});
+
 Then('I am authenticated', function() {
     expect(this.ice.socket.authenticated).to.be.true;
 });
@@ -40,3 +44,7 @@ When('I restart without login', function() {
     return this.app.restart();
 });
 
+
+When('I send my credentials to Cucumbot', async function() {
+    this.cucumbotClient.sendCredentials(this.username, this.passphrase);
+});

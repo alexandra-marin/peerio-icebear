@@ -20,7 +20,7 @@ const { getChatStore } = require('../../helpers/di-chat-store');
 class ChatMessageHandler {
     constructor(chat) {
         this.chat = chat;
-        tracker.onKegTypeUpdated(chat.id, 'message', this.onMessageDigestUpdate);
+        tracker.subscribeToKegUpdates(chat.id, 'message', this.onMessageDigestUpdate);
         this.onMessageDigestUpdate();
         this._reactionsToDispose.push(reaction(() => this.chat.active && clientApp.isInChatsView, (active) => {
             if (active) {

@@ -103,7 +103,7 @@ class MailStore {
     }
 
     constructor() {
-        tracker.onKegTypeUpdated('SELF', 'mail', () => {
+        tracker.subscribeToKegUpdates('SELF', 'mail', () => {
             console.log('Mails update event received');
             this.onMailDigestUpdate();
         });

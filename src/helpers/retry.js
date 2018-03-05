@@ -62,5 +62,8 @@ function scheduleRetry(fn, id) {
     setTimeout(() => socket.onceAuthenticated(() => retryUntilSuccess(fn, id, callInfo.maxRetries, true)), delay);
 }
 
+function isRunning(id) {
+    return !!callsInProgress[id];
+}
 
-module.exports = { retryUntilSuccess };
+module.exports = { retryUntilSuccess, isRunning };

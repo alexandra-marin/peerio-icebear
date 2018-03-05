@@ -8,7 +8,7 @@ const TinyDb = require('../../db/tiny-db');
 const config = require('../../config');
 const util = require('../../util');
 const _ = require('lodash');
-const { retryUntilSuccess } = require('../../helpers/retry');
+const { retryUntilSuccess, isRunning } = require('../../helpers/retry');
 const TaskQueue = require('../../helpers/task-queue');
 const { setFileStore } = require('../../helpers/di-file-store');
 const createMap = require('../../helpers/dynamic-array-map');
@@ -26,9 +26,15 @@ class FileStore {
         this.fileMapObservable = m.observableMap;
         this.folders = new FileStoreFolders(this);
 
-        tracker.onKegTypeUpdated('SELF', 'file', () => {
+        tracker.subscribeToKegUpdates('SELF', 'file', () => {
             console.log('Files update event received');
             this.onFileDigestUpdate();
+        });
+
+        tracker.subscribeToFileDescriptorUpdates(() => {
+            const d = tracker.fileDescriptorDigest;
+            if (d.knownUpdateId >= d.maxUpdateId) return;
+            this.updateDescriptors(d.knownUpdateId);
         });
     }
     /**
@@ -298,9 +304,44 @@ class FileStore {
         }
     }
 
+    updateDescriptors() {
+        const taskId = 'updating descriptors';
+        if (isRunning('taskId')) return;
+        if (!this.knownDescriptorVersion) {
+            this.knownDescriptorVersion = tracker.fileDescriptorDigest.knownUpdateId;
+        }
+        if (this.knownDescriptorVersion >= tracker.fileDescriptorDigest.maxUpdateId) return;
+        const maxUpdateIdBefore = tracker.fileDescriptorDigest.maxUpdateId;
+        const opts = this.knownDescriptorVersion ? { minCollectionVersion: this.knownDescriptorVersion } : undefined;
+        retryUntilSuccess(
+            () => socket.send('/auth/file/ids/fetch', opts),
+            taskId
+        ).then(async resp => {
+            await Promise.map(resp, fileId => {
+                const file = this.getById(fileId);
+                if (!file) return Promise.resolve();
+                return socket.send('/auth/file/descriptor/get', { fileId })
+                    .then(d => {
+                        file.deserializeDescriptor(d);
+                        if (this.knownDescriptorVersion < d.collectionVersion) {
+                            this.knownDescriptorVersion = d.collectionVersion;
+                        }
+                    });
+            });
+            // we might not have loaded all updated descriptors
+            // because corresponding files are not loaded (out of scope)
+            // so we don't know their individual collection versions
+            // but we still need to mark the known version
+            if (maxUpdateIdBefore === tracker.fileDescriptorDigest.maxUpdateId) {
+                this.knownDescriptorVersion = maxUpdateIdBefore;
+            }
+            tracker.seenThis(tracker.DESCRIPTOR_PATH, null, this.knownDescriptorVersion);
+            if (this.knownDescriptorVersion < tracker.fileDescriptorDigest.maxUpdateId) this.updateDescriptors();
+        });
+    }
+
     onFileDigestUpdate = _.throttle(() => {
         const digest = tracker.getDigest('SELF', 'file');
-        console.log(`Files digest: ${JSON.stringify(digest)}`);
         // this.unreadFiles = digest.newKegsCount;
         if (digest.maxUpdateId === this.maxUpdateId) {
             this.updatedAfterReconnect = true;
@@ -423,11 +464,11 @@ class FileStore {
                     if (keg.collectionVersion > this.knownUpdateId) {
                         this.knownUpdateId = keg.collectionVersion;
                     }
-                    if (!keg.props.fileId) {
+                    if (!keg.props.fileId && !keg.deleted) {
                         console.error('File keg missing fileId', keg.kegId);
                         continue;
                     }
-                    const existing = this.getById(keg.props.fileId);
+                    const existing = this.getById(keg.props.fileId) || this.getByKegId(keg.kegId);
                     const file = existing || new File(User.current.kegDb);
                     if (keg.deleted) {
                         if (existing) this.files.remove(existing);
@@ -465,6 +506,10 @@ class FileStore {
      */
     getById(fileId) {
         return this.fileMapObservable.get(fileId);
+    }
+
+    getByKegId(kegId) {
+        return this.files.find(f => f.id === kegId);
     }
 
     /**

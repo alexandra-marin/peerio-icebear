@@ -59,7 +59,7 @@ function download(filePath, resume, isTmpCacheDownload) {
         if (!isTmpCacheDownload) {
             this._saveDownloadStartFact(filePath);
         }
-        const nonceGen = new FileNonceGenerator(0, this.chunksCount - 1, cryptoUtil.b64ToBytes(this.nonce));
+        const nonceGen = new FileNonceGenerator(0, this.chunksCount - 1, cryptoUtil.b64ToBytes(this.blobNonce));
         let stream, mode = 'write';
         let p = Promise.resolve(true);
         if (resume) {

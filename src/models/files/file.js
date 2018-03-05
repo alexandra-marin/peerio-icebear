@@ -21,6 +21,8 @@ const clientApp = require('../client-app');
 class File extends Keg {
     constructor(db) {
         super(null, 'file', db);
+        this.format = 1;
+        this.descriptorFormat = 1;
     }
 
     /**
@@ -303,8 +305,10 @@ class File extends Keg {
     }
 
     @action deserializeKegPayload(data) {
-        // this.name = data.name;
         this.descriptorKey = data.descriptorKey;
+        // todo: will need for migration
+        // this.name = data.name;
+        // this.key = data.key;
         // this.nonce = data.nonce;
     }
 
@@ -312,30 +316,19 @@ class File extends Keg {
         return {
             fileId: this.fileId,
             folderId: this.folderId
-            // size: this.size,
-            // ext: this.ext, // don't really need to store, since it's computed, but we want to search by extension
-            // uploadedAt: this.uploadedAt.valueOf(),
-            // chunkSize: this.chunkSize
         };
     }
 
     @action deserializeProps(props) {
         this.fileId = props.fileId;
         this.folderId = props.folderId;
-        // this.readyForDownload = props.fileProcessingState === 'ready' || !!props.sharedBy;
-        // this.size = +props.size;
-        // this.uploadedAt = new Date(+props.uploadedAt);
-        // this.fileOwner = props.owner || this.owner;
-        // this.sharedBy = props.sharedBy;
-        // this.chunkSize = +props.chunkSize;
-        // this.shared = props.shared;
     }
 
     async serializeDescriptor() {
         let payload = {
             name: this.name,
             blobKey: this.blobKey,
-            nonce: this.nonce
+            blobNonce: this.blobNonce
         };
         payload = JSON.stringify(payload);
         payload = secret.encryptString(payload, this.descriptorKey);
@@ -347,12 +340,33 @@ class File extends Keg {
             fileId: this.fileId,
             payload: payload.buffer,
             ext: this.ext,
-            format: 1,
+            format: this.descriptorFormat,
             signature,
             signedBy: getUser().username
         };
         return descriptor;
     }
+    deserializeDescriptor(d) {
+        if (this.fileId && this.fileId !== d.fileId) throw new Error('Descriptor fileId mismatch');
+        this.uploadedAt = new Date(+d.createdAt);
+        this.updatedAt = new Date(+d.updatedAt);
+        this.readyForDownload = d.blobAvailable;
+        this.fileOwner = d.owner;
+        this.sharedBy = '[TODO]';
+        this.chunkSize = +d.chunkSize;
+        this.size = +d.size;
+        this.descriptorFormat = d.format;
+        this.shared = d.shared;
+        this.role = d.effectiveRole;
+        this.descriptorVersion = d.version;
+        let payload = new Uint8Array(d.payload);
+        payload = secret.decryptString(payload, this.descriptorKey);
+        payload = JSON.parse(payload);
+        this.name = payload.name;
+        this.blobKey = payload.blobKey;
+        this.blobNonce = payload.blobNonce;
+    }
+
     async createDescriptor() {
         const descriptor = await this.serializeDescriptor();
         descriptor.size = this.size;
@@ -373,9 +387,6 @@ class File extends Keg {
             });
     }
 
-    deserializeDescriptor() {
-
-    }
 
     /**
      * Share file with contacts

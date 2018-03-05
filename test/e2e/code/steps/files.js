@@ -10,6 +10,24 @@ When('I upload a {int} byte file', { timeout: 100000 }, async function(int) {
     this.uploadedFile = { name, fileId: keg.fileId };
 });
 
+When('I rename uploaded file to {string}', async function(string) {
+    this.filesToCleanup.push(string);
+    await this.ice.fileStore.getById(this.uploadedFile.fileId).rename(string);
+});
+
+Then('I have a file named {string}', function(string) {
+    const found = this.ice.fileStore.files.find(f => f.name === string);
+    expect(found).to.exist;
+});
+
+When('I remove the uploaded file', function() {
+    return this.ice.fileStore.getById(this.uploadedFile.fileId).remove();
+});
+
+Then('I have {int} files', function(int) {
+    return this.waitFor(() => this.ice.fileStore.files.length === int);
+});
+
 Then('I see the uploaded file in my drive', function() {
     const keg = this.ice.fileStore.getById(this.uploadedFile.fileId);
     keg.fileId.should.equal(this.uploadedFile.fileId);

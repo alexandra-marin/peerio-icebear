@@ -20,7 +20,7 @@ class SyncedKeg extends Keg {
         super(kegName, kegName, db, plaintext, forceSign, allowEmpty, storeSignerData);
         // this will make sure we'll update every time server sends a new digest
         // it will also happen after reconnect, because digest is always refreshed on reconnect
-        tracker.onKegTypeUpdated(db.id, kegName, this._enqueueLoad);
+        tracker.subscribeToKegUpdates(db.id, kegName, this._enqueueLoad);
         // this will load initial data
         socket.onceAuthenticated(this._enqueueLoad);
     }

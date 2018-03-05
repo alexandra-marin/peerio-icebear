@@ -452,6 +452,7 @@ class Keg {
                 this.detectTampering(payload);
             }
             this.deserializeKegPayload(payload);
+            if (keg.props && keg.props.descriptor) this.deserializeDescriptor(keg.props.descriptor);
             if (this.afterLoad) this.afterLoad();
             this.loaded = true;
             return this;

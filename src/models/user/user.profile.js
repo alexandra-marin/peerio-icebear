@@ -77,9 +77,9 @@ module.exports = function mixUserProfileModule() {
     }
 
     // will be triggered first time after login
-    tracker.onKegTypeUpdated('SELF', 'profile', this.loadProfile);
-    tracker.onKegTypeUpdated('SELF', 'quotas', this.loadQuota);
-    tracker.onKegTypeUpdated('SELF', 'settings', this.loadSettings);
+    tracker.subscribeToKegUpdates('SELF', 'profile', this.loadProfile);
+    tracker.subscribeToKegUpdates('SELF', 'quotas', this.loadQuota);
+    tracker.subscribeToKegUpdates('SELF', 'settings', this.loadSettings);
 
     /**
      * @instance

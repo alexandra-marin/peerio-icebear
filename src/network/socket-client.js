@@ -411,6 +411,7 @@ class SocketClient {
                             getUser().blacklisted = true;
                             this.close();
                         }
+                        console.error(name, data, resp);
                         reject(new ServerError(resp.error, resp.message));
                         return;
                     }

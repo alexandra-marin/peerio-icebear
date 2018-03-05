@@ -24,7 +24,7 @@ class ChatReceiptHandler {
         this.chat = chat;
         // receipts cache {username: ReadReceipt}
         this.chat.receipts = observable.shallowMap();
-        tracker.onKegTypeUpdated(chat.id, 'read_receipt', this.onDigestUpdate);
+        tracker.subscribeToKegUpdates(chat.id, 'read_receipt', this.onDigestUpdate);
         this.onDigestUpdate();
         this._reactionsToDispose.push(reaction(() => socket.authenticated, authenticated => {
             if (authenticated) this.onDigestUpdate();

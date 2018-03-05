@@ -370,6 +370,7 @@ class ChatStore {
                     .then(action(list => {
                         let k = 0;
                         for (const id of list) {
+                            if (id.startsWith('global:') || id.startsWith('volume:')) continue;
                             if (id.startsWith('channel:')) {
                                 this.addChat(id);
                                 continue;
@@ -389,7 +390,7 @@ class ChatStore {
         // 6. subscribe to future chats that will be created
         // this should always happen right after adding chats from digest, synchronously,
         // so that there's no new chats that can slip away
-        tracker.onKegDbAdded(this.addChat);
+        tracker.subscribeToKegDbAdded(this.addChat);
 
         // 7. waiting for most chats to load but up to a reasonable time
         await Promise.map(this.chats, chat => asPromise(chat, 'headLoaded', true))

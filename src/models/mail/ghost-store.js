@@ -70,7 +70,7 @@ class GhostStore {
                 this.sort(this.selectedSort);
                 this.loading = false;
                 this.loaded = true;
-                tracker.onKegTypeUpdated('SELF', 'ghost', this.updateGhosts);
+                tracker.subscribeToKegUpdates('SELF', 'ghost', this.updateGhosts);
             }))
             .catch(err => {
                 console.error('Failed to load ghosts:', err);

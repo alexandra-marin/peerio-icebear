@@ -86,7 +86,7 @@ function upload(filePath, fileName, resume) {
                     if (!this.size) return Promise.reject(new Error('Can not upload zero size file.'));
                     this.chunkSize = config.upload.getChunkSize(this.size);
                     nonceGen = new FileNonceGenerator(0, this.chunksCount - 1);
-                    this.nonce = cryptoUtil.bytesToB64(nonceGen.nonce);
+                    this.blobNonce = cryptoUtil.bytesToB64(nonceGen.nonce);
                     try {
                         await this.createDescriptor();
                         return this.saveToServer();
@@ -96,7 +96,7 @@ function upload(filePath, fileName, resume) {
                         return Promise.reject(err);
                     }
                 }
-                nonceGen = new FileNonceGenerator(0, this.chunksCount - 1, cryptoUtil.b64ToBytes(this.nonce));
+                nonceGen = new FileNonceGenerator(0, this.chunksCount - 1, cryptoUtil.b64ToBytes(this.blobNonce));
             })
             .then(() => {
                 if (nextChunkId === null) this._saveUploadStartFact(filePath);

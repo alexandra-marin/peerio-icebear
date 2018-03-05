@@ -15,18 +15,23 @@ When('I rename uploaded file to {string}', async function(string) {
     await this.ice.fileStore.getById(this.uploadedFile.fileId).rename(string);
 });
 
-Then('I have a file named {string}', function(string) {
-    const found = this.ice.fileStore.files.find(f => f.name === string);
-    expect(found).to.exist;
-});
+function hasFileNamed(string) {
+    return this.waitFor(() => !!this.ice.fileStore.files.find(f => f.name === string));
+}
+
+Then('I have a file named {string}', hasFileNamed);
+
+Then('Cucumbot has a file named {string}', hasFileNamed);
 
 When('I remove the uploaded file', function() {
     return this.ice.fileStore.getById(this.uploadedFile.fileId).remove();
 });
 
-Then('I have {int} files', function(int) {
+function hasXFiles(int) {
     return this.waitFor(() => this.ice.fileStore.files.length === int);
-});
+}
+Then('I have {int} files', hasXFiles);
+Then('Cucumbot has {int} files', hasXFiles);
 
 Then('I see the uploaded file in my drive', function() {
     const keg = this.ice.fileStore.getById(this.uploadedFile.fileId);

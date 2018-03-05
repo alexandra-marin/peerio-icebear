@@ -108,7 +108,7 @@ When('I install the mobile app', { timeout: 20000 }, async function() {
 });
 
 Then('I unlock {int}MB of storage', async function(int) {
-    this.waitFor(() => this.ice.User.current.currentOnboardingBonus === this.previousBonus + int, 1000);
+    await this.waitFor(() => this.ice.User.current.currentOnboardingBonus === this.previousBonus + int, 1000);
     this.previousBonus = this.ice.User.current.currentOnboardingBonus;
 });
 

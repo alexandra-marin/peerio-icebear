@@ -10,6 +10,7 @@ class AbstractFolder {
     @observable isShared = false;
     @observable isBlocked = false;
     @observable isHidden = false;
+    @observable isOwner = true;
     isFolder = true;
     folderId = null;
     @observable parent = null;

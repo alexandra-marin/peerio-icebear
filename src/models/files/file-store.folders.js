@@ -149,8 +149,8 @@ class FileStoreFolders {
         return folder;
     }
 
-    shareFolder(folder) {
-        return volumeStore.shareFolder(folder);
+    shareFolder(folder, usernamesAccessList) {
+        return volumeStore.shareFolder(folder, usernamesAccessList);
     }
 
     save() {

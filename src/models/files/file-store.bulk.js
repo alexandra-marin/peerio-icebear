@@ -2,6 +2,7 @@ const { action, computed } = require('mobx');
 const { getChatStore } = require('../../helpers/di-chat-store');
 const volumeStore = require('../volumes/volume-store');
 const config = require('../../config');
+const warnings = require('../warnings');
 
 /**
  * Extension to operate with selected files and folders in bulk
@@ -88,15 +89,42 @@ class FileStoreBulk {
         this.fileStore.clearSelection();
     }
 
-    @action.bound move(targetFolder) {
+    @action.bound moveOne(item, folder, bulk) {
+        item.selected = false;
+        if (item.folderId === folder.folderId) return;
+        if (item.isShared) return;
+        folder.moveInto(item);
+        if (!bulk) {
+            if (folder.isShared) {
+                warnings.add('title_itemMovedToFolder', null, { item: item.name, folder: folder.name });
+            }
+            this.fileStore.folders.save();
+        }
+    }
+
+    @action.bound async move(targetFolder) {
         const items = this.fileStore.selectedFilesOrFolders;
+        // currently progress is too quick, but in the future
+        // it may make sense to show progress bar
+        targetFolder.progress = 0;
+        targetFolder.progressMax = items.length;
+        // this is a mock to support async functions
+        let promise = Promise.resolve();
         items.forEach(i => {
-            i.selected = false;
-            if (i.folderId === targetFolder.folderId) return;
-            if (i.isShared) return;
-            targetFolder.moveInto(i);
+            promise = promise.then(async () => {
+                // TODO: remove timeout
+                await new Promise(resolve => setTimeout(resolve, 300));
+                i.selected = false;
+                if (i.folderId === targetFolder.folderId) return;
+                if (i.isShared) return;
+                targetFolder.moveInto(i);
+                targetFolder.progress++;
+            });
         });
-        return this.fileStore.folders.save();
+        await promise;
+        targetFolder.progress = null;
+        targetFolder.progressMax = null;
+        await this.fileStore.folders.save();
     }
 
     @action.bound async downloadOne(item, path) {

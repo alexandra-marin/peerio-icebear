@@ -280,6 +280,7 @@
   "title_viewSharedWith": "View shared with",
   "title_unshareUserWarning": "{fileCount} files shared by {user} in this folder will also be removed.",
   "title_removedFromFolder": "You've been removed from the <b>{folderName}</> shared folder. The files you shared in that folder have been moved here.",
+  "title_itemMovedToFolder": "{item} moved to {folder} and shared with everyone who can see the folder",
   "warning_folderAccessUpdated": "Your access to {folderName} was updated",
   "title_enterRoomOrContact": "Enter Room or contact",
   "title_addComment": "Add a comment",

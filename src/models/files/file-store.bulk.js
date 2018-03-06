@@ -16,6 +16,9 @@ class FileStoreBulk {
     // folder deletion
     deleteFolderConfirmator = null;
 
+    // functor selecting folder for bulk download
+    downloadFolderSelector = null;
+
     constructor(fileStore) {
         this.fileStore = fileStore;
     }
@@ -83,6 +86,29 @@ class FileStoreBulk {
     }
 
     @action.bound move() {
+    }
+
+    @action.bound async download() {
+        if (!this.downloadFolderSelector) {
+            console.error(`downloadFolderSelector has not been set`);
+            return;
+        }
+        if (!this.pickPathSelector) {
+            console.error(`pickPathSelector has not been set`);
+            return;
+        }
+        const path = await this.downloadFolderSelector();
+        const items = this.fileStore.selectedFilesOrFolders;
+        const files = items.filter(i => !i.isFolder);
+        let promise = Promise.resolve();
+        files.forEach(file => {
+            promise = promise.then(async () => {
+                const downloadPath = await this.pickPathSelector(path, file.nameWithoutExtension, file.ext);
+                file.selected = false;
+                // TODO: maybe run in parallel?
+                await file.download(downloadPath);
+            });
+        });
     }
 }
 

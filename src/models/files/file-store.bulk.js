@@ -1,6 +1,7 @@
 const { action, computed } = require('mobx');
 const { getChatStore } = require('../../helpers/di-chat-store');
 const volumeStore = require('../volumes/volume-store');
+const config = require('../../config');
 
 /**
  * Extension to operate with selected files and folders in bulk
@@ -34,8 +35,10 @@ class FileStoreBulk {
         if (i.isFolder && !i.isShared) {
             await this.fileStore.folders.deleteFolder(i);
             if (!batch) this.fileStore.folders.save();
-        } else {
+        } else if (i.isFolder) {
             await volumeStore.deleteVolume(i);
+        } else {
+            await i.remove();
         }
     }
 
@@ -85,7 +88,29 @@ class FileStoreBulk {
         this.fileStore.clearSelection();
     }
 
-    @action.bound move() {
+    @action.bound move(targetFolder) {
+        const items = this.fileStore.selectedFilesOrFolders;
+        items.forEach(i => {
+            i.selected = false;
+            if (i.folderId === targetFolder.folderId) return;
+            if (i.isShared) return;
+            targetFolder.moveInto(i);
+        });
+        return this.fileStore.folders.save();
+    }
+
+    @action.bound async downloadOne(item, path) {
+        item.selected = false;
+        const downloadPath = await this.pickPathSelector(
+            path,
+            item.nameWithoutExtension || item.name,
+            item.ext || '');
+        // TODO: maybe run in parallel?
+        if (item.isFolder) {
+            await item.download(path, this.pickPathSelector, config.FileStream.createDir);
+        } else {
+            await item.download(downloadPath);
+        }
     }
 
     @action.bound async download() {
@@ -98,17 +123,13 @@ class FileStoreBulk {
             return;
         }
         const path = await this.downloadFolderSelector();
+        if (!path) return;
         const items = this.fileStore.selectedFilesOrFolders;
-        const files = items.filter(i => !i.isFolder);
         let promise = Promise.resolve();
-        files.forEach(file => {
-            promise = promise.then(async () => {
-                const downloadPath = await this.pickPathSelector(path, file.nameWithoutExtension, file.ext);
-                file.selected = false;
-                // TODO: maybe run in parallel?
-                await file.download(downloadPath);
-            });
+        items.forEach(item => {
+            promise = promise.then(() => this.downloadOne(item, path));
         });
+        await promise;
     }
 }
 

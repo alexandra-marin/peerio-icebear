@@ -1,4 +1,6 @@
 const { action, computed } = require('mobx');
+const { getChatStore } = require('../../helpers/di-chat-store');
+const volumeStore = require('../volumes/volume-store');
 
 /**
  * Extension to operate with selected files and folders in bulk
@@ -30,7 +32,7 @@ class FileStoreBulk {
             await this.fileStore.folders.deleteFolder(i);
             if (!batch) this.fileStore.folders.save();
         } else {
-            await i.remove();
+            await volumeStore.deleteVolume(i);
         }
     }
 
@@ -38,7 +40,7 @@ class FileStoreBulk {
         const items = this.fileStore.selectedFilesOrFolders;
         if (this.deleteFilesConfirmator) {
             const files = items.filter(i => !i.isFolder);
-            const sharedFiles = items.some(i => i.shared);
+            const sharedFiles = items.filter(i => i.shared);
             if (files.length && !await this.deleteFilesConfirmator(files, sharedFiles)) return;
         }
         let promise = Promise.resolve();
@@ -71,6 +73,8 @@ class FileStoreBulk {
             promise = promise.then(() => { i.selected = false; });
             if (i.isFolder) {
                 operation = () => this.fileStore.folders.shareFolder(i, usernamesAccessList);
+            } else {
+                operation = () => getChatStore().startChatAndShareFiles(usernamesAccessList, [i]);
             }
             promise = promise.then(operation);
         });

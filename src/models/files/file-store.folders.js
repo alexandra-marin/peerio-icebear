@@ -114,9 +114,10 @@ class FileStoreFolders {
     }
 
     async deleteFolder(folder) {
+        // TODO: put the delete logic into the AbstractFolder (???)
         const { files } = folder;
         folder.progress = 0;
-        folder.progressMax = files.length; // folder.files.length;
+        folder.progressMax = files.length;
         let promise = Promise.resolve();
         files.forEach(file => {
             promise = promise.then(async () => {

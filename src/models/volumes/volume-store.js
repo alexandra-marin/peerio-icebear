@@ -11,10 +11,6 @@ function mockFolder(name) {
     return result;
 }
 
-function waitMS(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 function random(max) {
     return Math.floor(Math.random() * max);
 }
@@ -90,6 +86,33 @@ class VolumeStore {
         await mockProgress(folder);
         folder.isHidden = true;
         this.attachFolder(newFolder);
+    }
+
+    @action.bound async deleteVolume(volume) {
+        // TODO: put the delete logic into the AbstractFolder (???)
+        const { files } = volume;
+        volume.progress = 0;
+        volume.progressMax = files.length;
+        let promise = Promise.resolve();
+        files.forEach(file => {
+            promise = promise.then(async () => {
+                await file.remove();
+                volume.progress++;
+            });
+        });
+        await promise;
+        volume.progressMax = null;
+        volume.progress = null;
+        // there's a lag between deletion and file disappearance from the
+        // associated folder list. so to prevent confusion we clear files here
+        volume.files = [];
+        const i = this.volumes.indexOf(volume);
+        if (i !== -1) {
+            this.volumes.splice(i, 1);
+            folderResolveMap.delete(volume.folderId);
+        } else {
+            console.error('volume-store: cannot find the folder');
+        }
     }
 }
 

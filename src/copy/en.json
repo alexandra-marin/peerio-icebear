@@ -214,6 +214,8 @@
   "title_created": "Created",
   "title_empty": "Empty",
   "title_sharingFolderPercent": "<i>Sharing folder ({progressPercent}%)</>",
+  "title_deletingSharedFolder": "Deleting shared folder",
+  "title_deletingFolder": "Deleting folder",
   "title_selectedFiles": "Selected file(s)",
   "title_invalidFileSignature": "Invalid file signature",
   "title_filesNull1": "Let's encrypt a file.",

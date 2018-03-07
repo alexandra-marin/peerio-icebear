@@ -820,14 +820,19 @@ class Chat {
 
     shareFolders(folders) {
         folders.forEach(folder => this.uploadQueue.push(folder));
-        return Promise.all(folders.map(async folder => {
-            try {
-                await volumeStore.shareFolder(folder);
-            } catch (e) {
-                console.error(e);
-            }
-            this.uploadQueue.remove(folder);
-        }));
+        let promise = Promise.resolve();
+        folders.forEach(folder => {
+            promise = promise.then(async () => {
+                try {
+                    await volumeStore.convertFolder(folder);
+                    await this.sendSharedFolder(folder);
+                } catch (e) {
+                    console.error(e);
+                }
+                this.uploadQueue.remove(folder);
+            });
+        });
+        return promise;
     }
 
     async shareFilesAndFolders(filesAndFolders) {
@@ -1235,6 +1240,16 @@ class Chat {
         m.sendVideoLink(link);
         this._sendMessage(m);
     }
+
+    /**
+    * TODO: replace with the real thing
+    */
+    sendSharedFolder(folder) {
+        const m = new Message(this.db);
+        m.sendSharedFolder(folder);
+        return this._sendMessage(m);
+    }
+
 
     /**
      * Checks if there are any file attachments in new message batch and adds them to _recentFiles if needed.

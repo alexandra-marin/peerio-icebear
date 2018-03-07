@@ -20,6 +20,9 @@ class AbstractFolder {
     @observable progress = null;
     @observable progressMax = null;
 
+    // optional text for progress actions
+    @observable progressText = null;
+
     get progressPercentage() {
         return Math.ceil(this.progress / (this.progressMax | 1) * 100);
     }

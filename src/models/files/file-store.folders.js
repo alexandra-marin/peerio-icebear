@@ -118,6 +118,7 @@ class FileStoreFolders {
         const { files } = folder;
         folder.progress = 0;
         folder.progressMax = files.length;
+        folder.progressText = 'title_deletingFolder';
         let promise = Promise.resolve();
         files.forEach(file => {
             promise = promise.then(async () => {
@@ -128,6 +129,7 @@ class FileStoreFolders {
         await promise;
         folder.progressMax = null;
         folder.progress = null;
+        folder.progressText = null;
         // there's a lag between deletion and file disappearance from the
         // associated folder list. so to prevent confusion we clear files here
         folder.files = [];

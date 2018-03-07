@@ -275,6 +275,17 @@ class Message extends Keg {
     }
 
     /**
+     * TODO: replace with the real thing
+     */
+    sendSharedFolder(folder) {
+        this.systemData = {
+            action: 'folder',
+            folderName: folder.name,
+            folderId: folder.folderId
+        };
+    }
+
+    /**
      * Parses message to find urls or file attachments.
      * Verifies external url type and size and fills this.inlineImages.
      * @memberof Message

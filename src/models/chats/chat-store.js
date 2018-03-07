@@ -539,7 +539,7 @@ class ChatStore {
         const chat = this.startChat(participants);
         if (!chat) return Promise.reject(new Error('Failed to create chat'));
         return chat.loadMetadata().then(() => {
-            chat.shareFiles(files);
+            chat.shareFilesAndFolders(files);
             this.activate(chat.id);
         });
     }

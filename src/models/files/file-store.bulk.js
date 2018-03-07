@@ -76,14 +76,16 @@ class FileStoreBulk {
         }
         let promise = Promise.resolve();
         items.forEach(i => {
-            let operation = Promise.resolve();
             promise = promise.then(() => { i.selected = false; });
             if (i.isFolder) {
-                operation = () => this.fileStore.folders.shareFolder(i, usernamesAccessList);
+                promise = promise.then(
+                    () => volumeStore.shareFolder(i, usernamesAccessList));
             } else {
-                operation = () => getChatStore().startChatAndShareFiles(usernamesAccessList, [i]);
+                usernamesAccessList.forEach(contact => {
+                    promise = promise.then(
+                        async () => getChatStore().startChatAndShareFiles([contact], [i]));
+                });
             }
-            promise = promise.then(operation);
         });
         await promise;
         this.fileStore.clearSelection();

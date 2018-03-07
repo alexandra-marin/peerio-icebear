@@ -1,5 +1,6 @@
 const { observable, computed, action, when } = require('mobx');
 const { setVolumeStore } = require('../../helpers/di-volume-store');
+const { getChatStore } = require('../../helpers/di-chat-store');
 const cryptoUtil = require('../../crypto/util');
 const Volume = require('./volume');
 const folderResolveMap = require('../files/folder-resolve-map');
@@ -25,11 +26,16 @@ function mockProgress(folder) {
         if (folder.progress >= folder.progressMax) {
             clearInterval(folder.shareTimeout);
             folder.shareTimeout = undefined;
-            folder.progress = null;
-            folder.progressMax = null;
         }
     }, 500);
-    return new Promise(resolve => when(() => folder.progress === 100, resolve));
+    return new Promise(resolve =>
+        when(() => folder.progress === 100, () => {
+            setTimeout(() => {
+                resolve();
+                folder.progress = null;
+                folder.progressMax = null;
+            }, 1000);
+        }));
 }
 /**
  * Volume store.
@@ -75,17 +81,27 @@ class VolumeStore {
         folderResolveMap.set(folder.folderId, folder);
     }
 
-    @action.bound async shareFolder(folder) {
-        if (folder.isShared) {
-            // TODO: add participants to folder
-            console.log(`folder is already shared ${folder.name}`);
-            return;
+    @action.bound async convertFolder(folder) {
+        if (!folder.isShared) {
+            const newFolder = mockFolder(folder.name);
+            folder.isBlocked = true;
+            await mockProgress(folder);
+            folder.isHidden = true;
+            this.attachFolder(newFolder);
         }
-        const newFolder = mockFolder(folder.name);
-        folder.isBlocked = true;
-        await mockProgress(folder);
-        folder.isHidden = true;
-        this.attachFolder(newFolder);
+    }
+
+    @action.bound async shareFolder(folder, participants) {
+        await this.convertFolder(folder);
+        // TODO: add participants to folder
+        // TODO: maybe a better way to start the chat
+        let promise = Promise.resolve();
+        participants.forEach(contact => {
+            promise = promise.then(async () => {
+                await getChatStore().startChatAndShareFiles([contact]);
+            });
+        });
+        await promise;
     }
 
     @action.bound async deleteVolume(volume) {
@@ -93,6 +109,7 @@ class VolumeStore {
         const { files } = volume;
         volume.progress = 0;
         volume.progressMax = files.length;
+        volume.progressText = 'title_deletingSharedFolder';
         let promise = Promise.resolve();
         files.forEach(file => {
             promise = promise.then(async () => {

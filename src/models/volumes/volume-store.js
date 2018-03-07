@@ -8,7 +8,7 @@ const folderResolveMap = require('../files/folder-resolve-map');
 function mockFolder(name) {
     const result = new Volume();
     result.name = name;
-    result.folderId = cryptoUtil.getRandomShortIdHex();
+    result.folderId = `folderId${name}`;
     return result;
 }
 
@@ -76,6 +76,7 @@ class VolumeStore {
     }
 
     attachFolder(folder) {
+        if (folderResolveMap.get(folder.folderId)) return;
         this.volumes.push(folder);
         folder.parent = this.rootFileFolder;
         folderResolveMap.set(folder.folderId, folder);
@@ -98,7 +99,7 @@ class VolumeStore {
         let promise = Promise.resolve();
         participants.forEach(contact => {
             promise = promise.then(async () => {
-                await getChatStore().startChatAndShareFiles([contact]);
+                await getChatStore().startChatAndShareFiles([contact], [folder]);
             });
         });
         await promise;

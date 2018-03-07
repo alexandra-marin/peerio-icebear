@@ -152,10 +152,6 @@ class FileStoreFolders {
         return folder;
     }
 
-    shareFolder(folder, usernamesAccessList) {
-        return volumeStore.shareFolder(folder, usernamesAccessList);
-    }
-
     save() {
         this.keg.save(
             () => {

@@ -8,9 +8,12 @@ const socket = require('../../network/socket');
 const uploadModule = require('./file.upload');
 const downloadModule = require('./file.download');
 const { getUser } = require('../../helpers/di-current-user');
+const { getChatStore } = require('../../helpers/di-chat-store');
+const Contact = require('../contacts/contact');
 const { retryUntilSuccess } = require('../../helpers/retry');
 const { ServerError } = require('../../errors');
 const clientApp = require('../client-app');
+const { asPromise } = require('../../helpers/prombservable');
 
 /**
  * File keg and model.
@@ -25,18 +28,6 @@ class File extends Keg {
         this.descriptorFormat = 1;
     }
 
-    /**
-     * Blob key
-     * @member {Uint8Array}
-     * @public
-     */
-    key;
-    /**
-     * Blob nonce. It's separate because this is a base nonce, every chunk adds its number to it to decrypt.
-     * @member {Uint8Array}
-     * @public
-     */
-    nonce;
     /**
      * System-wide unique client-generated id
      * @member {string} fileId
@@ -394,56 +385,22 @@ class File extends Keg {
      * @returns {Promise}
      * @public
      */
-    share(contactOrContacts) {
+    async share(contactOrContacts) {
         const contacts =
             (Array.isArray(contactOrContacts) || isObservableArray(contactOrContacts))
                 ? contactOrContacts
                 : [contactOrContacts];
 
-        // Generate a new random payload key.
-        const payloadKey = cryptoUtil.getRandomBytes(32);
+        await Contact.ensureAllLoaded(contacts);
+        return Promise.map(contacts, async c => {
+            const chat = getChatStore().startChat([c]);
+            await chat.ensureMetaLoaded();
 
-        // Serialize payload.
-        const payload = JSON.stringify(this.serializeKegPayload());
-
-        // Encrypt payload with the payload key.
-        const encryptedPayload = secret.encryptString(payload, payloadKey);
-
-        // Encrypt message key for each recipient's public key.
-        //
-        // {
-        //   "user1": { "publicKey": ..., "encryptedKey": ... },
-        //   "user2": { "publicKey": ..., "encryptedKey": ... }
-        //   ...
-        //  }
-        //
-        const recipients = {};
-        contacts.forEach(contact => {
-            recipients[contact.username] = {
-                publicKey: cryptoUtil.bytesToB64(contact.encryptionPublicKey),
-                encryptedPayloadKey: cryptoUtil.bytesToB64(
-                    secret.encrypt(payloadKey, getUser().getSharedKey(contact.encryptionPublicKey))
-                )
-            };
+            const file = new File(chat.db);
+            file.descriptorKey = this.descriptorKey;
+            file.fileId = this.fileId;
+            return retryUntilSuccess(() => file.saveToServer());
         });
-
-        const data = {
-            recipients,
-            originalKegId: this.id,
-            keg: {
-                type: this.type,
-                payload: encryptedPayload.buffer,
-                // todo: this is questionable, could we leak properties we don't want to this way?
-                // todo: on the other hand we can forget to add properties that we do want to share
-                props: this.serializeProps()
-            }
-        };
-
-        // when we implement key change history, this will help to figure out which key to use
-        // this properties should not be blindly trusted, recipient verifies them
-        data.keg.props.sharedKegSenderPK = cryptoUtil.bytesToB64(getUser().encryptionKeys.publicKey);
-
-        return retryUntilSuccess(() => socket.send('/auth/kegs/share', data));
     }
 
     /**
@@ -489,7 +446,7 @@ class File extends Keg {
             return this.updateDescriptor()
                 .catch(err => {
                     if (err instanceof ServerError && err.code === ServerError.codes.malformedRequest) {
-                        return this.load();
+                        return this.load(); // mitigating optimistic concurrency issues
                     }
                     return Promise.reject(err);
                 });
@@ -505,6 +462,10 @@ class File extends Keg {
             || this.cachingFailed) return;
 
         this.downloadToTmpCache();
+    }
+
+    onceLoaded() {
+        return asPromise;
     }
 }
 

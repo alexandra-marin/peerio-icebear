@@ -88,7 +88,7 @@ When('I upload an avatar', async function() {
 });
 
 Then('the avatar should appear in my profile', async function() {
-    await this.waitFor(() => this.ice.contactStore.currentUser.hasAvatar);
+    await this.waitFor(() => this.ice.contactStore.currentUser.hasAvatar, 10000);
     this.ice.contactStore.currentUser.profileVersion.should.be.above(this.lastProfileVersion);
 
     const fileName = getTempFileName();

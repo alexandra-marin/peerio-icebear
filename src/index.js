@@ -63,6 +63,7 @@ const systemMessages = require('./helpers/system-messages');
 const serverSettings = require('./models/server-settings');
 const chatInviteStore = require('./models/chats/chat-invite-store');
 const Contact = require('./models/contacts/contact');
+const prombservable = require('./helpers/prombservable');
 
 // MEMO: Do NOT export NodeJsonStorage and NodeFileStream here for compatibility reasons
 module.exports = {
@@ -92,5 +93,6 @@ module.exports = {
     clientApp,
     systemMessages,
     serverSettings,
-    Contact // mostly for its utility static functions
+    Contact, // mostly for its utility static functions
+    prombservable
 };

@@ -16,6 +16,7 @@ const socket = require('../../network/socket');
 const warnings = require('../warnings');
 const Contact = require('../contacts/contact');
 const chatInviteStore = require('../chats/chat-invite-store');
+const { asPromise } = require('../../helpers/prombservable');
 
 // to assign when sending a message and don't have an id yet
 let temporaryChatId = 0;
@@ -1243,6 +1244,10 @@ class Chat {
             this.messages[i].parseExternalContent();
         }
         this.resetScheduled = false;
+    }
+
+    ensureMetaLoaded() {
+        return asPromise(this, 'metaLoaded', true);
     }
 
     dispose() {

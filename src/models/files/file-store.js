@@ -11,6 +11,7 @@ const _ = require('lodash');
 const { retryUntilSuccess, isRunning } = require('../../helpers/retry');
 const TaskQueue = require('../../helpers/task-queue');
 const { setFileStore } = require('../../helpers/di-file-store');
+const { getChatStore } = require('../../helpers/di-chat-store');
 const createMap = require('../../helpers/dynamic-array-map');
 const FileStoreFolders = require('./file-store.folders');
 
@@ -25,6 +26,8 @@ class FileStore {
         this.fileMap = m.map;
         this.fileMapObservable = m.observableMap;
         this.folders = new FileStoreFolders(this);
+
+        this.chatFileMap = observable.map();
 
         tracker.subscribeToKegUpdates('SELF', 'file', () => {
             console.log('Files update event received');
@@ -318,11 +321,12 @@ class FileStore {
             taskId
         ).then(async resp => {
             await Promise.map(resp, fileId => {
-                const file = this.getById(fileId);
-                if (!file) return Promise.resolve();
+                const files = this.getAllById(fileId);
+                if (!files.length) return Promise.resolve();
                 return socket.send('/auth/file/descriptor/get', { fileId })
                     .then(d => {
-                        file.deserializeDescriptor(d);
+                        // todo: optimise, do not repeat decrypt operations
+                        files.forEach(f => f.deserializeDescriptor(d));
                         if (this.knownDescriptorVersion < d.collectionVersion) {
                             this.knownDescriptorVersion = d.collectionVersion;
                         }
@@ -499,17 +503,101 @@ class FileStore {
     };
 
     /**
-     * Finds file by fileId.
+     * Finds file in user's drive by fileId.
+     * Looks for loaded files only (all of them are loaded normally)
      * @param {string} fileId
      * @returns {?File}
-     * @public
      */
     getById(fileId) {
         return this.fileMapObservable.get(fileId);
     }
-
+    /**
+     * Finds file in user's drive by kegId. This is not used often,
+     * only to detect deleted descriptor and remove file from memory,
+     * since deleted keg has no props to link it to the file.
+     * Looks for loaded files only (all of them are loaded normally)
+     * @param {string} kegId
+     * @returns {?File}
+     */
     getByKegId(kegId) {
         return this.files.find(f => f.id === kegId);
+    }
+
+    /**
+     * Finds all loaded file kegs by fileId
+     *
+     * @memberof FileStore
+     */
+    getAllById(fileId) {
+        const files = [];
+        const personal = this.getById(fileId);
+        if (personal) files.push(personal);
+        this.chatFileMap.forEach((fileMap) => {
+            fileMap.forEach((file, id) => {
+                if (id === fileId) files.push(file);
+            });
+        });
+        return files;
+    }
+    /**
+     * Returns file shared in specific chat. Loads it if needed.
+     * @param {string} fileId
+     * @param {string} kegDbId
+     * @memberof FileStore
+     */
+    getByIdInChat(fileId, kegDbId) {
+        const fileMap = this.chatFileMap.get(kegDbId);
+        if (!fileMap) {
+            return this.loadChatFile(fileId, kegDbId);
+        }
+        const file = fileMap.get(fileId);
+        if (!file) {
+            return this.loadChatFile(fileId, kegDbId);
+        }
+        return file;
+    }
+
+    // HACK: remove when server bug is fixed
+    _lastReq = Promise.resolve();
+    loadChatFile(fileId, kegDbId) {
+        const chat = getChatStore().chatMap[kegDbId];
+        if (!chat) {
+            const file = new File();
+            file.deleted = true; // maybe not really, but it's the best option for now
+            return file;
+        }
+        const file = new File(chat.db);
+        file.fileId = fileId;
+        let fileMap = this.chatFileMap.get(kegDbId);
+        if (!fileMap) {
+            fileMap = observable.map();
+            this.chatFileMap.set(kegDbId, fileMap);
+        }
+        fileMap.set(fileId, file);
+        // HACK: remove when server bug is fixed
+        this._lastReq = this._lastReq.then(() => {
+            return retryUntilSuccess(() => {
+                return socket.send('/auth/kegs/db/query', {
+                    kegDbId: chat.id,
+                    type: 'file',
+                    options: {},
+                    filter: { fileId }
+                });
+            }, 5);
+        })
+            .then(resp => {
+                // TODO: this check is temporary, remove when server api is stable
+                if (resp.kegs[0].props.fileId !== fileId) throw new Error('Request concurrency error');
+                if (!file.loadFromKeg(resp.kegs[0])) {
+                    file.loaded = file.deleted = true;
+                }
+            })
+            .catch(err => {
+                console.error('Error loading file from chat', err);
+                file.deleted = true;
+            })
+            .delay(500);
+        return file;
     }
 
     /**

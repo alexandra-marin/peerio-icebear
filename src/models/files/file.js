@@ -464,8 +464,8 @@ class File extends Keg {
         this.downloadToTmpCache();
     }
 
-    onceLoaded() {
-        return asPromise;
+    ensureLoaded() {
+        return asPromise(this, 'loaded', true);
     }
 }
 

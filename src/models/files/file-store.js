@@ -556,9 +556,6 @@ class FileStore {
         }
         return file;
     }
-
-    // HACK: remove when server bug is fixed
-    _lastReq = Promise.resolve();
     loadChatFile(fileId, kegDbId) {
         const chat = getChatStore().chatMap[kegDbId];
         if (!chat) {
@@ -574,20 +571,14 @@ class FileStore {
             this.chatFileMap.set(kegDbId, fileMap);
         }
         fileMap.set(fileId, file);
-        // HACK: remove when server bug is fixed
-        this._lastReq = this._lastReq.then(() => {
-            return retryUntilSuccess(() => {
-                return socket.send('/auth/kegs/db/query', {
-                    kegDbId: chat.id,
-                    type: 'file',
-                    options: {},
-                    filter: { fileId }
-                });
-            }, 5);
-        })
+        retryUntilSuccess(() => {
+            return socket.send('/auth/kegs/db/query', {
+                kegDbId: chat.id,
+                type: 'file',
+                filter: { fileId }
+            });
+        }, undefined, 5)
             .then(resp => {
-                // TODO: this check is temporary, remove when server api is stable
-                if (resp.kegs[0].props.fileId !== fileId) throw new Error('Request concurrency error');
                 if (!file.loadFromKeg(resp.kegs[0])) {
                     file.loaded = file.deleted = true;
                 }
@@ -595,8 +586,7 @@ class FileStore {
             .catch(err => {
                 console.error('Error loading file from chat', err);
                 file.deleted = true;
-            })
-            .delay(500);
+            });
         return file;
     }
 

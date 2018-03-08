@@ -13,8 +13,8 @@ const testConfig = require('./test-config');
  *
  * GOTCHAS:
  * 1. Do not require any modules from test files, except cucumber and actual test code.
- * 2. Do not cache any of the things that App exposes, always use fully qualified path (this.ice.socket.connected)
- *    if you will put, let's say `this.ice.socket` to some local variable it might fail to collect next cycle.
+ * 2. Do not cache any of the things that App exposes, always use fully qualified path (ice.socket.connected)
+ *    if you will put, let's say `ice.socket` to some local variable it might fail to collect next cycle.
  * 3. Do not use arrow functions in step definitions `Then('step',()=>{})`.
  *    Arrow function will get bound to a wrong object and you won't be able to access the world.
  * 4. One scenario can have multiple App instances. But one App instance can only belong to one scenario (world).
@@ -127,7 +127,7 @@ class App {
         console.log('===== STARTING TEST APP =====');
         App.lastInstanceDisposed = false;
         this._setupChai();
-        this.world.ice = require('~/');
+        global.ice = this.world.ice = require('~/');
         this._configure();
         this._addLibraries();
         this.world.ice.socket.start();
@@ -148,6 +148,7 @@ class App {
 
         // deleting module references
         delete this.world.ice;
+        delete global.ice;
         delete this.world.libs;
     }
 

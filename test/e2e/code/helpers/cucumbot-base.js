@@ -12,7 +12,8 @@ class CucumbotBase extends EventEmitter {
     messageHandlers = {
         takeControl: this.takeControl,
         ready: this.onReady,
-        credentials: this.onCredentials
+        credentials: this.onCredentials,
+        remoteEval: this.onRemoteEval
     };
 
     constructor(world) {
@@ -72,6 +73,19 @@ class CucumbotBase extends EventEmitter {
                 passphrase
             }
         });
+    }
+
+    remoteEval(code) {
+        (this.botProcess || process).send({
+            type: 'remoteEval',
+            data: {
+                code
+            }
+        });
+    }
+
+    onRemoteEval(msg) {
+        eval(msg.data.code); // eslint-disable-line no-eval
     }
 
     passControl() {

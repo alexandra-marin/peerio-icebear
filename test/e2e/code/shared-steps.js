@@ -25,11 +25,11 @@ When('Cucumbot logs in', { timeout: 60000 }, function() {
 });
 
 Then('I am authenticated', function() {
-    expect(this.ice.socket.authenticated).to.be.true;
+    expect(ice.socket.authenticated).to.be.true;
 });
 
 Then('I am not authenticated', function() {
-    expect(this.ice.socket.authenticated).to.be.false;
+    expect(ice.socket.authenticated).to.be.false;
 });
 
 async function restart() {

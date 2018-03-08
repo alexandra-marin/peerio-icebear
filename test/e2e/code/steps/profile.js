@@ -21,26 +21,26 @@ async function createAvatarPayload(world) {
 
 
 When('I change my first name to {string}', function(string) {
-    this.ice.User.current.firstName = string;
-    return this.ice.User.current.saveProfile();
+    ice.User.current.firstName = string;
+    return ice.User.current.saveProfile();
 });
 
 When('I change my last name to {string}', function(string) {
-    this.ice.User.current.lastName = string;
-    return this.ice.User.current.saveProfile();
+    ice.User.current.lastName = string;
+    return ice.User.current.saveProfile();
 });
 
 Then('my first name should be {string}', function(string) {
-    this.ice.User.current.firstName.should.equal(string);
+    ice.User.current.firstName.should.equal(string);
 });
 
 Then('my last name should be {string}', function(string) {
-    this.ice.User.current.lastName.should.equal(string);
+    ice.User.current.lastName.should.equal(string);
 });
 
 When('I add a new email', async function() {
     this.lastAddedEmail = getRandomEmail();
-    await this.ice.User.current.addEmail(this.lastAddedEmail);
+    await ice.User.current.addEmail(this.lastAddedEmail);
 });
 
 // This IS very similar to confirming primary email address in account.js
@@ -51,14 +51,14 @@ When('I confirm my new email', { timeout: 120000 }, async function() {
     await getUrl(url);
     // giving confirmed status a chance to propagate
     return this.waitFor(() => {
-        const adr = this.ice.User.current.addresses.find(a => a.address === this.lastAddedEmail);
+        const adr = ice.User.current.addresses.find(a => a.address === this.lastAddedEmail);
         if (!adr) return false;
         return adr.confirmed;
     }, 5000);
 });
 
 Then('my new email is confirmed', function() {
-    const adr = this.ice.User.current.addresses.find(a => a.address === this.lastAddedEmail);
+    const adr = ice.User.current.addresses.find(a => a.address === this.lastAddedEmail);
     expect(adr.confirmed).to.be.true;
 });
 
@@ -68,49 +68,49 @@ Given('I delete confirmation email', { timeout: 120000 }, async function() {
 });
 
 When('I request confirmation email resend', function() {
-    return this.ice.User.current.resendEmailConfirmation(this.lastAddedEmail);
+    return ice.User.current.resendEmailConfirmation(this.lastAddedEmail);
 });
 
 When('I change my primary email', function() {
-    return this.ice.User.current.makeEmailPrimary(this.lastAddedEmail);
+    return ice.User.current.makeEmailPrimary(this.lastAddedEmail);
 });
 
 Then('my primary email has been changed', { timeout: 15000 }, function() {
     return this.waitFor(() => {
-        return this.ice.User.current.email === this.lastAddedEmail;
+        return ice.User.current.email === this.lastAddedEmail;
     }, 5000);
 });
 
 When('I upload an avatar', async function() {
-    this.lastProfileVersion = this.ice.contactStore.currentUser.profileVersion;
+    this.lastProfileVersion = ice.contactStore.currentUser.profileVersion;
     const blobs = await createAvatarPayload(this);
-    return this.ice.User.current.saveAvatar(blobs).should.be.fulfilled;
+    return ice.User.current.saveAvatar(blobs).should.be.fulfilled;
 });
 
 Then('the avatar should appear in my profile', async function() {
-    await this.waitFor(() => this.ice.contactStore.currentUser.hasAvatar, 10000);
-    this.ice.contactStore.currentUser.profileVersion.should.be.above(this.lastProfileVersion);
+    await this.waitFor(() => ice.contactStore.currentUser.hasAvatar, 10000);
+    ice.contactStore.currentUser.profileVersion.should.be.above(this.lastProfileVersion);
 
     const fileName = getTempFileName();
     this.filesToCleanup.push(fileName);
-    return downloadFile(fileName, this.ice.contactStore.currentUser.largeAvatarUrl)
+    return downloadFile(fileName, ice.contactStore.currentUser.largeAvatarUrl)
         .then(file => filesEqual(this.avatarFileName, file.path).should.eventually.be.true);
 });
 
 Given('I start uploading an avatar and do not wait to finish', async function() {
     const blob = await createAvatarPayload(this);
-    this.ice.User.current.saveAvatar(blob); // return early
+    ice.User.current.saveAvatar(blob); // return early
 });
 
 Then('saving a new avatar should throw an error', function() {
-    return this.ice.User.current.saveAvatar(null).should.be.rejected;
+    return ice.User.current.saveAvatar(null).should.be.rejected;
 });
 
 When('I delete my avatar', function() {
-    return this.ice.User.current.saveAvatar(null).should.be.fulfilled;
+    return ice.User.current.saveAvatar(null).should.be.fulfilled;
 });
 
 Then('my avatar should be empty', function() {
-    this.ice.contactStore.currentUser.hasAvatar.should.be.false;
+    ice.contactStore.currentUser.hasAvatar.should.be.false;
 });
 

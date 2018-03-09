@@ -579,7 +579,7 @@ class FileStore {
             });
         }, undefined, 5)
             .then(resp => {
-                if (!file.loadFromKeg(resp.kegs[0])) {
+                if (!resp.kegs[0] || !file.loadFromKeg(resp.kegs[0])) {
                     file.loaded = file.deleted = true;
                 }
             })

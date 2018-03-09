@@ -1,5 +1,3 @@
-// @ts-check
-
 const { when } = require('mobx');
 const fileStore = require('../files/file-store');
 const config = require('../../config');

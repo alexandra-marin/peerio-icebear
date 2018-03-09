@@ -150,6 +150,9 @@ class UpdateTracker {
     processDigestEvent(kegDbId, ev, isFromEvent) {
         /* eslint-disable prefer-const, no-unused-vars */
         let [kegType, maxUpdateId, sessionUpdateId, newKegsCount] = ev;
+        // GOTCHA: sessionUpdateId is actually not session specific
+        // we track session known update id from within session (because session knows what it knows, right?)
+        // global (user-specific) known update id only interests us at the session start
         // unpacking
         sessionUpdateId = sessionUpdateId === 0 ? maxUpdateId : sessionUpdateId;
         // kegDb yet unknown to our digest? consider it just added
@@ -170,7 +173,7 @@ class UpdateTracker {
             const typeDigest = dbDigest[kegType];
             // storing data in internal digest cache
             typeDigest.maxUpdateId = maxUpdateId;
-            if (!isFromEvent && (typeDigest.knownUpdateId < sessionUpdateId || !typeDigest.knownUpdateId)) {
+            if (!isFromEvent) {
                 typeDigest.knownUpdateId = sessionUpdateId;
             }
             typeDigest.newKegsCount = newKegsCount;
@@ -180,7 +183,11 @@ class UpdateTracker {
         } else {
             const d = this.globalDigest[kegDbId];
             d.maxUpdateId = maxUpdateId;
-            if (isFromEvent) this.emitKegTypeUpdatedEvent(kegDbId, 'global');
+            if (isFromEvent) {
+                this.emitKegTypeUpdatedEvent(kegDbId, 'global');
+            } else {
+                d.knownUpdateId = sessionUpdateId;
+            }
         }
     }
 

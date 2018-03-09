@@ -211,14 +211,14 @@ class SocketClient {
             WebSocket.prototype.send = function(msg) {
                 self.bytesSent += msg.length || msg.byteLength || 0;
                 if (config.debug.socketLogEnabled && typeof msg === 'string') {
-                    console.log('OUTGOING SOCKET MSG:', msg);
+                    console.log('⬆️ OUT MSG:', msg);
                 }
                 return s.call(this, msg);
             };
             setInterval(() => {
-                console.log(
-                    'SENT:', util.formatBytes(self.bytesSent),
-                    'RECEIVED:', util.formatBytes(self.bytesReceived)
+                console.log('socket stat',
+                    'sent:', util.formatBytes(self.bytesSent),
+                    'received:', util.formatBytes(self.bytesReceived)
                 );
             }, config.debug.trafficReportInterval);
         }
@@ -294,7 +294,7 @@ class SocketClient {
             this.socket.io.engine.addEventListener('message', (msg) => {
                 this.bytesReceived += msg.length || msg.byteLength || 0;
                 if (config.debug.socketLogEnabled && typeof msg === 'string') {
-                    console.log('INCOMING SOCKET MSG:', msg);
+                    console.log('⬇️ IN MSG:', msg);
                 }
             });
         }

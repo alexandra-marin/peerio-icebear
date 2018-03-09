@@ -142,8 +142,8 @@ class ChatReceiptHandler {
                 }
             }
             digest = tracker.getDigest(this.chat.id, 'read_receipt');
-            if (digest.knownUpdateId < digest.maxUpdateId) {
-                tracker.seenThis(this.chat.id, 'read_receipt', digest.maxUpdateId);
+            if (digest.knownUpdateId < digest.maxUpdateId || !digest.maxUpdateId) {
+                tracker.seenThis(this.chat.id, 'read_receipt', this.downloadedCollectionVersion);
             }
             this.applyReceipts();
         });

@@ -34,6 +34,7 @@ class Message extends Keg {
         // format 1 adds richText property to payload.
         // this property will be be overwritten when keg is dehydrated from older format data,
         this.format = 1;
+        this.latestFormat = this.format;
     }
 
     static unfurlQueue = new TaskQueue(5);

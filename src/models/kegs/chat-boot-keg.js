@@ -81,6 +81,8 @@ class ChatBootKeg extends SyncedKeg {
         this.ignoreAntiTamperProtection = true;
         this.user = user;
         this.version = 1; // pre-created named keg
+        this.format = 1;
+        this.latestFormat = this.format;
     }
 
     /**
@@ -280,7 +282,6 @@ class ChatBootKeg extends SyncedKeg {
     }
 
     serializeKegPayload() {
-        this.format = 1;
         const ephemeralKeyPair = keys.generateEncryptionKeyPair();
         const ret = {};
         ret.publicKey = cryptoUtil.bytesToB64(ephemeralKeyPair.publicKey);

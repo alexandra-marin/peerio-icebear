@@ -23,6 +23,7 @@ class File extends Keg {
     constructor(db) {
         super(null, 'file', db);
         this.format = 1;
+        this.latestFormat = 1;
         this.descriptorFormat = 1;
     }
 
@@ -294,11 +295,13 @@ class File extends Keg {
     }
 
     @action deserializeKegPayload(data) {
-        this.descriptorKey = data.descriptorKey;
-        // todo: will need for migration
-        // this.name = data.name;
-        // this.key = data.key;
-        // this.nonce = data.nonce;
+        if (!this.format) {
+            this.name = data.name;
+            this.blobKey = data.key;
+            this.blobNonce = data.nonce;
+        } else {
+            this.descriptorKey = data.descriptorKey;
+        }
     }
 
     serializeProps() {
@@ -311,6 +314,15 @@ class File extends Keg {
     @action deserializeProps(props) {
         this.fileId = props.fileId;
         this.folderId = props.folderId;
+        if (!this.format) {
+            this.readyForDownload = props.fileProcessingState === 'ready' || !!props.sharedBy;
+            this.size = +props.size;
+            this.uploadedAt = new Date(+props.uploadedAt);
+            this.fileOwner = props.owner || this.owner;
+            this.sharedBy = props.sharedBy;
+            this.chunkSize = +props.chunkSize;
+            this.shared = props.shared;
+        }
     }
 
     async serializeDescriptor() {

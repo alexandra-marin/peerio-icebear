@@ -153,9 +153,14 @@ class Message extends Keg {
         this.version = 0;
         this.sender = contactStore.currentUser;
         this.timestamp = new Date();
-
-        // @ts-ignore we can't use jsdoc annotations to make bluebird promises assignable to global promises!
-        return (this.systemData ? retryUntilSuccess(() => this.saveToServer()) : this.saveToServer())
+        let promise;
+        // we want to auto-retry system messages and messages containing file attachments
+        if (this.systemData || (this.files && this.files.length)) {
+            promise = retryUntilSuccess(() => this.saveToServer());
+        } else {
+            promise = this.saveToServer();
+        }
+        return promise
             .catch(err => {
                 this.sendError = true;
                 console.error('Error sending message', err);

@@ -531,10 +531,14 @@ class FileStore {
     getAllById(fileId) {
         const files = [];
         const personal = this.getById(fileId);
-        if (personal) files.push(personal);
+        if (personal && personal.loaded && !personal.deleted && personal.version > 1) {
+            files.push(personal);
+        }
         this.chatFileMap.forEach((fileMap) => {
             fileMap.forEach((file, id) => {
-                if (id === fileId) files.push(file);
+                if (id === fileId && file.loaded && !file.deleted && file.version > 1) {
+                    files.push(file);
+                }
             });
         });
         return files;

@@ -59,7 +59,10 @@ class UpdateTracker {
     constructor() {
         socket.onceStarted(() => {
             socket.subscribe(socket.APP_EVENTS.digestUpdate, data => {
-                this.processDigestEvent(data.kegDbId || data.path, [data.type, data.maxUpdateId], true);
+                this.processDigestEvent(
+                    data.kegDbId || data.path,
+                    [data.type, data.maxUpdateId, data.knownUpdateId, data.newKegsCount],
+                    true);
             });
             socket.subscribe(socket.APP_EVENTS.channelDeleted, this.processChannelDeletedEvent.bind(this));
             socket.onAuthenticated(this.loadDigest);

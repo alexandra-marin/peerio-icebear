@@ -1,5 +1,5 @@
 const Keg = require('./../kegs/keg');
-const { observable, computed, action, isObservableArray } = require('mobx');
+const { observable, computed, action } = require('mobx');
 const { cryptoUtil, secret, sign: { signDetached } } = require('../../crypto');
 const fileHelper = require('../../helpers/file');
 const util = require('../../util');
@@ -8,8 +8,6 @@ const socket = require('../../network/socket');
 const uploadModule = require('./file.upload');
 const downloadModule = require('./file.download');
 const { getUser } = require('../../helpers/di-current-user');
-const { getChatStore } = require('../../helpers/di-chat-store');
-const Contact = require('../contacts/contact');
 const { retryUntilSuccess } = require('../../helpers/retry');
 const { ServerError } = require('../../errors');
 const clientApp = require('../client-app');
@@ -378,29 +376,17 @@ class File extends Keg {
             });
     }
 
-
     /**
-     * Share file with contacts
-     * @param {Contact|Array<Contact>|ObservableArray<Contact>} contactOrContacts
+     * Shares file with a chat (creates a copy of the keg)
+     * @param {Chat} any chat instance
      * @returns {Promise}
      * @public
      */
-    async share(contactOrContacts) {
-        const contacts =
-            (Array.isArray(contactOrContacts) || isObservableArray(contactOrContacts))
-                ? contactOrContacts
-                : [contactOrContacts];
-
-        await Contact.ensureAllLoaded(contacts);
-        return Promise.map(contacts, async c => {
-            const chat = getChatStore().startChat([c]);
-            await chat.ensureMetaLoaded();
-
-            const file = new File(chat.db);
-            file.descriptorKey = this.descriptorKey;
-            file.fileId = this.fileId;
-            return retryUntilSuccess(() => file.saveToServer());
-        });
+    share(chat) {
+        const file = new File(chat.db);
+        file.descriptorKey = this.descriptorKey;
+        file.fileId = this.fileId;
+        return retryUntilSuccess(() => file.saveToServer(), 10);
     }
 
     /**

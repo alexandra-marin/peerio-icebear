@@ -1,7 +1,6 @@
 const { when } = require('mobx');
 const fileStore = require('../files/file-store');
 const config = require('../../config');
-const TaskQueue = require('../../helpers/task-queue');
 const { retryUntilSuccess } = require('../../helpers/retry');
 const socket = require('../../network/socket');
 
@@ -23,13 +22,6 @@ class ChatFileHandler {
          */
         this.chat = chat;
     }
-
-    /**
-     * TaskQueue of files to share for paced process.
-     * @member {TaskQueue} shareQueue
-     * @protected
-     */
-    shareQueue = new TaskQueue(1, 2000);
 
     /**
      * Initiates file upload and shares it to the chat afterwards.
@@ -75,36 +67,13 @@ class ChatFileHandler {
      * @param {string} [message = ''] message to attach to file
      * @returns {Promise}
      */
-    share(files, message = '') {
-        // @ts-ignore no bluebird-promise assignability with jsdoc
-        return Promise.map(files, (f) => {
-            return this.shareQueue.addTask(() => {
-                const ids = this.shareFileKegs([f]);
-                return this.chat.sendMessage(message, ids);
-            });
-        });
+    async share(files, message = '') {
+        if (!files || !files.length) return Promise.reject();
+        await Promise.map(files, f => f.share(this.chat));
+        const ids = files.map(f => f.fileId);
+        return this.chat.sendMessage(message, ids);
     }
 
-
-    /**
-     * Shares existing Peerio files with a chat.
-     * This function performs only logical sharing, provides permissions/access for recipients.
-     * It doesn't inform recipients in the chat about the fact of sharing.
-     * @param {Array<File>} files
-     * @return {Array<string>} - fileId list
-     * @private
-     */
-    shareFileKegs(files) {
-        if (!files || !files.length) return null;
-        const ids = [];
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i];
-            // todo: handle failure
-            file.share(this.chat.otherParticipants);
-            ids.push(file.fileId);
-        }
-        return ids;
-    }
 
     getRecentFiles() {
         return retryUntilSuccess(() => {

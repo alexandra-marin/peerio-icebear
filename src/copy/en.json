@@ -213,6 +213,7 @@
   "title_folderSize": "Folder size",
   "title_created": "Created",
   "title_empty": "Empty",
+  "title_locked": "Folder is locked",
   "title_sharingFolderPercent": "<i>Sharing folder ({progressPercent}%)</>",
   "title_deletingSharedFolder": "Deleting shared folder",
   "title_deletingFolder": "Deleting folder",

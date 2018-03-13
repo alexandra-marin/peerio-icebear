@@ -1,7 +1,7 @@
 const { observable, computed, action, when } = require('mobx');
 const { setVolumeStore } = require('../../helpers/di-volume-store');
 const { getChatStore } = require('../../helpers/di-chat-store');
-const cryptoUtil = require('../../crypto/util');
+// const cryptoUtil = require('../../crypto/util');
 const Volume = require('./volume');
 const folderResolveMap = require('../files/folder-resolve-map');
 
@@ -71,7 +71,7 @@ class VolumeStore {
         this.attachFolder(mockFolder('My Shared Folder 1'));
         this.attachFolder(mockFolder('My Shared Folder 2'));
         const nonOwnedOne = mockFolder('Foreign Shared Folder 3');
-        nonOwnedOne.isOwner = false;
+        nonOwnedOne.owner = 'anri';
         this.attachFolder(nonOwnedOne);
     }
 

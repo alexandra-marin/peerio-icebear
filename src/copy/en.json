@@ -249,6 +249,8 @@
   "title_downloading": "Downloading",
   "title_uploading": "Uploading {name}",
   "title_fileName": "File name",
+  "title_noPreview": "No preview available",
+  "title_downloadingFile": "Downloading file",
   "title_queuedFiles": "Uploading {name} | {remaining} files in queue",
   "button_shareFilesWithChat": "Share files with this chat",
   "button_emojis": "Emojis",

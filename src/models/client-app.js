@@ -47,6 +47,14 @@ class ClientApp {
     @observable clientVersionDeprecated = false;
 
     /**
+     * Icebear sets this flag.
+     * @member {boolean} clientSessionExpired
+     * @memberof ClientApp
+     * @public
+     */
+    @observable clientSessionExpired = false;
+
+    /**
      * UI should listen to this and request entering of 2fa code from user and then pass ot back to icebear.
      * @member {TwoFARequest} active2FARequest
      * @memberof ClientApp

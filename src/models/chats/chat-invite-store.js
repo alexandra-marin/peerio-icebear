@@ -19,6 +19,13 @@ class ChatHead extends Keg {
     }
 }
 
+class ReceivedInvite {
+    @observable declined = false;
+    constructor(data) {
+        Object.assign(this, data);
+    }
+}
+
 /**
  * Chat invites store. Contains lists of incoming and outgoing invites and operations on them.
  * @namespace
@@ -89,11 +96,7 @@ class ChatInviteStore {
 
         if (!invite) return;
 
-        this.activeInvite = {
-            kegDbId,
-            channelName: invite.channelName,
-            username: invite.username
-        };
+        this.activeInvite = invite;
     }
 
     /**
@@ -140,7 +143,12 @@ class ChatInviteStore {
             .then(action(res => {
                 this.received = res.map(i => {
                     const channelName = this.decryptChannelName(i);
-                    return { username: i.admin, kegDbId: i.channel, timestamp: i.timestamp, channelName };
+                    return new ReceivedInvite({
+                        username: i.admin,
+                        kegDbId: i.channel,
+                        timestamp: i.timestamp,
+                        channelName
+                    });
                 });
             }));
     };
@@ -267,12 +275,19 @@ class ChatInviteStore {
      * @public
      */
     rejectInvite(kegDbId) {
-        return socket.send('/auth/kegs/channel/invite/reject', { kegDbId })
-            .catch(err => {
-                console.error('Failed to accept invite', kegDbId, err);
-                warnings.add('error_rejectChannelInvite');
-                return Promise.reject(err);
-            });
+        const invite = this.received.find(i => i.kegDbId === kegDbId);
+        if (!invite) {
+            return Promise.reject(new Error(`Can not reject invite for ${kegDbId} because it is not found`));
+        }
+        invite.declined = true;
+        return Promise.delay(500).then(() =>
+            socket.send('/auth/kegs/channel/invite/reject', { kegDbId })
+                .catch(err => {
+                    console.error('Failed to reject invite', kegDbId, err);
+                    warnings.add('error_rejectChannelInvite');
+                    return Promise.reject(err);
+                })
+        );
     }
 
     /**

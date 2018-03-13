@@ -134,7 +134,9 @@ function upload(filePath, fileName, resume) {
  * @public
  */
 function cancelUpload() {
-    if (this.readyForDownload) return Promise.reject();
+    if (this.readyForDownload) {
+        return Promise.reject(new Error('Can not cancel upload because file is already uploaded'));
+    }
     console.log('file.uploads.js: upload cancelled');
     this._saveUploadEndFact();
     this._resetUploadState();

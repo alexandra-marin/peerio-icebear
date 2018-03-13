@@ -109,7 +109,7 @@ class ChatReceiptHandler {
 
     loadReceipts = () => {
         let digest = tracker.getDigest(this.chat.id, 'read_receipt');
-        if (digest.maxUpdateId <= this.downloadedCollectionVersion) return null;
+        if (digest.maxUpdateId && digest.maxUpdateId <= this.downloadedCollectionVersion) return null;
         const filter = this.downloadedCollectionVersion ?
             { minCollectionVersion: this.downloadedCollectionVersion } : {};
         return socket.send('/auth/kegs/db/list-ext', {

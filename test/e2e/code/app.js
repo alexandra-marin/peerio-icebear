@@ -77,6 +77,7 @@ class App {
             error: console.error,
             debug: console.debug
         };
+        console._log = console.log;
         const write = (type, args) => {
             // DisconnectedError naturally happens all the time during tests.
             // It generates too much noise and hardly has any value, we can figure
@@ -158,7 +159,11 @@ class App {
         // closing connections
         this.world.ice.socket.close();
         return new Promise((resolve) => {
-            when(() => !this.world.ice.socket.connected, () => {
+            when(() => !this.world.ice.socket.connected, async () => {
+                // delete TinyDbs
+                if (this.world.ice.TinyDb.user) await this.world.ice.TinyDb.user.clear();
+                await this.world.ice.TinyDb.system.clear();
+
                 this._clearModuleCache();
                 // hell, yeah
                 if (global.gc) global.gc();

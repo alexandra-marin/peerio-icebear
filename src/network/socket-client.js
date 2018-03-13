@@ -40,7 +40,7 @@ const SOCKET_EVENTS = {
 
 // application events sent by app server
 const APP_EVENTS = {
-    kegsUpdate: 'kegsUpdate',
+    kegsUpdateTwo: 'kegsUpdateTwo',
     serverWarning: 'serverWarning',
     // clearWarning: 'clearWarning',
     channelInvitesUpdate: 'channelInvitesUpdate',
@@ -276,6 +276,7 @@ class SocketClient {
             // HACK: backoff.duration() will increase attempt count, so we balance that
             this.socket.io.backoff.attempts--;
             this.reconnectTimer.countDown(this.socket.io.backoff.duration() / 1000);
+            socket.open();
         };
 
         socket.on('connect_error', this.handleReconnectError);

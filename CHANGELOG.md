@@ -2,6 +2,114 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.14.2"></a>
+## [4.14.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.14.1...v4.14.2) (2018-03-12)
+
+
+
+<a name="4.14.1"></a>
+## [4.14.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.14.0...v4.14.1) (2018-03-04)
+
+
+
+<a name="4.14.0"></a>
+# [4.14.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.13.4...v4.14.0) (2018-02-26)
+
+
+### Features
+
+* e2e tests onboarding ([#148](https://github.com/PeerioTechnologies/peerio-icebear/issues/148)) ([357a409](https://github.com/PeerioTechnologies/peerio-icebear/commit/357a409))
+
+
+
+<a name="4.13.4"></a>
+## [4.13.4](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.13.3...v4.13.4) (2018-02-23)
+
+
+### Reverts
+
+* remove string from a different task ([276bcbc](https://github.com/PeerioTechnologies/peerio-icebear/commit/276bcbc))
+
+
+
+<a name="4.13.3"></a>
+## [4.13.3](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.13.2...v4.13.3) (2018-02-23)
+
+
+
+<a name="4.13.2"></a>
+## [4.13.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.13.1...v4.13.2) (2018-02-22)
+
+
+
+<a name="4.13.1"></a>
+## [4.13.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.13.0...v4.13.1) (2018-02-22)
+
+
+### Bug Fixes
+
+* receipts not loading initially ([a233475](https://github.com/PeerioTechnologies/peerio-icebear/commit/a233475))
+
+
+
+<a name="4.13.0"></a>
+# [4.13.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.12.1...v4.13.0) (2018-02-21)
+
+
+### Features
+
+* session management ([a460de2](https://github.com/PeerioTechnologies/peerio-icebear/commit/a460de2))
+* support for client session expiration ([746761f](https://github.com/PeerioTechnologies/peerio-icebear/commit/746761f))
+* support for client session expiration ([b0a0278](https://github.com/PeerioTechnologies/peerio-icebear/commit/b0a0278))
+* switch to new api and data formats ([7885bfc](https://github.com/PeerioTechnologies/peerio-icebear/commit/7885bfc))
+
+
+
+<a name="4.12.1"></a>
+## [4.12.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.12.0...v4.12.1) (2018-02-21)
+
+
+### Bug Fixes
+
+* activeInvite now uses an existing object ([3ae4f1c](https://github.com/PeerioTechnologies/peerio-icebear/commit/3ae4f1c))
+
+
+
+<a name="4.12.0"></a>
+# [4.12.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.11.1...v4.12.0) (2018-02-21)
+
+
+### Features
+
+* received invites now have observable 'declined' property ([07a66eb](https://github.com/PeerioTechnologies/peerio-icebear/commit/07a66eb))
+
+
+
+<a name="4.11.1"></a>
+## [4.11.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.11.0...v4.11.1) (2018-02-19)
+
+
+### Bug Fixes
+
+* contact caching logic ([bbecf60](https://github.com/PeerioTechnologies/peerio-icebear/commit/bbecf60))
+
+
+
+<a name="4.11.0"></a>
+# [4.11.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.10.2...v4.11.0) (2018-02-16)
+
+
+### Features
+
+* unit tests for retry.js ([#144](https://github.com/PeerioTechnologies/peerio-icebear/issues/144)) ([7b6e221](https://github.com/PeerioTechnologies/peerio-icebear/commit/7b6e221))
+
+
+
+<a name="4.10.2"></a>
+## [4.10.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.10.1...v4.10.2) (2018-02-15)
+
+
+
 <a name="4.10.1"></a>
 ## [4.10.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.10.0...v4.10.1) (2018-02-11)
 

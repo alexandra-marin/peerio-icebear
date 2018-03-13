@@ -1,6 +1,6 @@
 
 const BootKeg = require('./boot-keg');
-
+const tracker = require('../../models/update-tracker');
 /**
  * Keg database.
  * This class is for user's own database ('SELF')
@@ -75,6 +75,7 @@ class KegDb {
         this.boot = boot;
         return boot.load().then(() => {
             this.key = boot.kegKey;
+            tracker.seenThis('SELF', 'boot', boot.collectionVersion);
         });
     }
 

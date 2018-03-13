@@ -232,6 +232,12 @@ class User {
      * @protected
      */
     kegKey;
+    /**
+     * Automatically managed by authentication code.
+     * Session id is generated and expired by server.
+     * @type {string}
+     * */
+    sessionId;
     // -- flags
     _firstLoginInSession = true;
 
@@ -635,7 +641,7 @@ class User {
                             return this.createAccountAndLogin();
                         });
                 }
-                if (!socket.authenticated && !clientApp.clientVersionDeprecated) {
+                if (!socket.authenticated && !clientApp.clientVersionDeprecated && !clientApp.clientSessionExpired) {
                     socket.reset();
                 }
                 return Promise.reject(e);
@@ -758,8 +764,7 @@ class User {
     clearFromTinyDb() {
         return Promise.all([
             TinyDb.user.clear(),
-            User.removeLastAuthenticated(),
-            TinyDb.system.removeValue(`${User.current.username}:deviceToken`)
+            User.removeLastAuthenticated()
         ]);
     }
 }

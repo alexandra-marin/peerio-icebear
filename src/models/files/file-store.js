@@ -1,4 +1,4 @@
-const { observable, action, when, reaction, computed } = require('mobx');
+const { observable, action, when, computed } = require('mobx');
 const socket = require('../../network/socket');
 const User = require('../user/user');
 const File = require('./file');
@@ -9,7 +9,6 @@ const config = require('../../config');
 const util = require('../../util');
 const _ = require('lodash');
 const { retryUntilSuccess } = require('../../helpers/retry');
-const clientApp = require('../client-app');
 const TaskQueue = require('../../helpers/task-queue');
 const { setFileStore } = require('../../helpers/di-file-store');
 const createMap = require('../../helpers/dynamic-array-map');
@@ -391,14 +390,8 @@ class FileStore {
                 }
             }
         });
-        reaction(
-            () => this.unreadFiles === 0 || !clientApp.isInFilesView || !clientApp.isFocused,
-            (dontReport) => {
-                if (dontReport) return;
-                tracker.seenThis('SELF', 'file', this.knownUpdateId);
-            }, { fireImmediately: true, delay: 700 }
-        );
         setTimeout(this.updateFiles);
+        tracker.seenThis('SELF', 'file', this.knownUpdateId);
     }
 
     /**
@@ -460,6 +453,7 @@ class FileStore {
                     setTimeout(this.onFileDigestUpdate);
                 }
                 this.updatedAfterReconnect = true;
+                tracker.seenThis('SELF', 'file', this.knownUpdateId);
             }));
     };
 

@@ -33,7 +33,7 @@ class ChatFileHandler {
         const msgDigest = tracker.getDigest(this.chat.id, 'file');
         this.maxUpdateId = msgDigest.maxUpdateId;
         this.knownUpdateId = msgDigest.knownUpdateId;
-        if (this.isChannel) {
+        if (this.chat.isChannel) {
             this.knownUpdateId = this.maxUpdateId;
             tracker.seenThis(this.chat.id, 'file', this.maxUpdateId);
             return;

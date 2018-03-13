@@ -221,7 +221,15 @@ class FileStore {
      * @public
      */
     getSelectedFiles() {
-        return this.files.filter(FileStore.isFileSelected);
+        const own = this.files.filter(FileStore.isFileSelected);
+        if (own.length) return own;
+        // TODO: this is temporary, file selection needs to be better, especially with files-in-chats
+        const ret = [];
+        this.chatFileMap.values().forEach(dbMap => {
+            const selected = dbMap.values().filter(FileStore.isFileSelected);
+            if (selected.length) ret.push(...selected);
+        });
+        return ret;
     }
 
     /**
@@ -244,6 +252,9 @@ class FileStore {
         for (let i = 0; i < this.files.length; i++) {
             this.files[i].selected = false;
         }
+        this.chatFileMap.values().forEach(dbMap => {
+            dbMap.values().forEach(f => { f.selected = false; });
+        });
     }
 
     /**

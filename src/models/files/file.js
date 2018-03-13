@@ -444,7 +444,7 @@ class File extends Keg {
                     }
                     return Promise.reject(err);
                 });
-        }, 5);
+        }, undefined, 5);
     }
 
     tryToCacheTemporarily(force) {
@@ -478,7 +478,7 @@ class File extends Keg {
                     }
                     return Promise.reject(err);
                 });
-        }, 10);
+        }, undefined, 10);
     }
 }
 

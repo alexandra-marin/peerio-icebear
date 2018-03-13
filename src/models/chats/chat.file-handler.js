@@ -3,7 +3,8 @@ const fileStore = require('../files/file-store');
 const config = require('../../config');
 const { retryUntilSuccess } = require('../../helpers/retry');
 const socket = require('../../network/socket');
-
+const tracker = require('../update-tracker');
+const { getUser } = require('../../helpers/di-current-user');
 // for typechecking:
 /* eslint-disable no-unused-vars */
 const Chat = require('./chat');
@@ -16,11 +17,67 @@ const File = require('../files/file');
  * @public
  */
 class ChatFileHandler {
+    knownUpdateId = '';
+    maxUpdateId = '';
     constructor(chat) {
         /**
          * @type {Chat} chat
          */
         this.chat = chat;
+        tracker.subscribeToKegUpdates(chat.id, 'file', () => setTimeout(this.onFileDigestUpdate));
+        when(() => tracker.loadedOnce, this.onFileDigestUpdate);
+        socket.onAuthenticated(this.onFileDigestUpdate);
+    }
+
+    onFileDigestUpdate = () => {
+        const msgDigest = tracker.getDigest(this.chat.id, 'file');
+        this.maxUpdateId = msgDigest.maxUpdateId;
+        this.knownUpdateId = msgDigest.knownUpdateId;
+        if (this.isChannel) {
+            this.knownUpdateId = this.maxUpdateId;
+            tracker.seenThis(this.chat.id, 'file', this.maxUpdateId);
+            return;
+        }
+        this.copyFileKegs();
+    }
+
+    copyFileKegs() {
+        if (!this.maxUpdateId || this.maxUpdateId === this.knownUpdateId || this.copyingFiles) return;
+        this.copyingFiles = true;
+        socket.send('/auth/kegs/db/query', {
+            kegDbId: this.chat.db.id,
+            type: 'file',
+            filter: {
+                collectionVersion: { $gt: this.knownUpdateId }
+            }
+        })
+            .then(resp => {
+                if (!resp.kegs || !resp.kegs.length) return;
+
+                resp.kegs.forEach(keg => {
+                    if (this.knownUpdateId < keg.collectionVersion) this.knownUpdateId = keg.collectionVersion;
+                    const file = new File(this.chat.db);
+                    try {
+                        if (file.loadFromKeg(keg) && !file.deleted) {
+                            // Not waiting for this to resolve. Internally it will do retries,
+                            // but on larger scale it's too complicated to handle recovery
+                            // from non-connection related errors
+                            file.copyTo(getUser().kegDb);
+                        }
+                    } catch (err) {
+                        console.error(err);
+                    }
+                });
+            })
+            .then(() => {
+                this.copyingFiles = false;
+                tracker.seenThis(this.chat.db.id, 'file', this.knownUpdateId);
+                setTimeout(this.onFileDigestUpdate);
+            })
+            .catch(err => {
+                console.error('Error copying fileKegs to SELF', err);
+                this.copyingFiles = false;
+            });
     }
 
     /**

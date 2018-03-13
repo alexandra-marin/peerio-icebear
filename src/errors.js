@@ -124,6 +124,7 @@ const serverErrorCodes = {
     accountMigrationRequired: 434,
     captchaPending: 435,
     incorrectTimestamp: 442,
+    fileKegAlreadyExists: 480,
     accountClosed: 488,
     responseValidationError: 501
 };

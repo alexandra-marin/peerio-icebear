@@ -584,12 +584,14 @@ class FileStore {
         }, undefined, 5)
             .then(resp => {
                 if (!resp.kegs[0] || !file.loadFromKeg(resp.kegs[0])) {
-                    file.loaded = file.deleted = true;
+                    file.deleted = true;
+                    file.loaded = true;
                 }
             })
             .catch(err => {
                 console.error('Error loading file from chat', err);
                 file.deleted = true;
+                file.loaded = true;
             });
         return file;
     }

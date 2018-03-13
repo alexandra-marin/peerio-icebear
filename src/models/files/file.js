@@ -12,7 +12,6 @@ const { retryUntilSuccess } = require('../../helpers/retry');
 const { ServerError } = require('../../errors');
 const clientApp = require('../client-app');
 const { asPromise } = require('../../helpers/prombservable');
-
 /**
  * File keg and model.
  * @param {KegDb} db
@@ -395,10 +394,7 @@ class File extends Keg {
      * @public
      */
     share(chat) {
-        const file = new File(chat.db);
-        file.descriptorKey = this.descriptorKey;
-        file.fileId = this.fileId;
-        return retryUntilSuccess(() => file.saveToServer(), 10);
+        return this.copyTo(chat.db);
     }
 
     /**
@@ -464,6 +460,25 @@ class File extends Keg {
 
     ensureLoaded() {
         return asPromise(this, 'loaded', true);
+    }
+
+    /**
+     * Copies this file keg to another db
+     * @param {KegDb} db
+     */
+    copyTo(db) {
+        const file = new File(db);
+        file.descriptorKey = this.descriptorKey;
+        file.fileId = this.fileId;
+        return retryUntilSuccess(() => {
+            return file.saveToServer()
+                .catch(err => {
+                    if (err && err.code === ServerError.codes.fileKegAlreadyExists) {
+                        return Promise.resolve();
+                    }
+                    return Promise.reject(err);
+                });
+        }, 10);
     }
 }
 

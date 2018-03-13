@@ -8,7 +8,6 @@ const config = require('../../config');
 const { retryUntilSuccess } = require('../../helpers/retry');
 const { reaction, action } = require('mobx');
 const clientApp = require('../client-app');
-const _ = require('lodash');
 const { ServerError } = require('../../errors');
 const { getChatStore } = require('../../helpers/di-chat-store');
 
@@ -20,7 +19,8 @@ const { getChatStore } = require('../../helpers/di-chat-store');
 class ChatMessageHandler {
     constructor(chat) {
         this.chat = chat;
-        tracker.subscribeToKegUpdates(chat.id, 'message', this.onMessageDigestUpdate);
+        // asynchronously. to avoid changing unreadCount in reaction to unreadCount change
+        tracker.subscribeToKegUpdates(chat.id, 'message', () => setTimeout(this.onMessageDigestUpdate));
         this.onMessageDigestUpdate();
         this._reactionsToDispose.push(reaction(() => this.chat.active && clientApp.isInChatsView, (active) => {
             if (active) {
@@ -78,13 +78,12 @@ class ChatMessageHandler {
         }, 15000);
     }
 
-    // one of the reasons to throttle is to avoid changing unreadCount observable inside a reaction to it's change
-    onMessageDigestUpdate = _.throttle(() => {
+    onMessageDigestUpdate = () => {
         const msgDigest = tracker.getDigest(this.chat.id, 'message');
         this.chat.unreadCount = msgDigest.newKegsCount;
         this.maxUpdateId = msgDigest.maxUpdateId;
         this.loadUpdates();
-    }, 250);
+    }
 
     loadUpdates() {
         if (!(this.chat.mostRecentMessageLoaded || this.chat.initialPageLoaded)) return;

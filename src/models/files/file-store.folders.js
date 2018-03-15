@@ -3,7 +3,6 @@ const { getUser } = require('../../helpers/di-current-user');
 const socket = require('../../network/socket');
 const FileFolder = require('./file-folder');
 const RootFolder = require('./root-folder');
-const volumeStore = require('../volumes/volume-store');
 const FileFoldersKeg = require('./file-folders-keg');
 const cryptoUtil = require('../../crypto/util');
 const warnings = require('../warnings');

@@ -30,11 +30,12 @@ function mockProgress(folder) {
     }, 500);
     return new Promise(resolve =>
         when(() => folder.progress === 100, () => {
-            setTimeout(() => {
+            setTimeout(action(() => {
                 resolve();
                 folder.progress = null;
                 folder.progressMax = null;
-            }, 1000);
+                folder.isBlocked = false;
+            }), 1000);
         }));
 }
 /**

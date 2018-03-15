@@ -1,14 +1,14 @@
 const { observable, computed, action, when } = require('mobx');
 const { setVolumeStore } = require('../../helpers/di-volume-store');
 const { getChatStore } = require('../../helpers/di-chat-store');
-const cryptoUtil = require('../../crypto/util');
+// const cryptoUtil = require('../../crypto/util');
 const Volume = require('./volume');
 const folderResolveMap = require('../files/folder-resolve-map');
 
 function mockFolder(name) {
     const result = new Volume();
     result.name = name;
-    result.folderId = cryptoUtil.getRandomShortIdHex();
+    result.folderId = `folderId${name}`;
     return result;
 }
 
@@ -30,11 +30,12 @@ function mockProgress(folder) {
     }, 500);
     return new Promise(resolve =>
         when(() => folder.progress === 100, () => {
-            setTimeout(() => {
+            setTimeout(action(() => {
                 resolve();
                 folder.progress = null;
                 folder.progressMax = null;
-            }, 1000);
+                folder.isBlocked = false;
+            }), 1000);
         }));
 }
 /**
@@ -71,11 +72,13 @@ class VolumeStore {
         this.attachFolder(mockFolder('My Shared Folder 1'));
         this.attachFolder(mockFolder('My Shared Folder 2'));
         const nonOwnedOne = mockFolder('Foreign Shared Folder 3');
+        nonOwnedOne.owner = 'anri';
         nonOwnedOne.isOwner = false;
         this.attachFolder(nonOwnedOne);
     }
 
     attachFolder(folder) {
+        if (folderResolveMap.get(folder.folderId)) return;
         this.volumes.push(folder);
         folder.parent = this.rootFileFolder;
         folderResolveMap.set(folder.folderId, folder);
@@ -98,7 +101,7 @@ class VolumeStore {
         let promise = Promise.resolve();
         participants.forEach(contact => {
             promise = promise.then(async () => {
-                await getChatStore().startChatAndShareFiles([contact]);
+                await getChatStore().startChatAndShareFiles([contact], [folder]);
             });
         });
         await promise;

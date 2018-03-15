@@ -24,7 +24,7 @@ class AbstractFolder {
     @observable progressText = null;
 
     get progressPercentage() {
-        return Math.ceil(this.progress / (this.progressMax | 1) * 100);
+        return Math.min(Math.ceil(this.progress / (this.progressMax | 1) * 100), 100);
     }
 
     get virtualFolders() {

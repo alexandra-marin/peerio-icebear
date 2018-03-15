@@ -72,6 +72,7 @@ class VolumeStore {
         this.attachFolder(mockFolder('My Shared Folder 2'));
         const nonOwnedOne = mockFolder('Foreign Shared Folder 3');
         nonOwnedOne.owner = 'anri';
+        nonOwnedOne.isOwner = false;
         this.attachFolder(nonOwnedOne);
     }
 

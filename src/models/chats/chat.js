@@ -817,6 +817,9 @@ class Chat {
     shareFiles(files) {
         return this._fileHandler.share(files);
     }
+    unshareFile(file) {
+        return this._fileHandler.unshare(file);
+    }
 
     /**
      * @returns {Promise}

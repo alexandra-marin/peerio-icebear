@@ -24,28 +24,34 @@ function isNotAMember(world, chat, username) {
         return !chat.allParticipants.find(predicate);
     });
 }
-
-When('I create a room', function() {
+function createRoom() {
     const room = ice.chatStore.startChat([], true);
     return this.waitFor(() => room.metaLoaded && ice.chatStore.activeChat);
-});
+}
 
-When('I invite Cucumbot to the room', function() {
+When('I create a room', createRoom);
+
+function inviteCucumbot() {
     return ice.chatStore.activeChat.addParticipants(
         [this.cucumbotClient.username]
     );
-});
+}
+
+When('I invite Cucumbot to the room', inviteCucumbot);
 
 When('Cucumbot leaves the room', async function() {
     await this.waitFor(() => ice.chatStore.activeChat);
     return ice.chatStore.activeChat.leave();
 });
 
-When('Cucumbot accepts the invite', function() {
+async function cucumbotAccept() {
+    await this.waitFor(() => ice.chatInviteStore.received.length);
     return ice.chatInviteStore.acceptInvite(
         ice.chatInviteStore.received[0].kegDbId
     );
-});
+}
+
+When('Cucumbot accepts the invite', cucumbotAccept);
 
 When('Cucumbot rejects the invite', function() {
     return ice.chatInviteStore.rejectInvite(
@@ -98,11 +104,7 @@ Then('The invite sent is removed', function() {
 });
 
 Then('Cucumbot\'s invite is removed', function() {
-    // TODO:
-    // TODO: REMOVE THE HACK WHEN SERVER BUG IS FIXED
-    // TODO:
-    return true;
-    // return this.waitFor(() => ice.chatInviteStore.received.length === 0, 10000);
+    return this.waitFor(() => ice.chatInviteStore.received.length === 0, 10000);
 });
 
 Then('The Cucumbot is not a member of the room', function() {
@@ -113,3 +115,7 @@ Then('Cucumbot is not in the room anymore', function() {
     return this.waitFor(() => !ice.chatStore.activeChat && ice.chatStore.channels.length === 0);
 });
 
+When('I create a room with Cucumbot', async function() {
+    await createRoom.call(this);
+    return inviteCucumbot.call(this);
+});

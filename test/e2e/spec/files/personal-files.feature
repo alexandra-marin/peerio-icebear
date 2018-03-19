@@ -36,9 +36,9 @@ Feature: Personal files
         And   Cucumbot logs in
         When  I upload a 1024 byte file
         Then  I see the uploaded file in my drive
-        And   Cucumbot has 1 files
+        And   Cucumbot has 1 files in his drive
         When  I remove the uploaded file
-        Then  I have 0 files
-        And   Cucumbot has 0 files
+        Then  I have 0 files in my drive
+        And   Cucumbot has 0 files in his drive
         When  I restart
-        Then  I have 0 files
+        Then  I have 0 files in my drive

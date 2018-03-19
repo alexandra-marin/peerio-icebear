@@ -423,7 +423,10 @@ class File extends Keg {
         this._resetUploadState();
         this._resetDownloadState();
         if (!this.id) return Promise.resolve();
-        return retryUntilSuccess(() => super.remove(), `remove file ${this.id}`, 3)
+        return retryUntilSuccess(
+            () => super.remove(),
+            `remove file ${this.id} from ${this.db.id}`,
+            5)
             .then(() => { this.deleted = true; });
     }
 

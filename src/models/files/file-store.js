@@ -49,6 +49,9 @@ class FileStore {
      */
     @observable.shallow files = [];
 
+    @observable.shallow pendingMigration = [];
+    @observable.shallow pendingOwnMigration = [];
+
     /**
      * Subset of files not currently hidden by any applied filters
      * @readonly
@@ -416,7 +419,12 @@ class FileStore {
                     }
                     this.files.unshift(file);
                 } else {
-                    console.error('Failed to load file keg', keg.kegId);
+                    console.error('Failed to load file keg.', keg.kegId);
+                    // trying to be safe performing destructive operation of deleting a corrupted file keg
+                    if (keg.version > 1 && keg.type === 'file'
+                        && (!keg.createdAt || Date.now() - keg.createdAt > 600000000/* approx 1 week */)) {
+                        file.remove();
+                    }
                     continue;
                 }
             }

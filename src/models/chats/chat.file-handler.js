@@ -131,6 +131,24 @@ class ChatFileHandler {
         return this.chat.sendMessage(message, ids);
     }
 
+    /**
+     *
+     * @param {string|File} file - file id or instance
+     */
+    async unshare(file) {
+        if (typeof file === 'string') {
+            file = fileStore.getByIdInChat(file, this.chat.id); // eslint-disable-line no-param-reassign
+            await file.ensureLoaded();
+            if (file.deleted) return Promise.resolve();
+        }
+        if (file.db.id !== this.chat.id) {
+            return Promise.reject(
+                new Error('Attempt to unshare file from kegdb it does not belong to.')
+            );
+        }
+        return file.remove();
+    }
+
 
     getRecentFiles() {
         return retryUntilSuccess(() => {

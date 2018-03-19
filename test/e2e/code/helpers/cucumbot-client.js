@@ -47,7 +47,7 @@ class CucumbotClient extends CucumbotBase {
 
         child.stdout.on('data', data => {
             const msg = data.toString().split('\n');
-            msg.forEach(m => console._log('CUCUMBOT:', m));
+            msg.forEach(m => m && console._log('CUCUMBOT:', m));
         });
 
         this.botProcess = child;

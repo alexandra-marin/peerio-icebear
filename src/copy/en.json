@@ -257,7 +257,7 @@
   "button_thumbsUp": "Thumbs up",
   "title_shareFromFiles": "Share from Peerio files",
   "title_uploadAndShare": "Upload and share file",
-  "title_uploadAndShareCount":  "Upload and share file ({current} of {total})",
+  "title_uploadAndShareCount": "Upload and share file ({current} of {total})",
   "title_labelText": "Label text",
   "title_confirmCancelUpload": "Cancel upload?",
   "title_confirmRemoveEmail": "Remove email?",
@@ -685,10 +685,8 @@
   "title_contactAdded": "{name} has been added",
   "dialog_migrationTitle": "We are upgrading our file sharing security!",
   "dialog_migrationText": " Because these improvements involve changes to our file system, we need your permission to maintain your file sharing relationships.<br/><br/>You can review who your files are currently shared with in this document: <downloadFile>filename</><br/><br/>Select <b>Continue</> to preserve your file sharing relationships. Select <b>Unshare</> to unshare all files you have shared.",
-  "button_unshare": "Unshare",
   "warning_sharingHistory": "Your sharing history has been kept.",
   "dialog_unshareTitle": "Unshare all your files?",
   "dialog_unshareText": "You are about to unshare all files you have ever shared with others on Peerio. This action cannot be reversed. Are you sure you want to unshare all your files?",
-  "button_unshareAll": "Unshare all",
   "warning_unsharedAll": "All shared files have been unshared."
 }

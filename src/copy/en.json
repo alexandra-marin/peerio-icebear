@@ -642,7 +642,7 @@
   "title_helloName": "Hello, {name}.",
   "title_hello": "Hello",
   "title_signup": "Sign Up",
-  "title_createNewAccount": "Create a new account.",
+  "title_createNewAccount": "Create a new account. ",
   "title_signupLink": "<a-signup>Sign up</>",
   "title_here": " here.",
   "error_setup2fa": "Unable to enable two step verification",

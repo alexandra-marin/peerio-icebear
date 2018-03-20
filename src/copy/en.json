@@ -682,5 +682,7 @@
   "error_messageErrorNotAvailable": "Not available",
   "title_verifyUserIdentity": "You can verify any user’s identity with their Peerio ID#. <a-identityVerification>Show me how</>",
   "title_addPeopleToRoom": "Add people to this room",
-  "title_contactAdded": "{name} has been added"
+  "title_contactAdded": "{name} has been added",
+  "dialog_fileTypeForExtension": "{extension} File",
+  "dialog_fileTypeAllFiles": "All Files"
 }

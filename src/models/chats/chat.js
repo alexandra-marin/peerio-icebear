@@ -17,6 +17,7 @@ const warnings = require('../warnings');
 const Contact = require('../contacts/contact');
 const chatInviteStore = require('../chats/chat-invite-store');
 const { asPromise } = require('../../helpers/prombservable');
+const volumeStore = require('../volumes/volume-store');
 
 // to assign when sending a message and don't have an id yet
 let temporaryChatId = 0;
@@ -821,6 +822,34 @@ class Chat {
         return this._fileHandler.unshare(file);
     }
 
+    shareFolders(folders) {
+        folders.forEach(folder => this.uploadQueue.push(folder));
+        let promise = Promise.resolve();
+        folders.forEach(folder => {
+            promise = promise.then(async () => {
+                try {
+                    await volumeStore.convertFolder(folder);
+                    await this.sendSharedFolder(folder);
+                } catch (e) {
+                    console.error(e);
+                }
+                this.uploadQueue.remove(folder);
+            });
+        });
+        return promise;
+    }
+
+    async shareFilesAndFolders(filesAndFolders) {
+        const files = filesAndFolders.filter(f => !f.isFolder);
+        const folders = filesAndFolders.filter(f => f.isFolder);
+        if (files.length) {
+            await this.shareFiles(files);
+        }
+        if (folders.length) {
+            await this.shareFolders(folders);
+        }
+    }
+
     /**
      * @returns {Promise}
      * @protected
@@ -1215,6 +1244,16 @@ class Chat {
         m.sendVideoLink(link);
         this._sendMessage(m);
     }
+
+    /**
+    * TODO: replace with the real thing
+    */
+    sendSharedFolder(folder) {
+        const m = new Message(this.db);
+        m.sendSharedFolder(folder);
+        return this._sendMessage(m);
+    }
+
 
     /**
      * Checks if there are any file attachments in new message batch and adds them to _recentFiles if needed.

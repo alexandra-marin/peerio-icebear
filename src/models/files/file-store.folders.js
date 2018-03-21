@@ -2,11 +2,13 @@ const { observable, action, reaction, computed } = require('mobx');
 const { getUser } = require('../../helpers/di-current-user');
 const socket = require('../../network/socket');
 const FileFolder = require('./file-folder');
+const RootFolder = require('./root-folder');
 const FileFoldersKeg = require('./file-folders-keg');
 const cryptoUtil = require('../../crypto/util');
 const warnings = require('../warnings');
+const folderResolveMap = require('./folder-resolve-map');
 
-const ROOT_FOLDER = new FileFolder('/');
+const ROOT_FOLDER = new RootFolder();
 
 class FileStoreFolders {
     constructor(fileStore) {
@@ -26,11 +28,10 @@ class FileStoreFolders {
     root = ROOT_FOLDER;
     @observable currentFolder = ROOT_FOLDER;
 
-    folderResolveMap = observable.shallowMap({});
     folderIdReactions = {};
 
     getById(id) {
-        return this.folderResolveMap.get(id);
+        return folderResolveMap.get(id);
     }
 
     _addFile = (file) => {
@@ -63,7 +64,7 @@ class FileStoreFolders {
             this._intercept();
             this._intercept = null;
         }
-        const { folderResolveMap, root } = this;
+        const { root } = this;
         const newFolderResolveMap = {};
         root.deserialize(this.keg, null, folderResolveMap, newFolderResolveMap);
         // remove files from folders if they aren't present in the keg
@@ -73,10 +74,13 @@ class FileStoreFolders {
                 if (folder) folder.moveInto(f);
             } else if (f.folder) f.folder.free(f);
         });
-        // remove folders if they aren't present in the keg
+        // remove folders if they aren't present in the keg and are not volumes
         folderResolveMap.keys().forEach(folderId => {
             if (!newFolderResolveMap[folderId]) {
-                folderResolveMap.get(folderId).freeSelf();
+                const folder = folderResolveMap.get(folderId);
+                if (!folder.isShared) {
+                    folder.remove();
+                }
             }
         });
         Object.keys(newFolderResolveMap).forEach(folderId => {
@@ -94,7 +98,7 @@ class FileStoreFolders {
     }
 
     @computed get folderResolveMapSorted() {
-        return this.folderResolveMap.values()
+        return folderResolveMap.values()
             .sort((f1, f2) => f1.normalizedName > f2.normalizedName);
     }
 
@@ -104,8 +108,31 @@ class FileStoreFolders {
             .filter(f => f.normalizedName.includes(q));
     }
 
-    deleteFolder(folder) {
-        folder.freeSelf();
+    @computed get selectedFolders() {
+        return this.folderResolveMapSorted.filter(f => f.selected);
+    }
+
+    async deleteFolder(folder) {
+        // TODO: put the delete logic into the AbstractFolder (???)
+        const { files } = folder;
+        folder.progress = 0;
+        folder.progressMax = files.length;
+        folder.progressText = 'title_deletingFolder';
+        let promise = Promise.resolve();
+        files.forEach(file => {
+            promise = promise.then(async () => {
+                await file.remove();
+                folder.progress++;
+            });
+        });
+        await promise;
+        folder.progressMax = null;
+        folder.progress = null;
+        folder.progressText = null;
+        // there's a lag between deletion and file disappearance from the
+        // associated folder list. so to prevent confusion we clear files here
+        folder.files = [];
+        folder.remove();
         this.save();
     }
 
@@ -116,10 +143,10 @@ class FileStoreFolders {
             throw new Error('error_folderAlreadyExists');
         }
         const folder = new FileFolder(name);
-        const folderId = cryptoUtil.getRandomShortIdHex(getUser().username);
+        const folderId = cryptoUtil.getRandomShortIdHex();
         folder.folderId = folderId;
         folder.createdAt = Date.now();
-        this.folderResolveMap.set(folderId, folder);
+        folderResolveMap.set(folderId, folder);
         target.addFolder(folder);
         return folder;
     }

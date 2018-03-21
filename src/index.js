@@ -45,6 +45,7 @@ const contactStore = require('./models/contacts/contact-store');
 const tofuStore = require('./models/contacts/tofu-store');
 const chatStore = require('./models/chats/chat-store');
 const fileStore = require('./models/files/file-store');
+const volumeStore = require('./models/volumes/volume-store');
 const ghostStore = require('./models/mail/ghost-store');
 const mailStore = require('./models/mail/mail-store');
 const validation = require('./helpers/validation/field-validation');
@@ -80,6 +81,7 @@ module.exports = {
     chatStore,
     chatInviteStore,
     fileStore,
+    volumeStore,
     ghostStore,
     mailStore,
     validation,

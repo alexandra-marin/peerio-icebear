@@ -14,6 +14,7 @@ const { setFileStore } = require('../../helpers/di-file-store');
 const { getChatStore } = require('../../helpers/di-chat-store');
 const createMap = require('../../helpers/dynamic-array-map');
 const FileStoreFolders = require('./file-store.folders');
+const FileStoreBulk = require('./file-store.bulk');
 
 /**
  * File store.
@@ -26,6 +27,7 @@ class FileStore {
         this.fileMap = m.map;
         this.fileMapObservable = m.observableMap;
         this.folders = new FileStoreFolders(this);
+        this.bulk = new FileStoreBulk(this);
 
         this.chatFileMap = observable.map();
 
@@ -181,6 +183,16 @@ class FileStore {
     }
 
     /**
+     * @member {boolean} hasSelectedFilesOrFolders
+     * @memberof FileStore
+     * @instance
+     * @public
+     */
+    @computed get hasSelectedFilesOrFolders() {
+        return this.selectedFilesOrFolders.length;
+    }
+
+    /**
      * @member {boolean} canShareSelectedFiles
      * @memberof FileStore
      * @instance
@@ -245,7 +257,20 @@ class FileStore {
     }
 
     /**
-     * Deselects all files
+     * Returns currently selected folders (folder.selected == true)
+     * @returns {Array<Folder>}
+     * @public
+     */
+    get selectedFolders() {
+        return this.folders.selectedFolders;
+    }
+
+    @computed get selectedFilesOrFolders() {
+        return this.selectedFolders.slice().concat(this.getSelectedFiles());
+    }
+
+    /**
+     * Deselects all files and folders
      * @function clearSelection
      * @memberof FileStore
      * @instance
@@ -258,6 +283,12 @@ class FileStore {
         this.chatFileMap.values().forEach(dbMap => {
             dbMap.values().forEach(f => { f.selected = false; });
         });
+
+        // selectedFolders is computable, do not recalculate it
+        const selFolders = this.selectedFolders;
+        for (let i = 0; i < selFolders.length; i++) {
+            selFolders[i].selected = false;
+        }
     }
 
     /**

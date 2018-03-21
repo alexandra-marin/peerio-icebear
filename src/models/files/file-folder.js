@@ -1,57 +1,10 @@
-const { observable, computed } = require('mobx');
 const createMap = require('../../helpers/dynamic-array-map');
 const warnings = require('../warnings');
-const util = require('../../util');
+const AbstractFolder = require('./abstract-folder');
 
-class FileFolder {
-    @observable.shallow files = [];
-    @observable.shallow folders = [];
-    @observable name;
-    @observable createdAt;
-    @observable isDeleted;
-
-    @computed get normalizedName() {
-        return this.name ? this.name.toLowerCase() : '';
-    }
-
-    @computed get foldersSortedByName() {
-        return this.folders.sort((f1, f2) => f1.normalizedName > f2.normalizedName);
-    }
-
-    @computed get filesSortedByDate() {
-        return this.files.sort((f1, f2) => f2.uploadedAt - f1.uploadedAt);
-    }
-
-    @computed get foldersAndFilesDefaultSorting() {
-        const { foldersSortedByName, filesSortedByDate } = this;
-        return foldersSortedByName.concat(filesSortedByDate);
-    }
-
-    @computed get size() {
-        let currentSize = 0;
-        for (const folder of this.folders) {
-            currentSize += folder.size;
-        }
-        for (const file of this.files) {
-            currentSize += file.size;
-        }
-        return currentSize;
-    }
-
-    @computed get sizeFormatted() {
-        return util.formatBytes(this.size);
-    }
-
-    @observable parent = null;
-    isFolder = true;
-    get isRoot() {
-        return !this.parent;
-    }
-    get hasNested() {
-        return this.folders && this.folders.length;
-    }
-
+class FileFolder extends AbstractFolder {
     constructor(name) {
+        super();
         const m = createMap(this.files, 'fileId');
         this.name = name;
         this.fileMap = m.map;
@@ -115,7 +68,7 @@ class FileFolder {
         }
     }
 
-    freeSelf() {
+    remove() {
         if (this.isRoot) return;
         let root = this;
         while (!root.isRoot) root = root.parent;
@@ -124,7 +77,7 @@ class FileFolder {
             root.add(file);
         });
         this.files = [];
-        this.folders.forEach(folder => folder.freeSelf());
+        this.folders.forEach(folder => folder.remove());
         this.folders = [];
         this.parent && this.parent.freeFolder(this);
         this.isDeleted = true;

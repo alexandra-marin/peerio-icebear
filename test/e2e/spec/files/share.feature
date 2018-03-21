@@ -28,7 +28,7 @@ Feature: Sharing files in DM
         When  I unshare the uploaded file with Cucumbot
         Then  The uploaded file is removed from the DM
         And   Cucumbot has 0 files in his drive
-        And   Cucumbot can not see the uploaded file in the room
+        And   Cucumbot can not see the uploaded file in DM
         And   Cucumbot can not download the uploaded file
         When  Cucumbot restarts
         Then  The uploaded file is removed from the DM

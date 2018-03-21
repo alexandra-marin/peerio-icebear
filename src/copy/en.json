@@ -726,5 +726,5 @@
   "dialog_unshareText": "You are about to unshare all files you have ever shared with others on Peerio. This action cannot be reversed. Are you sure you want to unshare all your files?",
   "warning_unsharedAll": "All shared files have been unshared.",
   "title_limitedActions": "Limited actions available",
-  "dialog_limitedActionsContent": "File has old version. The file owner still needs to upgrade.<br/>Actions for this file are limited to <b>download</> and <b>delete</>. <a-limitedActions>Read more</>"
+  "dialog_limitedActionsContent": "File has old version. The file owner still needs to upgrade.<br/><br/>Actions for this file are limited to <b>download</> and <b>delete</>. <a-limitedActions>Read more</>"
 }

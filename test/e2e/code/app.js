@@ -88,8 +88,8 @@ class App {
                 (args[0] && args[0].name === 'DisconnectedError')
                 || (args[1] && args[1].name === 'DisconnectedError')
             ) return;
-
-            let line = `${type}${new Date().toISOString()}: `;
+            const d = new Date();
+            let line = `${type}${d.getMinutes()}:${d.getSeconds()}.${d.getMilliseconds()}: `;
             for (let i = 0; i < args.length; i++) {
                 if (typeof args[i] === 'object') {
                     line += `${safeJsonStringify(args[i])} `;

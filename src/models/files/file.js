@@ -470,18 +470,29 @@ class File extends Keg {
      * @param {KegDb} db
      */
     copyTo(db) {
-        const file = new File(db);
-        file.descriptorKey = this.descriptorKey;
-        file.fileId = this.fileId;
         return retryUntilSuccess(() => {
-            return file.saveToServer()
-                .catch(err => {
-                    if (err && err.code === ServerError.codes.fileKegAlreadyExists) {
-                        return Promise.resolve();
-                    }
-                    return Promise.reject(err);
+            // to avoid creating empty keg
+            return socket.send('/auth/kegs/db/query', {
+                kegDbId: db.id,
+                type: 'file',
+                filter: { fileId: this.fileId }
+            })
+                .then(resp => {
+                    // file already exists in this db
+                    if (resp.kegs.length) return Promise.resolve();
+                    const file = new File(db);
+                    file.descriptorKey = this.descriptorKey;
+                    file.fileId = this.fileId;
+                    return file.saveToServer()
+                        .catch(err => {
+                            if (err && err.code === ServerError.codes.fileKegAlreadyExists) {
+                                // need to delete empty keg
+                                return file.remove();
+                            }
+                            return Promise.reject(err);
+                        });
                 });
-        }, undefined, 10);
+        }, `copying ${this.fileId} to ${db.id}`, 10);
     }
 }
 

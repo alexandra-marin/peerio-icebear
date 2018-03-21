@@ -1,5 +1,6 @@
 const cp = require('child_process');
 const CucumbotBase = require('./cucumbot-base');
+const testConfig = require('../test-config');
 
 class CucumbotClient extends CucumbotBase {
     finished = false;
@@ -45,10 +46,12 @@ class CucumbotClient extends CucumbotBase {
             this.emit('finished');
         });
 
-        child.stdout.on('data', data => {
-            const msg = data.toString().split('\n');
-            msg.forEach(m => m && console._log('CUCUMBOT:', m));
-        });
+        if (!testConfig.muteCucumbot) {
+            child.stdout.on('data', data => {
+                const msg = data.toString().split('\n');
+                msg.forEach(m => m && console._log('>>>>>>BOT:', m));
+            });
+        }
 
         this.botProcess = child;
 

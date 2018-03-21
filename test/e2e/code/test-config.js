@@ -18,5 +18,6 @@ module.exports = {
     // will output every websocket message, incoming and outgoing to console
     logSocketMessages: true,
     // will output application logs to console
-    showAppLogs: !!process.env.SHOW_APP_LOGS
+    showAppLogs: !!process.env.SHOW_APP_LOGS,
+    muteCucumbot: false
 };

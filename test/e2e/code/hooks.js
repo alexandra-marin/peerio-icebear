@@ -16,13 +16,20 @@ Before({ wrapperOptions: { noWrap: true } }, function(data) {
 });
 
 // after each scenario
-After({ wrapperOptions: { noWrap: true } }, async function() {
-    await checkCucumbotRunResult(this);
+After({ wrapperOptions: { noWrap: true }, timeout: -1 }, async function() {
+    let cucumbotSuccess = false;
+    try {
+        cucumbotSuccess = await checkCucumbotRunResult(this).timeout(5 * 60000);
+    } catch (err) {
+        // don't care
+    }
     await this.app.dispose();
     const scenarioLog = this.app.logs.join('\n');
     this.attach(scenarioLog);
     delete this.app;
     this.filesToCleanup.forEach(f => deleteFile(f));
+    if (!cucumbotSuccess) return Promise.reject(new Error('Cucumbot scenario failed'));
+    return Promise.resolve();
 });
 
 setDefinitionFunctionWrapper(function(fn, opts) {
@@ -79,13 +86,14 @@ function startCucumbotBeforeScenario(world) {
  */
 function checkCucumbotRunResult(world) {
     if (!world.cucumbotClient) {
-        return Promise.resolve();
+        return Promise.resolve(true);
     }
     if (world.cucumbotClient.finished) {
         if (world.cucumbotClient.finishedWithError) {
-            return Promise.reject(new Error('Oh no, Cucumbot run was not successful.'));
+            console.error('Oh no, Cucumbot run was not successful.');
+            return Promise.resolve(false);
         }
-        return Promise.resolve();
+        return Promise.resolve(true);
     }
     return new Promise(resolve => {
         world.cucumbotClient.once('finished', () => checkCucumbotRunResult(world).then(resolve));

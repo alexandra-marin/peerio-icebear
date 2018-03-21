@@ -33,14 +33,30 @@ function hasXFiles(int) {
 Then('I have {int} files in my drive', hasXFiles);
 Then('Cucumbot has {int} files in his drive', hasXFiles);
 
-function fileExistInDrive() {
-    const keg = ice.fileStore.getById(this.uploadedFile.fileId);
+async function fileExistInDrive() {
+    let keg;
+    await this.waitFor(() => {
+        keg = ice.fileStore.getById(this.uploadedFile.fileId);
+        return keg;
+    });
     keg.fileId.should.equal(this.uploadedFile.fileId);
 }
 
 Then('I see the uploaded file in my drive', fileExistInDrive);
 
 Then('Cucumbot can see the uploaded file in his drive', fileExistInDrive);
+
+Then('Cucumbot can not see the uploaded file in the room', async function() {
+    return this.waitFor(() =>
+        ice.fileStore.getByIdInChat(this.uploadedFile.fileId, ice.chatStore.channels[0].id).deleted
+    );
+});
+
+Then('Cucumbot can not see the uploaded file in DM', async function() {
+    return this.waitFor(() =>
+        ice.fileStore.getByIdInChat(this.uploadedFile.fileId, ice.chatStore.directMessages[0].id).deleted
+    );
+});
 
 When('I download the uploaded file', { timeout: 100000 }, function() {
     const name = getTempFileName();
@@ -58,16 +74,20 @@ Then('the uploaded and the downloaded files are the same', async function() {
 When('I share the uploaded file with Cucumbot', async function() {
     await startDmWithCucumbot.call(this);
     const file = ice.fileStore.getById(this.uploadedFile.fileId);
-    return ice.chatStore.activeChat.shareFiles([file]);
+    return ice.chatStore.directMessages[0].shareFiles([file]);
 });
 
 When('I unshare the uploaded file with Cucumbot', async function() {
-    return ice.chatStore.activeChat.unshareFile(this.uploadedFile.fileId);
+    return ice.chatStore.directMessages[0].unshareFile(this.uploadedFile.fileId);
+});
+
+When('I unshare the uploaded file with the room', async function() {
+    return ice.chatStore.channels[0].unshareFile(this.uploadedFile.fileId);
 });
 
 When('I share the uploaded file in the room', async function() {
     const file = ice.fileStore.getById(this.uploadedFile.fileId);
-    return ice.chatStore.activeChat.shareFiles([file]);
+    return ice.chatStore.channels[0].shareFiles([file]);
 });
 
 async function checkFileIsShared(chat) {
@@ -80,11 +100,11 @@ async function checkFileIsShared(chat) {
     messages[messages.length - 1].files.should.deep.equal([this.uploadedFile.fileId]);
 }
 
-Then('Cucumbot received the uploaded file in DM', { timeout: 40000 }, function() {
+Then('Cucumbot can see the uploaded file in DM', { timeout: 40000 }, function() {
     const chat = ice.chatStore.directMessages[0];
     return checkFileIsShared.call(this, chat);
 });
-Then('Cucumbot received the uploaded file in the room', { timeout: 40000 }, function() {
+Then('Cucumbot can see the uploaded file in the room', { timeout: 40000 }, function() {
     const chat = ice.chatStore.channels[0];
     return checkFileIsShared.call(this, chat);
 });
@@ -103,15 +123,19 @@ Then('The uploaded file is shared in the room', { timeout: 40000 }, function() {
 });
 
 
-function cucumbotDownload() {
+function cucumbotDownload(chatId) {
     const name = getTempFileName();
-    return ice.fileStore.getByIdInChat(this.uploadedFile.fileId, ice.chatStore.activeChat.id)
+    return ice.fileStore.getByIdInChat(this.uploadedFile.fileId, chatId)
         .download(name).then(() => {
             this.filesToCleanup.push(name);
         });
 }
-Then('Cucumbot can download the received file in DM', cucumbotDownload);
-Then('Cucumbot can download the received file in the room', cucumbotDownload);
+Then('Cucumbot can download the received file in DM', function() {
+    return cucumbotDownload.call(this, ice.chatStore.directMessages[0].id);
+});
+Then('Cucumbot can download the received file in the room', function() {
+    return cucumbotDownload.call(this, ice.chatStore.channels[0].id);
+});
 
 Then('Cucumbot can not download the uploaded file', function() {
     return ice.socket.send('/auth/file/url', { fileId: this.uploadedFile.fileId })

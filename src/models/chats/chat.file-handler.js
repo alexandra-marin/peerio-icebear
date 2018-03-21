@@ -32,12 +32,7 @@ class ChatFileHandler {
     onFileDigestUpdate = () => {
         const msgDigest = tracker.getDigest(this.chat.id, 'file');
         this.maxUpdateId = msgDigest.maxUpdateId;
-        this.knownUpdateId = msgDigest.knownUpdateId;
-        if (this.chat.isChannel) {
-            this.knownUpdateId = this.maxUpdateId;
-            tracker.seenThis(this.chat.id, 'file', this.maxUpdateId);
-            return;
-        }
+        if (this.knownUpdateId < msgDigest.knownUpdateId) this.knownUpdateId = msgDigest.knownUpdateId;
         this.copyFileKegs();
     }
 
@@ -55,7 +50,15 @@ class ChatFileHandler {
                 if (!resp.kegs || !resp.kegs.length) return;
 
                 resp.kegs.forEach(keg => {
-                    if (this.knownUpdateId < keg.collectionVersion) this.knownUpdateId = keg.collectionVersion;
+                    if (this.knownUpdateId < keg.collectionVersion) {
+                        this.knownUpdateId = keg.collectionVersion;
+                    }
+                    if (keg.deleted) {
+                        fileStore.removeCachedChatKeg(this.chat.id, keg.kegId);
+                    }
+                    if (this.chat.isChannel) {
+                        return;
+                    }
                     const file = new File(this.chat.db);
                     try {
                         if (file.loadFromKeg(keg) && !file.deleted) {

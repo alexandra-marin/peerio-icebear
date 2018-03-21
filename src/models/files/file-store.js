@@ -579,6 +579,7 @@ class FileStore {
         }
         return file;
     }
+
     loadChatFile(fileId, kegDbId) {
         const chat = getChatStore().chatMap[kegDbId];
         if (!chat) {
@@ -613,6 +614,17 @@ class FileStore {
                 file.loaded = true;
             });
         return file;
+    }
+
+    removeCachedChatKeg(chatId, kegId) {
+        const map = this.chatFileMap.get(chatId);
+        if (!map) return;
+        for (const f of map.values()) {
+            if (f.id === kegId) {
+                f.deleted = true;
+                return;
+            }
+        }
     }
 
     /**

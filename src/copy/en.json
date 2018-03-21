@@ -96,7 +96,7 @@
   "title_upgradeFileSystem": "Your Peerio files leveled up!",
   "title_upgradeFileSystemDescription1": "You can now share entire folders and perform bulk actions on your files, making collaboration and organization a snap.",
   "title_upgradeFileSystemDescription2": "We topped it off by improving security, fixing some minor bugs, and tweaking the UI to make things more intuitive.",
-  "title_upgradeFileSystemDescription3": "Adding shared folders requires updates to our file system. Before completing the update we want to give you an opportunity to <download>download</> a record of your currently shared files.",
+  "title_upgradeFileSystemDescription3": "Adding shared folders required updates to our file system. Before completing the update we want to give you an opportunity to <download>download</> a record of your currently shared files.",
   "title_fileUpdateProgress": "File update in progress",
   "title_fileUpdateComplete": "File update complete. Enjoy!",
   "title_newfsUpgradeImageError": "Image cannot be displayed.",

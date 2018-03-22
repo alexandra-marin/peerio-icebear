@@ -3,6 +3,7 @@
   "button_yes": "Yes",
   "button_no": "No",
   "button_ok": "OK",
+  "button_gotIt": "Got it",
   "button_submit": "Submit",
   "button_cancel": "Cancel",
   "button_continue": "Continue",
@@ -299,7 +300,7 @@
   "title_sharedWith": "Shared with",
   "title_viewSharedWith": "View shared with",
   "title_roomsSharedWith": "{roomsSharedWith} chats",
-  "title_roomSharedWith" : "1 chat",
+  "title_roomSharedWith": "1 chat",
   "title_plusRoomSharedWith": "+1 chat",
   "title_numberOfChatsSharedWith": "+{chatNumberSharedWith}",
   "title_unshareUserWarning": "{fileCount} files shared by {user} in this folder will also be removed.",
@@ -482,7 +483,6 @@
   "title_inviteToPeerio": "Invite your contacts to Peerio",
   "title_favoriteContacts": "Favourites",
   "title_invitedContacts": "Invited",
-  "title_inviteLegacy": "This legacy Peerio user has not migrated to Peerio 2 yet.",
   "title_newRoom": "New Room",
   "title_to": "To: ",
   "title_with": "With: ",
@@ -724,5 +724,7 @@
   "warning_sharingHistory": "Your sharing history has been kept.",
   "dialog_unshareTitle": "Unshare all your files?",
   "dialog_unshareText": "You are about to unshare all files you have ever shared with others on Peerio. This action cannot be reversed. Are you sure you want to unshare all your files?",
-  "warning_unsharedAll": "All shared files have been unshared."
+  "warning_unsharedAll": "All shared files have been unshared.",
+  "title_limitedActions": "Limited actions available",
+  "dialog_limitedActionsContent": "File has old version. The file owner still needs to upgrade.<br/><br/>Actions for this file are limited to <b>download</> and <b>delete</>. <a-limitedActions>Read more</>"
 }

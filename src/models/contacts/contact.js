@@ -278,13 +278,7 @@ class Contact {
      * @public
      */
     @observable notFound = false;
-    /**
-     * Legacy contacts can't be used so they should treated as 'notFound' but clients can inform user about legacy
-     * contact pending migration if this flag is `true` after loading is done.
-     * @member {boolean}
-     * @public
-     */
-    isLegacy = false;
+
     // to avoid parallel queries
     _waitingForResponse = false;
 
@@ -348,9 +342,8 @@ class Contact {
         )
             .then(action(resp => {
                 const profile = resp && resp[0] && resp[0][0] && resp[0][0].profile || null;
-                if (!profile || profile.legacy) {
+                if (!profile) {
                     this.notFound = true;
-                    this.isLegacy = !!(profile ? profile.legacy : false);
                     this._waitingForResponse = false;
                     this.loading = false;
                     return;

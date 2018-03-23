@@ -99,6 +99,7 @@
   "title_upgradeFileSystemDescription2": "We topped it off by improving security, fixing some minor bugs, and tweaking the UI to make things more intuitive.",
   "title_upgradeFileSystemDescription3": "Adding shared folders required updates to our file system. Before completing the update we want to give you an opportunity to <download>download</> a record of your currently shared files.",
   "title_fileUpdateProgress": "File update in progress",
+  "title_fileUpdateProgressPercent": "{progress}%",
   "title_fileUpdateComplete": "File update complete. Enjoy!",
   "title_newfsUpgradeImageError": "Image cannot be displayed.",
   "title_oldVersion": "Old version",

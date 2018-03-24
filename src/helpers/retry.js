@@ -43,7 +43,7 @@ function retryUntilSuccess(fn, id = Math.random(), maxRetries = maxRetryCount, t
     }).catch(err => {
         callInfo.lastError = err;
         scheduleRetry(fn, id);
-        console.debug(err);
+        console.error(err);
     });
 
     return callInfo.promise;

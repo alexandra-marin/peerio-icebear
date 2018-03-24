@@ -371,6 +371,7 @@ class Message extends Keg {
     }
 
     serializeKegPayload() {
+        this.format = this.latestFormat;
         this.userMentions = this.text
             ? _.uniq(this.db.participants.filter((u) => this.text.match(u.mentionRegex)).map((u) => u.username))
             : [];

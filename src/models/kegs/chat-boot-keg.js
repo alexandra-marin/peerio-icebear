@@ -282,6 +282,7 @@ class ChatBootKeg extends SyncedKeg {
     }
 
     serializeKegPayload() {
+        this.format = this.latestFormat || this.format;
         const ephemeralKeyPair = keys.generateEncryptionKeyPair();
         const ret = {};
         ret.publicKey = cryptoUtil.bytesToB64(ephemeralKeyPair.publicKey);

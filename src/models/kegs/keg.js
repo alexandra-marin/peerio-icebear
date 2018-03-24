@@ -242,7 +242,6 @@ class Keg {
     internalSave() {
         let payload, props, lastVersion, signingPromise = Promise.resolve(true);
         try {
-            this.format = this.latestFormat || this.format;
             payload = this.serializeKegPayload();
             props = this.serializeProps();
             // existence of these properties means this keg was shared with us and we haven't re-encrypted it yet

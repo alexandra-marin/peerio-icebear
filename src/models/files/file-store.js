@@ -15,6 +15,8 @@ const { getChatStore } = require('../../helpers/di-chat-store');
 const createMap = require('../../helpers/dynamic-array-map');
 const FileStoreFolders = require('./file-store.folders');
 const FileStoreBulk = require('./file-store.bulk');
+const cryptoUtil = require('../../crypto/util');
+const cryptoKeys = require('../../crypto/keys');
 
 /**
  * File store.
@@ -392,7 +394,7 @@ class FileStore {
     onFileDigestUpdate = _.throttle(() => {
         const digest = tracker.getDigest('SELF', 'file');
         // this.unreadFiles = digest.newKegsCount;
-        if (digest.maxUpdateId === this.maxUpdateId) {
+        if (this.loaded && digest.maxUpdateId === this.maxUpdateId) {
             this.updatedAfterReconnect = true;
             return;
         }
@@ -449,12 +451,29 @@ class FileStore {
                         continue;
                     }
                     this.files.unshift(file);
+                    if (!file.format && file.fileOwner === User.current.username) {
+                        console.log(`migrating file ${file.fileId}`);
+                        retryUntilSuccess(() => {
+                            file.format = file.latestFormat;
+                            file.descriptorKey = cryptoUtil.bytesToB64(cryptoKeys.generateEncryptionKey());
+                            return file.createDescriptor()
+                                .then(() => file.saveToServer())
+                                .catch(err => {
+                                    if (err && err.error === 406) {
+                                        // our other connected client managed to migrate this first
+                                        return Promise.resolve();
+                                    }
+                                    return Promise.reject(err);
+                                });
+                        }, `migrating file ${file.fileId}`);
+                    }
                 } else {
                     console.error('Failed to load file keg.', keg.kegId);
                     // trying to be safe performing destructive operation of deleting a corrupted file keg
                     if (keg.version > 1 && keg.type === 'file'
                         && (!keg.createdAt || Date.now() - keg.createdAt > 600000000/* approx 1 week */)) {
-                        file.remove();
+                        console.log('Removing invalid file keg', keg);
+                        // file.remove();
                     }
                     continue;
                 }
@@ -620,30 +639,32 @@ class FileStore {
         }
         const file = new File(chat.db);
         file.fileId = fileId;
-        let fileMap = this.chatFileMap.get(kegDbId);
-        if (!fileMap) {
-            fileMap = observable.map();
-            this.chatFileMap.set(kegDbId, fileMap);
-        }
-        fileMap.set(fileId, file);
-        retryUntilSuccess(() => {
-            return socket.send('/auth/kegs/db/query', {
-                kegDbId: chat.id,
-                type: 'file',
-                filter: { fileId }
-            });
-        }, undefined, 5)
-            .then(resp => {
-                if (!resp.kegs[0] || !file.loadFromKeg(resp.kegs[0])) {
+        setTimeout(() => {
+            let fileMap = this.chatFileMap.get(kegDbId);
+            if (!fileMap) {
+                fileMap = observable.map();
+                this.chatFileMap.set(kegDbId, fileMap);
+            }
+            fileMap.set(fileId, file);
+            retryUntilSuccess(() => {
+                return socket.send('/auth/kegs/db/query', {
+                    kegDbId: chat.id,
+                    type: 'file',
+                    filter: { fileId }
+                });
+            }, undefined, 5)
+                .then(resp => {
+                    if (!resp.kegs[0] || !file.loadFromKeg(resp.kegs[0])) {
+                        file.deleted = true;
+                        file.loaded = true;
+                    }
+                })
+                .catch(err => {
+                    console.error('Error loading file from chat', err);
                     file.deleted = true;
                     file.loaded = true;
-                }
-            })
-            .catch(err => {
-                console.error('Error loading file from chat', err);
-                file.deleted = true;
-                file.loaded = true;
-            });
+                });
+        });
         return file;
     }
 

@@ -86,7 +86,7 @@ class ChatMessageHandler {
     }
 
     loadUpdates() {
-        if (!(this.chat.mostRecentMessageLoaded || this.chat.initialPageLoaded)) return;
+        if (!(this.chat.mostRecentMessageLoaded || this.chat.initialPageLoaded) || !socket.authenticated) return;
         if (this.chat.canGoDown || this.downloadedUpdateId >= this.maxUpdateId) {
             this.chat.updatedAfterReconnect = true;
             return;

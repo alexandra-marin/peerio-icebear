@@ -26,7 +26,11 @@ class FileFolder extends AbstractFolder {
         file.folderId = this.isRoot ? null : this.folderId;
 
         if (!skipSaving) {
-            retryUntilSuccess(() => file.saveToServer());
+            retryUntilSuccess(
+                () => file.saveToServer(),
+                `moving file ${file.fileId}`,
+                2
+            );
         }
         this.files.push(file);
     }

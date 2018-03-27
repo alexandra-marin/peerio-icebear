@@ -1,6 +1,7 @@
 const createMap = require('../../helpers/dynamic-array-map');
 const warnings = require('../warnings');
 const AbstractFolder = require('./abstract-folder');
+const { retryUntilSuccess } = require('../../helpers/retry');
 
 class FileFolder extends AbstractFolder {
     constructor(name) {
@@ -25,7 +26,7 @@ class FileFolder extends AbstractFolder {
         file.folderId = this.isRoot ? null : this.folderId;
 
         if (!skipSaving) {
-            file.saveToServer();
+            retryUntilSuccess(() => file.saveToServer());
         }
         this.files.push(file);
     }

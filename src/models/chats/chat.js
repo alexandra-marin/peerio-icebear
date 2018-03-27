@@ -827,6 +827,8 @@ class Chat {
         let promise = Promise.resolve();
         folders.forEach(folder => {
             promise = promise.then(async () => {
+                // retry and error handling
+                // is done in store implementations
                 try {
                     await volumeStore.convertFolder(folder);
                     await this.sendSharedFolder(folder);

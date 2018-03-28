@@ -2,6 +2,14 @@ const createMap = require('../../helpers/dynamic-array-map');
 const warnings = require('../warnings');
 const AbstractFolder = require('./abstract-folder');
 const { retryUntilSuccess } = require('../../helpers/retry');
+const { computed } = require('mobx');
+
+function isLegacyFilePredicate(f) {
+    return !!(f && f.isLegacy);
+}
+function hasLegacyFilesPredicate(f) {
+    return !!(f && f.hasLegacyFiles);
+}
 
 class FileFolder extends AbstractFolder {
     constructor(name) {
@@ -12,6 +20,10 @@ class FileFolder extends AbstractFolder {
         this.fileMapObservable = m.observableMap;
         const m2 = createMap(this.folders, 'folderId');
         this.folderMap = m2.map;
+    }
+
+    @computed get hasLegacyFiles() {
+        return !!(this.folders.find(hasLegacyFilesPredicate) || this.files.find(isLegacyFilePredicate));
     }
 
     add(file, skipSaving) {

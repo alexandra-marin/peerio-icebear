@@ -26,6 +26,8 @@ class File extends Keg {
         this.descriptorFormat = 1;
     }
 
+    @observable migrating = false;
+
     /**
      * System-wide unique client-generated id
      * @member {string} fileId
@@ -202,6 +204,10 @@ class File extends Keg {
      */
     @observable folder;
 
+    @computed get isLegacy() {
+        return !this.format;
+    }
+
 
     descriptorVersion = 0;
 
@@ -266,7 +272,7 @@ class File extends Keg {
      * @public
      */
     @computed get canShare() {
-        return true; // getUser().username === this.fileOwner;
+        return this.format === 1;
     }
     /**
      * Bytes
@@ -286,10 +292,15 @@ class File extends Keg {
     }
 
     serializeKegPayload() {
+        if (!this.format) {
+            return {
+                name: this.name,
+                key: this.blobKey,
+                nonce: this.nonce
+            };
+        }
         return {
-            // name: this.name,
             descriptorKey: this.descriptorKey
-            // nonce: this.nonce
         };
     }
 
@@ -314,7 +325,7 @@ class File extends Keg {
         this.fileId = props.fileId;
         this.folderId = props.folderId;
         if (!this.format) {
-            this.readyForDownload = props.fileProcessingState === 'ready' || !!props.sharedBy;
+            this.readyForDownload = true;
             this.size = +props.size;
             this.uploadedAt = new Date(+props.uploadedAt);
             this.fileOwner = props.owner || this.owner;
@@ -352,7 +363,7 @@ class File extends Keg {
         this.updatedAt = new Date(+d.updatedAt);
         this.readyForDownload = d.blobAvailable;
         this.fileOwner = d.owner;
-        this.sharedBy = '[TODO]';
+        this.sharedBy = '';// TODO: maybe
         this.chunkSize = +d.chunkSize;
         this.size = +d.size;
         this.descriptorFormat = d.format;

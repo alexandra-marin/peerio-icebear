@@ -1,5 +1,3 @@
-// @ts-check
-
 const { observable, computed, when } = require('mobx');
 const contactStore = require('./../contacts/contact-store');
 const User = require('./../user/user');

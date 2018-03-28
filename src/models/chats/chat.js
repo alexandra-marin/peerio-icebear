@@ -1,5 +1,3 @@
-// @ts-check
-
 const { observable, computed, action, when, reaction } = require('mobx');
 const Message = require('./message');
 const ChatKegDb = require('../kegs/chat-keg-db');

@@ -1,4 +1,4 @@
-
+const { when } = require('mobx');
 const Profile = require('./profile');
 const Quota = require('./quota');
 const Settings = require('./settings');
@@ -8,36 +8,27 @@ const warnings = require('../warnings');
 const socket = require('../../network/socket');
 const { validators } = require('../../helpers/validation/field-validation');
 const contactStore = require('../contacts/contact-store');
-
+const AccountVersion = require('./account-version');
+const { getFileStore } = require('../../helpers/di-file-store');
 //
 // These are still members of User class, they're just split across several mixins to make User file size sensible.
 //
 module.exports = function mixUserProfileModule() {
     const _profileKeg = new Profile(this);
     const _quotaKeg = new Quota(this);
-    /**
-     * User settings from settings keg.
-     * @instance
-     * @member {Settings}
-     * @memberof User
-     * @public
-     */
+    this.accountVersionKeg = new AccountVersion(this.kegDb);
     this.settings = new Settings(this);
 
-    /**
-     * @instance
-     * @memberof User
-     * @protected
-     */
+    when(() => this.accountVersionKeg.loaded, () => {
+        // already migrated?
+        if (this.accountVersionKeg.accountVersion === 1) return;
+        getFileStore().migrateToAccountVersion1();
+    });
+
     this.loadSettings = () => {
         loadSimpleKeg(this.settings);
     };
 
-    /**
-     * @instance
-     * @memberof User
-     * @protected
-     */
     this.saveSettings = () => {
         return this.settings.saveToServer().tapCatch(err => {
             console.error(err);
@@ -45,20 +36,10 @@ module.exports = function mixUserProfileModule() {
         });
     };
 
-    /**
-     * @instance
-     * @memberof User
-     * @protected
-     */
     this.loadProfile = () => {
         loadSimpleKeg(_profileKeg);
     };
 
-    /**
-     * @instance
-     * @memberof User
-     * @protected
-     */
     this.loadQuota = () => {
         loadSimpleKeg(_quotaKeg);
     };
@@ -79,11 +60,6 @@ module.exports = function mixUserProfileModule() {
     tracker.subscribeToKegUpdates('SELF', 'quotas', this.loadQuota);
     tracker.subscribeToKegUpdates('SELF', 'settings', this.loadSettings);
 
-    /**
-     * @instance
-     * @memberof User
-     * @protected
-     */
     this.saveProfile = function() {
         return _profileKeg.saveToServer().tapCatch(err => {
             console.error(err);
@@ -94,9 +70,6 @@ module.exports = function mixUserProfileModule() {
     /**
      * @param {string} email
      * @returns {Promise}
-     * @instance
-     * @memberof User
-     * @public
      */
     this.resendEmailConfirmation = function(email) {
         return socket.send('/auth/address/resend-confirmation', {
@@ -117,9 +90,6 @@ module.exports = function mixUserProfileModule() {
     /**
      * @param {string} email
      * @returns {Promise}
-     * @instance
-     * @memberof User
-     * @public
      */
     this.removeEmail = function(email) {
         return socket.send('/auth/address/remove', {
@@ -136,9 +106,6 @@ module.exports = function mixUserProfileModule() {
     /**
      * @param {string} email
      * @returns {Promise}
-     * @instance
-     * @memberof User
-     * @public
      */
     this.addEmail = function(email) {
         return validators.emailAvailability.action(email).then(available => {
@@ -163,9 +130,6 @@ module.exports = function mixUserProfileModule() {
     /**
      * @param {string} email
      * @returns {Promise}
-     * @instance
-     * @memberof User
-     * @public
      */
     this.makeEmailPrimary = function(email) {
         return socket.send('/auth/address/make-primary', {
@@ -194,9 +158,6 @@ module.exports = function mixUserProfileModule() {
      * @param {Array<ArrayBuffer>} [blobs] - 2 elements, 0-large, 1-medium avatar. Omit parameter
      * or pass null to delete avatar
      * @returns {Promise}
-     * @instance
-     * @memberof User
-     * @public
      */
     this.saveAvatar = function(blobs) {
         if (this.savingAvatar) return Promise.reject(new Error('Already saving avatar, wait for it to finish.'));
@@ -224,9 +185,6 @@ module.exports = function mixUserProfileModule() {
 
     /**
      * @returns {Promise}
-     * @instance
-     * @memberof User
-     * @public
      */
     this.deleteAvatar = function() {
         return this.saveAvatar(null);
@@ -235,9 +193,6 @@ module.exports = function mixUserProfileModule() {
     /**
      * Notify server that the account key is backed up, so server would give a storage bonus
      * @returns {Promise}
-     * @instance
-     * @memberof User
-     * @public
      */
     this.setAccountKeyBackedUp = function() {
         return retryUntilSuccess(() => socket.send('/auth/account-key/backed-up'));

@@ -288,7 +288,7 @@ class ChatStore {
      * @param {string | Chat} chat - chat id or Chat instance
      * @public
      */
-    addChat = (chat) => {
+    addChat = (chat, noActivate) => {
         if (!chat) throw new Error(`Invalid chat id. ${chat}`);
         let c;
         if (typeof chat === 'string') {
@@ -309,7 +309,7 @@ class ChatStore {
         // console.log('Added chat ', c.id);
         if (this.myChats.hidden.includes(c.id)) c.unhide();
         c.loadMetadata().then(() => c.loadMostRecentMessage());
-        if (this.loaded && !this.activeChat) this.activate(c.id);
+        if (this.loaded && !this.activeChat && !noActivate) this.activate(c.id);
     };
 
     // takes current fav/hidden lists and makes sure store.chats reflect it
@@ -467,30 +467,35 @@ class ChatStore {
      * @instance
      * @public
      */
-    @action startChat(participants = [], isChannel = false, name, purpose) {
+    @action startChat(participants = [], isChannel = false, name, purpose, noActivate) {
         const cached = isChannel ? null : this.findCachedChatWithParticipants(participants);
         if (cached) {
-            this.activate(cached.id);
+            if (!noActivate) this.activate(cached.id);
             return cached;
         }
         if (isChannel && getUser().channelsLeft === 0) {
             warnings.add('error_channelLimitReached');
             return null;
         }
-        // we can't add participants before setting channel name because
-        // server will trigger invites and send empty chat name to user
-        const chat = new Chat(null, isChannel ? [] : this.getSelflessParticipants(participants), this, isChannel);
-        runInAction(async () => {
-            await chat.loadMetadata();
-            this.addChat(chat);
-            this.activate(chat.id);
-            if (name) await chat.rename(name);
-            if (purpose) await chat.changePurpose(purpose);
-            if (isChannel) {
-                chat.addParticipants(this.getSelflessParticipants(participants));
-            }
-        });
-        return chat;
+        try {
+            // we can't add participants before setting channel name because
+            // server will trigger invites and send empty chat name to user
+            const chat = new Chat(null, isChannel ? [] : this.getSelflessParticipants(participants), this, isChannel);
+            runInAction(async () => {
+                await chat.loadMetadata();
+                this.addChat(chat);
+                if (!noActivate) this.activate(chat.id);
+                if (name) await chat.rename(name);
+                if (purpose) await chat.changePurpose(purpose);
+                if (isChannel) {
+                    chat.addParticipants(this.getSelflessParticipants(participants));
+                }
+            });
+            return chat;
+        } catch (err) {
+            console.error(err);
+            return null;
+        }
     }
 
     /**

@@ -67,7 +67,7 @@ class SocketClient {
      * @private
      */
     socket = null;
-    taskPacer = new TaskPacer(40);// todo: maybe move to config
+    taskPacer = new TaskPacer(20);// todo: maybe move to config
     /**
      * Was socket started or not
      * @public

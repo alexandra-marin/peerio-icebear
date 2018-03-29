@@ -108,6 +108,7 @@
   "title_oldVersionDescription2": "File actions are limited to <b>download</> and <b>delete</>.",
   "title_fileUpdateProgressDescription": "This dialog will close when the update is complete",
   "title_sharedFilesUnshared": "All shared files were unshared.",
+  "error_fieldRequired": "Required",
   "error_usernameBadFormat": "Only letters, numbers or underscore allowed.",
   "error_usernameNotAvailable": "Username already exists, try another one.",
   "error_invalidName": "Name is not allowed.",

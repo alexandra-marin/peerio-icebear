@@ -324,10 +324,10 @@ class File extends Keg {
     @action deserializeProps(props) {
         this.fileId = props.fileId;
         this.folderId = props.folderId;
+        this.uploadedAt = new Date(+props.uploadedAt);
         if (!this.format) {
             this.readyForDownload = true;
             this.size = +props.size;
-            this.uploadedAt = new Date(+props.uploadedAt);
             this.fileOwner = props.owner || this.owner;
             this.sharedBy = props.sharedBy;
             this.chunkSize = +props.chunkSize;
@@ -359,7 +359,6 @@ class File extends Keg {
     }
     deserializeDescriptor(d) {
         if (this.fileId && this.fileId !== d.fileId) throw new Error('Descriptor fileId mismatch');
-        this.uploadedAt = new Date(+d.createdAt);
         this.updatedAt = new Date(+d.updatedAt);
         this.readyForDownload = d.blobAvailable;
         this.fileOwner = d.owner;

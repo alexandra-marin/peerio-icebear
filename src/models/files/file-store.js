@@ -931,16 +931,22 @@ class FileStore {
         return socket.send('/auth/file/legacy/channel/list')
             .then(res => {
                 this.legacySharedFiles = [];
-                Object.keys(res.sharedInChannels).forEach(kegDbId => {
-                    res.sharedInChannels[kegDbId].forEach(fileId => {
-                        this.legacySharedFiles.push({ kegDbId, fileId });
-                    });
-                });
-                Object.keys(res.sharedWithUsers).forEach(fileId => {
-                    res.sharedWithUsers[fileId].forEach(username => {
-                        this.legacySharedFiles.push({ username, fileId });
-                    });
-                });
+                if (res) {
+                    if (res.sharedInChannels) {
+                        Object.keys(res.sharedInChannels).forEach(kegDbId => {
+                            res.sharedInChannels[kegDbId].forEach(fileId => {
+                                this.legacySharedFiles.push({ kegDbId, fileId });
+                            });
+                        });
+                    }
+                    if (res.sharedWithUsers) {
+                        Object.keys(res.sharedWithUsers).forEach(fileId => {
+                            res.sharedWithUsers[fileId].forEach(username => {
+                                this.legacySharedFiles.push({ username, fileId });
+                            });
+                        });
+                    }
+                }
                 return this.legacySharedFiles;
             });
     }

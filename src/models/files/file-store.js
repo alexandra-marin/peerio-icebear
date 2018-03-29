@@ -656,7 +656,7 @@ class FileStore {
     loadAllFiles = Promise.method(async () => {
         if (this.loading || this.loaded) return;
         this.loading = true;
-        let lastPage = { maxId: '1001' };
+        let lastPage = { maxId: '1000' };
         do {
             lastPage = await this._loadPage(lastPage.maxId); // eslint-disable-line no-await-in-loop
         } while (lastPage.size > 0);

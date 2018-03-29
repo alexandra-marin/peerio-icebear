@@ -50,12 +50,12 @@ function mockProgress(folder) {
  * @public
  */
 class VolumeStore {
-    constructor() {
-        // socket.onceStarted(() => {
-        //   socket.subscribe('volumeInvitesUpdate', this.update);
-        //   socket.onAuthenticated(this.update);
-        // });
-    }
+    // constructor() {
+    // socket.onceStarted(() => {
+    //   socket.subscribe('volumeInvitesUpdate', this.update);
+    //   socket.onAuthenticated(this.update);
+    // });
+    // }
 
     @observable left = observable.shallowMap();
 

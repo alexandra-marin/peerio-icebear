@@ -8,6 +8,9 @@ class AbstractFolder {
     @observable createdAt;
     @observable isDeleted;
     @observable isShared = false;
+    // TODO: this is to be replaced
+    // by proper chat-related ACL management
+    @observable isJustUnshared = false;
     @observable isBlocked = false;
     @observable isHidden = false;
     @observable isOwner = true;

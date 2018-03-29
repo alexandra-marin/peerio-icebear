@@ -611,11 +611,11 @@ class FileStore {
                 } else {
                     console.error('Failed to load file keg.', keg.kegId);
                     // trying to be safe performing destructive operation of deleting a corrupted file keg
-                    if (keg.version > 1 && keg.type === 'file'
-                        && (!keg.createdAt || Date.now() - keg.createdAt > 600000000/* approx 1 week */)) {
-                        console.log('Removing invalid file keg', keg);
-                        file.remove();
-                    }
+                    // if (keg.version > 1 && keg.type === 'file'
+                    //     && (!keg.createdAt || Date.now() - keg.createdAt > 600000000/* approx 1 week */)) {
+                    //     console.log('Removing invalid file keg', keg);
+                    //     file.remove();
+                    // }
                     continue;
                 }
             }

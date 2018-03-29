@@ -16,7 +16,7 @@ const { getFileStore } = require('../../helpers/di-file-store');
 module.exports = function mixUserProfileModule() {
     const _profileKeg = new Profile(this);
     const _quotaKeg = new Quota(this);
-    this.accountVersionKeg = new AccountVersion(this.kegDb);
+    this.accountVersionKeg = new AccountVersion(this);
     this.settings = new Settings(this);
 
     when(() => this.accountVersionKeg.loaded, () => {

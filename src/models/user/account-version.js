@@ -9,8 +9,8 @@ class AccountVersion extends SyncedKeg {
     // migration specific data
     migration = {};
 
-    constructor(db) {
-        super('account_version', db);
+    constructor(user) {
+        super('account_version', user.kegDb);
     }
 
     serializeKegPayload() {

@@ -951,8 +951,36 @@ class FileStore {
             });
     }
 
-    getLegacySharedFilesText() {
-        return JSON.stringify(this.legacySharedFiles, null, 2);
+    async getLegacySharedFilesText() {
+        await asPromise(this, 'loaded', true);
+        await asPromise(getChatStore(), 'loaded', true);
+        await this.getLegacySharedFiles();
+
+        const eol = typeof navigator === 'undefined'
+            || !navigator.platform // eslint-disable-line no-undef
+            || !navigator.platform.startsWith('Win') // eslint-disable-line no-undef
+            ? '\n' : '\r\n';
+
+        let ret = '';
+        for (const item of this.legacySharedFiles) {
+            let fileName = item.fileId;
+            const file = this.getById(item.fileId);
+            if (file && file.name) {
+                fileName = file.name;
+            }
+            let recipient = item.username;
+            if (!recipient) {
+                const chat = getChatStore().chatMap[item.kegDbId];
+                if (chat) {
+                    await asPromise(chat, 'headLoaded', true); //eslint-disable-line
+                    recipient = chat.name;
+                } else {
+                    recipient = item.kegDbId;
+                }
+            }
+            ret += `${fileName} ; ${recipient}${eol}`;
+        }
+        return ret;
     }
 }
 const ret = new FileStore();

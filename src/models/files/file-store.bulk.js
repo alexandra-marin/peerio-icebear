@@ -14,7 +14,7 @@ class FileStoreBulk {
     // functor taking folder as an argument to confirm folder deletion
     deleteFolderConfirmator = null;
 
-    // functor taking files and shared fiels as an argument to confirm
+    // functor taking files and shared fields as an argument to confirm
     // folder deletion
     deleteFolderConfirmator = null;
 

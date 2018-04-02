@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.15.0"></a>
+# [4.15.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.14.7...v4.15.0) (2018-04-02)
+
+
+### Features
+
+* new invite events ([6c05f18](https://github.com/PeerioTechnologies/peerio-icebear/commit/6c05f18))
+
+
+
 <a name="4.14.7"></a>
 ## [4.14.7](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.14.6...v4.14.7) (2018-04-02)
 

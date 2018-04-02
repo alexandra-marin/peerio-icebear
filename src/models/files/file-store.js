@@ -270,6 +270,10 @@ class FileStore {
      */
     @observable loaded = false;
     /**
+     * Updates to file store are paused.
+     */
+    @observable paused = false;
+    /**
      * Currently updating file list from server, this is not observable property.
      * @member {boolean}
      * @public
@@ -524,6 +528,8 @@ class FileStore {
     }
 
     onFileDigestUpdate = _.throttle(() => {
+        if (this.paused) return;
+
         const digest = tracker.getDigest('SELF', 'file');
         // this.unreadFiles = digest.newKegsCount;
         if (this.loaded && digest.maxUpdateId === this.maxUpdateId) {
@@ -982,6 +988,23 @@ class FileStore {
         }
         return ret;
     }
+
+    /**
+     * Pause file store updates.
+     * @public
+     */
+    pause() {
+        this.paused = true;
+    }
+
+    /**
+     * Resume file store updates.
+     * @public
+     */
+    resume() {
+        this.paused = false;
+    }
+
 }
 const ret = new FileStore();
 setFileStore(ret);

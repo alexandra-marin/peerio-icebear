@@ -127,7 +127,7 @@
   "button_forward": "Forward",
   "button_send": "Send",
   "button_upgrade": "Upgrade",
-  "title_upgradeMessage": "Upgrade to get additional storage, unlimited file upload size, and unlimited archive.",
+  "title_upgradeMessage": "Upgrade to get additional storage and unlimited file upload size.",
   "error_fileQuotaExceeded": "You don't have enough space. <a-upgrade>Upgrade</> for more storage.",
   "error_fileUploadSizeExceeded": "The file you are trying to upload is too big. <a-upgrade>Upgrade</> to be able to upload bigger files.",
   "serverWarning_Welcome": "A paid plan has been registered to your account. You can view your plan benefits and learn <a-proWelcome>how to manage your account</>.",
@@ -422,6 +422,14 @@
   "dialog_updateAvailable": "Peerio Update",
   "title_updateWillRestart": "An update has finished downloading and is ready to install.",
   "title_updateDownloading": "Peerio is downloading an update.",
+  "title_updateFailed": "Update failed",
+  "title_updateFailedMessage": "Unfortunately, the new version of Peerio failed to install. We recommend trying to install it again or download it manually. Alternatively, you can continue using the older version for some time, but you will miss bug fixes and new features.",
+  "button_continueUsingOlderVersion": "Continue using older version",
+  "button_downloadManually": "Download manually",
+  "button_tryAgain": "Try again",
+  "title_installingUpdate": "Installing update",
+  "title_installingUpdatePleaseWait": "Please wait, installing update.",
+  "title_installingUpdateWillRestart": "When installation completes, Peerio will restart.",
   "notification_newMessages": "{count} new messages",
   "notification_newMentions": "Mentioned multiple times",
   "notification_newDMs": "Lots of new messages",
@@ -684,5 +692,7 @@
   "error_messageErrorNotAvailable": "Not available",
   "title_verifyUserIdentity": "You can verify any user’s identity with their Peerio ID#. <a-identityVerification>Show me how</>",
   "title_addPeopleToRoom": "Add people to this room",
-  "title_contactAdded": "{name} has been added"
+  "title_contactAdded": "{name} has been added",
+  "dialog_fileTypeForExtension": "{extension} File",
+  "dialog_fileTypeAllFiles": "All Files"
 }

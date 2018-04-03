@@ -44,7 +44,8 @@ const APP_EVENTS = {
     serverWarning: 'serverWarning',
     // clearWarning: 'clearWarning',
     channelInvitesUpdate: 'channelInvitesUpdate',
-    channelDeleted: 'channelDeleted'
+    channelDeleted: 'channelDeleted',
+    fileMigrationUnlocked: 'fileMigrationUnlocked'
 };
 
 /**

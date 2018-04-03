@@ -58,7 +58,10 @@ class FileStore {
     @observable migrationPending = false;
     @observable migrationStarted = false;
     @observable migrationProgress = 0;
+    @observable migrationPerformedByAnotherClient = false;
     @observable.shallow legacySharedFiles = null;
+
+    stopMigrationDisconnectListener = null;
 
     @computed get hasLegacySharedFiles() {
         return !!(this.legacySharedFiles && this.legacySharedFiles.length);
@@ -90,6 +93,35 @@ class FileStore {
         this.doMigrate();
     }
     async migrateToAccountVersion1() {
+        if (!await this.canStartMigration()) {
+            this.migrationPending = true;
+            this.migrationPerformedByAnotherClient = true;
+            this.pause();
+            // Handle the case when another client disconnects or finishes migration.
+            const unsubscribe = socket.subscribe(socket.APP_EVENTS.fileMigrationUnlocked, () => {
+                unsubscribe();
+                // Migrated?
+                if (this.migrationKeg.accountVersion === 1) return;
+                // Not migrated, try to take over the migration.
+                this.migrateToAccountVersion1();
+            });
+            return;
+        }
+        if (this.paused) {
+            // TODO(dchest): reload everything?
+            this.resume();
+        }
+        this.stopMigrationDisconnectListener = socket.onDisconnect(() => {
+            this.stopMigrationDisconnectListener();
+            this.stopMigrationDisconnectListener = null;
+            this.migrationPending = false;
+            this.migrationStarted = false;
+            this.migrationPerformedByAnotherClient = false;
+            socket.onceAuthenticated(() => {
+                // TODO(dchest): try starting migration again?
+                // this.migrateToAccountVersion1();
+            });
+        });
         await retryUntilSuccess(() => this.getLegacySharedFiles());
         this.migrationPending = true;
         if (this.migrationKeg.migration.files) {
@@ -99,10 +131,34 @@ class FileStore {
         }
         when(() => this.migrationKeg.accountVersion === 1, this.stopMigration);
     }
-    @action.bound stopMigration() {
+    @action.bound async stopMigration() {
+        if (this.stopMigrationDisconnectListener) {
+            this.stopMigrationDisconnectListener();
+            this.stopMigrationDisconnectListener = null;
+        }
+        await this.finishMigration();
         this.migrationPending = false;
         this.migrationStarted = false;
+        this.migrationPerformedByAnotherClient = false;
         this.migrationProgress = 100;
+    }
+
+    /**
+     * Asks server if we can start migration.
+     * @returns {Promise<boolean>}
+     * @private
+     */
+    canStartMigration() {
+        return retryUntilSuccess(() => socket.send('/auth/file/migration/start'))
+            .then(res => res.success);
+    }
+
+    /**
+     * Tells server that migration is finished.
+     * @private
+     */
+    finishMigration() {
+        return retryUntilSuccess(() => socket.send('/auth/file/migration/finish'));
     }
 
     async doMigrate() {
@@ -1003,8 +1059,8 @@ class FileStore {
      */
     resume() {
         this.paused = false;
+        setTimeout(this.onFileDigestUpdate);
     }
-
 }
 const ret = new FileStore();
 setFileStore(ret);

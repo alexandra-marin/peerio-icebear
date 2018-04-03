@@ -9,7 +9,7 @@ const warnings = require('../warnings');
 const contactStore = require('../contacts/contact-store');
 const Contact = require('../contacts/contact');
 const User = require('../user/user');
-const ChatBootKeg = require('../kegs/chat-boot-keg');
+const SharedDbBootKeg = require('../kegs/shared-db-boot-keg');
 
 function mockFolder(name) {
     const result = new Volume();
@@ -205,7 +205,7 @@ class VolumeStore {
         return Contact.ensureAllLoaded(participants)
             .then(() => {
                 // keg key for this db
-                const boot = new ChatBootKeg(this, User.current, this.isChannel);
+                const boot = new SharedDbBootKeg(this, User.current, this.isChannel);
                 boot.addKey();
                 participants.forEach(p => {
                     boot.addParticipant(p);

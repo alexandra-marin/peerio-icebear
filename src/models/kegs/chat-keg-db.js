@@ -1,4 +1,4 @@
-const ChatBootKeg = require('./chat-boot-keg');
+const SharedDbBootKeg = require('./shared-db-boot-keg');
 const socket = require('../../network/socket');
 const User = require('../user/user');
 const contactStore = require('../contacts/contact-store');
@@ -233,7 +233,7 @@ class ChatKegDb {
         return Contact.ensureAllLoaded(participants)
             .then(() => {
                 // keg key for this db
-                const boot = new ChatBootKeg(this, User.current, this.isChannel);
+                const boot = new SharedDbBootKeg(this, User.current, this.isChannel);
                 boot.addKey();
                 participants.forEach(p => {
                     boot.addParticipant(p);
@@ -253,7 +253,7 @@ class ChatKegDb {
      */
     loadBootKeg() {
         // console.log(`Loading chat boot keg for ${this.id}`);
-        const boot = new ChatBootKeg(this, User.current);
+        const boot = new SharedDbBootKeg(this, User.current);
         return boot._enqueueLoad().return(boot);
     }
 }

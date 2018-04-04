@@ -108,7 +108,6 @@ class FileStore {
             return;
         }
         if (this.paused) {
-            // TODO(dchest): reload everything?
             this.resume();
         }
         this.stopMigrationDisconnectListener = socket.onDisconnect(() => {
@@ -118,12 +117,12 @@ class FileStore {
             this.migrationStarted = false;
             this.migrationPerformedByAnotherClient = false;
             socket.onceAuthenticated(() => {
-                // TODO(dchest): try starting migration again?
-                // this.migrateToAccountVersion1();
+                this.migrateToAccountVersion1();
             });
         });
-        await retryUntilSuccess(() => this.getLegacySharedFiles());
         this.migrationPending = true;
+        this.migrationPerformedByAnotherClient = false;
+        await retryUntilSuccess(() => this.getLegacySharedFiles());
         if (this.migrationKeg.migration.files) {
             this.legacySharedFiles = this.migrationKeg.migration.files;
             this.migrationStarted = true;

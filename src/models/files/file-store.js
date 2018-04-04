@@ -93,6 +93,8 @@ class FileStore {
         this.doMigrate();
     }
     async migrateToAccountVersion1() {
+        if (this.migrationKeg.accountVersion === 1) return;
+
         if (!await this.canStartMigration()) {
             console.log('Migration is perfomed by another client');
             this.migrationPending = true;
@@ -104,7 +106,11 @@ class FileStore {
                 unsubscribe();
                 console.log('Received file migration unlocked event from server');
                 // Migrated?
-                await this.migrationKeg.reload();
+                try {
+                    await this.migrationKeg.reload();
+                } catch (ex) {
+                    // ignore error
+                }
                 if (this.migrationKeg.accountVersion === 1) {
                     this.migrationPending = false;
                     this.migrationPerformedByAnotherClient = false;
@@ -145,6 +151,7 @@ class FileStore {
         }
         when(() => this.migrationKeg.accountVersion === 1, this.stopMigration);
     }
+
     @action.bound async stopMigration() {
         if (this.discardMigrationDisconnectListener) {
             this.discardMigrationDisconnectListener();

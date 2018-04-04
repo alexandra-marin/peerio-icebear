@@ -1,11 +1,11 @@
-// const { observable } = require('mobx');
+const { observable } = require('mobx');
 const SyncedKeg = require('../kegs/synced-keg');
 
 // TODO: need something more abstract here and in UI by the next migration
 
 class AccountVersion extends SyncedKeg {
     // current account version
-    accountVersion = 0;
+    @observable accountVersion = 0;
     // migration specific data
     migration = {};
 

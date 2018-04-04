@@ -97,6 +97,7 @@ class FileStore {
             console.log('Migration is perfomed by another client');
             this.migrationPending = true;
             this.migrationPerformedByAnotherClient = true;
+            this.migrationStarted = false;
             this.pause();
             // Handle the case when another client disconnects during migration.
             const unsubscribe = socket.subscribe(socket.APP_EVENTS.fileMigrationUnlocked, () => {

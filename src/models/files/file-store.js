@@ -94,13 +94,16 @@ class FileStore {
     }
     async migrateToAccountVersion1() {
         if (!await this.canStartMigration()) {
+            console.log('Migration is perfomed by another client');
             this.migrationPending = true;
             this.migrationPerformedByAnotherClient = true;
             this.pause();
             // Handle the case when another client disconnects during migration.
             const unsubscribe = socket.subscribe(socket.APP_EVENTS.fileMigrationUnlocked, () => {
                 unsubscribe();
+                console.log('Received file migration unlocked event from server');
                 // Migrated?
+                await this.migrationKeg.reload();
                 if (this.migrationKeg.accountVersion === 1) {
                     this.migrationPending = false;
                     this.migrationPerformedByAnotherClient = false;
@@ -108,25 +111,25 @@ class FileStore {
                     return;
                 }
                 // Not migrated, try to take over the migration.
+                console.log('Taking over migration');
                 this.migrateToAccountVersion1();
             });
             // Handle the case when another client finishes migration.
             when(() => this.migrationKeg.accountVersion === 1, () => {
+                unsubscribe();
                 this.migrationPending = false;
                 this.migrationPerformedByAnotherClient = false;
                 this.resume();
             });
             return;
         }
+
         if (this.paused) {
             this.resume();
         }
         this.discardMigrationDisconnectListener = socket.onDisconnect(() => {
             this.discardMigrationDisconnectListener();
             this.discardMigrationDisconnectListener = null;
-            this.migrationPending = false;
-            this.migrationStarted = false;
-            this.migrationPerformedByAnotherClient = false;
             socket.onceAuthenticated(() => {
                 this.migrateToAccountVersion1();
             });

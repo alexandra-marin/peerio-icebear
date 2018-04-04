@@ -97,13 +97,24 @@ class FileStore {
             this.migrationPending = true;
             this.migrationPerformedByAnotherClient = true;
             this.pause();
-            // Handle the case when another client disconnects or finishes migration.
+            // Handle the case when another client disconnects during migration.
             const unsubscribe = socket.subscribe(socket.APP_EVENTS.fileMigrationUnlocked, () => {
                 unsubscribe();
                 // Migrated?
-                if (this.migrationKeg.accountVersion === 1) return;
+                if (this.migrationKeg.accountVersion === 1) {
+                    this.migrationPending = false;
+                    this.migrationPerformedByAnotherClient = false;
+                    this.resume();
+                    return;
+                }
                 // Not migrated, try to take over the migration.
                 this.migrateToAccountVersion1();
+            });
+            // Handle the case when another client finishes migration.
+            when(() => this.migrationKeg.accountVersion === 1, () => {
+                this.migrationPending = false;
+                this.migrationPerformedByAnotherClient = false;
+                this.resume();
             });
             return;
         }

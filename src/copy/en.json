@@ -247,6 +247,7 @@
   "button_shareWithOthers": "Share with others",
   "button_unshare": "Unshare",
   "button_reshare": "Reshare",
+  "title_folderNameUnshared": "{folderName} was unshared",
   "title_folderUnshared": "Folder was unshared",
   "button_unshareAll": "Unshare all",
   "button_shareViaChat": "Share via chat",

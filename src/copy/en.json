@@ -630,7 +630,7 @@
   "title_confirmTitle": "Remember, we can’t access your data.",
   "title_confirmContent1": "Only you have a copy of your Account Key.",
   "title_confirmContent2": "If you lose it, we cannot help you access your account.",
-  "title_accountKey1": "Passwords are way stronger when computers make them. This Account Key was generated just for you. Beep boop.",
+  "title_accountKey1": "Passwords are way stronger when computers make them. This Account Key was generated just for you.",
   "title_accountKey2": "Since Peerio cannot access any of your data, including this Account Key, saving a backup may help you in the future.",
   "title_onboarding1": "Thanks for joining Peerio!",
   "title_onboarding2": "Get more free storage by completing these tasks!",

@@ -48,9 +48,12 @@ class ChatStore {
     }
 
     // todo: not sure this little event emitter experiment should live
-    EVENT_TYPES = { messagesReceived: 'messagesReceived' };
+    EVENT_TYPES = {
+        messagesReceived: 'messagesReceived',
+        invitedToChannel: 'invitedToChannel'
+    };
     /**
-     * Currently emits just one event - 'messagesReceived' (1 sec. throttled)
+     * Events emitter.
      * @member {EventEmitter}
      * @type {EventEmitter}
      * @public
@@ -276,6 +279,10 @@ class ChatStore {
     onNewMessages = _.throttle((props) => {
         this.events.emit(this.EVENT_TYPES.messagesReceived, props);
     }, 1000);
+
+    onInvitedToChannel = (props) => {
+        this.events.emit(this.EVENT_TYPES.invitedToChannel, props);
+    };
 
     generateJitsiUrl() {
         const id = cryptoUtil.getRandomGlobalShortIdHex();

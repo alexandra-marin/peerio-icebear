@@ -79,6 +79,7 @@ class ChatInviteStore {
 
     updating = false;
     updateAgain = false;
+    initialInvitesProcessed = false;
 
     /**
      * Active invite object { kegDbId, channelName, username }
@@ -141,7 +142,7 @@ class ChatInviteStore {
     updateInvites = () => {
         return socket.send('/auth/kegs/channel/invites')
             .then(action(res => {
-                this.received = res.map(i => {
+                const newReceivedInvites = res.map(i => {
                     const channelName = this.decryptChannelName(i);
                     return new ReceivedInvite({
                         username: i.admin,
@@ -150,6 +151,19 @@ class ChatInviteStore {
                         channelName
                     });
                 });
+                if (this.initialInvitesProcessed) {
+                    // Find new invites and notify about them.
+                    newReceivedInvites.forEach(invite => {
+                        for (let i = 0; i < this.received.length; i++) {
+                            if (this.received[i].kegDbId === invite.kegDbId) {
+                                return; // invite seen
+                            }
+                        }
+                        // invite not seen, notify.
+                        setTimeout(() => { getChatStore().onInvitedToChannel({ invite }); });
+                    });
+                }
+                this.received = newReceivedInvites;
             }));
     };
 
@@ -215,27 +229,22 @@ class ChatInviteStore {
         if (!socket.authenticated) return;
         this.updating = true;
 
-        try {
-            this.updateInvitees()
-                .then(this.updateInvites)
-                .then(this.updateLeftUsers)
-                .catch(err => {
-                    console.error('Error updating invite store', err);
-                })
-                .finally(() => {
-                    this.afterUpdate();
-                });
-        } catch (err) {
-            console.error('Error updating invite store', err);
-        } finally {
-            this.afterUpdate();
-        }
+        this.updateInvitees()
+            .then(this.updateInvites)
+            .then(this.updateLeftUsers)
+            .catch(err => {
+                console.error('Error updating invite store', err);
+            })
+            .finally(() => {
+                this.afterUpdate();
+            });
     };
 
     /**
      * @private
      */
     afterUpdate() {
+        this.initialInvitesProcessed = true;
         this.updating = false;
         if (this.updateAgain === false) return;
         setTimeout(this.update);

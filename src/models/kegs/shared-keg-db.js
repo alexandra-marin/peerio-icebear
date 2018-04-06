@@ -177,10 +177,13 @@ class SharedKegDb {
     }
 
     _createMeta() {
-        if (!this.isChannel) {
-            const arg = { participants: this.participantsToCreateWith.map(p => p.username) };
-            arg.participants.push(User.current.username);
+        if (this.isChannel) {
+            return socket.send(`/auth/kegs/db/create-${this.urlName}`)
+                .then(this._parseMeta)
+                .then(this._resolveBootKeg);
         }
+        const arg = { participants: this.participantsToCreateWith.map(p => p.username) };
+        arg.participants.push(User.current.username);
         // server will return existing chat if it does already exist
         // the logic below takes care of rare collision cases, like when users create chat or boot keg at the same time
         return socket.send(`/auth/kegs/db/create-${this.urlName}`, arg)

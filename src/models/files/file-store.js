@@ -568,6 +568,8 @@ class FileStore {
     }
 
     updateDescriptors() {
+        if (this.paused) return;
+
         const taskId = 'updating descriptors';
         if (isRunning('taskId')) return;
         if (!this.knownDescriptorVersion) {

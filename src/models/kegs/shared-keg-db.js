@@ -183,7 +183,7 @@ class SharedKegDb {
         }
         // server will return existing chat if it does already exist
         // the logic below takes care of rare collision cases, like when users create chat or boot keg at the same time
-        return socket.send(`/auth/kegs/db/create-${urlName}`, arg)
+        return socket.send(`/auth/kegs/db/create-${this.urlName}`, arg)
             .then(this._parseMeta)
             .then(this._resolveBootKeg);
     }

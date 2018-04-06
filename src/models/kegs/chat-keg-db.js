@@ -233,7 +233,7 @@ class ChatKegDb {
         return Contact.ensureAllLoaded(participants)
             .then(() => {
                 // keg key for this db
-                const boot = new SharedDbBootKeg(this, User.current, this.isChannel);
+                const boot = new SharedDbBootKeg(this, User.current);
                 boot.addKey();
                 participants.forEach(p => {
                     boot.addParticipant(p);

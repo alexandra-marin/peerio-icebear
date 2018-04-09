@@ -18,11 +18,17 @@ const warnings = require('../warnings');
 class SyncedKeg extends Keg {
     constructor(kegName, db, plaintext = false, forceSign = false, allowEmpty = true, storeSignerData = false) {
         super(kegName, kegName, db, plaintext, forceSign, allowEmpty, storeSignerData);
-        // this will make sure we'll update every time server sends a new digest
-        // it will also happen after reconnect, because digest is always refreshed on reconnect
-        tracker.subscribeToKegUpdates(db.id, kegName, this._enqueueLoad);
+
         // this will load initial data
-        socket.onceAuthenticated(this._enqueueLoad);
+        socket.onceAuthenticated(() => {
+            // this is hacky, but there's no better way unless we refactor login seriously
+            // the problem is with failed login leaving synced keg instances behind without cleaning up subscription
+            if (!this.db.boot || !this.db.boot.keys) return;
+            // this will make sure we'll update every time server sends a new digest
+            // it will also happen after reconnect, because digest is always refreshed on reconnect
+            tracker.subscribeToKegUpdates(db.id, kegName, this._enqueueLoad);
+            this._enqueueLoad();
+        });
     }
 
     _syncQueue = new TaskQueue(1, 0);

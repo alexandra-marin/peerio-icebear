@@ -1091,8 +1091,10 @@ class FileStore {
      */
     resume() {
         this.paused = false;
-        setTimeout(() => this.onFileDigestUpdate());
-        setTimeout(() => this.updateDescriptors());
+        setTimeout(() => {
+            this.onFileDigestUpdate();
+            this.updateDescriptors();
+        });
     }
 }
 const ret = new FileStore();

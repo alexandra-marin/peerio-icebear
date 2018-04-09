@@ -111,9 +111,11 @@ class FileStore {
                 } catch (ex) {
                     // ignore error
                 }
+
+                this.migrationPending = false;
+                this.migrationPerformedByAnotherClient = false;
+
                 if (this.migrationKeg.accountVersion === 1) {
-                    this.migrationPending = false;
-                    this.migrationPerformedByAnotherClient = false;
                     this.resume();
                     return;
                 }

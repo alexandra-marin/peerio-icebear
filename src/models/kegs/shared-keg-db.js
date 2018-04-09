@@ -236,7 +236,7 @@ class SharedKegDb {
      * @private
      */
     createBootKeg() {
-        console.log(`Creating chat boot keg for ${this.id}, isChannel:${this.isChannel}`);
+        console.log(`Creating ${this.urlName} boot keg for ${this.id}, isChannel:${this.isChannel}`);
         const participants = this.participantsToCreateWith.slice();
         participants.push(contactStore.currentUser);
         return Contact.ensureAllLoaded(participants)

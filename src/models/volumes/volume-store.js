@@ -144,77 +144,10 @@ class VolumeStore {
     }
 
     async create() {
-        // the logic below takes care of rare collision cases, like when users create chat or boot keg at the same time
-        await socket.send('/auth/kegs/db/create-volume')
-            .then(this._parseMeta)
-            .then(this._resolveBootKeg);
-        /**
-            id: Joi.string(),
-            lastId: Joi.number().integer(),
-            owner: Joi.string(),
-            type: Joi.string(),
-            bootVersion: Joi.number().optional(),
-            permissionVersion: Joi.string().optional(),
-            collectionVersions: Joi.object().pattern(/.+/, Joi.string()),
-            permissions: {
-                users: Joi.object().pattern(/^[a-z0-9_]{1,32}$/, Joi.string().valid('rw', 'r')),
-                groups: Joi.object().optional()
-            }
-         */
-    }
-
-    // fills current object properties from raw keg metadata
-    _parseMeta = (meta) => {
-        this.id = meta.id;
-        if (!this.isChannel && meta.permissions && meta.permissions.users) {
-            this._metaParticipants = Object.keys(meta.permissions.users)
-                .map(username => contactStore.getContactAndSave(username));
-        }
-    }
-
-    // figures out if we need to load/create boot keg and does it
-    _resolveBootKeg = () => {
-        return this.loadBootKeg()
-            .then(boot => {
-                if (boot.version > 1) {
-                    // disabled for now
-                    // Migrating boot keg
-                    if (!boot.format) {
-                        boot.participants = this._metaParticipants;
-                    }
-                    return [boot, false];
-                }
-                return this.createBootKeg();
-            })
-            .spread((boot, justCreated) => {
-                this.boot = boot;
-                if (!this.key && !justCreated) this.dbIsBroken = true;
-                return justCreated;
-            })
-            .tapCatch(err => console.error(err));
-    }
-
-    /**
-     * Create boot keg for this database
-     * @private
-     */
-    createBootKeg() {
-        console.log(`Creating volume boot keg for ${this.id}`);
-        const participants = this.participantsToCreateWith.slice();
-        participants.push(contactStore.currentUser);
-        return Contact.ensureAllLoaded(participants)
-            .then(() => {
-                // keg key for this db
-                const boot = new SharedDbBootKeg(this, User.current, this.isChannel);
-                boot.addKey();
-                participants.forEach(p => {
-                    boot.addParticipant(p);
-                });
-                boot.assignRole(contactStore.currentUser, 'admin');
-
-                // saving bootkeg
-                return boot.saveToServer().return([boot, true]);
-            });
+        const volume = new Volume('test-volume');
+        await volume.create();
+        await volume.loadMetadata();
+        return volume;
     }
 
     /**

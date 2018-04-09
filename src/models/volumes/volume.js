@@ -1,6 +1,8 @@
+const { observable } = require('mobx');
 const createMap = require('../../helpers/dynamic-array-map');
 // const warnings = require('../warnings');
 const AbstractFolder = require('../files/abstract-folder');
+const VolumeKegDb = require('../kegs/volume-keg-db');
 
 class Volume extends AbstractFolder {
     isShared = true;
@@ -13,6 +15,21 @@ class Volume extends AbstractFolder {
         this.fileMapObservable = m.observableMap;
         const m2 = createMap(this.folders, 'folderId');
         this.folderMap = m2.map;
+    }
+
+    @observable loadingMeta = false;
+    @observable metaLoaded = false;
+
+    create() {
+        this.db = new VolumeKegDb(null);
+    }
+
+    loadMetadata() {
+        if (this.metaLoaded || this.loadingMeta) return this._metaPromise;
+        this.loadingMeta = true;
+        // retry is handled inside loadMeta()
+        this._metaPromise = this.db.loadMeta();
+        return this._metaPromise;
     }
 
     add(file) {

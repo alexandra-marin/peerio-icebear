@@ -16,8 +16,6 @@ const { getContactStore } = require('../../helpers/di-contact-store');
 const createMap = require('../../helpers/dynamic-array-map');
 const FileStoreFolders = require('./file-store.folders');
 const FileStoreBulk = require('./file-store.bulk');
-const cryptoUtil = require('../../crypto/util');
-const cryptoKeys = require('../../crypto/keys');
 const { asPromise } = require('../../helpers/prombservable');
 
 /**
@@ -680,7 +678,7 @@ class FileStore {
                     if (!file.format && file.fileOwner === User.current.username) {
                         file.migrating = true;
                         file.format = file.latestFormat;
-                        file.descriptorKey = cryptoUtil.bytesToB64(cryptoKeys.generateEncryptionKey());
+                        file.descriptorKey = file.blobKey;
                         console.log(`migrating file ${file.fileId}`);
                         retryUntilSuccess(() => {
                             return file.createDescriptor()

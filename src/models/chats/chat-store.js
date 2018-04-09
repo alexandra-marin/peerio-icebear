@@ -4,7 +4,6 @@ const socket = require('../../network/socket');
 const tracker = require('../update-tracker');
 const { EventEmitter } = require('eventemitter3');
 const _ = require('lodash');
-const { retryUntilSuccess } = require('../../helpers/retry');
 const MyChats = require('../chats/my-chats');
 const TinyDb = require('../../db/tiny-db');
 const config = require('../../config');

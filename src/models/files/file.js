@@ -359,6 +359,10 @@ class File extends Keg {
     }
     deserializeDescriptor(d) {
         if (this.fileId && this.fileId !== d.fileId) throw new Error('Descriptor fileId mismatch');
+        if (!this.descriptorKey) {
+            // this is a legacy file, owner migrated it and by default descriptorKey == blobKey during migration
+            this.descriptorKey = this.blobKey;
+        }
         this.uploadedAt = new Date(+d.createdAt);
         this.updatedAt = new Date(+d.updatedAt);
         this.readyForDownload = d.blobAvailable;

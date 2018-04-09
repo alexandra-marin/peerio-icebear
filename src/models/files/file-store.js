@@ -647,12 +647,17 @@ class FileStore {
                     count: 50
                 },
                 filter: {
-                    deleted: false
+                    deleted: false,
+                    hidden: false
                 }
             }),
             'Initial file list loading'
         ).then(action(kegs => {
             for (const keg of kegs.kegs) {
+                if (keg.deleted || keg.hidden) {
+                    console.log('Hidden or deleted file kegs should not have been returned by server. kegid:', keg.id);
+                    continue;
+                }
                 const file = new File(User.current.kegDb);
                 if (keg.collectionVersion > this.maxUpdateId) {
                     this.maxUpdateId = keg.collectionVersion;
@@ -771,7 +776,7 @@ class FileStore {
                     }
                     const existing = this.getById(keg.props.fileId) || this.getByKegId(keg.kegId);
                     const file = existing || new File(User.current.kegDb);
-                    if (keg.deleted) {
+                    if (keg.deleted || keg.hidden) {
                         if (existing) this.files.remove(existing);
                         continue;
                     }

@@ -1,5 +1,3 @@
-// @ts-check
-
 const { observable, action, computed, reaction, autorunAsync, isObservableArray, when, runInAction } = require('mobx');
 const Chat = require('./chat');
 const socket = require('../../network/socket');
@@ -16,6 +14,7 @@ const warnings = require('../warnings');
 const { setChatStore } = require('../../helpers/di-chat-store');
 const { getFileStore } = require('../../helpers/di-file-store');
 const { cryptoUtil } = require('../../crypto');
+const dbListProvider = require('../../helpers/keg-db-list-provider');
 
 // Used for typechecking
 // eslint-disable-next-line no-unused-vars
@@ -295,7 +294,7 @@ class ChatStore {
      * @param {string | Chat} chat - chat id or Chat instance
      * @public
      */
-    addChat = (chat, noActivate) => {
+    @action.bound addChat(chat, noActivate) {
         if (!chat) throw new Error(`Invalid chat id. ${chat}`);
         let c;
         if (typeof chat === 'string') {
@@ -317,7 +316,7 @@ class ChatStore {
         if (this.myChats.hidden.includes(c.id)) c.unhide();
         c.loadMetadata().then(() => c.loadMostRecentMessage());
         if (this.loaded && !this.activeChat && !noActivate) this.activate(c.id);
-    };
+    }
 
     // takes current fav/hidden lists and makes sure store.chats reflect it
     // at first login this class and chat list loader will call this function once each making sure data is applied
@@ -362,34 +361,35 @@ class ChatStore {
     @action async loadAllChats() {
         if (this.loaded || this.loading) return;
         this.loading = true;
-        // 1. Loading my_chats keg
+
+        // Loading my_chats keg
         this.myChats = new MyChats();
         this.myChats.onUpdated = this.applyMyChatsData;
-        // 2. loading favorite chats
-        // gonna happen in applyMyChatsData when fav list is loaded
         await asPromise(this.myChats, 'loaded', true);
-        // 3. checking how many more chats we can load
-        const rest = config.chat.maxInitialChats - this.myChats.favorites.length;
-        if (rest > 0) {
-            // 4. loading the rest unhidden chats
-            await retryUntilSuccess(() =>
-                socket.send('/auth/kegs/user/dbs')
-                    .then(action(list => {
-                        let k = 0;
-                        for (const id of list) {
-                            if (id.startsWith('global:') || id.startsWith('volume:')) continue;
-                            if (id.startsWith('channel:')) {
-                                this.addChat(id);
-                                continue;
-                            }
-                            if (id === 'SELF' || this.myChats.hidden.includes(id)
-                                || this.myChats.favorites.includes(id)) continue;
-                            if (k++ >= rest) continue;
-                            this.addChat(id);
-                        }
-                    })));
+
+        // loading favorite chats
+        // ..... gonna happen in applyMyChatsData when fav list is loaded
+
+        // checking how many more chats we can load
+        let chatsLeft = config.chat.maxInitialChats - this.myChats.favorites.length;
+        if (chatsLeft > 0) {
+            // loading all the channels
+            const channels = await dbListProvider.getChannels();
+            channels.forEach(this.addChat);
+            chatsLeft -= channels.length;
         }
-        // 5. check if chats were created while we were loading chat list
+        // loading the rest unhidden chats
+        if (chatsLeft > 0) {
+            const dms = await dbListProvider.getDMs();
+            for (const id of dms) {
+                if (chatsLeft <= 0) break;
+                if (this.myChats.favorites.includes(id)) continue;
+                this.addChat(id);
+                chatsLeft--;
+            }
+        }
+
+        // check if chats were created while we were loading chat list
         // unlikely, but possible
         runInAction(() => {
             Object.keys(tracker.digest).forEach(this.addChat);

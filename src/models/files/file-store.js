@@ -179,6 +179,8 @@ class FileStore {
      * @private
      */
     finishMigration() {
+        if (this.migrationPerformedByAnotherClient) return Promise.resolve();
+        console.log('Sending /auth/file/migration/finish');
         return retryUntilSuccess(() => socket.send('/auth/file/migration/finish'));
     }
 

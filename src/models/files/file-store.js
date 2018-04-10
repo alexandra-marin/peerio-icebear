@@ -59,8 +59,6 @@ class FileStore {
     @observable migrationPerformedByAnotherClient = false;
     @observable.shallow legacySharedFiles = null;
 
-    discardMigrationDisconnectListener = null;
-
     @computed get hasLegacySharedFiles() {
         return !!(this.legacySharedFiles && this.legacySharedFiles.length);
     }
@@ -134,13 +132,6 @@ class FileStore {
         if (this.paused) {
             this.resume();
         }
-        this.discardMigrationDisconnectListener = socket.onDisconnect(() => {
-            this.discardMigrationDisconnectListener();
-            this.discardMigrationDisconnectListener = null;
-            socket.onceAuthenticated(() => {
-                this.migrateToAccountVersion1();
-            });
-        });
         this.migrationPending = true;
         this.migrationPerformedByAnotherClient = false;
         await retryUntilSuccess(() => this.getLegacySharedFiles());
@@ -153,10 +144,6 @@ class FileStore {
     }
 
     @action.bound async stopMigration() {
-        if (this.discardMigrationDisconnectListener) {
-            this.discardMigrationDisconnectListener();
-            this.discardMigrationDisconnectListener = null;
-        }
         await this.finishMigration();
         this.migrationPending = false;
         this.migrationStarted = false;

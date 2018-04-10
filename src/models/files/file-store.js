@@ -91,12 +91,13 @@ class FileStore {
     async migrateToAccountVersion1() {
         if (this.migrationKeg.accountVersion === 1) return;
 
+        this.pause();
+
         if (!await this.canStartMigration()) {
             console.log('Migration is perfomed by another client');
             this.migrationPending = true;
             this.migrationPerformedByAnotherClient = true;
             this.migrationStarted = false;
-            this.pause();
             // Handle the case when another client disconnects during migration.
             const unsubscribe = socket.subscribe(socket.APP_EVENTS.fileMigrationUnlocked, async () => {
                 unsubscribe();
@@ -129,9 +130,6 @@ class FileStore {
             return;
         }
 
-        if (this.paused) {
-            this.resume();
-        }
         this.migrationPending = true;
         this.migrationPerformedByAnotherClient = false;
         await retryUntilSuccess(() => this.getLegacySharedFiles());
@@ -149,6 +147,7 @@ class FileStore {
         this.migrationStarted = false;
         this.migrationPerformedByAnotherClient = false;
         this.migrationProgress = 100;
+        this.resume();
     }
 
     /**
@@ -1075,6 +1074,7 @@ class FileStore {
      * @public
      */
     resume() {
+        if (!this.paused) return;
         this.paused = false;
         setTimeout(() => {
             this.onFileDigestUpdate();

@@ -51,12 +51,6 @@ class Keg {
          */
         this.overrideKey = null;
         /**
-         * Keg format version, client tracks kegs structure changes with this property
-         * @member {number}
-         * @public
-         */
-        this.format = 0;
-        /**
          * Keg collection (all kegs with this.type) version, snowflake string id.
          * null means we don't know the version yet, need to fetch keg at least once.
          * @member {?string}
@@ -86,6 +80,12 @@ class Keg {
         this.storeSignerData = storeSignerData;
     }
 
+    /**
+     * Keg format version, client tracks kegs structure changes with this property
+     * @member {number}
+     * @public
+     */
+    @observable format = 0;
     /**
      * null when signature has not been verified yet (it's async) or it will never be because this keg is not supposed
      * to be signed.

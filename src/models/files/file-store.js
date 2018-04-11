@@ -12,11 +12,11 @@ const { retryUntilSuccess, isRunning } = require('../../helpers/retry');
 const TaskQueue = require('../../helpers/task-queue');
 const { setFileStore } = require('../../helpers/di-file-store');
 const { getChatStore } = require('../../helpers/di-chat-store');
-const { getContactStore } = require('../../helpers/di-contact-store');
 const createMap = require('../../helpers/dynamic-array-map');
 const FileStoreFolders = require('./file-store.folders');
 const FileStoreBulk = require('./file-store.bulk');
-const { asPromise } = require('../../helpers/prombservable');
+const FileStoreMigration = require('./file-store.migration');
+const errorCodes = require('../../errors').codes;
 
 /**
  * File store.
@@ -30,6 +30,7 @@ class FileStore {
         this.fileMapObservable = m.observableMap;
         this.folders = new FileStoreFolders(this);
         this.bulk = new FileStoreBulk(this);
+        this.migration = new FileStoreMigration(this);
 
         this.chatFileMap = observable.map();
 
@@ -52,206 +53,6 @@ class FileStore {
      * @public
      */
     @observable.shallow files = [];
-
-    @observable migrationPending = false;
-    @observable migrationStarted = false;
-    @observable migrationProgress = 0;
-    @observable migrationPerformedByAnotherClient = false;
-    @observable.shallow legacySharedFiles = null;
-
-    @computed get hasLegacySharedFiles() {
-        return !!(this.legacySharedFiles && this.legacySharedFiles.length);
-    }
-
-    get migrationKeg() {
-        return User.current.accountVersionKeg;
-    }
-    confirmMigration = async () => {
-        if (this.migrationStarted || this.migrationKeg.accountVersion === 1) return;
-        this.migrationStarted = true;
-        await asPromise(this, 'loaded', true);
-        await asPromise(getChatStore(), 'loaded', true);
-        if (this.migrationKeg.accountVersion === 1) return;
-        await retryUntilSuccess(() => {
-            return this.migrationKeg.save(() => {
-                this.migrationKeg.migration = { files: this.legacySharedFiles };
-            }).catch(err => {
-                console.error(err);
-                if (this.socket.authenticated) {
-                    // concurrency issue
-                    if (this.migrationKeg.accountVersion === 1) return Promise.resolve();
-                    this.legacySharedFiles = this.migrationKeg.migration.files;
-                    return Promise.resolve();
-                }
-                return Promise.reject(err);
-            });
-        });
-        this.doMigrate();
-    }
-    async migrateToAccountVersion1() {
-        if (this.migrationKeg.accountVersion === 1) return;
-
-        this.pause();
-
-        if (!await this.canStartMigration()) {
-            console.log('Migration is perfomed by another client');
-            this.migrationPending = true;
-            this.migrationPerformedByAnotherClient = true;
-            this.migrationStarted = false;
-            // Handle the case when another client disconnects during migration.
-            const unsubscribe = socket.subscribe(socket.APP_EVENTS.fileMigrationUnlocked, async () => {
-                unsubscribe();
-                console.log('Received file migration unlocked event from server');
-                // Migrated?
-                try {
-                    await this.migrationKeg.reload();
-                } catch (ex) {
-                    // ignore error
-                }
-
-                this.migrationPending = false;
-                this.migrationPerformedByAnotherClient = false;
-
-                if (this.migrationKeg.accountVersion === 1) {
-                    this.resume();
-                    return;
-                }
-                // Not migrated, try to take over the migration.
-                console.log('Taking over migration');
-                this.migrateToAccountVersion1();
-            });
-            // Handle the case when another client finishes migration.
-            when(() => this.migrationKeg.accountVersion === 1, () => {
-                unsubscribe();
-                this.migrationPending = false;
-                this.migrationPerformedByAnotherClient = false;
-                this.resume();
-            });
-            return;
-        }
-
-        this.migrationPending = true;
-        this.migrationPerformedByAnotherClient = false;
-        await retryUntilSuccess(() => this.getLegacySharedFiles());
-        if (this.migrationKeg.migration.files) {
-            this.legacySharedFiles = this.migrationKeg.migration.files;
-            this.migrationStarted = true;
-            this.doMigrate();
-        }
-        when(() => this.migrationKeg.accountVersion === 1, this.stopMigration);
-    }
-
-    @action.bound async stopMigration() {
-        await this.finishMigration();
-        this.migrationPending = false;
-        this.migrationStarted = false;
-        this.migrationPerformedByAnotherClient = false;
-        this.migrationProgress = 100;
-        this.resume();
-    }
-
-    /**
-     * Asks server if we can start migration.
-     * @returns {Promise<boolean>}
-     * @private
-     */
-    canStartMigration() {
-        return retryUntilSuccess(() => socket.send('/auth/file/migration/start'))
-            .then(res => res.success);
-    }
-
-    /**
-     * Tells server that migration is finished.
-     * @private
-     */
-    finishMigration() {
-        if (this.migrationPerformedByAnotherClient) return Promise.resolve();
-        console.log('Sending /auth/file/migration/finish');
-        return retryUntilSuccess(() => socket.send('/auth/file/migration/finish'));
-    }
-
-    async doMigrate() {
-        await asPromise(this, 'loaded', true);
-        await asPromise(getChatStore(), 'loaded', true);
-
-        /* eslint-disable no-await-in-loop */
-        for (let i = 0; i < this.legacySharedFiles.length; i++) {
-            if (!this.migrationPending) return; // it was ended externally
-            this.migrationProgress = Math.floor(i / (this.legacySharedFiles.length / 100));
-            const item = this.legacySharedFiles[i];
-            console.log('migrating', item);
-            // verify file
-            const file = this.getById(item.fileId);
-            if (!file) {
-                console.error(`File ${item.fileId} not found, can't migrate`);
-                continue;
-            }
-            if (!file.format || file.migrating) {
-                await asPromise(file, 'migrating', false);
-            }
-            if (!file.format) {
-                console.error(`File ${item.fileId} is invalid, can't migrate`);
-                continue;
-            }
-            // this will be a share in DM
-            if (item.username) {
-                // load and verify contact
-                const contact = getContactStore().getContact(item.username);
-                await contact.ensureLoaded();
-                if (contact.notFound) {
-                    console.error(`Contact ${item.username} not found can't share ${item.fileId}`);
-                    continue;
-                }
-                if (contact.isDeleted) {
-                    console.error(`Contact ${item.username} deleted can't share ${item.fileId}`);
-                    continue;
-                }
-                // load and verify DM
-                let chat = null;
-                await retryUntilSuccess(() => {
-                    chat = getChatStore().startChat([contact], false, '', '', true);
-                    return chat.loadMetadata();
-                }, null, 10)
-                    .catch(() => {
-                        console.error(`Can't create DM with ${item.username} to share ${item.fileId}`);
-                    });
-                if (!chat || !chat.metaLoaded) {
-                    continue;
-                }
-                // share (retry is inside)
-                await file.share(chat).catch(err => {
-                    console.error(err);
-                    console.error(`Failed to share ${item.fileId}`);
-                });
-                continue;
-            } else if (item.kegDbId) {
-                getChatStore().addChat(item.kegDbId, true);
-                if (!getChatStore().chatMap[item.kegDbId]) {
-                    console.error(`Failed to load room ${item.kegDbId}`);
-                    continue;
-                }
-                const chat = getChatStore().chatMap[item.kegDbId];
-                await chat.loadMetadata().catch(err => {
-                    console.error(err);
-                    console.error(`Failed to load room ${item.kegDbId}`);
-                });
-                if (!chat.metaLoaded) {
-                    continue;
-                }
-                await file.share(chat).catch(err => {
-                    console.error(err);
-                    console.error(`Failed to share ${item.fileId}`);
-                });
-            }
-        }
-        /* eslint-enable no-await-in-loop */
-        this.stopMigration();
-        this.migrationKeg.save(() => {
-            this.migrationKeg.migration.files = [];
-            this.migrationKeg.accountVersion = 1;
-        });
-        warnings.add('title_fileUpdateComplete');
-    }
 
     /**
      * Subset of files not currently hidden by any applied filters
@@ -661,30 +462,34 @@ class FileStore {
                         continue;
                     }
                     this.files.unshift(file);
-                    if (!file.format && file.fileOwner === User.current.username) {
-                        file.migrating = true;
-                        file.format = file.latestFormat;
-                        file.descriptorKey = file.blobKey;
-                        console.log(`migrating file ${file.fileId}`);
-                        retryUntilSuccess(() => {
-                            return file.createDescriptor()
-                                .then(() => file.saveToServer())
-                                .then(() => { file.migrating = false; })
+                    if (!file.format) {
+                        if (file.fileOwner === User.current.username) {
+                            file.migrating = true;
+                            file.format = file.latestFormat;
+                            file.descriptorKey = file.blobKey;
+                            console.log(`migrating file ${file.fileId}`);
+                            retryUntilSuccess(() => {
+                                return file.createDescriptor()
+                                    .then(() => file.saveToServer())
+                                    .then(() => { file.migrating = false; })
+                                    .catch(err => {
+                                        if (err && err.error === errorCodes.malformedRequest) {
+                                            // our other connected client managed to migrate this first
+                                            file.migrating = false;
+                                            return Promise.resolve();
+                                        }
+                                        return Promise.reject(err);
+                                    });
+                            }, `migrating file ${file.fileId}`, 10)
                                 .catch(err => {
-                                    if (err && err.error === 406) {
-                                        // our other connected client managed to migrate this first
-                                        file.migrating = false;
-                                        return Promise.resolve();
-                                    }
-                                    return Promise.reject(err);
+                                    file.format = 0;
+                                    file.migrating = false;
+                                    console.error(err);
+                                    console.error(`Failed to migrate file ${file.fileId}`);
                                 });
-                        }, `migrating file ${file.fileId}`, 10)
-                            .catch(err => {
-                                file.format = 0;
-                                file.migrating = false;
-                                console.error(err);
-                                console.error(`Failed to migrate file ${file.fileId}`);
-                            });
+                        } else if (keg.descriptor) {
+                            file.saveToServer();
+                        }
                     }
                 } else {
                     console.error('Failed to load file keg.', keg.kegId);
@@ -1003,63 +808,6 @@ class FileStore {
         checkFile();
     }
 
-    // [ { kegDbId: string, fileId: string }, ... ]
-    getLegacySharedFiles() {
-        if (this.legacySharedFiles) return Promise.resolve(this.legacySharedFiles);
-        return socket.send('/auth/file/legacy/channel/list')
-            .then(res => {
-                this.legacySharedFiles = [];
-                if (res) {
-                    if (res.sharedInChannels) {
-                        Object.keys(res.sharedInChannels).forEach(kegDbId => {
-                            res.sharedInChannels[kegDbId].forEach(fileId => {
-                                this.legacySharedFiles.push({ kegDbId, fileId });
-                            });
-                        });
-                    }
-                    if (res.sharedWithUsers) {
-                        Object.keys(res.sharedWithUsers).forEach(fileId => {
-                            res.sharedWithUsers[fileId].forEach(username => {
-                                this.legacySharedFiles.push({ username, fileId });
-                            });
-                        });
-                    }
-                }
-                return this.legacySharedFiles;
-            });
-    }
-
-    async getLegacySharedFilesText() {
-        await asPromise(this, 'loaded', true);
-        await asPromise(getChatStore(), 'loaded', true);
-        await this.getLegacySharedFiles();
-
-        const eol = typeof navigator === 'undefined'
-            || !navigator.platform // eslint-disable-line no-undef
-            || !navigator.platform.startsWith('Win') // eslint-disable-line no-undef
-            ? '\n' : '\r\n';
-
-        let ret = '';
-        for (const item of this.legacySharedFiles) {
-            let fileName = item.fileId;
-            const file = this.getById(item.fileId);
-            if (file && file.name) {
-                fileName = file.name;
-            }
-            let recipient = item.username;
-            if (!recipient) {
-                const chat = getChatStore().chatMap[item.kegDbId];
-                if (chat) {
-                    await asPromise(chat, 'headLoaded', true); //eslint-disable-line
-                    recipient = chat.name;
-                } else {
-                    recipient = item.kegDbId;
-                }
-            }
-            ret += `${fileName} ; ${recipient}${eol}`;
-        }
-        return ret;
-    }
 
     /**
      * Pause file store updates.
@@ -1082,6 +830,7 @@ class FileStore {
         });
     }
 }
+
 const ret = new FileStore();
 setFileStore(ret);
 module.exports = ret;

@@ -402,7 +402,7 @@ class SocketClient {
                     return;
                 }
                 const handler = (resp) => {
-                    this.throttled = (resp.error === 425);
+                    this.throttled = (resp.error === ServerError.codes.accountThrottled);
                     if (resp && resp.error) {
                         if (resp.error === ServerError.codes.accountClosed) {
                             getUser().deleted = true;

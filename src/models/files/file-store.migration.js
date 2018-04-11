@@ -9,9 +9,12 @@ const { asPromise } = require('../../helpers/prombservable');
 const errorCodes = require('../../errors').codes;
 
 /**
- * File store.
- * @namespace
- * @public
+ * File store migration module
+ * Workflow:
+ * 1. migrateToAccountVersion1() is being called by user profile logic if older account version is detected
+ * 2. migrateToAccountVersion1 loads required data and sets pending flag OR starts the migration if it was already
+ *    confirmed by the user in previous sessions.
+ * 3. UI calls confirmMigration()
  */
 class FileStoreMigration {
     constructor(fileStore) {
@@ -43,7 +46,7 @@ class FileStoreMigration {
      * migration will auto-start next time, if interrupted.
      */
     confirmMigration = async () => {
-        if (this.started || this.migrationKeg.accountVersion === 1) return;
+        if (!this.pending || this.started || this.migrationKeg.accountVersion === 1) return;
         this.started = true;
         await this.waitForStores();
         // in case another client has migrated while were waiting for stores
@@ -69,14 +72,18 @@ class FileStoreMigration {
         this.doMigrate();
     }
 
+    /**
+     * Prepares migration data and flags and starts migration OR waits for UI to confirm start.
+     */
     async migrateToAccountVersion1() {
         if (this.migrationKeg.accountVersion === 1) return;
-
+        this.pending = true;
+        this.performedByAnotherClient = false;
         this.fileStore.pause();
 
+        // trying to acquire lock
         if (!await this.canStartMigration()) {
             console.log('Migration is performed by another client');
-            this.pending = true;
             this.performedByAnotherClient = true;
             this.started = false;
             // Handle the case when another client disconnects during migration.
@@ -90,11 +97,8 @@ class FileStoreMigration {
                     // ignore error
                 }
 
-                this.pending = false;
-                this.performedByAnotherClient = false;
-
                 if (this.migrationKeg.accountVersion === 1) {
-                    this.fileStore.resume();
+                    this.finishMigration();
                     return;
                 }
                 // Not migrated, try to take over the migration.
@@ -104,26 +108,28 @@ class FileStoreMigration {
             // Handle the case when another client finishes migration.
             when(() => this.migrationKeg.accountVersion === 1, () => {
                 unsubscribe();
-                this.pending = false;
-                this.performedByAnotherClient = false;
-                this.fileStore.resume();
+                this.finishMigration();
             });
             return;
         }
 
-        this.pending = true;
-        this.performedByAnotherClient = false;
-        await retryUntilSuccess(() => this.getLegacySharedFiles());
+        when(() => this.migrationKeg.accountVersion === 1, this.finishMigration);
+
+        // in case we already have file list stored - no confirmation is needed
         if (this.migrationKeg.migration.files) {
             this.legacySharedFiles = this.migrationKeg.migration.files;
             this.started = true;
             this.doMigrate();
+        } else {
+            await this.getLegacySharedFiles();
         }
-        when(() => this.migrationKeg.accountVersion === 1, this.stopMigration);
     }
 
-    @action.bound async stopMigration() {
-        await this.finishMigration();
+    @action.bound async finishMigration() {
+        if (!this.performedByAnotherClient) {
+            console.log('Sending /auth/file/migration/finish');
+            retryUntilSuccess(() => socket.send('/auth/file/migration/finish'));
+        }
         this.pending = false;
         this.started = false;
         this.performedByAnotherClient = false;
@@ -139,16 +145,6 @@ class FileStoreMigration {
     canStartMigration() {
         return retryUntilSuccess(() => socket.send('/auth/file/migration/start'))
             .then(res => res.success);
-    }
-
-    /**
-     * Tells server that migration is finished.
-     * @private
-     */
-    finishMigration() {
-        if (this.performedByAnotherClient) return Promise.resolve();
-        console.log('Sending /auth/file/migration/finish');
-        return retryUntilSuccess(() => socket.send('/auth/file/migration/finish'));
     }
 
     async doMigrate() {
@@ -225,7 +221,7 @@ class FileStoreMigration {
             }
         }
         /* eslint-enable no-await-in-loop */
-        this.stopMigration();
+        this.finishMigration();
         this.migrationKeg.save(() => {
             this.migrationKeg.migration.files = [];
             this.migrationKeg.accountVersion = 1;
@@ -236,7 +232,7 @@ class FileStoreMigration {
     // [ { kegDbId: string, fileId: string }, ... ]
     getLegacySharedFiles() {
         if (this.legacySharedFiles) return Promise.resolve(this.legacySharedFiles);
-        return socket.send('/auth/file/legacy/channel/list')
+        return retryUntilSuccess(() => socket.send('/auth/file/legacy/channel/list')
             .then(res => {
                 this.legacySharedFiles = [];
                 if (res) {
@@ -256,7 +252,7 @@ class FileStoreMigration {
                     }
                 }
                 return this.legacySharedFiles;
-            });
+            }));
     }
 
     async getLegacySharedFilesText() {

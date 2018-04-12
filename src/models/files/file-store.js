@@ -154,6 +154,7 @@ class FileStore {
      * @public
      */
     uploadQueue = new TaskQueue(1);
+    migrationQueue = new TaskQueue(1);
 
     /**
      * @ignore
@@ -377,7 +378,16 @@ class FileStore {
                 return socket.send('/auth/file/descriptor/get', { fileId })
                     .then(d => {
                         // todo: optimise, do not repeat decrypt operations
-                        files.forEach(f => f.deserializeDescriptor(d));
+                        files.forEach(f => {
+                            if (!f.format) {
+                                // time to migrate keg
+                                f.format = f.latestFormat;
+                                f.deserializeDescriptor(d);
+                                this.migrationQueue.addTask(() => f.saveToServer());
+                            } else {
+                                f.deserializeDescriptor(d);
+                            }
+                        });
                         if (this.knownDescriptorVersion < d.collectionVersion) {
                             this.knownDescriptorVersion = d.collectionVersion;
                         }
@@ -466,29 +476,33 @@ class FileStore {
                         if (file.fileOwner === User.current.username) {
                             file.migrating = true;
                             file.format = file.latestFormat;
-                            file.descriptorKey = file.blobKey;
                             console.log(`migrating file ${file.fileId}`);
-                            retryUntilSuccess(() => {
-                                return file.createDescriptor()
-                                    .then(() => file.saveToServer())
-                                    .then(() => { file.migrating = false; })
+                            this.migrationQueue.addTask(() =>
+                                retryUntilSuccess(() => {
+                                    return file.createDescriptor()
+                                        .then(() => file.saveToServer())
+                                        .then(() => { file.migrating = false; })
+                                        .catch(err => {
+                                            if (err && err.error === errorCodes.malformedRequest) {
+                                                // our other connected client managed to migrate this first
+                                                file.migrating = false;
+                                                return Promise.resolve();
+                                            }
+                                            return Promise.reject(err);
+                                        });
+                                }, `migrating file ${file.fileId}`, 10)
                                     .catch(err => {
-                                        if (err && err.error === errorCodes.malformedRequest) {
-                                            // our other connected client managed to migrate this first
-                                            file.migrating = false;
-                                            return Promise.resolve();
-                                        }
-                                        return Promise.reject(err);
-                                    });
-                            }, `migrating file ${file.fileId}`, 10)
-                                .catch(err => {
-                                    file.format = 0;
-                                    file.migrating = false;
-                                    console.error(err);
-                                    console.error(`Failed to migrate file ${file.fileId}`);
-                                });
+                                        file.format = 0;
+                                        file.migrating = false;
+                                        console.error(err);
+                                        console.error(`Failed to migrate file ${file.fileId}`);
+                                    })
+                            );
                         } else if (keg.descriptor) {
-                            file.saveToServer();
+                            // file owner migrated it, we can migrate our keg
+                            file.format = file.latestFormat;
+                            file.descriptorKey = file.blobKey;
+                            this.migrationQueue.addTask(() => retryUntilSuccess(() => file.saveToServer()));
                         }
                     }
                 } else {

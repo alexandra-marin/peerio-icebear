@@ -342,7 +342,7 @@ class File extends Keg {
             blobNonce: this.blobNonce
         };
         payload = JSON.stringify(payload);
-        payload = secret.encryptString(payload, this.descriptorKey);
+        payload = secret.encryptString(payload, cryptoUtil.b64ToBytes(this.descriptorKey));
 
         let signature = await signDetached(payload, getUser().signKeys.secretKey);
         signature = cryptoUtil.bytesToB64(signature);
@@ -375,7 +375,7 @@ class File extends Keg {
         this.role = d.effectiveRole;
         this.descriptorVersion = d.version;
         let payload = new Uint8Array(d.payload);
-        payload = secret.decryptString(payload, this.descriptorKey);
+        payload = secret.decryptString(payload, cryptoUtil.b64ToBytes(this.descriptorKey));
         payload = JSON.parse(payload);
         this.name = payload.name;
         this.blobKey = payload.blobKey;

@@ -296,7 +296,7 @@ class File extends Keg {
             return {
                 name: this.name,
                 key: this.blobKey,
-                nonce: this.nonce
+                nonce: this.blobNonce
             };
         }
         return {

@@ -22,7 +22,7 @@ module.exports = function mixUserProfileModule() {
     when(() => this.accountVersionKeg.loaded, () => {
         // already migrated?
         if (this.accountVersionKeg.accountVersion === 1) return;
-        getFileStore().migrateToAccountVersion1();
+        getFileStore().migration.migrateToAccountVersion1();
     });
 
     this.loadSettings = () => {

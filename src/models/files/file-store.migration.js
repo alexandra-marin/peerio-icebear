@@ -6,7 +6,7 @@ const { retryUntilSuccess } = require('../../helpers/retry');
 const { getChatStore } = require('../../helpers/di-chat-store');
 const { getContactStore } = require('../../helpers/di-contact-store');
 const { asPromise } = require('../../helpers/prombservable');
-const errorCodes = require('../../errors').codes;
+const errorCodes = require('../../errors').ServerError.codes;
 
 /**
  * File store migration module

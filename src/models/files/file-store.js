@@ -16,7 +16,7 @@ const createMap = require('../../helpers/dynamic-array-map');
 const FileStoreFolders = require('./file-store.folders');
 const FileStoreBulk = require('./file-store.bulk');
 const FileStoreMigration = require('./file-store.migration');
-const errorCodes = require('../../errors').codes;
+const errorCodes = require('../../errors').ServerError.codes;
 
 /**
  * File store.
@@ -476,6 +476,7 @@ class FileStore {
                         if (file.fileOwner === User.current.username) {
                             file.migrating = true;
                             file.format = file.latestFormat;
+                            file.descriptorKey = file.blobKey;
                             console.log(`migrating file ${file.fileId}`);
                             this.migrationQueue.addTask(() =>
                                 retryUntilSuccess(() => {

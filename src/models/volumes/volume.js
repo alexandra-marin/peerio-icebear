@@ -1,11 +1,16 @@
-const { observable } = require('mobx');
+const { observable, computed } = require('mobx');
 const createMap = require('../../helpers/dynamic-array-map');
 // const warnings = require('../warnings');
 const AbstractFolder = require('../files/abstract-folder');
 const VolumeKegDb = require('../kegs/volume-keg-db');
+const contactStore = require('../contacts/contact-store');
+const Contact = require('../contacts/contact');
+const socket = require('../../network/socket');
+const warnings = require('../warnings');
 
 class Volume extends AbstractFolder {
     isShared = true;
+    @observable id = null;
 
     constructor(name) {
         super();
@@ -19,6 +24,7 @@ class Volume extends AbstractFolder {
 
     @observable loadingMeta = false;
     @observable metaLoaded = false;
+
 
     create() {
         this.db = new VolumeKegDb(null);
@@ -52,6 +58,63 @@ class Volume extends AbstractFolder {
             // removing from existing folder or volume
             if (file.folder) file.folder.free(file);
             this.add(file);
+        }
+    }
+
+    async addParticipants(participants) {
+        if (!participants || !participants.length) return Promise.resolve();
+        const contacts = participants.map(p => (typeof p === 'string' ? contactStore.getContactAndSave(p) : p));
+        await Contact.ensureAllLoaded(contacts);
+
+        const { boot } = this.db;
+        return boot.save(
+            () => {
+                contacts.forEach(c => boot.addParticipant(c));
+                return true;
+            },
+            () => {
+                contacts.forEach(c => boot.removeParticipant(c));
+            },
+            'error_addParticipant'
+        );
+    }
+
+    removeParticipant(participant) {
+        let contact = participant;
+        if (typeof contact === 'string') {
+            // we don't really care if it's loaded or not, we just need Contact instance
+            contact = contactStore.getContact(contact);
+        }
+        const boot = this.db.boot;
+        const wasAdmin = boot.admins.includes(contact);
+
+        return contact.ensureLoaded()
+            .then(() => {
+                return boot.save(
+                    () => {
+                        if (wasAdmin) boot.unassignRole(contact, 'admin');
+                        boot.removeParticipant(contact);
+                        return true;
+                    },
+                    () => {
+                        boot.addParticipant(contact);
+                        if (wasAdmin) boot.assignRole(contact, 'admin');
+                    },
+                    'error_removeParticipant'
+                );
+            });
+    }
+
+    async leave() {
+        this.leaving = true;
+        try {
+            await socket.send('/auth/kegs/volume/leave', { kegDbId: this.id });
+        } catch (err) {
+            console.error('Failed to leave volume.', this.id, err);
+            warnings.add('error_volumeLeave');
+            this.leaving = false;
+        } finally {
+            this.leaving = false;
         }
     }
 }

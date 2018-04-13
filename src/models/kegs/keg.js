@@ -336,7 +336,7 @@ class Keg {
             kegId: this.id
         })
             .catch((err) => {
-                if (this.allowEmpty && err instanceof ServerError && err.code === ServerError.codes.notFound) {
+                if (this.allowEmpty && err && err.code === ServerError.codes.notFound) {
                     // expected error for empty named kegs
                     const keg = {
                         kegId: this.id,

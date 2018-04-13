@@ -8,7 +8,7 @@ const config = require('../../config');
 const { retryUntilSuccess } = require('../../helpers/retry');
 const { reaction, action } = require('mobx');
 const clientApp = require('../client-app');
-const { ServerError } = require('../../errors');
+const errorCodes = require('../../errors').ServerError.codes;
 const { getChatStore } = require('../../helpers/di-chat-store');
 
 /**
@@ -125,7 +125,7 @@ class ChatMessageHandler {
                 this.chat.updatedAfterReconnect = true;
             }))
             .catch((err) => {
-                if (err && err.code === ServerError.codes.accessForbidden) {
+                if (err && err.code === errorCodes.accessForbidden) {
                     getChatStore().unloadChat(this.chat);
                 } else {
                     this.onMessageDigestUpdate();
@@ -200,7 +200,7 @@ class ChatMessageHandler {
                 return this.chat.addMessages(resp.kegs);
             }))
             .catch((err) => {
-                if (err && err.code === ServerError.codes.accessForbidden) {
+                if (err && err.code === errorCodes.accessForbidden) {
                     getChatStore().unloadChat(this.chat);
                 } else {
                     throw err;
@@ -239,7 +239,7 @@ class ChatMessageHandler {
             }
         }))
             .catch((err) => {
-                if (err && err.code === ServerError.codes.accessForbidden) {
+                if (err && err.code === errorCodes.accessForbidden) {
                     getChatStore().unloadChat(this.chat);
                 } else {
                     throw err;

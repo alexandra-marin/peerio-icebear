@@ -457,7 +457,7 @@ class File extends Keg {
             this.name = newName;
             return this.updateDescriptor()
                 .catch(err => {
-                    if (err instanceof ServerError && err.code === ServerError.codes.malformedRequest) {
+                    if (err && err.code === ServerError.codes.malformedRequest) {
                         return this.load(); // mitigating optimistic concurrency issues
                     }
                     return Promise.reject(err);

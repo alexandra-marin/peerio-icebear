@@ -45,6 +45,7 @@ const APP_EVENTS = {
     // clearWarning: 'clearWarning',
     channelInvitesUpdate: 'channelInvitesUpdate',
     channelDeleted: 'channelDeleted',
+    volumeDeleted: 'volumeDeleted',
     fileMigrationUnlocked: 'fileMigrationUnlocked'
 };
 

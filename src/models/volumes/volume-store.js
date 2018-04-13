@@ -1,15 +1,18 @@
 const { observable, computed, action, when } = require('mobx');
 const { setVolumeStore } = require('../../helpers/di-volume-store');
-const { getChatStore } = require('../../helpers/di-chat-store');
 // const cryptoUtil = require('../../crypto/util');
 const Volume = require('./volume');
 const folderResolveMap = require('../files/folder-resolve-map');
 const socket = require('../../network/socket');
 const warnings = require('../warnings');
-const contactStore = require('../contacts/contact-store');
-const Contact = require('../contacts/contact');
-const User = require('../user/user');
-const SharedDbBootKeg = require('../kegs/shared-db-boot-keg');
+// const contactStore = require('../contacts/contact-store');
+// const Contact = require('../contacts/contact');
+// const User = require('../user/user');
+// const SharedDbBootKeg = require('../kegs/shared-db-boot-keg');
+const dbListProvider = require('../../helpers/keg-db-list-provider');
+// const { asPromise } = require('../../helpers/prombservable');
+const tracker = require('../update-tracker');
+
 
 function mockFolder(name) {
     const result = new Volume();
@@ -44,125 +47,121 @@ function mockProgress(folder) {
             }), 1000);
         }));
 }
-/**
- * Volume store.
- * @namespace
- * @public
- */
+
 class VolumeStore {
-    // constructor() {
-    // socket.onceStarted(() => {
-    //   socket.subscribe('volumeInvitesUpdate', this.update);
-    //   socket.onAuthenticated(this.update);
-    // });
-    // }
-
-    @observable left = observable.shallowMap();
-
-    /**
-     * Updates local data from server.
-     * @function
-     * @memberof VolumeStore
-     * @private
-     */
-    update = async () => {
-        if (this.updating) {
-            this.updateAgain = true;
-            return;
-        }
-        this.updateAgain = false;
-        if (!socket.authenticated) return;
-        this.updating = true;
-
-        try {
-            // TODO: add this when ready
-            // await this.updateInvitees();
-            // await this.updateInvites();
-            await this.updateLeftUsers();
-        } catch (err) {
-            console.error('Error updating volume store', err);
-        } finally {
-            this.afterUpdate();
-        }
-    };
-
-    /**
-     * @private
-     */
-    afterUpdate() {
-        this.updating = false;
-        if (this.updateAgain === false) return;
-        setTimeout(this.update);
+    constructor() {
+        socket.onceAuthenticated(this.loadAllVolumes);
+        socket.onceStarted(() => {
+            socket.subscribe(socket.APP_EVENTS.volumeDeleted, this.processVolumeDeletedEvent);
+        });
     }
 
-    /** @private */
-    updateLeftUsers = async () => {
-        const res = await socket.send('/auth/kegs/volume/users-left');
-        // TODO: make it an action?
-        this.left.clear();
-        for (const kegDbId in res) {
-            const leavers = res[kegDbId];
-            if (!leavers || !leavers.length) continue;
-            this.left.set(kegDbId, leavers.map(l => { return { username: l }; }));
+    @observable.shallow volumes = [];
+    volumeMap = {};
+    @observable loading = false;
+    @observable loaded = false;
+
+    processVolumeDeletedEvent = data => {
+        const volume = this.volumeMap[data.kegDbId];
+        if (!volume) return;
+        if (!volume.deletedByMyself) {
+            warnings.addSevere('title_kickedFromVolume', '', { name: volume.name });
         }
+        this.unloadVolume(volume);
     };
 
-    /**
-     * Remove myself from this volume.
-     * @public
-     */
-    async leave() {
-        this.leaving = true;
-        try {
-            await socket.send('/auth/kegs/channel/leave', { kegDbId: this.id });
-        } catch (err) {
-            console.error('Failed to leave channel.', this.id, err);
-            warnings.add('error_channelLeave');
-            this.leaving = false;
+    @action.bound addVolume(volume) {
+        if (!volume) throw new Error(`Invalid volume id. ${volume}`);
+        let v;
+        if (typeof volume === 'string') {
+            if (volume === 'SELF' || this.volumeMap[volume]) return;
+            v = new Volume(volume, undefined, this);
+        } else {
+            v = volume;
+            if (this.volumeMap[v.id]) {
+                console.error('Trying to add a copy of an instance of a volume that already exists.', v.id);
+                return;
+            }
         }
+
+        this.volumeMap[v.id] = v;
+        this.volumes.push(v);
+        v.added = true;
+        v.loadMetadata().then(() => v.loadFiles());
     }
 
+
     /**
-     * Deletes the volume.
+     * Initial volumes list loading, call once after login.
+     *
+     * Logic:
+     * - load all favorite volumes
+     * - see if we have some limit left and load other unhidden volumes
+     * - see if digest contains some new volumes that are not hidden
+     *
+     * ORDER OF THE STEPS IS IMPORTANT ON MANY LEVELS
+     * @function loadAllVolumes
      * @returns {Promise}
+     * @memberof VolumeStore
+     * @instance
      * @public
      */
-    async delete() {
-        // this is an ugly-ish flag to prevent volume store from creating a warning about user being kicked from volume
-        this.deletedByMyself = true;
-        console.log(`Deleting volume ${this.id}.`);
+    @action async loadAllVolumes() {
+        if (this.loaded || this.loading) return;
+        this.loading = true;
+
+        const volumes = await dbListProvider.getVolumes();
+        volumes.forEach(this.addVolume);
+        Object.keys(tracker.digest).forEach(this.addVolume);
+        tracker.subscribeToKegDbAdded(this.addVolume);
+
+        this.loading = false;
+        this.loaded = true;
+    }
+
+
+    @action async createVolume(participants = [], name) {
         try {
-            await socket.send('/auth/kegs/volume/delete', { kegDbId: this.id });
-            console.log(`Volume ${this.id} has been deleted.`);
-            warnings.add('title_volumeDeleted');
+            // we can't add participants before setting volume name because
+            // server will trigger invites and send empty volume name to user
+            const volume = new Volume(null, []);
+            await volume.loadMetadata();
+            this.addVolume(volume);
+            if (name) await volume.rename(name);
+            volume.addParticipants(participants.filter(p => !p.isMe));
+            return volume;
         } catch (err) {
-            console.error('Failed to delete volume', err);
-            this.deletedByMyself = false;
-            warnings.add('error_volumeDelete');
-            throw err;
+            console.error(err);
+            return null;
         }
     }
 
-    async create() {
-        const volume = new Volume('test-volume');
-        await volume.create();
-        await volume.loadMetadata();
-        return volume;
+    @action unloadVolume(volume) {
+        if (volume.active) {
+            this.deactivateCurrentVolume();
+        }
+        volume.dispose();
+        delete this.volumeMap[volume.id];
+        this.volumes.remove(volume);
     }
 
+    getVolumeWhenReady(id) {
+        return new Promise((resolve) => {
+            when(
+                () => {
+                    const volume = this.volumes.find(c => c.id === id);
+                    return !!(volume && volume.metaLoaded);
+                },
+                () => resolve(this.volumeMap[id])
+            );
+        });
+    }
+
+    //------------------------------------------------------------
     /**
      * MOCK METHODS/IMPLEMENTATIONS
      * TO BE REMOVED
      */
-    /**
-     * Full list of user's files.
-     * @member {ObservableArray<File>} files
-     * @memberof FileStore
-     * @instance
-     * @public
-     */
-    @observable.shallow volumes = [];
-
     // TODO: it is currently set on first deserialize
     // need to do something better
     rootFileFolder = undefined;

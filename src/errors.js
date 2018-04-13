@@ -148,6 +148,7 @@ function ServerError(code, msg) {
     const error = Error.call(this, this.message);
     this.name = `ServerError: ${code}: ${type}`;
     this.code = code;
+    this.error = code; // I always forget which one is it, code or error, so let it be both
     this.stack = error.stack;
 }
 

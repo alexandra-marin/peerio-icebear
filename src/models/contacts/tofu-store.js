@@ -21,7 +21,7 @@ class TofuStore {
                 type: 'tofu',
                 reverse: false
             }
-        }).then(res => {
+        }, false).then(res => {
             if (!res.kegs || !res.kegs.length) {
                 return;
             }
@@ -68,7 +68,7 @@ class TofuStore {
                 reverse: false
             },
             filter: { username }
-        }).then(res => {
+        }, false).then(res => {
             if (!res.kegs || !res.kegs.length) return null;
             const keg = new Tofu(getUser().kegDb);
             keg.loadFromKeg(res.kegs[0]); // TODO: detect and delete excess? shouldn't really happen though

@@ -45,7 +45,7 @@ class ChatFileHandler {
             filter: {
                 collectionVersion: { $gt: this.knownUpdateId }
             }
-        })
+        }, false)
             .then(resp => {
                 if (!resp.kegs || !resp.kegs.length) return;
 
@@ -157,7 +157,8 @@ class ChatFileHandler {
         return retryUntilSuccess(() => {
             return socket.send(
                 '/auth/kegs/db/files/latest',
-                { kegDbId: this.chat.id, count: config.chat.recentFilesDisplayLimit }
+                { kegDbId: this.chat.id, count: config.chat.recentFilesDisplayLimit },
+                false
             )
                 .then(res => {
                     const ids = [];

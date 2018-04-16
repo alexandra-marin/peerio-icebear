@@ -386,14 +386,14 @@ class File extends Keg {
         const descriptor = await this.serializeDescriptor();
         descriptor.size = this.size;
         descriptor.chunkSize = this.chunkSize;
-        return socket.send('/auth/file/descriptor/create', descriptor);
+        return socket.send('/auth/file/descriptor/create', descriptor, true);
     }
 
     async updateDescriptor() {
         const descriptor = await this.serializeDescriptor();
         const version = this.descriptorVersion + 1;
         descriptor.version = version;
-        return socket.send('/auth/file/descriptor/update', descriptor)
+        return socket.send('/auth/file/descriptor/update', descriptor, true)
             .then(() => {
                 // in case descriptor was updated while waiting for response
                 if (this.descriptorVersion + 1 === version) {
@@ -491,7 +491,7 @@ class File extends Keg {
                 kegDbId: db.id,
                 type: 'file',
                 filter: { fileId: this.fileId }
-            })
+            }, false)
                 .then(resp => {
                     // file already exists in this db
                     if (resp.kegs.length) return Promise.resolve();

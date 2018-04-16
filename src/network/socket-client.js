@@ -380,10 +380,11 @@ class SocketClient {
      * Send a message to server
      * @param {string} name - api method name
      * @param {any=} data - data to send
+     * @param {?bool} hasBinaryData - if you know for sure, set this to true/false to increase performance
      * @returns {Promise<Object>} - server response, always returns `{}` if response is empty
      * @public
      */
-    send(name, data) {
+    send(name, data, hasBinaryData = null) {
         const id = this.requestId++;
         return new Promise((resolve, reject) => {
             this.awaitingRequests[id] = { name, data, reject };
@@ -420,7 +421,11 @@ class SocketClient {
                     resolve(resp);
                 };
                 // console.debug(id, name, data);
-                this.socket.emit(name, data, handler);
+                if (hasBinaryData === null) {
+                    this.socket.emit(name, data, handler);
+                } else {
+                    this.socket.binary(hasBinaryData).emit(name, data, handler);
+                }
             });
         })
             .timeout(60000)

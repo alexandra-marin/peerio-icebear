@@ -369,13 +369,13 @@ class FileStore {
         const maxUpdateIdBefore = tracker.fileDescriptorDigest.maxUpdateId;
         const opts = this.knownDescriptorVersion ? { minCollectionVersion: this.knownDescriptorVersion } : undefined;
         retryUntilSuccess(
-            () => socket.send('/auth/file/ids/fetch', opts),
+            () => socket.send('/auth/file/ids/fetch', opts, false),
             taskId
         ).then(async resp => {
             await Promise.map(resp, fileId => {
                 const files = this.getAllById(fileId);
                 if (!files.length) return Promise.resolve();
-                return socket.send('/auth/file/descriptor/get', { fileId })
+                return socket.send('/auth/file/descriptor/get', { fileId }, false)
                     .then(d => {
                         // todo: optimise, do not repeat decrypt operations
                         files.forEach(f => {
@@ -430,7 +430,7 @@ class FileStore {
                 count: 50
             },
             filter
-        });
+        }, false);
     }
 
     @action _loadPage(fromKegId) {
@@ -447,7 +447,7 @@ class FileStore {
                     deleted: false,
                     hidden: false
                 }
-            }),
+            }, false),
             'Initial file list loading'
         ).then(action(kegs => {
             for (const keg of kegs.kegs) {
@@ -690,7 +690,7 @@ class FileStore {
                     kegDbId: chat.id,
                     type: 'file',
                     filter: { fileId }
-                });
+                }, false);
             }, undefined, 5)
                 .then(resp => {
                     if (!resp.kegs[0] || !file.loadFromKeg(resp.kegs[0])) {

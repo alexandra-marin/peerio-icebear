@@ -309,7 +309,7 @@ class ContactStore {
 
     _getBatchPage(emails, pos) {
         if (pos >= emails.length) return Promise.resolve([]);
-        return socket.send('/auth/user/lookup', { string: emails.slice(pos, pos + 15) });
+        return socket.send('/auth/user/lookup', { string: emails.slice(pos, pos + 15) }, false);
     }
 
     /**

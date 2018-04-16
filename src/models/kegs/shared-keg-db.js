@@ -171,7 +171,7 @@ class SharedKegDb {
     }
 
     _loadExistingMeta() {
-        return socket.send('/auth/kegs/db/meta', { kegDbId: this.id })
+        return socket.send('/auth/kegs/db/meta', { kegDbId: this.id }, false)
             .then(this._parseMeta)
             .then(this._resolveBootKeg);
     }

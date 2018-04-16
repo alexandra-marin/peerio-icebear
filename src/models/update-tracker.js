@@ -259,9 +259,9 @@ class UpdateTracker {
     loadDigest = async () => {
         console.log('Requesting full digest');
         try {
-            let resp = await socket.send('/auth/updates/digest', { prefixes: ['global:'] });
+            let resp = await socket.send('/auth/updates/digest', { prefixes: ['global:'] }, false);
             this.processDigestResponse(resp);
-            resp = await socket.send('/auth/updates/digest', { unread: true });
+            resp = await socket.send('/auth/updates/digest', { unread: true }, false);
             this.processDigestResponse(resp);
             this.loadedOnce = true;
             this.updatedAfterReconnect = true;
@@ -300,7 +300,7 @@ class UpdateTracker {
         socket.send('/auth/updates/last-known-version', {
             path: type ? `${id}:${type}` : id,
             lastKnownVersion: updateId
-        })
+        }, false)
             .then(() => {
                 if (digest.knownUpdateId < updateId) digest.knownUpdateId = updateId;
             })

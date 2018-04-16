@@ -119,7 +119,7 @@ class ChatReceiptHandler {
                 reverse: false
             },
             filter
-        }).then(res => {
+        }, false).then(res => {
             const { kegs } = res;
             if (!kegs || !kegs.length) return;
             for (let i = 0; i < kegs.length; i++) {

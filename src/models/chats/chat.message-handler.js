@@ -107,7 +107,7 @@ class ChatMessageHandler {
                 reverse: false
             },
             filter
-        })
+        }, false)
             .tapCatch(() => { this._loadingUpdates = false; })
             .then(action(resp => {
                 this._loadingUpdates = false;
@@ -165,7 +165,7 @@ class ChatMessageHandler {
                 offset: 0,
                 count: 1
             }
-        }))
+        }, false))
             .then(action(resp => {
                 this.setDownloadedUpdateId(resp.kegs);
                 this.chat.mostRecentMessageLoaded = true;
@@ -187,7 +187,7 @@ class ChatMessageHandler {
                 offset: 0,
                 count: config.chat.initialPageSize
             }
-        }))
+        }, false))
             .then(action(resp => {
                 this.chat.canGoUp = resp.hasMore;
                 this.chat.initialPageLoaded = true;
@@ -237,7 +237,7 @@ class ChatMessageHandler {
                 fromKegId: startingKegId || this.chat.messages[pagingUp ? 0 : this.chat.messages.length - 1].id,
                 count: config.chat.pageSize
             }
-        }))
+        }, false))
             .catch((err) => {
                 if (err && err.code === errorCodes.accessForbidden) {
                     getChatStore().unloadChat(this.chat);

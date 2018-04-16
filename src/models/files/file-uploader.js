@@ -125,7 +125,7 @@ class FileUploader extends FileProcessor {
             chunkNum: chunk.id,
             chunk: chunk.buffer.buffer,
             last: !this.uploadQueue.length && this.nonceGenerator.eof
-        })
+        }, true)
             .then(() => {
                 this.chunksWaitingForResponse--;
                 // console.log(`chunk ${chunk.id} sent`);

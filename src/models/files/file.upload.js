@@ -21,7 +21,7 @@ function _getUlResumeParams(path) {
                 throw new Error(`Upload file size mismatch. Was ${this.size} now ${stat.size}`);
             }
             // check file state on server
-            return socket.send('/auth/file/state', { fileId: this.fileId });
+            return socket.send('/auth/file/state', { fileId: this.fileId }, false);
         })
         .then(state => {
             console.log(state);

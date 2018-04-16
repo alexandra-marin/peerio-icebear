@@ -304,7 +304,7 @@ class Contact {
         }
         const usernames = Contact.smartRequestQueue.splice(0, 50); // 50 - max allowed batch size on server
         console.log(`Batch requesting ${usernames.length} lookups`);
-        socket.send('/auth/user/lookup', { string: usernames.map(u => u.username) })
+        socket.send('/auth/user/lookup', { string: usernames.map(u => u.username) }, false)
             .then(res => {
                 for (let i = 0; i < usernames.length; i++) {
                     usernames[i].resolve([res[i]]);

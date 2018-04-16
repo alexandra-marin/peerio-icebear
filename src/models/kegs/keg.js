@@ -224,7 +224,7 @@ class Keg {
         return socket.send('/auth/kegs/create', {
             kegDbId: this.db.id,
             type: this.type
-        }).then(resp => {
+        }, false).then(resp => {
             this.id = resp.kegId;
             this.version = resp.version;
             this.collectionVersion = resp.collectionVersion;
@@ -298,7 +298,7 @@ class Keg {
                 version: lastVersion + 1,
                 format: this.format
             }
-        })).then(resp => {
+        }, true)).then(resp => {
             this.pendingReEncryption = false;
             this.dirty = false;
             this.collectionVersion = resp.collectionVersion;
@@ -334,7 +334,7 @@ class Keg {
         return socket.send('/auth/kegs/get', {
             kegDbId: this.db.id,
             kegId: this.id
-        })
+        }, false)
             .catch((err) => {
                 if (this.allowEmpty && err && err.code === ServerError.codes.notFound) {
                     // expected error for empty named kegs
@@ -369,7 +369,7 @@ class Keg {
         return socket.send('/auth/kegs/delete', {
             kegDbId: this.db.id,
             kegId: this.id
-        });
+        }, false);
     }
 
     /**

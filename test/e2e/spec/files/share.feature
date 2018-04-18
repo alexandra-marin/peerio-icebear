@@ -1,4 +1,3 @@
-@wip
 Feature: Sharing files in DM
     Files may be shared by sending in a direct message; sharing a file with a single user
     creates a DM in which the file invitation is sent. There is no way to share a file without

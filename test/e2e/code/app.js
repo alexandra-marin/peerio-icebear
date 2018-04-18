@@ -58,7 +58,7 @@ class App {
         cfg.StorageEngine.storageFolder = path.join(os.homedir(), '.peerio-icebear-tests');
         cfg.socketServerUrl = testConfig.socketServerUrl;
         if (testConfig.logSocketMessages) {
-            cfg.debug = { trafficReportInterval: 5000, socketLogEnabled: true };
+            cfg.debug = { trafficReportInterval: 15000, socketLogEnabled: true };
         }
     }
 
@@ -158,14 +158,18 @@ class App {
         console.log('===== STOPPING TEST APP =====');
         const { when } = require('mobx');
         // closing connections
+        console.log('closing connection');
         this.world.ice.socket.close();
+        this.world.ice.socket.dispose();
         return new Promise((resolve) => {
             when(() => !this.world.ice.socket.connected, async () => {
+                console.log('clearing tinydb');
                 // delete TinyDbs
                 if (this.world.ice.TinyDb.user) await this.world.ice.TinyDb.user.clear();
                 await this.world.ice.TinyDb.system.clear();
-
+                console.log('clearing modules');
                 this._clearModuleCache();
+                console.log('invoking GC');
                 // hell, yeah
                 if (global.gc) global.gc();
                 this.started = false;

@@ -1,4 +1,4 @@
-const { observable, computed } = require('mobx');
+const { observable } = require('mobx');
 const createMap = require('../../helpers/dynamic-array-map');
 // const warnings = require('../warnings');
 const AbstractFolder = require('../files/abstract-folder');
@@ -7,6 +7,7 @@ const contactStore = require('../contacts/contact-store');
 const Contact = require('../contacts/contact');
 const socket = require('../../network/socket');
 const warnings = require('../warnings');
+const FileStoreBase = require('../files/file-store-base');
 
 class Volume extends AbstractFolder {
     isShared = true;
@@ -26,8 +27,10 @@ class Volume extends AbstractFolder {
     @observable metaLoaded = false;
 
 
-    create() {
+    async create() {
         this.db = new VolumeKegDb(null);
+        await this.loadMetadata();
+        this.fileStore = new FileStoreBase(this.db);
     }
 
     loadMetadata() {

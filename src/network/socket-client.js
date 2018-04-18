@@ -209,7 +209,7 @@ class SocketClient {
         this.authenticated = false;
         // <DEBUG>
         if (config.debug && config.debug.trafficReportInterval > 0) {
-            const s = WebSocket.prototype.send;
+            const s = this._originalWSSend = WebSocket.prototype.send;
             WebSocket.prototype.send = function(msg) {
                 self.bytesSent += msg.length || msg.byteLength || 0;
                 if (config.debug.socketLogEnabled && typeof msg === 'string') {
@@ -564,6 +564,10 @@ class SocketClient {
             clearInterval(interval);
         }, 1000);
     };
+
+    dispose() {
+        if (this._originalWSSend) WebSocket.prototype.send = this._originalWSSend;
+    }
 }
 
 module.exports = SocketClient;

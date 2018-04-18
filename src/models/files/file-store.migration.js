@@ -109,6 +109,7 @@ class FileStoreMigration {
             when(() => this.migrationKeg.accountVersion === 1, () => {
                 unsubscribe();
                 this.finishMigration();
+                this.fileStore.resume();
             });
             return;
         }
@@ -122,6 +123,10 @@ class FileStoreMigration {
             this.doMigrate();
         } else {
             await this.getLegacySharedFiles();
+            // new user or user with no shared files to migrate
+            if (!this.legacySharedFiles.length) {
+                this.confirmMigration();
+            }
         }
     }
 
@@ -226,7 +231,7 @@ class FileStoreMigration {
             this.migrationKeg.migration.files = [];
             this.migrationKeg.accountVersion = 1;
         });
-        warnings.add('title_fileUpdateComplete');
+        if (this.legacySharedFiles.length) warnings.add('title_fileUpdateComplete');
     }
 
     // [ { kegDbId: string, fileId: string }, ... ]

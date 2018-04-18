@@ -87,7 +87,7 @@ class VolumeStore {
         this.volumeMap[v.id] = v;
         this.volumes.push(v);
         v.added = true;
-        v.loadMetadata().then(() => v.loadFiles());
+        v.loadMetadata().then(() => v.fileStore.loadAllFiles());
     }
 
 
@@ -106,7 +106,7 @@ class VolumeStore {
      * @instance
      * @public
      */
-    @action async loadAllVolumes() {
+    @action.bound async loadAllVolumes() {
         if (this.loaded || this.loading) return;
         this.loading = true;
 
@@ -125,7 +125,7 @@ class VolumeStore {
             // we can't add participants before setting volume name because
             // server will trigger invites and send empty volume name to user
             const volume = new Volume(null, []);
-            await volume.loadMetadata();
+            await volume.create();
             this.addVolume(volume);
             if (name) await volume.rename(name);
             volume.addParticipants(participants.filter(p => !p.isMe));

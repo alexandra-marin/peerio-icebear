@@ -1,4 +1,4 @@
-const { observable, action, when, computed } = require('mobx');
+const { observable, action, when } = require('mobx');
 const socket = require('../../network/socket');
 const User = require('../user/user');
 const File = require('./file');
@@ -6,356 +6,32 @@ const warnings = require('../warnings');
 const tracker = require('../update-tracker');
 const TinyDb = require('../../db/tiny-db');
 const config = require('../../config');
-const util = require('../../util');
-const _ = require('lodash');
 const { retryUntilSuccess, isRunning } = require('../../helpers/retry');
 const TaskQueue = require('../../helpers/task-queue');
 const { setFileStore } = require('../../helpers/di-file-store');
 const { getChatStore } = require('../../helpers/di-chat-store');
-const createMap = require('../../helpers/dynamic-array-map');
-const FileStoreFolders = require('./file-store.folders');
-const FileStoreBulk = require('./file-store.bulk');
 const FileStoreMigration = require('./file-store.migration');
 const errorCodes = require('../../errors').ServerError.codes;
+const FileStoreBase = require('./file-store-base');
 
-/**
- * File store.
- * @namespace
- * @public
- */
-class FileStore {
+class FileStore extends FileStoreBase {
     constructor() {
-        const m = createMap(this.files, 'fileId');
-        this.fileMap = m.map;
-        this.fileMapObservable = m.observableMap;
-        this.folders = new FileStoreFolders(this);
-        this.bulk = new FileStoreBulk(this);
+        super();
         this.migration = new FileStoreMigration(this);
-
         this.chatFileMap = observable.map();
-
-        tracker.subscribeToKegUpdates('SELF', 'file', () => {
-            console.log('Files update event received');
-            this.onFileDigestUpdate();
-        });
 
         tracker.subscribeToFileDescriptorUpdates(() => {
             const d = tracker.fileDescriptorDigest;
             if (d.knownUpdateId >= d.maxUpdateId) return;
             this.updateDescriptors(d.knownUpdateId);
         });
-    }
-    /**
-     * Full list of user's files.
-     * @member {ObservableArray<File>} files
-     * @memberof FileStore
-     * @instance
-     * @public
-     */
-    @observable.shallow files = [];
 
-    /**
-     * Subset of files not currently hidden by any applied filters
-     * @readonly
-     * @memberof FileStore
-     */
-    @computed get visibleFiles() {
-        return this.files.filter(f => f.show);
+        when(() => this.loaded, this.onFinishLoading);
     }
 
-    /**
-     * Subset of files and folders not currently hidden by any applied filters
-     * @readonly
-     * @memberof FileStore
-     */
-    @computed get visibleFilesAndFolders() {
-        const folders = this.folders.searchAllFoldersByName(this.currentFilter);
-        return folders.concat(this.files.filter(f => f.show));
-    }
-
-    /**
-     * Filter to apply when computing visible folders
-     * @member {string} folderFilter
-     * @memberof FileStore
-     * @instance
-     * @public
-     */
-    @observable folderFilter = '';
-
-    /**
-     * Subset of folders not currently hidden by any applied filters
-     * @readonly
-     * @memberof FileStore
-     */
-    @computed get visibleFolders() {
-        return this.folders.searchAllFoldersByName(this.folderFilter);
-    }
-
-    /**
-     * Human readable maximum auto-expandable inline image size limit
-     * @readonly
-     * @memberof FileStore
-     */
-    inlineImageSizeLimitFormatted = util.formatBytes(config.chat.inlineImageSizeLimit);
-
-    /**
-     * Human readable maximum cutoff inline image size limit
-     * @readonly
-     * @memberof FileStore
-     */
-    inlineImageSizeLimitCutoffFormatted = util.formatBytes(config.chat.inlineImageSizeLimitCutoff);
-
-    /**
-     * Store is loading full file list for the first time.
-     * @member {boolean} loading
-     * @memberof FileStore
-     * @instance
-     * @public
-     */
-    @observable loading = false;
-    /**
-     * Will set to true after file list has been updated upon reconnect.
-     * @member {boolean} updatedAfterReconnect
-     * @memberof FileStore
-     * @instance
-     * @public
-     */
-    @observable updatedAfterReconnect = true;
-    /**
-     * Readonly, shows which keyword was used with last call to `filter()`, this need refactoring.
-     * @member {string} currentFilter
-     * @memberof FileStore
-     * @instance
-     * @public
-     */
-    @observable currentFilter = '';
-    /**
-     * Initial file list was loaded.
-     * @member {boolean}
-     * @protected
-     */
-    @observable loaded = false;
-    /**
-     * Updates to file store are paused.
-     */
-    @observable paused = false;
-    /**
-     * Currently updating file list from server, this is not observable property.
-     * @member {boolean}
-     * @public
-     */
-    updating = false;
-
-    maxUpdateId = '';
-    knownUpdateId = '';
-    /**
-     * Readonly
-     * @member {TaskQueue} uploadQueue
-     * @public
-     */
     uploadQueue = new TaskQueue(1);
     migrationQueue = new TaskQueue(1);
 
-    /**
-     * @ignore
-     * This will go away soon.
-     */
-    @observable unreadFiles = 0;// tracker.getDigest('SELF', 'file').newKegsCount;
-
-    // optimization to avoid creating functions every time
-    static isFileSelected(file) {
-        return file.selected;
-    }
-
-    // optimization to avoid creating functions every time
-    static isSelectedFileShareable(file) {
-        return !file.selected ? true : file.canShare;
-    }
-
-    // optimization to avoid creating functions every time
-    static isFileShareable(file) {
-        return file.canShare;
-    }
-
-    /**
-     * @member {boolean} hasSelectedFiles
-     * @memberof FileStore
-     * @instance
-     * @public
-     */
-    @computed get hasSelectedFiles() {
-        return this.files.some(FileStore.isFileSelected);
-    }
-
-    /**
-     * @member {boolean} hasSelectedFilesOrFolders
-     * @memberof FileStore
-     * @instance
-     * @public
-     */
-    @computed get hasSelectedFilesOrFolders() {
-        return this.selectedFilesOrFolders.length;
-    }
-
-    /**
-     * @member {boolean} canShareSelectedFiles
-     * @memberof FileStore
-     * @instance
-     * @public
-     */
-    @computed get canShareSelectedFiles() {
-        return this.hasSelectedFiles && this.files.every(FileStore.isSelectedFileShareable);
-    }
-
-    /**
-     * @member {boolean} allVisibleSelected
-     * @memberof FileStore
-     * @instance
-     * @public
-     */
-    @computed get allVisibleSelected() {
-        for (let i = 0; i < this.files.length; i++) {
-            if (!this.files[i].show) continue;
-            if (this.files[i].selected === false) return false;
-        }
-        return true;
-    }
-
-    /**
-     * @member {number} selectedCount
-     * @memberof FileStore
-     * @instance
-     * @public
-     */
-    @computed get selectedCount() {
-        let ret = 0;
-        for (let i = 0; i < this.files.length; i++) {
-            if (this.files[i].selected) ret += 1;
-        }
-        return ret;
-    }
-
-    /**
-     * Returns currently selected files (file.selected == true)
-     * @returns {Array<File>}
-     * @public
-     */
-    getSelectedFiles() {
-        const own = this.files.filter(FileStore.isFileSelected);
-        if (own.length) return own;
-        // TODO: this is temporary, file selection needs to be better, especially with files-in-chats
-        const ret = [];
-        this.chatFileMap.values().forEach(dbMap => {
-            const selected = dbMap.values().filter(FileStore.isFileSelected);
-            if (selected.length) ret.push(...selected);
-        });
-        return ret;
-    }
-
-    /**
-     * Returns currently selected files that are also shareable.
-     * @returns {Array<File>}
-     * @public
-     */
-    getShareableSelectedFiles() {
-        return this.files.filter(FileStore.isFileSelectedAndShareable);
-    }
-
-    /**
-     * Returns currently selected folders (folder.selected == true)
-     * @returns {Array<Folder>}
-     * @public
-     */
-    get selectedFolders() {
-        return this.folders.selectedFolders;
-    }
-
-    @computed get selectedFilesOrFolders() {
-        return this.selectedFolders.slice().concat(this.getSelectedFiles());
-    }
-
-    /**
-     * Deselects all files and folders
-     * @function clearSelection
-     * @memberof FileStore
-     * @instance
-     * @public
-     */
-    @action clearSelection() {
-        for (let i = 0; i < this.files.length; i++) {
-            this.files[i].selected = false;
-        }
-        this.chatFileMap.values().forEach(dbMap => {
-            dbMap.values().forEach(f => { f.selected = false; });
-        });
-
-        // selectedFolders is computable, do not recalculate it
-        const selFolders = this.selectedFolders;
-        for (let i = 0; i < selFolders.length; i++) {
-            selFolders[i].selected = false;
-        }
-    }
-
-    /**
-     * Selects all files
-     * @function selectAll
-     * @memberof FileStore
-     * @instance
-     * @public
-     */
-    @action selectAll() {
-        for (let i = 0; i < this.files.length; i++) {
-            const file = this.files[i];
-            if (!file.show || !file.readyForDownload) continue;
-            this.files[i].selected = true;
-        }
-    }
-
-    /**
-     * Deselects unshareable files
-     * @function deselectUnshareableFiles
-     * @memberof FileStore
-     * @instance
-     * @public
-     */
-    @action deselectUnshareableFiles() {
-        for (let i = 0; i < this.files.length; i++) {
-            const file = this.files[i];
-            if (file.canShare) continue;
-            if (file.selected) file.selected = false;
-        }
-    }
-
-    /**
-     * Applies filter to files.
-     * @function filterByName
-     * @param {string} query
-     * @memberof FileStore
-     * @instance
-     * @public
-     */
-    @action filterByName(query) {
-        this.currentFilter = query;
-        const regex = new RegExp(_.escapeRegExp(query), 'i');
-        for (let i = 0; i < this.files.length; i++) {
-            this.files[i].show = regex.test(this.files[i].name);
-            if (!this.files[i].show) this.files[i].selected = false;
-        }
-    }
-
-    /**
-     * Resets filter
-     * @function clearFilter
-     * @memberof FileStore
-     * @instance
-     * @public
-     */
-    @action clearFilter() {
-        this.currentFilter = '';
-        for (let i = 0; i < this.files.length; i++) {
-            this.files[i].show = true;
-        }
-    }
 
     updateDescriptors() {
         if (this.paused) return;
@@ -365,6 +41,7 @@ class FileStore {
         if (!this.knownDescriptorVersion) {
             this.knownDescriptorVersion = tracker.fileDescriptorDigest.knownUpdateId;
         }
+
         if (this.knownDescriptorVersion >= tracker.fileDescriptorDigest.maxUpdateId) return;
         const maxUpdateIdBefore = tracker.fileDescriptorDigest.maxUpdateId;
         const opts = this.knownDescriptorVersion ? { minCollectionVersion: this.knownDescriptorVersion } : undefined;
@@ -382,6 +59,7 @@ class FileStore {
                             if (!f.format) {
                                 // time to migrate keg
                                 f.format = f.latestFormat;
+                                f.descriptorKey = f.blobKey;
                                 f.deserializeDescriptor(d);
                                 this.migrationQueue.addTask(() => f.saveToServer());
                             } else {
@@ -405,146 +83,60 @@ class FileStore {
         });
     }
 
-    onFileDigestUpdate = _.throttle(() => {
-        if (this.paused) return;
-
-        const digest = tracker.getDigest('SELF', 'file');
-        // this.unreadFiles = digest.newKegsCount;
-        if (this.loaded && digest.maxUpdateId === this.maxUpdateId) {
-            this.updatedAfterReconnect = true;
-            return;
-        }
-        this.maxUpdateId = digest.maxUpdateId;
-        this.updateFiles(this.maxUpdateId);
-    }, 1500);
-
-    _getFiles() {
-        const filter = this.knownUpdateId ? { minCollectionVersion: this.knownUpdateId } : {};
-        // this is naturally paged because every update calls another update in the end
-        // until all update pages are loaded
-        return socket.send('/auth/kegs/db/list-ext', {
-            kegDbId: 'SELF',
-            options: {
-                type: 'file',
-                reverse: false,
-                count: 50
-            },
-            filter
-        }, false);
-    }
-
-    @action _loadPage(fromKegId) {
-        return retryUntilSuccess(
-            () => socket.send('/auth/kegs/db/list-ext', {
-                kegDbId: 'SELF',
-                options: {
-                    type: 'file',
-                    reverse: false,
-                    fromKegId,
-                    count: 50
-                },
-                filter: {
-                    deleted: false,
-                    hidden: false
-                }
-            }, false),
-            'Initial file list loading'
-        ).then(action(kegs => {
-            for (const keg of kegs.kegs) {
-                if (keg.deleted || keg.hidden) {
-                    console.log('Hidden or deleted file kegs should not have been returned by server. kegid:', keg.id);
-                    continue;
-                }
-                const file = new File(User.current.kegDb);
-                if (keg.collectionVersion > this.maxUpdateId) {
-                    this.maxUpdateId = keg.collectionVersion;
-                }
-                if (keg.collectionVersion > this.knownUpdateId) {
-                    this.knownUpdateId = keg.collectionVersion;
-                }
-                if (file.loadFromKeg(keg)) {
-                    if (!file.fileId) {
-                        console.error('File keg missing fileId', file.id);
-                        continue;
-                    }
-                    if (this.fileMap[file.fileId]) {
-                        console.error('File keg has duplicate fileId', file.id);
-                        continue;
-                    }
-                    this.files.unshift(file);
-                    if (!file.format) {
-                        if (file.fileOwner === User.current.username) {
-                            file.migrating = true;
-                            file.format = file.latestFormat;
-                            file.descriptorKey = file.blobKey;
-                            console.log(`migrating file ${file.fileId}`);
-                            this.migrationQueue.addTask(() =>
-                                retryUntilSuccess(() => {
-                                    return file.createDescriptor()
-                                        .then(() => file.saveToServer())
-                                        .then(() => { file.migrating = false; })
-                                        .catch(err => {
-                                            if (err && err.error === errorCodes.malformedRequest) {
-                                                // our other connected client managed to migrate this first
-                                                file.migrating = false;
-                                                return Promise.resolve();
-                                            }
-                                            return Promise.reject(err);
-                                        });
-                                }, `migrating file ${file.fileId}`, 10)
-                                    .catch(err => {
-                                        file.format = 0;
-                                        file.migrating = false;
-                                        console.error(err);
-                                        console.error(`Failed to migrate file ${file.fileId}`);
-                                    })
-                            );
-                        } else if (keg.descriptor) {
-                            // file owner migrated it, we can migrate our keg
-                            file.format = file.latestFormat;
-                            file.descriptorKey = file.blobKey;
-                            this.migrationQueue.addTask(() => retryUntilSuccess(() => file.saveToServer()));
-                        }
-                    }
-                } else {
-                    console.error('Failed to load file keg.', keg.kegId);
-                    // trying to be safe performing destructive operation of deleting a corrupted file keg
-                    // if (keg.version > 1 && keg.type === 'file'
-                    //     && (!keg.createdAt || Date.now() - keg.createdAt > 600000000/* approx 1 week */)) {
-                    //     console.log('Removing invalid file keg', keg);
-                    //     file.remove();
-                    // }
-                    continue;
-                }
+    @action.bound onInitialFileAdded(keg, file) {
+        if (!file.format) {
+            if (file.fileOwner === User.current.username) {
+                file.migrating = true;
+                file.format = file.latestFormat;
+                file.descriptorKey = file.blobKey;
+                console.log(`migrating file ${file.fileId}`);
+                this.migrationQueue.addTask(() =>
+                    retryUntilSuccess(() => {
+                        return file.createDescriptor()
+                            .then(() => file.saveToServer())
+                            .then(() => { file.migrating = false; })
+                            .catch(err => {
+                                if (err && err.error === errorCodes.malformedRequest) {
+                                    // our other connected client managed to migrate this first
+                                    file.migrating = false;
+                                    return Promise.resolve();
+                                }
+                                return Promise.reject(err);
+                            });
+                    }, `migrating file ${file.fileId}`, 10)
+                        .catch(err => {
+                            file.format = 0;
+                            file.migrating = false;
+                            console.error(err);
+                            console.error(`Failed to migrate file ${file.fileId}`);
+                        })
+                );
+            } else if (keg.descriptor) {
+                // file owner migrated it, we can migrate our keg
+                file.format = file.latestFormat;
+                file.descriptorKey = file.blobKey;
+                this.migrationQueue.addTask(() => retryUntilSuccess(() => file.saveToServer()));
             }
-            const size = kegs.kegs.length;
-            return { size, maxId: size > 0 ? kegs.kegs[0].kegId : 0 };
-        }));
+        }
     }
 
-    @action _finishLoading() {
-        this.loading = false;
-        this.loaded = true;
+    @action.bound onFinishLoading() {
         this.resumeBrokenDownloads();
         this.resumeBrokenUploads();
         this.detectCachedFiles();
-        socket.onDisconnect(() => { this.updatedAfterReconnect = false; });
         socket.onAuthenticated(() => {
-            this.onFileDigestUpdate();
             setTimeout(() => {
                 if (socket.authenticated) {
                     this.resumeBrokenDownloads();
                     this.resumeBrokenUploads();
                 }
-            }, 3000);
+            }, 1000);
             for (let i = 0; i < this.files.length; i++) {
                 if (this.files[i].cachingFailed) {
                     this.files[i].cachingFailed = false;
                 }
             }
         });
-        setTimeout(this.updateFiles);
-        tracker.seenThis('SELF', 'file', this.knownUpdateId);
     }
 
     /**
@@ -561,54 +153,12 @@ class FileStore {
         this._finishLoading();
     });
 
-    // this essentially does the same as loadAllFiles but with filter,
-    // we reserve this way of updating anyway for future, when we'll not gonna load entire file list on start
-    updateFiles = (maxId) => {
-        if (!this.loaded || this.updating) return;
-        if (!maxId) maxId = this.maxUpdateId; // eslint-disable-line
-        console.log(`Proceeding to file update. Known collection version: ${this.knownUpdateId}`);
-        this.updating = true;
-        let dirty = false;
-        retryUntilSuccess(() => this._getFiles(), 'Updating file list')
-            .then(action(resp => {
-                const { kegs } = resp;
-                for (const keg of kegs) {
-                    if (keg.collectionVersion > this.knownUpdateId) {
-                        this.knownUpdateId = keg.collectionVersion;
-                    }
-                    if (!keg.props.fileId && !keg.deleted) {
-                        console.error('File keg missing fileId', keg.kegId);
-                        continue;
-                    }
-                    const existing = this.getById(keg.props.fileId) || this.getByKegId(keg.kegId);
-                    const file = existing || new File(User.current.kegDb);
-                    if (keg.deleted || keg.hidden) {
-                        if (existing) this.files.remove(existing);
-                        continue;
-                    }
-                    if (!file.loadFromKeg(keg) || file.isEmpty) continue;
-                    if (!existing) {
-                        dirty = true;
-                        this.files.unshift(file);
-                    }
-                }
-                this.updating = false;
-                if (dirty) {
-                    this.resumeBrokenDownloads();
-                    this.resumeBrokenUploads();
-                }
-                // need this because if u delete all files knownUpdateId won't be set at all after initial load
-                if (this.knownUpdateId < maxId) this.knownUpdateId = maxId;
-                // in case we missed another event while updating
-                if (kegs.length || (this.maxUpdateId && this.knownUpdateId < this.maxUpdateId)) {
-                    setTimeout(this.updateFiles);
-                } else {
-                    setTimeout(this.onFileDigestUpdate);
-                }
-                this.updatedAfterReconnect = true;
-                tracker.seenThis('SELF', 'file', this.knownUpdateId);
-            }));
-    };
+    onAfterUpdate(dirty) {
+        if (dirty) {
+            this.resumeBrokenDownloads();
+            this.resumeBrokenUploads();
+        }
+    }
 
     /**
      * Finds file in user's drive by fileId.
@@ -648,6 +198,11 @@ class FileStore {
                     files.push(file);
                 }
             });
+        });
+
+        FileStoreBase.instances.forEach(store => {
+            const f = store.getById(fileId);
+            if (f) files.push(f);
         });
         return files;
     }
@@ -823,22 +378,11 @@ class FileStore {
         checkFile();
     }
 
-
-    /**
-     * Pause file store updates.
-     * @public
-     */
-    pause() {
-        this.paused = true;
-    }
-
     /**
      * Resume file store updates.
-     * @public
      */
     resume() {
-        if (!this.paused) return;
-        this.paused = false;
+        super.resume();
         setTimeout(() => {
             this.onFileDigestUpdate();
             this.updateDescriptors();

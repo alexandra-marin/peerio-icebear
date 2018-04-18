@@ -30,7 +30,7 @@ function retryUntilSuccess(fn, id = Math.random(), maxRetries = maxRetryCount, t
     // don't make parallel calls
     if (!thisIsRetry && callInfo) return callInfo.promise;
     if (!callInfo) {
-        callInfo = { retryCount: 0, maxRetries };
+        callInfo = { retryCount: 0, maxRetries, fatalErrorCount: 0 };
         callInfo.promise = new Promise((resolve, reject) => {
             callInfo.resolve = resolve;
             callInfo.reject = reject;
@@ -41,9 +41,12 @@ function retryUntilSuccess(fn, id = Math.random(), maxRetries = maxRetryCount, t
         callInfo.resolve(res);
         delete callsInProgress[id];
     }).catch(err => {
-        callInfo.lastError = err;
-        scheduleRetry(fn, id);
         console.error(err);
+        callInfo.lastError = err;
+        if (err && err.code === 404) {
+            callInfo.fatalErrorCount++;
+        }
+        scheduleRetry(fn, id);
     });
 
     return callInfo.promise;
@@ -51,7 +54,7 @@ function retryUntilSuccess(fn, id = Math.random(), maxRetries = maxRetryCount, t
 // todo: don't retry if throttled
 function scheduleRetry(fn, id) {
     const callInfo = callsInProgress[id];
-    if (callInfo.retryCount++ > callInfo.maxRetries) {
+    if (callInfo.retryCount++ > callInfo.maxRetries || callInfo.fatalErrorCount > 2) {
         console.error(`Maximum retry count reached for action id ${id}. Giving up, rejecting promise.`);
         console.debug(fn);
         callInfo.reject(errors.normalize(callInfo.lastError));

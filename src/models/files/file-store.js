@@ -161,27 +161,6 @@ class FileStore extends FileStoreBase {
     }
 
     /**
-     * Finds file in user's drive by fileId.
-     * Looks for loaded files only (all of them are loaded normally)
-     * @param {string} fileId
-     * @returns {?File}
-     */
-    getById(fileId) {
-        return this.fileMapObservable.get(fileId);
-    }
-    /**
-     * Finds file in user's drive by kegId. This is not used often,
-     * only to detect deleted descriptor and remove file from memory,
-     * since deleted keg has no props to link it to the file.
-     * Looks for loaded files only (all of them are loaded normally)
-     * @param {string} kegId
-     * @returns {?File}
-     */
-    getByKegId(kegId) {
-        return this.files.find(f => f.id === kegId);
-    }
-
-    /**
      * Finds all loaded file kegs by fileId
      *
      * @memberof FileStore

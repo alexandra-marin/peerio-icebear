@@ -74,7 +74,7 @@ class VolumeStore {
         if (!volume) throw new Error(`Invalid volume id. ${volume}`);
         let v;
         if (typeof volume === 'string') {
-            if (volume === 'SELF' || this.volumeMap[volume]) return;
+            if (volume === 'SELF' || this.volumeMap[volume] || !volume.startsWith('volume:')) return;
             v = new Volume(volume, undefined, this);
         } else {
             v = volume;

@@ -162,6 +162,16 @@ const config = new class {
     platform = '';
 
     /**
+     * Branding label for signup and login
+     * Default is null
+     * See other allowed values in your branding guide
+     * @member {string}
+     * @memberof config
+     * @public
+     */
+    appLabel = null;
+
+    /**
      * Unique device identifying string (optional).
      *
      * If set, it should uniquely, globally identify the device (some device UUID is fine).

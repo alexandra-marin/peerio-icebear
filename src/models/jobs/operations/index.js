@@ -24,7 +24,9 @@ function unserializeOperation(data) {
     const { name, props, done } = data;
     const cls = operations[name];
     if (!cls) throw new Error(`Operation ${name} not found`);
-    return new cls(props);
+    const instance = new cls(props); // eslint-disable-line new-cap
+    instance.done = done;
+    return instance;
 }
 
 /**

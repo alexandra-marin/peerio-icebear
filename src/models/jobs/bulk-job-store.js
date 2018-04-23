@@ -1,6 +1,7 @@
 const { observable } = require('mobx');
 const _ = require('lodash');
-const TaskQueue = require('../helpers/task-queue');
+const TaskQueue = require('../../helpers/task-queue');
+const TinyDb = require('../../db/tiny-db');
 const BulkJob = require('./bulk-job');
 
 const TINYDB_KEY = 'bulk_jobs';
@@ -11,16 +12,16 @@ class BulkJobStore {
     queue = new TaskQueue();
 
     async load() {
-        const jobData = await TinyDb.user.getValue(DB_KEY);
+        const jobsData = await TinyDb.user.getValue(TINYDB_KEY);
         if (jobsData) {
-            const jobs = this.jobsData.map(data => BulkJob.unserialize(data, this.save));
+            this.jobs = this.jobsData.map(data => BulkJob.unserialize(data, this.save));
         }
         this.loaded = true;
     }
 
     async saveImmediately() {
         this.jobs = this.jobs.filter(job => !job.done);
-        await TinyDb.user.setValue(DB_KEY, this.jobs.map(job => job.serialize()));
+        await TinyDb.user.setValue(TINYDB_KEY, this.jobs.map(job => job.serialize()));
     }
 
     save = _.throttle(() => {
@@ -56,7 +57,6 @@ class BulkJobStore {
         // a single job will continue to proceed.
         this.queue.pause();
     }
-
 }
 
 module.exports = new BulkJobStore();

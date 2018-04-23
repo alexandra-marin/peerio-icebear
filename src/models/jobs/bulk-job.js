@@ -22,9 +22,10 @@ class BulkJob {
 
     async resume() {
         const todo = this.operations.filter(op => !op.done);
-        for (let i = 0; i < this.todo.length; i++) {
-            const op = this.todo[i];
-            await op.execute(); // TODO: what to do with individual errors?
+        for (let i = 0; i < todo.length; i++) {
+            const op = todo[i];
+            await op.execute(); // eslint-disable-line no-await-in-loop
+            // TODO: what to do with individual errors?
             op.done = true;
             this.onSave();
         }

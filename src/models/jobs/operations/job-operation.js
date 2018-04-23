@@ -15,7 +15,7 @@ class JobOperation {
      * Execute operation on this.props.
      */
     async execute() {
-        throw new Error('JobOperation execute() method is not implemented')
+        throw new Error('JobOperation execute() method is not implemented');
     }
 }
 

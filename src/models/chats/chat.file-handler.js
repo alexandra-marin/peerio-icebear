@@ -5,11 +5,7 @@ const { retryUntilSuccess } = require('../../helpers/retry');
 const socket = require('../../network/socket');
 const tracker = require('../update-tracker');
 const { getUser } = require('../../helpers/di-current-user');
-// for typechecking:
-/* eslint-disable no-unused-vars */
-const Chat = require('./chat');
 const File = require('../files/file');
-/* eslint-enable no-unused-vars */
 
 /**
  * File handling module for Chat. Extracted for readability.

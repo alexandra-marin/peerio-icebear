@@ -3,6 +3,7 @@ const createMap = require('../../helpers/dynamic-array-map');
 // const warnings = require('../warnings');
 const AbstractFolder = require('../files/abstract-folder');
 const VolumeKegDb = require('../kegs/volume-keg-db');
+const ChatHead = require('../chats/chat-head');
 const contactStore = require('../contacts/contact-store');
 const Contact = require('../contacts/contact');
 const socket = require('../../network/socket');
@@ -13,13 +14,24 @@ class Volume extends AbstractFolder {
     isShared = true;
     @observable id = null;
 
+    get name() {
+        // uses AbstractFolder observable as a fallback
+        return this.chatHead ? this.chatHead.chatName : this._name;
+    }
+
+    set name(value) {
+        if (this.chatHead) this.rename(value);
+    }
+
     constructor(id, name) {
         super();
         this.id = id;
         this.db = new VolumeKegDb(id);
         if (id) this.fileStore = new FileStoreBase(this.db);
         const m = createMap(this.files, 'fileId');
-        this.name = name;
+        // TODO: maybe we don't need that
+        // it uses AbstractFolder observable
+        this._name = name;
         this.fileMap = m.map;
         this.fileMapObservable = m.observableMap;
         const m2 = createMap(this.folders, 'folderId');
@@ -37,12 +49,32 @@ class Volume extends AbstractFolder {
         this.fileStore = new FileStoreBase(this.db);
     }
 
+    /**
+     * @public
+     */
+    rename(name) {
+        let validated = name || '';
+        validated = validated.trim();
+        if (this.chatHead.chatName === validated) {
+            return Promise.resolve(); // nothing to rename
+        }
+        return this.chatHead.save(() => {
+            this.chatHead.chatName = validated;
+        }, null, 'error_chatRename');
+    }
+
     loadMetadata() {
         if (this.metaLoaded || this.loadingMeta) return this._metaPromise;
         this.loadingMeta = true;
-        // retry is handled inside loadMeta()
-        this._metaPromise = this.db.loadMeta();
+        this._metaPromise = this.loadMetaPromise();
         return this._metaPromise;
+    }
+
+    async loadMetaPromise() {
+        await this.db.loadMeta();
+        this.chatHead = new ChatHead(this.db);
+        this.loadingMeta = false;
+        this.metaLoaded = true;
     }
 
     add(file) {

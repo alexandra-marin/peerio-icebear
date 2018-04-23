@@ -4,7 +4,7 @@ const util = require('../../util');
 class AbstractFolder {
     @observable.shallow files = [];
     @observable.shallow folders = [];
-    @observable name;
+    @observable _name;
     @observable createdAt;
     @observable isDeleted;
     @observable isShared = false;
@@ -25,6 +25,10 @@ class AbstractFolder {
 
     // optional text for progress actions
     @observable progressText = null;
+
+    get name() { return this._name; }
+
+    set name(value) { this._name = value; }
 
     get progressPercentage() {
         return Math.min(Math.ceil(this.progress / (this.progressMax | 1) * 100), 100);

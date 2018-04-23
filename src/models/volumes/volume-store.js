@@ -9,6 +9,7 @@ const warnings = require('../warnings');
 // const Contact = require('../contacts/contact');
 // const User = require('../user/user');
 // const SharedDbBootKeg = require('../kegs/shared-db-boot-keg');
+const { getChatStore } = require('../../helpers/di-chat-store');
 const dbListProvider = require('../../helpers/keg-db-list-provider');
 // const { asPromise } = require('../../helpers/prombservable');
 const tracker = require('../update-tracker');
@@ -178,12 +179,12 @@ class VolumeStore {
     deserialize(parent) {
         if (this.volumes.length) return;
         this.rootFileFolder = parent;
-        this.attachFolder(mockFolder('My Shared Folder 1'));
+        /* this.attachFolder(mockFolder('My Shared Folder 1'));
         this.attachFolder(mockFolder('My Shared Folder 2'));
         const nonOwnedOne = mockFolder('Foreign Shared Folder 3');
         nonOwnedOne.owner = 'anri';
         nonOwnedOne.isOwner = false;
-        this.attachFolder(nonOwnedOne);
+        this.attachFolder(nonOwnedOne); */
     }
 
     attachFolder(folder) {

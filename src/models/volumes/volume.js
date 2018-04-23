@@ -14,6 +14,10 @@ class Volume extends AbstractFolder {
     isShared = true;
     @observable id = null;
 
+    // TODO: maybe refactor it later to use folderId instead
+    get folderId() { return this.id; }
+    set folderId(value) { this.id = value; }
+
     get name() {
         // uses AbstractFolder observable as a fallback
         return this.chatHead ? this.chatHead.chatName : this._name;

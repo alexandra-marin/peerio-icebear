@@ -15,7 +15,9 @@ class AbstractFolder {
     @observable isHidden = false;
     @observable isOwner = true;
     isFolder = true;
-    folderId = null;
+    _folderId = null;
+    get folderId() { return this._folderId; }
+    set folderId(value) { this._folderId = value; }
     @observable parent = null;
 
     // Variables for bulk actions and share-related actions

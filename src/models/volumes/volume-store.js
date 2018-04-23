@@ -87,6 +87,8 @@ class VolumeStore {
 
         this.volumeMap[v.id] = v;
         this.volumes.push(v);
+        // important for UI
+        this.attachFolder(v);
         v.added = true;
         v.loadMetadata().then(() => v.fileStore.loadAllFiles());
     }
@@ -128,7 +130,12 @@ class VolumeStore {
             const volume = new Volume(null, []);
             await volume.create();
             this.addVolume(volume);
-            if (name) await volume.rename(name);
+            // TODO: this crashes without timeout
+            if (name) {
+                setTimeout(() => {
+                    volume.rename(name);
+                }, 1000);
+            }
             volume.addParticipants(participants.filter(p => !p.isMe));
             return volume;
         } catch (err) {
@@ -189,9 +196,12 @@ class VolumeStore {
 
     attachFolder(folder) {
         if (folderResolveMap.get(folder.folderId)) return;
-        this.volumes.push(folder);
-        folder.parent = this.rootFileFolder;
-        folderResolveMap.set(folder.folderId, folder);
+        // TODO: should have temporary id or something
+        // DEFINITELY NEEDS FIXING
+        when(() => folder.folderId, () => {
+            folder.parent = this.rootFileFolder;
+            folderResolveMap.set(folder.folderId, folder);
+        });
     }
 
     @action.bound async convertFolder(folder) {
@@ -236,6 +246,12 @@ class VolumeStore {
         // there's a lag between deletion and file disappearance from the
         // associated folder list. so to prevent confusion we clear files here
         volume.files = [];
+        try {
+            await volume.delete();
+        } catch (e) {
+            console.error(e);
+            return;
+        }
         const i = this.volumes.indexOf(volume);
         if (i !== -1) {
             this.volumes.splice(i, 1);

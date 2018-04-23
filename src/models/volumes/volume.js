@@ -148,6 +148,27 @@ class Volume extends AbstractFolder {
             });
     }
 
+    /**
+     * Deletes the volume.
+     * @returns {Promise}
+     * @public
+     */
+    async delete() {
+        // this is an ugly-ish flag to prevent chat store from creating a warning about user being kicked from channel
+        this.deletedByMyself = true;
+        console.log(`Deleting volume ${this.id}.`);
+        try {
+            await socket.send('/auth/kegs/channel/delete', { kegDbId: this.id });
+            console.log(`Volume ${this.id} has been deleted.`);
+            warnings.add('title_volumeDeleted');
+        } catch (err) {
+            console.error('Failed to delete volume', err);
+            this.deletedByMyself = false;
+            warnings.add('error_channelDelete');
+            throw err;
+        }
+    }
+
     async leave() {
         this.leaving = true;
         try {

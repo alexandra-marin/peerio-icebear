@@ -5,8 +5,9 @@ class BulkJob {
     operations = [];
     done = false;
 
-    constructor(operations, onSave) {
+    constructor(operations, onDone, onSave) {
         this.operations = operations;
+        this.onDone = onDone;
         this.onSave = onSave;
     }
 
@@ -29,6 +30,7 @@ class BulkJob {
         }
         this.done = true;
         this.onSave();
+        if (this.onDone) this.onDone();
     }
 }
 

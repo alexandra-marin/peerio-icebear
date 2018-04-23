@@ -40,8 +40,8 @@ class BulkJobStore {
      *
      * @param {Array<JobOperation>} operations
      */
-    createJob(operations) {
-        const job = new BulkJob(operations, this.save);
+    createJob(operations, onDone) {
+        const job = new BulkJob(operations, onDone, this.save);
         this.jobs.push(job);
         this.queue.addTask(job.resume, job);
         this.save();

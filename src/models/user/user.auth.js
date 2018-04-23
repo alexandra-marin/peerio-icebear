@@ -78,7 +78,7 @@ module.exports = function mixUserAuthModule() {
                 arch: config.arch,
                 clientVersion: config.appVersion,
                 sdkVersion: config.sdkVersion,
-                appLabel: config.appLabel,
+                // appLabel: config.appLabel,
                 // sending whatever string in the beginning to let server know we are
                 // a new, cool client which is gonna use sessions
                 sessionId: this.sessionId || 'initialize'

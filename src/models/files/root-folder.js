@@ -1,7 +1,7 @@
 
 const { computed } = require('mobx');
 const FileFolder = require('./file-folder');
-const volumeStore = require('../volumes/volume-store');
+const { getVolumeStore } = require('../../helpers/di-volume-store');
 
 /* function mergeSortedArray(arr1, arr2) {
     const arr = [];
@@ -27,18 +27,18 @@ class RootFolder extends FileFolder {
     }
 
     @computed get virtualFolders() {
-        return super.virtualFolders.concat(volumeStore.volumes.slice());
+        return super.virtualFolders.concat(getVolumeStore().volumes.slice());
     }
 
     serialize() {
         console.log(`root-folder: serialize dummy`);
-        volumeStore.serialize();
+        getVolumeStore().serialize();
         super.serialize();
     }
 
     deserialize(dataItem, parent, folderResolveMap, newFolderResolveMap) {
         console.log(`root-folder: deserialize dummy`);
-        volumeStore.deserialize(this);
+        getVolumeStore().deserialize(this);
         return super.deserialize(dataItem, parent, folderResolveMap, newFolderResolveMap);
     }
 }

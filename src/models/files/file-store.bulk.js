@@ -1,6 +1,6 @@
 const { action, computed } = require('mobx');
 const { getChatStore } = require('../../helpers/di-chat-store');
-const volumeStore = require('../volumes/volume-store');
+const { getVolumeStore } = require('../../helpers/di-volume-store');
 const config = require('../../config');
 const warnings = require('../warnings');
 
@@ -37,7 +37,7 @@ class FileStoreBulk {
             await this.fileStore.folders.deleteFolder(i);
             if (!batch) this.fileStore.folders.save();
         } else if (i.isFolder) {
-            await volumeStore.deleteVolume(i);
+            await getVolumeStore().deleteVolume(i);
         } else {
             await i.remove();
         }
@@ -79,7 +79,7 @@ class FileStoreBulk {
             promise = promise.then(() => { i.selected = false; });
             if (i.isFolder) {
                 promise = promise.then(
-                    () => volumeStore.shareFolder(i, usernamesAccessList));
+                    () => getVolumeStore().shareFolder(i, usernamesAccessList));
             } else {
                 usernamesAccessList.forEach(contact => {
                     promise = promise.then(

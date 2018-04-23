@@ -13,8 +13,11 @@ class Volume extends AbstractFolder {
     isShared = true;
     @observable id = null;
 
-    constructor(name) {
+    constructor(id, name) {
         super();
+        this.id = id;
+        this.db = new VolumeKegDb(id);
+        if (id) this.fileStore = new FileStoreBase(this.db);
         const m = createMap(this.files, 'fileId');
         this.name = name;
         this.fileMap = m.map;
@@ -28,8 +31,9 @@ class Volume extends AbstractFolder {
 
 
     async create() {
-        this.db = new VolumeKegDb(null);
         await this.loadMetadata();
+        // TODO: remove when not needed anymore
+        if (this.fileStore) throw new Error('File store for this volume is already initialized');
         this.fileStore = new FileStoreBase(this.db);
     }
 

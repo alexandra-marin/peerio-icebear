@@ -128,7 +128,7 @@ class VolumeStore {
             const volume = new Volume(null, []);
             await volume.create();
             this.addVolume(volume);
-            if (name) await volume.rename(name);
+            // if (name) await volume.rename(name);
             volume.addParticipants(participants.filter(p => !p.isMe));
             return volume;
         } catch (err) {

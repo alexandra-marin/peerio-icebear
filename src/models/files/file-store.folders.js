@@ -56,6 +56,7 @@ class FileStoreFolders {
         }
     }
 
+    // TODO: this gets called too often on folder convert
     @action sync() {
         const { files } = this.fileStore;
         if (this._intercept) {
@@ -131,6 +132,17 @@ class FileStoreFolders {
         // associated folder list. so to prevent confusion we clear files here
         folder.files = [];
         folder.remove();
+        this.save();
+    }
+
+    /**
+     * Deletes only the folder and does not delete files
+     * Useful for converting folder into a shared one
+     * @param {FileFolder} folder
+     */
+    async deleteFolderSkipFiles(folder) {
+        folder.parent.freeFolder(folder);
+        folder.isDeleted = true;
         this.save();
     }
 

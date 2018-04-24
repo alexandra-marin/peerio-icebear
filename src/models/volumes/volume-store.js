@@ -11,6 +11,7 @@ const rootFolder = require('../files/root-folder');
 // const User = require('../user/user');
 // const SharedDbBootKeg = require('../kegs/shared-db-boot-keg');
 const { getChatStore } = require('../../helpers/di-chat-store');
+const { getFileStore } = require('../../helpers/di-file-store');
 const dbListProvider = require('../../helpers/keg-db-list-provider');
 // const { asPromise } = require('../../helpers/prombservable');
 const tracker = require('../update-tracker');
@@ -123,9 +124,9 @@ class VolumeStore {
             const volume = new Volume(null, []);
             (async () => {
                 await volume.create();
-                this.addVolume(volume);
                 await volume.loadMetadata();
                 await volume.rename(name);
+                this.addVolume(volume);
                 volume.addParticipants(participants.filter(p => !p.isMe));
             })();
             return volume;
@@ -178,8 +179,8 @@ class VolumeStore {
             folder.isBlocked = true;
             await mockProgress(folder);
             newFolder.isHidden = false;
-            // TODO: other mechanism for hiding local folders, @anri?
             folder.isHidden = true;
+            getFileStore().folders.deleteFolderSkipFiles(folder);
         }
     }
 

@@ -76,6 +76,7 @@ class Volume extends AbstractFolder {
 
     async loadMetaPromise() {
         await this.db.loadMeta();
+        this.id = this.db.id;
         this.chatHead = new ChatHead(this.db);
         await new Promise(resolve => when(() => this.chatHead.loaded, resolve));
         this.loadingMeta = false;

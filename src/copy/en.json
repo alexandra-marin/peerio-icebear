@@ -91,6 +91,7 @@
   "title_selectAll": "Select All",
   "title_addContacts": "Add Contacts",
   "title_inviteContacts": "Invite Contacts",
+  "title_searchContacts": "Search contacts",
   "title_inviteByEmail": "Invite by email",
   "title_emailInvite": "Email invite",
   "title_contactsInvited": "{contactsInvited} contacts unvited.",

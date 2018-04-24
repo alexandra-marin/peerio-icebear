@@ -26,6 +26,10 @@ class RootFolder extends FileFolder {
         super('/');
     }
 
+    @computed get virtualFiles() {
+        return this.files.filter(f => f.folderId !== 'HIDDEN_FOLDER');
+    }
+
     @computed get virtualFolders() {
         return super.virtualFolders.concat(getVolumeStore().volumes.filter(f => !f.isHidden).slice());
     }

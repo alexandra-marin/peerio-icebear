@@ -94,11 +94,7 @@ class Volume extends AbstractFolder {
             console.error('file already belongs to a folder');
             return;
         }
-        file.isHidden = true;
         await file.copyTo(this.db);
-        // file.folder = this;
-        // file.folderId = this.isRoot ? null : this.folderId;
-        // this.files.push(file);
     }
 
     moveInto(file) {

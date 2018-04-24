@@ -41,7 +41,7 @@ class AbstractFolder {
     }
 
     get virtualFiles() {
-        return this.files.filter(file => !file.isHidden);
+        return this.files;
     }
 
     @computed get normalizedName() {
@@ -58,7 +58,7 @@ class AbstractFolder {
 
     @computed get foldersAndFilesDefaultSorting() {
         const { foldersSortedByName, filesSortedByDate } = this;
-        return foldersSortedByName.concat(filesSortedByDate);
+        return foldersSortedByName.concat(filesSortedByDate).filter(f => f.folderId !== 'HIDDEN_FOLDER');
     }
 
     @computed get size() {

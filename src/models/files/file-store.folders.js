@@ -18,6 +18,7 @@ class FileStoreFolders {
         reaction(() => this.currentFolder.isDeleted, deleted => {
             if (deleted) this.currentFolder = rootFolder;
         });
+        window.folderResolveMap = folderResolveMap;
     }
 
     @observable loaded = false;

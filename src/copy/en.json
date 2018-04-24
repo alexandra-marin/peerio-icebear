@@ -107,6 +107,7 @@
   "error_signupServerError": "Server error. Please try again later.",
   "error_usernameNotFound": "Username not found.",
   "error_userNotFound": "User not found",
+  "error_userNotFoundSendInvite": "User not found. Send an invitation?",
   "error_userNotFoundTryEmail": "<b>{user}</> could not be found. Try searching by email address.",
   "error_userAlreadyAdded": "<b>{user}</> is already in this room.",
   "error_loginFailed": "Sign-in failed",

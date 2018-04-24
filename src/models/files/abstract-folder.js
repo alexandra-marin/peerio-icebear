@@ -40,6 +40,10 @@ class AbstractFolder {
         return this.folders.filter(folder => !folder.isHidden);
     }
 
+    get virtualFiles() {
+        return this.files.filter(file => !file.isHidden);
+    }
+
     @computed get normalizedName() {
         return this.name ? this.name.toLowerCase() : '';
     }
@@ -49,7 +53,7 @@ class AbstractFolder {
     }
 
     @computed get filesSortedByDate() {
-        return this.files.sort((f1, f2) => f2.uploadedAt - f1.uploadedAt);
+        return this.virtualFiles.sort((f1, f2) => f2.uploadedAt - f1.uploadedAt);
     }
 
     @computed get foldersAndFilesDefaultSorting() {

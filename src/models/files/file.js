@@ -152,6 +152,17 @@ class File extends Keg {
      * @public
      */
     @observable show = true;
+
+    /**
+     * Is this file hidden because of sharing in the volume
+     * or for other reason (TBD)
+     * @member {boolean} hiddenShared
+     * @memberof File
+     * @instance
+     * @public
+     */
+    @observable isHidden = false;
+
     /**
      * Is this file currently shared with anyone.
      * @member {boolean} shared

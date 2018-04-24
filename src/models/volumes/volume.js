@@ -45,6 +45,9 @@ class Volume extends AbstractFolder {
     @observable loadingMeta = false;
     @observable metaLoaded = false;
 
+    get virtualFiles() {
+        return this.fileStore.files;
+    }
 
     async create() {
         await this.loadMetadata();
@@ -83,7 +86,7 @@ class Volume extends AbstractFolder {
         this.metaLoaded = true;
     }
 
-    add(file) {
+    async add(file) {
         if (this.fileMap[file.fileId]) {
             return;
         }
@@ -91,9 +94,11 @@ class Volume extends AbstractFolder {
             console.error('file already belongs to a folder');
             return;
         }
-        file.folder = this;
-        file.folderId = this.isRoot ? null : this.folderId;
-        this.files.push(file);
+        file.isHidden = true;
+        await file.copyTo(this.db);
+        // file.folder = this;
+        // file.folderId = this.isRoot ? null : this.folderId;
+        // this.files.push(file);
     }
 
     moveInto(file) {

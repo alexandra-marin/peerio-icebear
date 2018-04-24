@@ -5,6 +5,7 @@ const Volume = require('./volume');
 const folderResolveMap = require('../files/folder-resolve-map');
 const socket = require('../../network/socket');
 const warnings = require('../warnings');
+const rootFolder = require('../files/root-folder');
 // const contactStore = require('../contacts/contact-store');
 // const Contact = require('../contacts/contact');
 // const User = require('../user/user');
@@ -13,14 +14,6 @@ const { getChatStore } = require('../../helpers/di-chat-store');
 const dbListProvider = require('../../helpers/keg-db-list-provider');
 // const { asPromise } = require('../../helpers/prombservable');
 const tracker = require('../update-tracker');
-
-
-function mockFolder(name) {
-    const result = new Volume();
-    result.name = name;
-    result.folderId = `folderId${name}`;
-    return result;
-}
 
 function random(max) {
     return Math.floor(Math.random() * max);
@@ -123,20 +116,18 @@ class VolumeStore {
     }
 
 
-    @action async createVolume(participants = [], name) {
+    @action createVolume(participants = [], name) {
         try {
             // we can't add participants before setting volume name because
             // server will trigger invites and send empty volume name to user
             const volume = new Volume(null, []);
-            await volume.create();
-            this.addVolume(volume);
-            // TODO: this crashes without timeout
-            if (name) {
-                setTimeout(() => {
-                    volume.rename(name);
-                }, 1000);
-            }
-            volume.addParticipants(participants.filter(p => !p.isMe));
+            (async () => {
+                await volume.create();
+                this.addVolume(volume);
+                await volume.loadMetadata();
+                await volume.rename(name);
+                volume.addParticipants(participants.filter(p => !p.isMe));
+            })();
             return volume;
         } catch (err) {
             console.error(err);
@@ -165,33 +156,9 @@ class VolumeStore {
         });
     }
 
-    //------------------------------------------------------------
-    /**
-     * MOCK METHODS/IMPLEMENTATIONS
-     * TO BE REMOVED
-     */
-    // TODO: it is currently set on first deserialize
-    // need to do something better
-    rootFileFolder = undefined;
-
     @computed get sortedVolumes() {
         return this.volumes
             .sort((f1, f2) => f1.normalizedName > f2.normalizedName);
-    }
-
-    serialize() {
-        console.log(`volume-store.js: serialization dummy`);
-    }
-
-    deserialize(parent) {
-        if (this.volumes.length) return;
-        this.rootFileFolder = parent;
-        /* this.attachFolder(mockFolder('My Shared Folder 1'));
-        this.attachFolder(mockFolder('My Shared Folder 2'));
-        const nonOwnedOne = mockFolder('Foreign Shared Folder 3');
-        nonOwnedOne.owner = 'anri';
-        nonOwnedOne.isOwner = false;
-        this.attachFolder(nonOwnedOne); */
     }
 
     attachFolder(folder) {
@@ -199,18 +166,20 @@ class VolumeStore {
         // TODO: should have temporary id or something
         // DEFINITELY NEEDS FIXING
         when(() => folder.folderId, () => {
-            folder.parent = this.rootFileFolder;
+            folder.parent = rootFolder;
             folderResolveMap.set(folder.folderId, folder);
         });
     }
 
     @action.bound async convertFolder(folder) {
         if (!folder.isShared) {
-            const newFolder = mockFolder(folder.name);
+            const newFolder = this.createVolume([], folder.name);
+            newFolder.isHidden = true;
             folder.isBlocked = true;
             await mockProgress(folder);
+            newFolder.isHidden = false;
+            // TODO: other mechanism for hiding local folders, @anri?
             folder.isHidden = true;
-            this.attachFolder(newFolder);
         }
     }
 

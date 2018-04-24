@@ -27,20 +27,18 @@ class RootFolder extends FileFolder {
     }
 
     @computed get virtualFolders() {
-        return super.virtualFolders.concat(getVolumeStore().volumes.slice());
+        return super.virtualFolders.concat(getVolumeStore().volumes.filter(f => !f.isHidden).slice());
     }
 
     serialize() {
         console.log(`root-folder: serialize dummy`);
-        getVolumeStore().serialize();
         super.serialize();
     }
 
     deserialize(dataItem, parent, folderResolveMap, newFolderResolveMap) {
         console.log(`root-folder: deserialize dummy`);
-        getVolumeStore().deserialize(this);
         return super.deserialize(dataItem, parent, folderResolveMap, newFolderResolveMap);
     }
 }
 
-module.exports = RootFolder;
+module.exports = new RootFolder();

@@ -1,4 +1,4 @@
-const { observable } = require('mobx');
+const { observable, when } = require('mobx');
 const createMap = require('../../helpers/dynamic-array-map');
 // const warnings = require('../warnings');
 const AbstractFolder = require('../files/abstract-folder');
@@ -67,7 +67,7 @@ class Volume extends AbstractFolder {
         }, null, 'error_chatRename');
     }
 
-    loadMetadata() {
+    async loadMetadata() {
         if (this.metaLoaded || this.loadingMeta) return this._metaPromise;
         this.loadingMeta = true;
         this._metaPromise = this.loadMetaPromise();
@@ -77,6 +77,7 @@ class Volume extends AbstractFolder {
     async loadMetaPromise() {
         await this.db.loadMeta();
         this.chatHead = new ChatHead(this.db);
+        await new Promise(resolve => when(() => this.chatHead.loaded, resolve));
         this.loadingMeta = false;
         this.metaLoaded = true;
     }

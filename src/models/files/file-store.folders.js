@@ -2,13 +2,11 @@ const { observable, action, reaction, computed } = require('mobx');
 const { getUser } = require('../../helpers/di-current-user');
 const socket = require('../../network/socket');
 const FileFolder = require('./file-folder');
-const RootFolder = require('./root-folder');
+const rootFolder = require('./root-folder');
 const FileFoldersKeg = require('./file-folders-keg');
 const cryptoUtil = require('../../crypto/util');
 const warnings = require('../warnings');
 const folderResolveMap = require('./folder-resolve-map');
-
-const ROOT_FOLDER = new RootFolder();
 
 class FileStoreFolders {
     constructor(fileStore) {
@@ -18,15 +16,15 @@ class FileStoreFolders {
             this.keg.onUpdated = () => { this.sync(); };
         });
         reaction(() => this.currentFolder.isDeleted, deleted => {
-            if (deleted) this.currentFolder = ROOT_FOLDER;
+            if (deleted) this.currentFolder = rootFolder;
         });
     }
 
     @observable loaded = false;
     @observable keg = null;
 
-    root = ROOT_FOLDER;
-    @observable currentFolder = ROOT_FOLDER;
+    root = rootFolder;
+    @observable currentFolder = rootFolder;
 
     folderIdReactions = {};
 

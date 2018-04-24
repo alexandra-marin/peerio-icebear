@@ -12,9 +12,13 @@ class BulkJobStore {
     queue = new TaskQueue();
 
     async load() {
-        const jobsData = await TinyDb.user.getValue(TINYDB_KEY);
-        if (jobsData) {
-            this.jobs = this.jobsData.map(data => BulkJob.unserialize(data, this.save));
+        try {
+            const jobsData = await TinyDb.user.getValue(TINYDB_KEY);
+            if (jobsData) {
+                this.jobs = this.jobsData.map(data => BulkJob.unserialize(data, this.save));
+            }
+        } catch (err) {
+            console.error('Failed to unserialize jobs data to resume', err);
         }
         this.loaded = true;
     }

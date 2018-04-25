@@ -147,7 +147,7 @@ class MailStore {
                 }
                 this.loading = false;
                 this.loaded = true;
-                socket.onAuthenticated(() => {
+                tracker.onUpdated(() => {
                     this.onMailDigestUpdate();
                 });
                 setTimeout(this.updateMails);

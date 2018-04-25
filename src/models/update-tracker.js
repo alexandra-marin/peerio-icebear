@@ -1,7 +1,7 @@
 
 const socket = require('../network/socket');
-const { observable, when } = require('mobx');
-
+const { observable, when, reaction } = require('mobx');
+const { asPromise } = require('../helpers/prombservable');
 /**
  * Data update tracking module. This is an internal module that allows Icebear to get and report new data as it arrives
  * and is needed by your client.
@@ -37,7 +37,7 @@ class UpdateTracker {
     @observable loadedOnce = false;
 
     // for 'clientApp.updatingAfterReconnect'
-    @observable updatedAfterReconnect = false;
+    @observable updated = false;
 
     /**
      * Keg digest
@@ -56,6 +56,25 @@ class UpdateTracker {
         return this.globalDigest[this.DESCRIPTOR_PATH];
     }
 
+    waitUntilUpdated() {
+        if (this.updated) return Promise.resolve();
+        return asPromise(this, 'updated', true);
+    }
+
+    onUpdated(handler, fireImmediately = false) {
+        reaction(
+            () => this.updated,
+            updated => {
+                if (updated) handler();
+            },
+            { fireImmediately }
+        );
+    }
+
+    onceUpdated(handler) {
+        when(() => this.updated, handler);
+    }
+
     constructor() {
         socket.onceStarted(() => {
             socket.subscribe(socket.APP_EVENTS.digestUpdate, data => {
@@ -67,7 +86,7 @@ class UpdateTracker {
             socket.subscribe(socket.APP_EVENTS.channelDeleted, this.processChannelDeletedEvent.bind(this));
             socket.onAuthenticated(this.loadDigest);
             socket.onDisconnect(() => {
-                this.updatedAfterReconnect = false;
+                this.updated = false;
             });
             if (socket.authenticated) this.loadDigest();
         });
@@ -223,11 +242,13 @@ class UpdateTracker {
         }
         if (!this.updateHandlers[id] || !this.updateHandlers[id][type]) return;
         this.updateHandlers[id][type].forEach(handler => {
-            try {
-                handler(id);
-            } catch (err) {
-                console.error(err);
-            }
+            setTimeout(() => {
+                try {
+                    handler(id);
+                } catch (err) {
+                    console.error(err);
+                }
+            });
         });
     }
 
@@ -263,8 +284,11 @@ class UpdateTracker {
             this.processDigestResponse(resp);
             resp = await socket.send('/auth/updates/digest', { unread: true }, false);
             this.processDigestResponse(resp);
+            if (!this.loadedOnce) {
+                this.markZeroCounterTypesAsRead();
+            }
             this.loadedOnce = true;
-            this.updatedAfterReconnect = true;
+            this.updated = true;
         } catch (err) {
             if (err && err.name === 'TimeoutError') {
                 this.loadDigest();
@@ -272,6 +296,25 @@ class UpdateTracker {
         }
     }
 
+    // In the beginning of session, any unread digest items with newKegsCount = 0
+    // or with newKegsCount>0 but for keg types which counters are not useful to us - are leftovers that we can
+    // remove to minimize digest size
+    markZeroCounterTypesAsRead() {
+        for (const dbId in this.digest) {
+            const db = this.digest[dbId];
+            for (const type in db) {
+                const item = db[type];
+                if (type === 'message') {
+                    if (item.newKegsCount > 0) continue;
+                }
+                if (item.knownUpdateId < item.maxUpdateId) {
+                    this.seenThis(dbId, type, item.maxUpdateId);
+                }
+            }
+        }
+    }
+
+    seenThisQueue = {};
     /**
      * Stores max update id that user has seen to server.
      * @param {string} id - keg db id
@@ -279,8 +322,25 @@ class UpdateTracker {
      * @param {string} updateId - max known update id
      * @protected
      */
-    seenThis(id, type, updateId) {
+    seenThis(id, type, updateId, throttle = true) {
         if (!updateId) return;
+
+        if (throttle) {
+            if (this.seenThisQueue[id] && this.seenThisQueue[id][type]) {
+                // just updating parameter, will get used when scheduled
+                this.seenThisQueue[id][type] = updateId;
+                return;
+            }
+            this.seenThisQueue[id] = { type: updateId };
+            // scheduling a run
+            setTimeout(() => this.seenThis(id, type, this.seenThisQueue[id][type], false), 5000);
+            return;
+        }
+
+        if (this.seenThisQueue[id] && this.seenThisQueue[id][type]) {
+            this.seenThisQueue[id][type] = '';
+        }
+
         let digest = this.getDigest(id, type);
         if (digest === this.zeroDigest) {
             // if we don't have digest loaded, we assume that's because there was no unread items in it
@@ -292,8 +352,7 @@ class UpdateTracker {
                 newKegsCount: 0
             };
             this.digest[id][type] = digest;
-        }
-        if (digest.knownUpdateId >= updateId) return;
+        } else if (digest.knownUpdateId === updateId) return;
         // console.debug('SEEN THIS', id, type, updateId);
         // consumers should not care if this call fails, it makes things simpler.
         // to cover failure cases, consumers should activate 'mark as read' logic after every reconnect

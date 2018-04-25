@@ -1,6 +1,6 @@
 const { observable, action, reaction, computed } = require('mobx');
 const { getUser } = require('../../helpers/di-current-user');
-const socket = require('../../network/socket');
+const tracker = require('../update-tracker');
 const FileFolder = require('./file-folder');
 const rootFolder = require('./root-folder');
 const FileFoldersKeg = require('./file-folders-keg');
@@ -11,7 +11,7 @@ const folderResolveMap = require('./folder-resolve-map');
 class FileStoreFolders {
     constructor(fileStore) {
         this.fileStore = fileStore;
-        socket.onceAuthenticated(() => {
+        tracker.onceUpdated(() => {
             this.keg = new FileFoldersKeg(getUser().kegDb);
             this.keg.onUpdated = () => { this.sync(); };
         });

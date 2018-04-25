@@ -4,8 +4,8 @@
  * @protected
  */
 
-const socket = require('../network/socket');
 const errors = require('../errors');
+const tracker = require('../models/update-tracker');
 
 const maxRetryCount = 120; // will bail out after this amount of retries
 const minRetryInterval = 1000; // will start with this interval between retries
@@ -62,7 +62,7 @@ function scheduleRetry(fn, id) {
     }
     const delay = minRetryInterval + Math.min(maxRetryInterval, (callInfo.retryCount * retryIntervalMultFactor));
     console.debug(`Retrying ${id} in ${delay} second`);
-    setTimeout(() => socket.onceAuthenticated(() => retryUntilSuccess(fn, id, callInfo.maxRetries, true)), delay);
+    setTimeout(() => tracker.onceUpdated(() => retryUntilSuccess(fn, id, callInfo.maxRetries, true)), delay);
 }
 
 function isRunning(id) {

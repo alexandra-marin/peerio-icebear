@@ -26,9 +26,9 @@ class ChatReceiptHandler {
         this.chat.receipts = observable.shallowMap();
         tracker.subscribeToKegUpdates(chat.id, 'read_receipt', this.onDigestUpdate);
         this.onDigestUpdate();
-        this._reactionsToDispose.push(reaction(() => socket.authenticated, authenticated => {
-            if (authenticated) this.onDigestUpdate();
-            if (!authenticated || !this.pendingReceipt) return;
+        this._reactionsToDispose.push(reaction(() => tracker.updated, updated => {
+            if (updated) this.onDigestUpdate();
+            if (!updated || !this.pendingReceipt) return;
             const pos = this.pendingReceipt;
             this.pendingReceipt = null;
             this.sendReceipt(pos);
@@ -39,6 +39,10 @@ class ChatReceiptHandler {
     }
 
     onDigestUpdate = () => {
+        const digest = tracker.getDigest(this.chat.id, 'read_receipt');
+        if (digest.maxUpdateId < this.downloadedCollectionVersion) {
+            tracker.seenThis(this.chat.id, 'read_receipt', this.downloadedCollectionVersion);
+        }
         if (!this.chat.active) return;
         this.loadQueue.addTask(this.loadReceipts);
     };

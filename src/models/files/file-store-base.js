@@ -283,7 +283,7 @@ class FileStoreBase {
         this.loading = false;
         this.loaded = true;
         socket.onDisconnect(() => { this.updatedAfterReconnect = false; });
-        socket.onAuthenticated(() => this.onFileDigestUpdate());
+        tracker.onUpdated(this.onFileDigestUpdate);
         setTimeout(this.updateFiles);
         tracker.seenThis(this.kegDb.id, 'file', this.knownUpdateId);
     }

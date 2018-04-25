@@ -361,6 +361,11 @@ class ChatStore {
         if (this.loaded || this.loading) return;
         this.loading = true;
 
+        await tracker.waitUntilUpdated();
+
+        // subscribe to future chats that will be created
+        tracker.subscribeToKegDbAdded(this.addChat);
+
         // Loading my_chats keg
         this.myChats = new MyChats();
         this.myChats.onUpdated = this.applyMyChatsData;
@@ -369,34 +374,21 @@ class ChatStore {
         // loading favorite chats
         // ..... gonna happen in applyMyChatsData when fav list is loaded
 
-        // checking how many more chats we can load
-        let chatsLeft = config.chat.maxInitialChats - this.myChats.favorites.length;
-        if (chatsLeft > 0) {
-            // loading all the channels
-            const channels = await dbListProvider.getChannels();
-            channels.forEach(this.addChat);
-            chatsLeft -= channels.length;
-        }
-        // loading the rest unhidden chats
-        if (chatsLeft > 0) {
-            const dms = await dbListProvider.getDMs();
-            for (const id of dms) {
-                if (chatsLeft <= 0) break;
-                if (this.myChats.favorites.includes(id)) continue;
-                this.addChat(id);
-                chatsLeft--;
-            }
-        }
+        // loading all the channels
+        const channels = await dbListProvider.getChannels();
+        channels.forEach(this.addChat);
 
-        // check if chats were created while we were loading chat list
-        // unlikely, but possible
-        runInAction(() => {
-            Object.keys(tracker.digest).forEach(this.addChat);
-        });
-        // 6. subscribe to future chats that will be created
-        // this should always happen right after adding chats from digest, synchronously,
-        // so that there's no new chats that can slip away
-        tracker.subscribeToKegDbAdded(this.addChat);
+        // checking how many more chats we can load
+        let chatsLeft = config.chat.maxInitialChats - this.myChats.favorites.length - channels.length;
+        // loading the rest unhidden chats
+        const dms = await dbListProvider.getDMs();
+        for (const id of dms) {
+            const d = tracker.getDigest(id, 'message');
+            if (chatsLeft <= 0 && d.maxUpdateId === d.knownUpdateId) continue;
+            if (this.myChats.favorites.includes(id)) continue;
+            this.addChat(id);
+            chatsLeft--;
+        }
 
         // 7. waiting for most chats to load but up to a reasonable time
         await Promise.map(this.chats, chat => asPromise(chat, 'headLoaded', true))

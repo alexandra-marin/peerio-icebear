@@ -48,7 +48,7 @@ module.exports = function mixUserProfileModule() {
         if (keg.loading) return;
         const digest = tracker.getDigest('SELF', keg.type);
         if (keg.loaded && digest.maxUpdateId <= keg.collectionVersion) {
-            tracker.seenThis('SELF', keg.type, digest.maxUpdateId);
+            tracker.seenThis('SELF', keg.type, keg.collectionVersion);
             return;
         }
         console.log(`Loading ${keg.type} keg`);

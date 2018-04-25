@@ -20,7 +20,7 @@ class SyncedKeg extends Keg {
         super(kegName, kegName, db, plaintext, forceSign, allowEmpty, storeSignerData);
 
         // this will load initial data
-        socket.onceAuthenticated(() => {
+        tracker.onceUpdated(() => {
             // this is hacky, but there's no better way unless we refactor login seriously
             // the problem is with failed login leaving synced keg instances behind without cleaning up subscription
             if (!this.db.boot || !this.db.boot.keys) return;
@@ -99,6 +99,7 @@ class SyncedKeg extends Keg {
 
                 return this.saveToServer()
                     .then(() => {
+                        tracker.seenThis(this.db.id, this.type, this.collectionVersion);
                         this.onSaved();
                     })
                     .tapCatch(() => {

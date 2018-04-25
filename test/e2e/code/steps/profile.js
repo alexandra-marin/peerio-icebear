@@ -84,7 +84,8 @@ Then('my primary email has been changed', { timeout: 15000 }, function() {
 When('I upload an avatar', async function() {
     this.lastProfileVersion = ice.contactStore.currentUser.profileVersion;
     const blobs = await createAvatarPayload(this);
-    return ice.User.current.saveAvatar(blobs).should.be.fulfilled;
+    await ice.User.current.saveAvatar(blobs).should.be.fulfilled;
+    return Promise.delay(2000); // server updates profileVersion a bit slow
 });
 
 Then('the avatar should appear in my profile', async function() {

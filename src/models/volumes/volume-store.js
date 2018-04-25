@@ -45,7 +45,7 @@ function mockProgress(folder) {
 
 class VolumeStore {
     constructor() {
-        socket.onceAuthenticated(this.loadAllVolumes);
+        tracker.onceUpdated(this.loadAllVolumes);
         socket.onceStarted(() => {
             socket.subscribe(socket.APP_EVENTS.volumeDeleted, this.processVolumeDeletedEvent);
         });

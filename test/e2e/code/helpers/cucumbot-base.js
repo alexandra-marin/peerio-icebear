@@ -63,6 +63,7 @@ class CucumbotBase extends EventEmitter {
     async onCredentials(msg) {
         this.world.username = msg.data.username;
         this.world.passphrase = msg.data.passphrase;
+        this.sendReady();
     }
 
     sendCredentials(username, passphrase) {

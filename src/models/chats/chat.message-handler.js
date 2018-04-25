@@ -31,8 +31,8 @@ class ChatMessageHandler {
                 this.cancelTimers();
             }
         }));
-        this._reactionsToDispose.push(reaction(() => socket.authenticated, (authenticated) => {
-            if (authenticated) {
+        this._reactionsToDispose.push(reaction(() => tracker.updated, (updated) => {
+            if (updated) {
                 this.onMessageDigestUpdate();
             } else {
                 this.chat.updatedAfterReconnect = false;
@@ -40,7 +40,7 @@ class ChatMessageHandler {
         }));
         this._reactionsToDispose.push(reaction(
             () =>
-                socket.authenticated && clientApp.isFocused && clientApp.isInChatsView && this.chat.active,
+                tracker.updated && clientApp.isFocused && clientApp.isInChatsView && this.chat.active,
             (userIsReading) => {
                 if (userIsReading) {
                     this.markAllAsSeen();
@@ -138,7 +138,7 @@ class ChatMessageHandler {
         this._markAsSeenTimer = setTimeout(() => {
             this._markAsSeenTimer = null;
             if (!clientApp.isFocused || !clientApp.isInChatsView || !this.chat.active) return;
-            tracker.seenThis(this.chat.id, 'message', this.downloadedUpdateId);
+            tracker.seenThis(this.chat.id, 'message', this.downloadedUpdateId, false);
         }, this._getTimeoutValue(this.chat.unreadCount));
     }
 

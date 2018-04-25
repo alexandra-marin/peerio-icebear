@@ -11,7 +11,7 @@ class TofuStore {
 
     // todo: paging
     @action.bound load() {
-        if (this.loading) return;
+        if (this.loading || this.loaded) return;
         this.loading = true;
 
         console.log('Precaching tofu kegs');
@@ -43,6 +43,7 @@ class TofuStore {
             this.preCacheRequests = [];
         }).finally(() => {
             this.loaded = true;
+            this.loading = false;
         });
     }
 

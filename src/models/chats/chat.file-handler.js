@@ -20,9 +20,8 @@ class ChatFileHandler {
          * @type {Chat} chat
          */
         this.chat = chat;
-        tracker.subscribeToKegUpdates(chat.id, 'file', () => setTimeout(this.onFileDigestUpdate));
-        when(() => tracker.loadedOnce, this.onFileDigestUpdate);
-        socket.onAuthenticated(this.onFileDigestUpdate);
+        tracker.subscribeToKegUpdates(chat.id, 'file', this.onFileDigestUpdate);
+        tracker.onUpdated(this.onFileDigestUpdate, true);
     }
 
     onFileDigestUpdate = () => {

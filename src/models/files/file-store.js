@@ -1,4 +1,4 @@
-const { observable, action, when } = require('mobx');
+const { observable, action, when, computed } = require('mobx');
 const socket = require('../../network/socket');
 const User = require('../user/user');
 const File = require('./file');
@@ -32,6 +32,9 @@ class FileStore extends FileStoreBase {
     uploadQueue = new TaskQueue(1);
     migrationQueue = new TaskQueue(1);
 
+    @computed get isEmpty() {
+        return !this.files.length && !this.folders.root.folders.length;
+    }
 
     updateDescriptors() {
         if (this.paused) return;

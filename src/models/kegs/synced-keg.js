@@ -1,4 +1,3 @@
-const socket = require('../../network/socket');
 const tracker = require('../update-tracker');
 const { retryUntilSuccess } = require('../../helpers/retry');
 const TaskQueue = require('../../helpers/task-queue');

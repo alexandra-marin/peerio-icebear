@@ -297,13 +297,16 @@ class ChatStore {
         if (!chat) throw new Error(`Invalid chat id. ${chat}`);
         let c;
         if (typeof chat === 'string') {
-            if (chat === 'SELF' || this.chatMap[chat]) return;
+            if (chat === 'SELF' || this.chatMap[chat]
+                || !(chat.startsWith('channel:') || chat.startsWith('chat:'))) {
+                return this.chatMap[chat];
+            }
             c = new Chat(chat, undefined, this, chat.startsWith('channel:'));
         } else {
             c = chat;
             if (this.chatMap[c.id]) {
                 console.error('Trying to add a copy of an instance of a chat that already exists.', c.id);
-                return;
+                return this.chatMap[c.id];
             }
         }
 
@@ -315,6 +318,7 @@ class ChatStore {
         if (this.myChats.hidden.includes(c.id)) c.unhide();
         c.loadMetadata().then(() => c.loadMostRecentMessage());
         if (this.loaded && !this.activeChat && !noActivate) this.activate(c.id);
+        return c;
     }
 
     // takes current fav/hidden lists and makes sure store.chats reflect it
@@ -465,7 +469,7 @@ class ChatStore {
      * @instance
      * @public
      */
-    @action startChat(participants = [], isChannel = false, name, purpose, noActivate) {
+    @action async startChat(participants = [], isChannel = false, name, purpose, noActivate) {
         const cached = isChannel ? null : this.findCachedChatWithParticipants(participants);
         if (cached) {
             if (!noActivate) this.activate(cached.id);
@@ -478,17 +482,22 @@ class ChatStore {
         try {
             // we can't add participants before setting channel name because
             // server will trigger invites and send empty chat name to user
-            const chat = new Chat(null, isChannel ? [] : this.getSelflessParticipants(participants), this, isChannel);
-            runInAction(async () => {
-                await chat.loadMetadata();
-                this.addChat(chat);
-                if (!noActivate) this.activate(chat.id);
-                if (name) await chat.rename(name);
-                if (purpose) await chat.changePurpose(purpose);
-                if (isChannel) {
-                    chat.addParticipants(this.getSelflessParticipants(participants));
-                }
-            });
+            let chat = new Chat(null, isChannel ? [] : this.getSelflessParticipants(participants), this, isChannel);
+            await chat.loadMetadata();
+            // There's a concurrency situation, because 'addChat' can be called before this
+            // by the event from server (db added).
+            // Event can arrive before this call not only as a result of our DM creation, but also
+            // if we get lucky and our contact creates same DM right before we do.
+            // That is why addChat returns the correct instance and we overwrite our chat variable.
+            chat = this.addChat(chat);
+            // in case instance has changed, otherwise resolves immediately
+            await chat.loadMetadata();
+            if (!noActivate) this.activate(chat.id);
+            if (name) await chat.rename(name);
+            if (purpose) await chat.changePurpose(purpose);
+            if (isChannel) {
+                chat.addParticipants(this.getSelflessParticipants(participants));
+            }
             return chat;
         } catch (err) {
             console.error(err);
@@ -538,9 +547,9 @@ class ChatStore {
      * @instance
      * @public
      */
-    @action startChatAndShareFiles(participants, fileOrFiles) {
+    @action async startChatAndShareFiles(participants, fileOrFiles) {
         const files = (Array.isArray(fileOrFiles) || isObservableArray(fileOrFiles)) ? fileOrFiles : [fileOrFiles];
-        const chat = this.startChat(participants);
+        const chat = await this.startChat(participants);
         if (!chat) return Promise.reject(new Error('Failed to create chat'));
         return chat.loadMetadata().then(() => {
             chat.shareFilesAndFolders(files);

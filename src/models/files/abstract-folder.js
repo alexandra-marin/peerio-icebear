@@ -76,6 +76,23 @@ class AbstractFolder {
         return util.formatBytes(this.size);
     }
 
+    @computed get totalFileCount() {
+        let count = 0;
+        for (const folder of this.folders) {
+            count += folder.totalFileCount;
+        }
+        count += this.files.length;
+        return count;
+    }
+
+    @computed get allFiles() {
+        let ret = this.files;
+        this.folders.forEach(f => {
+            ret = ret.concat(f.allFiles);
+        });
+        return ret;
+    }
+
     get isRoot() {
         return !this.parent;
     }

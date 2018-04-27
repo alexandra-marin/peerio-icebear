@@ -820,24 +820,25 @@ class Chat {
         return this._fileHandler.unshare(file);
     }
 
-    shareFolders(folders) {
-        folders.forEach(folder => this.uploadQueue.push(folder));
-        let promise = Promise.resolve();
-        folders.forEach(folder => {
-            promise = promise.then(async () => {
-                // retry and error handling
-                // is done in store implementations
-                try {
-                    await volumeStore.convertFolder(folder);
-                    await this.sendSharedFolder(folder);
-                } catch (e) {
-                    console.error(e);
-                }
-                this.uploadQueue.remove(folder);
-            });
-        });
-        return promise;
-    }
+    // we don't share folders with chats yet // Anri
+    // shareFolders(folders) {
+    //     folders.forEach(folder => this.uploadQueue.push(folder));
+    //     let promise = Promise.resolve();
+    //     folders.forEach(folder => {
+    //         promise = promise.then(async () => {
+    //             // retry and error handling
+    //             // is done in store implementations
+    //             try {
+    //                 await volumeStore.convertFolder(folder);
+    //                 await this.sendSharedFolder(folder);
+    //             } catch (e) {
+    //                 console.error(e);
+    //             }
+    //             this.uploadQueue.remove(folder);
+    //         });
+    //     });
+    //     return promise;
+    // }
 
     async shareFilesAndFolders(filesAndFolders) {
         const files = filesAndFolders.filter(f => !f.isFolder);
@@ -846,7 +847,8 @@ class Chat {
             await this.shareFiles(files);
         }
         if (folders.length) {
-            await this.shareFolders(folders);
+            // we don't share folders with chats yet // Anri
+            // await this.shareFolders(folders);
         }
     }
 

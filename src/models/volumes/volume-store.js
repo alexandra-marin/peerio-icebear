@@ -69,13 +69,14 @@ class VolumeStore {
         if (!volume) throw new Error(`Invalid volume id. ${volume}`);
         let v;
         if (typeof volume === 'string') {
-            if (volume === 'SELF' || this.volumeMap[volume] || !volume.startsWith('volume:')) return;
-            v = new Volume(volume, undefined, this);
+            if (volume === 'SELF' || this.volumeMap[volume] || !volume.startsWith('volume:')) {
+                return this.volumeMap[volume];
+            }
+            v = new Volume(volume);
         } else {
             v = volume;
             if (this.volumeMap[v.id]) {
-                console.error('Trying to add a copy of an instance of a volume that already exists.', v.id);
-                return;
+                return this.volumeMap[v.id];
             }
         }
 
@@ -85,6 +86,7 @@ class VolumeStore {
         this.attachFolder(v);
         v.added = true;
         v.loadMetadata().then(() => v.fileStore.loadAllFiles());
+        return v;
     }
 
 
@@ -106,29 +108,30 @@ class VolumeStore {
     @action.bound async loadAllVolumes() {
         if (this.loaded || this.loading) return;
         this.loading = true;
+        await tracker.waitUntilUpdated();
+        tracker.subscribeToKegDbAdded(this.addVolume);
 
         const volumes = await dbListProvider.getVolumes();
         volumes.forEach(this.addVolume);
-        Object.keys(tracker.digest).forEach(this.addVolume);
-        tracker.subscribeToKegDbAdded(this.addVolume);
 
         this.loading = false;
         this.loaded = true;
     }
 
-
-    @action createVolume(participants = [], name) {
+    @action async createVolume(participants = [], name) {
         try {
             // we can't add participants before setting volume name because
             // server will trigger invites and send empty volume name to user
-            const volume = new Volume(null, []);
-            (async () => {
-                await volume.create();
-                await volume.loadMetadata();
-                await volume.rename(name);
-                this.addVolume(volume);
-                volume.addParticipants(participants.filter(p => !p.isMe));
-            })();
+            let volume = new Volume(null, []);
+            // this call will create or load meta
+            await volume.loadMetadata();
+            // due to concurrency with db added event from update tracker,
+            // we need to make sure we have the right instance before we proceed
+            volume = this.addVolume(volume);
+            // in case instance has changed. otherwise it will immediately resolve
+            await volume.loadMetadata();
+            await volume.rename(name);
+            volume.addParticipants(participants.filter(p => !p.isMe));
             return volume;
         } catch (err) {
             console.error(err);
@@ -172,29 +175,38 @@ class VolumeStore {
         });
     }
 
-    @action.bound async convertFolder(folder) {
-        if (!folder.isShared) {
-            const newFolder = this.createVolume([], folder.name);
-            newFolder.isHidden = true;
-            folder.isBlocked = true;
-            await mockProgress(folder);
-            newFolder.isHidden = false;
-            folder.isHidden = true;
-            getFileStore().folders.deleteFolderSkipFiles(folder);
-        }
-    }
 
     @action.bound async shareFolder(folder, participants) {
-        await this.convertFolder(folder);
-        // TODO: add participants to folder
-        // TODO: maybe a better way to start the chat
-        let promise = Promise.resolve();
-        participants.forEach(contact => {
-            promise = promise.then(async () => {
-                await getChatStore().startChatAndShareFiles([contact], [folder]);
+        if (folder.isShared) return;
+        const newFolder = await this.createVolume(participants, folder.name);
+        newFolder.isHidden = false;
+        folder.isBlocked = false;
+        await this.copyFolderStructure(folder, newFolder);
+        await this.copyFilesToVolume(folder, newFolder);
+        getFileStore().folders.deleteFolderSkipFiles(folder);
+    }
+    @action async copyFolderStructure(src, dst) {
+        const copyFolders = (parentSrc, parentDst) => {
+            parentSrc.folders.forEach(f => {
+                const folder = dst.fileStore.folders.createFolder(f.name, parentDst, f.id);
+                copyFolders(f, folder);
             });
-        });
-        await promise;
+        };
+        copyFolders(src);
+        return dst.fileStore.folders.save();
+    }
+    @action async copyFilesToVolume(src, dst) {
+        src.progress = dst.progress = 0;
+        src.progressMax = dst.progressMax = src.totalFileCount;
+        while (src.progress < src.progressMax) {
+            const file = src.allFiles[src.progress];
+            if (!file) break;
+            await file.copyTo(dst.db); // eslint-disable-line no-await-in-loop
+            src.progressMax = dst.progressMax = src.totalFileCount;
+            src.progress = ++dst.progress;
+        }
+        src.progress = dst.progress = 0;
+        src.progressMax = dst.progressMax = 0;
     }
 
     @action.bound async deleteVolume(volume) {

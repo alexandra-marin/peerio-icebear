@@ -9,6 +9,7 @@ const Contact = require('../contacts/contact');
 const socket = require('../../network/socket');
 const warnings = require('../warnings');
 const FileStoreBase = require('../files/file-store-base');
+const { asPromise } = require('../../helpers/prombservable');
 
 class Volume extends AbstractFolder {
     isShared = true;
@@ -20,22 +21,19 @@ class Volume extends AbstractFolder {
 
     get name() {
         // uses AbstractFolder observable as a fallback
-        return this.chatHead ? this.chatHead.chatName : this._name;
+        return this.chatHead && this.chatHead.loaded ? this.chatHead.chatName : '';
     }
 
     set name(value) {
         if (this.chatHead) this.rename(value);
     }
 
-    constructor(id, name) {
+    constructor(id) {
         super();
         this.id = id;
         this.db = new VolumeKegDb(id);
         if (id) this.fileStore = new FileStoreBase(this.db);
         const m = createMap(this.files, 'fileId');
-        // TODO: maybe we don't need that
-        // it uses AbstractFolder observable
-        this._name = name;
         this.fileMap = m.map;
         this.fileMapObservable = m.observableMap;
         const m2 = createMap(this.folders, 'folderId');
@@ -47,13 +45,6 @@ class Volume extends AbstractFolder {
 
     get virtualFiles() {
         return this.fileStore.files;
-    }
-
-    async create() {
-        await this.loadMetadata();
-        // TODO: remove when not needed anymore
-        if (this.fileStore) throw new Error('File store for this volume is already initialized');
-        this.fileStore = new FileStoreBase(this.db);
     }
 
     /**
@@ -71,7 +62,7 @@ class Volume extends AbstractFolder {
     }
 
     async loadMetadata() {
-        if (this.metaLoaded || this.loadingMeta) return this._metaPromise;
+        if (this._metaPromise) return this._metaPromise;
         this.loadingMeta = true;
         this._metaPromise = this.loadMetaPromise();
         return this._metaPromise;
@@ -81,7 +72,8 @@ class Volume extends AbstractFolder {
         await this.db.loadMeta();
         this.id = this.db.id;
         this.chatHead = new ChatHead(this.db);
-        await new Promise(resolve => when(() => this.chatHead.loaded, resolve));
+        await asPromise(this.chatHead, 'loaded', true);
+        this.fileStore = new FileStoreBase(this.db);
         this.loadingMeta = false;
         this.metaLoaded = true;
     }

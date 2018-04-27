@@ -189,8 +189,8 @@ class FileStoreMigration {
                 }
                 // load and verify DM
                 let chat = null;
-                await retryUntilSuccess(() => {
-                    chat = getChatStore().startChat([contact], false, '', '', true);
+                await retryUntilSuccess(async () => {
+                    chat = await getChatStore().startChat([contact], false, '', '', true);
                     return chat.loadMetadata();
                 }, null, 10)
                     .catch(() => {

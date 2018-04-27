@@ -18,7 +18,6 @@ class FileStoreFolders {
         reaction(() => this.currentFolder.isDeleted, deleted => {
             if (deleted) this.currentFolder = rootFolder;
         });
-        window.folderResolveMap = folderResolveMap;
     }
 
     @observable loaded = false;
@@ -147,14 +146,14 @@ class FileStoreFolders {
         this.save();
     }
 
-    createFolder(name, parent) {
+    createFolder(name, parent, id) {
         const target = parent || this.root;
         if (target.findFolderByName(name)) {
             warnings.addSevere('error_folderAlreadyExists');
             throw new Error('error_folderAlreadyExists');
         }
         const folder = new FileFolder(name);
-        const folderId = cryptoUtil.getRandomShortIdHex();
+        const folderId = id || cryptoUtil.getRandomShortIdHex();
         folder.folderId = folderId;
         folder.createdAt = Date.now();
         folderResolveMap.set(folderId, folder);

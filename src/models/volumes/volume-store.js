@@ -175,13 +175,12 @@ class VolumeStore {
         });
     }
 
-
     @action.bound async shareFolder(folder, participants) {
         if (folder.isShared) return;
         const newFolder = await this.createVolume(participants, folder.name);
         newFolder.isHidden = false;
         folder.isBlocked = false;
-        await this.copyFolderStructure(folder, newFolder);
+        // await this.copyFolderStructure(folder, newFolder);
         await this.copyFilesToVolume(folder, newFolder);
         getFileStore().folders.deleteFolderSkipFiles(folder);
     }

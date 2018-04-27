@@ -15,6 +15,7 @@ const errorCodes = require('../../errors').ServerError.codes;
 const FileStoreBase = require('./file-store-base');
 
 class FileStore extends FileStoreBase {
+    isMainStore = true;
     constructor() {
         super();
         this.migration = new FileStoreMigration(this);

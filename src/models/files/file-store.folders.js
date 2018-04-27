@@ -58,6 +58,7 @@ class FileStoreFolders {
 
     // TODO: this gets called too often on folder convert
     @action sync() {
+        if (!this.fileStore.isMainStore) return;
         const { files } = this.fileStore;
         if (this._intercept) {
             this._intercept();

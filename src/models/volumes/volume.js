@@ -91,11 +91,9 @@ class Volume extends AbstractFolder {
 
     moveInto(file) {
         if (file.isFolder) {
-            console.error('moving folders into shared folders is not implemented');
+            file.allFiles.forEach(f => f.copyTo(this.db));
         } else {
-            // removing from existing folder or volume
-            if (file.folder) file.folder.free(file);
-            this.add(file);
+            file.copyTo(this.db);
         }
     }
 

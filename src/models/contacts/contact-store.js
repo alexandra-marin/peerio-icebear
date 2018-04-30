@@ -9,6 +9,7 @@ const warnings = require('../warnings');
 const createMap = require('../../helpers/dynamic-array-map');
 const { getFirstLetterUpperCase } = require('./../../helpers/string');
 const { getUser } = require('../../helpers/di-current-user');
+const { getChatStore } = require('../../helpers/di-chat-store');
 const tofuStore = require('./tofu-store');
 const { asPromise } = require('../../helpers/prombservable');
 
@@ -198,13 +199,18 @@ class ContactStore {
                 Promise.each(this.invitedContacts, c => {
                     if (c.username) {
                         return this.addContact(c.username)
-                            .then(() => this.removeInvite(c.email));
+                            .then(() => {
+                                console.log(`adding invitee ${c.username} to fake list`);
+                                getChatStore().pending.add(c.username);
+                            });
+                        // .then(() => this.removeInvite(c.email));
                     }
                     return null;
                 }).then(() => {
                     return Promise.each(this.invites.received, username => {
                         return this.addContact(username)
-                            .then(() => this.removeReceivedInvite(username));
+                            .then(() => getChatStore().pending.add(username));
+                        // .then(() => this.removeReceivedInvite(username));
                     });
                 }).catch(err => {
                     console.error('Error applying contact invites', err);

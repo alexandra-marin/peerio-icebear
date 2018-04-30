@@ -2,6 +2,7 @@
 
 const { observable, action, computed, reaction, autorunAsync, isObservableArray, when, runInAction } = require('mobx');
 const Chat = require('./chat');
+const ChatStorePending = require('./chat-store.pending.js');
 const socket = require('../../network/socket');
 const tracker = require('../update-tracker');
 const { EventEmitter } = require('eventemitter3');
@@ -28,6 +29,8 @@ const Contact = require('../contacts/contact');
  */
 class ChatStore {
     constructor() {
+        this.pending = new ChatStorePending(this);
+
         reaction(() => this.activeChat, chat => {
             if (chat) chat.loadMessages();
         });
@@ -510,6 +513,7 @@ class ChatStore {
     @action activate(id) {
         const chat = this.chatMap[id];
         if (!chat) return;
+        if (chat.disableActivate) return;
         TinyDb.user.setValue('lastUsedChat', id);
         if (this.activeChat) {
             this.activeChat.active = false;

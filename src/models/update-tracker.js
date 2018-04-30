@@ -352,7 +352,7 @@ class UpdateTracker {
                 newKegsCount: 0
             };
             this.digest[id][type] = digest;
-        } else if (digest.knownUpdateId === updateId) return;
+        } else if (digest.knownUpdateId >= updateId) return;
         // console.debug('SEEN THIS', id, type, updateId);
         // consumers should not care if this call fails, it makes things simpler.
         // to cover failure cases, consumers should activate 'mark as read' logic after every reconnect

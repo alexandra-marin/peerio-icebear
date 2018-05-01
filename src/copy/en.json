@@ -550,7 +550,7 @@
   "title_createChannelUpgradeOffer": "Free accounts are limited to 3 Rooms. <a-upgrade>Upgrade for unlimited Rooms</>.",
   "title_acceptedInvitationText": "Good news! <b>{fullName}</> just joined Peerio.",
   "title_addedToContactsText": "Hello! <b>{fullName}</> has added you to the Contact list.",
-  "title_blankChatScreen": "You can start a Direct Message with your contacts using the <plusIcon>+</> button",
+  "title_acceptedInvitationDismissed": "You can start a Direct Message with your contacts using the <plusIcon>+</> button",
   "title_channelName": "Name:",
   "title_channelNamePlaceholder": "this Room is called",
   "title_channelNameLimit": "Limit of {maxChatNameLength} characters",

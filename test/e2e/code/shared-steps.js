@@ -48,3 +48,14 @@ When('I restart without login', function() {
 When('I send my credentials to Cucumbot', async function() {
     this.cucumbotClient.sendCredentials(this.username, this.passphrase);
 });
+
+When('I wait {int} seconds', function(int) {
+    return Promise.delay(int * 1000);
+});
+
+When('I go offline', function() {
+    ice.socket.close();
+});
+When('I go online', function() {
+    ice.socket.open();
+});

@@ -47,7 +47,7 @@ module.exports = function mixUserProfileModule() {
     function loadSimpleKeg(keg) {
         if (keg.loading) return;
         const digest = tracker.getDigest('SELF', keg.type);
-        if (keg.loaded && digest.maxUpdateId <= keg.collectionVersion) {
+        if (keg.loaded) {
             tracker.seenThis('SELF', keg.type, keg.collectionVersion);
             return;
         }
@@ -59,6 +59,12 @@ module.exports = function mixUserProfileModule() {
     tracker.subscribeToKegUpdates('SELF', 'profile', this.loadProfile);
     tracker.subscribeToKegUpdates('SELF', 'quotas', this.loadQuota);
     tracker.subscribeToKegUpdates('SELF', 'settings', this.loadSettings);
+
+    tracker.onUpdated(() => {
+        this.loadProfile();
+        this.loadQuota();
+        this.loadSettings();
+    });
 
     this.saveProfile = function() {
         return _profileKeg.saveToServer().tapCatch(err => {

@@ -24,8 +24,8 @@ function isNotAMember(world, chat, username) {
         return !chat.allParticipants.find(predicate);
     });
 }
-function createRoom() {
-    const room = ice.chatStore.startChat([], true);
+async function createRoom() {
+    const room = await ice.chatStore.startChat([], true);
     return this.waitFor(() => room.metaLoaded && ice.chatStore.activeChat);
 }
 

@@ -55,7 +55,8 @@ class App {
         cfg.os = os.type();
         cfg.FileStream = FileStream;
         cfg.StorageEngine = StorageEngine;
-        cfg.StorageEngine.storageFolder = path.join(os.homedir(), '.peerio-icebear-tests');
+        cfg.StorageEngine.storageFolder = path.join(os.homedir(),
+            process.env.CUCUMBOT ? '.peerio-icebear-tests-cucumbot' : '.peerio-icebear-tests');
         cfg.socketServerUrl = testConfig.socketServerUrl;
         if (testConfig.logSocketMessages) {
             cfg.debug = { trafficReportInterval: 15000, socketLogEnabled: true };

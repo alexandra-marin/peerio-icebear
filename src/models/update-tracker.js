@@ -326,12 +326,14 @@ class UpdateTracker {
         if (!updateId) return;
 
         if (throttle) {
-            if (this.seenThisQueue[id] && this.seenThisQueue[id][type]) {
-                // just updating parameter, will get used when scheduled
-                this.seenThisQueue[id][type] = updateId;
-                return;
-            }
-            this.seenThisQueue[id] = { type: updateId };
+            if (this.seenThisQueue[id]) {
+                if (this.seenThisQueue[id][type]) {
+                    // just updating parameter, will get used when scheduled
+                    this.seenThisQueue[id][type] = updateId;
+                    return;
+                }
+            } else this.seenThisQueue[id] = {};
+            this.seenThisQueue[id][type] = updateId;
             // scheduling a run
             setTimeout(() => this.seenThis(id, type, this.seenThisQueue[id][type], false), 5000);
             return;

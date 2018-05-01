@@ -34,7 +34,7 @@ class ChatMessageHandler {
                 }
             }
         ));
-        this._reactionsToDispose.push(reaction(() => socket.authenticated, (authenticated) => {
+        this._reactionsToDispose.push(reaction(() => tracker.updatedAfterReconnect, (authenticated) => {
             if (authenticated) {
                 this.onMessageDigestUpdate();
             } else {
@@ -42,8 +42,11 @@ class ChatMessageHandler {
             }
         }));
         this._reactionsToDispose.push(reaction(
-            () => socket.authenticated && clientApp.isFocused && clientApp.isInChatsView
-                && this.chat.active && clientApp.isReadingNewestMessages,
+            () => tracker.updatedAfterReconnect
+                && this.chat.active
+                && clientApp.isFocused
+                && clientApp.isInChatsView
+                && clientApp.isReadingNewestMessages,
             (userIsReading) => {
                 if (userIsReading) {
                     this.markAllAsSeen();

@@ -22,15 +22,18 @@ class ChatMessageHandler {
         // asynchronously. to avoid changing unreadCount in reaction to unreadCount change
         tracker.subscribeToKegUpdates(chat.id, 'message', () => setTimeout(this.onMessageDigestUpdate));
         this.onMessageDigestUpdate();
-        this._reactionsToDispose.push(reaction(() => this.chat.active && clientApp.isInChatsView, (active) => {
-            if (active) {
-                this.onMessageDigestUpdate();
-                this.markAllAsSeen();
-                this.removeMaker();
-            } else {
-                this.cancelTimers();
+        this._reactionsToDispose.push(reaction(
+            () => this.chat.active && clientApp.isInChatsView && clientApp.isReadingNewestMessages,
+            (active) => {
+                if (active) {
+                    this.onMessageDigestUpdate();
+                    this.markAllAsSeen();
+                    this.removeMaker();
+                } else {
+                    this.cancelTimers();
+                }
             }
-        }));
+        ));
         this._reactionsToDispose.push(reaction(() => tracker.updated, (updated) => {
             if (updated) {
                 this.onMessageDigestUpdate();
@@ -39,8 +42,11 @@ class ChatMessageHandler {
             }
         }));
         this._reactionsToDispose.push(reaction(
-            () =>
-                tracker.updated && clientApp.isFocused && clientApp.isInChatsView && this.chat.active,
+            () => tracker.updated
+                && this.chat.active
+                && clientApp.isFocused
+                && clientApp.isInChatsView
+                && clientApp.isReadingNewestMessages,
             (userIsReading) => {
                 if (userIsReading) {
                     this.markAllAsSeen();

@@ -22,15 +22,18 @@ class ChatMessageHandler {
         this.chat = chat;
         tracker.onKegTypeUpdated(chat.id, 'message', this.onMessageDigestUpdate);
         this.onMessageDigestUpdate();
-        this._reactionsToDispose.push(reaction(() => this.chat.active && clientApp.isInChatsView, (active) => {
-            if (active) {
-                this.onMessageDigestUpdate();
-                this.markAllAsSeen();
-                this.removeMaker();
-            } else {
-                this.cancelTimers();
+        this._reactionsToDispose.push(reaction(
+            () => this.chat.active && clientApp.isInChatsView && clientApp.isReadingNewestMessages,
+            (active) => {
+                if (active) {
+                    this.onMessageDigestUpdate();
+                    this.markAllAsSeen();
+                    this.removeMaker();
+                } else {
+                    this.cancelTimers();
+                }
             }
-        }));
+        ));
         this._reactionsToDispose.push(reaction(() => socket.authenticated, (authenticated) => {
             if (authenticated) {
                 this.onMessageDigestUpdate();
@@ -39,8 +42,8 @@ class ChatMessageHandler {
             }
         }));
         this._reactionsToDispose.push(reaction(
-            () =>
-                socket.authenticated && clientApp.isFocused && clientApp.isInChatsView && this.chat.active,
+            () => socket.authenticated && clientApp.isFocused && clientApp.isInChatsView
+                && this.chat.active && clientApp.isReadingNewestMessages,
             (userIsReading) => {
                 if (userIsReading) {
                     this.markAllAsSeen();

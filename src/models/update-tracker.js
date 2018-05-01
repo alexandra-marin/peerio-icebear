@@ -335,7 +335,7 @@ class UpdateTracker {
             } else this.seenThisQueue[id] = {};
             this.seenThisQueue[id][type] = updateId;
             // scheduling a run
-            setTimeout(() => this.seenThis(id, type, this.seenThisQueue[id][type], false), 5000);
+            setTimeout(() => this.seenThis(id, type, this.seenThisQueue[id][type], false), 3000);
             return;
         }
 

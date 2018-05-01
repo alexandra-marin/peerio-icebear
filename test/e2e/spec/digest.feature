@@ -51,7 +51,15 @@ Feature: Digest
         And   I send my credentials to Cucumbot
         And   Cucumbot logs in
         When  I start a DM with Cucumbot
+        And   I wait 5 seconds
+        # 2 restars a re needed because lastKnownVersion are not reported for own messages (when chat was created)
+        # first restart will call lastKnownVersion, but our test case has to execute without that call in the session
+        And   I restart
+        And   I wait 3 seconds
+        And   I restart
+        And   I wait 3 seconds
         And   I go offline
+        And   I wait 3 seconds
         And   Cucumbot sends a message "I see you are offline."
         And   I wait 3 seconds
         And   I go online

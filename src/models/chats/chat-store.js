@@ -362,6 +362,7 @@ class ChatStore {
     @action async loadAllChats() {
         if (this.loaded || this.loading) return;
         this.loading = true;
+        await asPromise(tracker, 'updatedAfterReconnect', true);
         // 1. Loading my_chats keg
         this.myChats = new MyChats();
         this.myChats.onUpdated = this.applyMyChatsData;

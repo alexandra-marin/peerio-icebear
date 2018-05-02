@@ -442,6 +442,16 @@ class ContactStore {
             });
     }
 
+    /**
+     * Sends an invite
+     * @param {string} email
+     * @returns {Promise}
+     * @public
+     */
+    inviteNoWarning(email) {
+        return socket.send('/auth/contacts/invite', { email });
+    }
+
     _merge(usernames) {
         usernames.forEach(u => this.getContactAndSave(u));
     }

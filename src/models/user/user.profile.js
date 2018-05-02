@@ -46,7 +46,6 @@ module.exports = function mixUserProfileModule() {
 
     function loadSimpleKeg(keg) {
         if (keg.loading) return;
-        const digest = tracker.getDigest('SELF', keg.type);
         if (keg.loaded) {
             tracker.seenThis('SELF', keg.type, keg.collectionVersion);
             return;

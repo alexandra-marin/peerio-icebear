@@ -1,7 +1,7 @@
 
-const { computed } = require('mobx');
+// const { computed } = require('mobx');
 const FileFolder = require('./file-folder');
-const { getVolumeStore } = require('../../helpers/di-volume-store');
+// const { getVolumeStore } = require('../../helpers/di-volume-store');
 
 /* function mergeSortedArray(arr1, arr2) {
     const arr = [];
@@ -24,14 +24,6 @@ const { getVolumeStore } = require('../../helpers/di-volume-store');
 class RootFolder extends FileFolder {
     constructor() {
         super('/');
-    }
-
-    @computed get virtualFiles() {
-        return this.files.filter(f => f.folderId !== 'HIDDEN_FOLDER');
-    }
-
-    @computed get virtualFolders() {
-        return super.virtualFolders.concat(getVolumeStore().volumes.filter(f => !f.isHidden).slice());
     }
 
     serialize() {

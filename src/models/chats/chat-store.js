@@ -1,4 +1,4 @@
-const { observable, action, computed, reaction, autorunAsync, isObservableArray, when, runInAction } = require('mobx');
+const { observable, action, computed, reaction, autorunAsync, isObservableArray, when } = require('mobx');
 const Chat = require('./chat');
 const socket = require('../../network/socket');
 const tracker = require('../update-tracker');

@@ -1,4 +1,4 @@
-const { observable, when } = require('mobx');
+const { observable } = require('mobx');
 const createMap = require('../../helpers/dynamic-array-map');
 // const warnings = require('../warnings');
 const AbstractFolder = require('../files/abstract-folder');
@@ -42,10 +42,6 @@ class Volume extends AbstractFolder {
 
     @observable loadingMeta = false;
     @observable metaLoaded = false;
-
-    get virtualFiles() {
-        return this.fileStore.files;
-    }
 
     /**
      * @public

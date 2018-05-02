@@ -8,12 +8,7 @@ class AbstractFolder {
     @observable createdAt;
     @observable isDeleted;
     @observable isShared = false;
-    // TODO: this is to be replaced
-    // by proper chat-related ACL management
-    @observable isJustUnshared = false;
-    @observable isBlocked = false;
-    @observable isHidden = false;
-    @observable isOwner = true;
+
     isFolder = true;
     _folderId = null;
     get folderId() { return this._folderId; }
@@ -36,29 +31,20 @@ class AbstractFolder {
         return Math.min(Math.ceil(this.progress / (this.progressMax | 1) * 100), 100);
     }
 
-    get virtualFolders() {
-        return this.folders.filter(folder => !folder.isHidden);
-    }
-
-    get virtualFiles() {
-        return this.files;
-    }
-
     @computed get normalizedName() {
-        return this.name ? this.name.toLowerCase() : '';
+        return this.name ? this.name.toUpperCase() : '';
     }
 
     @computed get foldersSortedByName() {
-        return this.virtualFolders.sort((f1, f2) => f1.normalizedName > f2.normalizedName);
+        return this.folders.sort((f1, f2) => f1.normalizedName > f2.normalizedName);
     }
 
     @computed get filesSortedByDate() {
-        return this.virtualFiles.sort((f1, f2) => f2.uploadedAt - f1.uploadedAt);
+        return this.files.sort((f1, f2) => f2.uploadedAt - f1.uploadedAt);
     }
 
     @computed get foldersAndFilesDefaultSorting() {
-        const { foldersSortedByName, filesSortedByDate } = this;
-        return foldersSortedByName.concat(filesSortedByDate).filter(f => f.folderId !== 'HIDDEN_FOLDER');
+        return this.foldersSortedByName.concat(this.filesSortedByDate);
     }
 
     @computed get size() {
@@ -98,12 +84,12 @@ class AbstractFolder {
     }
 
     get hasNested() {
-        return this.virtualFolders && this.virtualFolders.length;
+        return this.folders && this.folders.length;
     }
 
     findFolderByName(name) {
-        const normalizedName = name.toLowerCase();
-        return this.virtualFolders.find(f => f.normalizedName === normalizedName);
+        const normalizedName = name.toUpperCase();
+        return this.folders.find(f => f.normalizedName === normalizedName);
     }
 
     async download(path, pickPathSelector, createDirFunctor) {
@@ -114,7 +100,7 @@ class AbstractFolder {
         this.progressMax = this.files.length + this.folders.length;
         await createDirFunctor(downloadPath);
         let promise = Promise.resolve();
-        this.virtualFolders.forEach(folder => {
+        this.folders.forEach(folder => {
             promise = promise.then(async () => {
                 await folder.download(downloadPath, pickPathSelector, createDirFunctor);
                 this.progress++;

@@ -15,7 +15,7 @@ const warnings = require('../warnings');
 const Contact = require('../contacts/contact');
 const chatInviteStore = require('../chats/chat-invite-store');
 const { asPromise } = require('../../helpers/prombservable');
-const volumeStore = require('../volumes/volume-store');
+// const volumeStore = require('../volumes/volume-store');
 
 // to assign when sending a message and don't have an id yet
 let temporaryChatId = 0;

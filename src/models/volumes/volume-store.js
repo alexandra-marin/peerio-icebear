@@ -10,38 +10,11 @@ const rootFolder = require('../files/root-folder');
 // const Contact = require('../contacts/contact');
 // const User = require('../user/user');
 // const SharedDbBootKeg = require('../kegs/shared-db-boot-keg');
-const { getChatStore } = require('../../helpers/di-chat-store');
+// const { getChatStore } = require('../../helpers/di-chat-store');
 const { getFileStore } = require('../../helpers/di-file-store');
 const dbListProvider = require('../../helpers/keg-db-list-provider');
 // const { asPromise } = require('../../helpers/prombservable');
 const tracker = require('../update-tracker');
-
-function random(max) {
-    return Math.floor(Math.random() * max);
-}
-
-function mockProgress(folder) {
-    if (folder.shareTimeout) return Promise.resolve();
-    folder.progressMax = 100;
-    folder.progress = random(10);
-    folder.shareTimeout = setInterval(() => {
-        folder.progress = Math.min(folder.progressMax, folder.progress + random(40));
-        console.log(`progress: ${folder.progress}, ${folder.progressMax}`);
-        if (folder.progress >= folder.progressMax) {
-            clearInterval(folder.shareTimeout);
-            folder.shareTimeout = undefined;
-        }
-    }, 500);
-    return new Promise(resolve =>
-        when(() => folder.progress === 100, () => {
-            setTimeout(action(() => {
-                resolve();
-                folder.progress = null;
-                folder.progressMax = null;
-                folder.isBlocked = false;
-            }), 1000);
-        }));
-}
 
 class VolumeStore {
     constructor() {
@@ -178,8 +151,6 @@ class VolumeStore {
     @action.bound async shareFolder(folder, participants) {
         if (folder.isShared) return;
         const newFolder = await this.createVolume(participants, folder.name);
-        newFolder.isHidden = false;
-        folder.isBlocked = false;
         // await this.copyFolderStructure(folder, newFolder);
         await this.copyFilesToVolume(folder, newFolder);
         getFileStore().folders.deleteFolderSkipFiles(folder);

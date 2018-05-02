@@ -30,7 +30,8 @@ module.exports = function mixUserRegisterModule() {
                     localeCode: this.locale.trim(),
                     platform: config.platform,
                     clientVersion: config.appVersion,
-                    sdkVersion: config.sdkVersion
+                    sdkVersion: config.sdkVersion,
+                    appLabel: config.appLabel
 
                 };
                 return socket.send('/noauth/register', request);

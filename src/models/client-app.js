@@ -75,6 +75,13 @@ class ClientApp {
     @observable uiUserPrefs = {};
 
     /**
+     * UI should listen to this to determine whether or not to show "scroll to bottom" button
+     * and SDK should listen to determine whether to mark messages as read
+     * @memberof ClientApp
+     */
+    @observable isReadingNewestMessages = true;
+
+    /**
      * UI should listen to this and request entering of 2fa code from user and then pass ot back to icebear.
      * @member {TwoFARequest} updatingAfterReconnect
      * @memberof ClientApp

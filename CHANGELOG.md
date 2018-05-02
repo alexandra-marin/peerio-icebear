@@ -2,6 +2,61 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.16.5"></a>
+## [4.16.5](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.16.4...v4.16.5) (2018-05-02)
+
+
+
+<a name="4.16.4"></a>
+## [4.16.4](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.16.3...v4.16.4) (2018-05-01)
+
+
+
+<a name="4.16.3"></a>
+## [4.16.3](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.16.2...v4.16.3) (2018-05-01)
+
+
+
+<a name="4.16.2"></a>
+## [4.16.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.16.1...v4.16.2) (2018-04-30)
+
+
+
+<a name="4.16.1"></a>
+## [4.16.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.16.0...v4.16.1) (2018-04-27)
+
+
+
+<a name="4.16.0"></a>
+# [4.16.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.15.4...v4.16.0) (2018-04-26)
+
+
+### Features
+
+* add userNotFoundSendInvite error ([#180](https://github.com/PeerioTechnologies/peerio-icebear/issues/180)) ([35ccdab](https://github.com/PeerioTechnologies/peerio-icebear/commit/35ccdab))
+
+
+
+<a name="4.15.4"></a>
+## [4.15.4](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.15.3...v4.15.4) (2018-04-22)
+
+
+
+<a name="4.15.3"></a>
+## [4.15.3](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.15.2...v4.15.3) (2018-04-18)
+
+
+
+<a name="4.15.2"></a>
+## [4.15.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.15.1...v4.15.2) (2018-04-17)
+
+
+### Bug Fixes
+
+* update copy, remove unused ([7a13088](https://github.com/PeerioTechnologies/peerio-icebear/commit/7a13088))
+
+
+
 <a name="4.15.1"></a>
 ## [4.15.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.15.0...v4.15.1) (2018-04-05)
 

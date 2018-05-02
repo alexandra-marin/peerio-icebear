@@ -31,6 +31,7 @@ class FileStore {
             this.onFileDigestUpdate();
         });
     }
+
     /**
      * Full list of user's files.
      * @member {ObservableArray<File>} files
@@ -39,6 +40,10 @@ class FileStore {
      * @public
      */
     @observable.shallow files = [];
+
+    @computed get isEmpty() {
+        return !this.files.length && !this.folders.root.folders.length;
+    }
 
     /**
      * Subset of files not currently hidden by any applied filters

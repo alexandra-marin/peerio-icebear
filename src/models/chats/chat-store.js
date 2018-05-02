@@ -248,6 +248,17 @@ class ChatStore {
             // a is fav, b is not fav
             return -1;
         } else if (!b.isFavorite) {
+            // if it is a pending DM
+            if (a.isInvite) {
+                if (b.isInvite) {
+                    return a.name.localeCompare(b.name);
+                }
+                // a is pending dm, b is not
+                return -1;
+            } else if (b.isInvite) {
+                // b is pending dm, a is not
+                return 1;
+            }
             // non favorite chats sort by a weird combination unread count and then by update time
             if (unreadOnTop) {
                 // we want chats with unread count > 0 to always come first

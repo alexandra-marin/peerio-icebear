@@ -1,4 +1,5 @@
-const { observable, computed } = require('mobx');
+const { observable, computed, action, when } = require('mobx');
+const socket = require('../../network/socket');
 const Chat = require('../chats/chat');
 const { getChatStore } = require('../../helpers/di-chat-store');
 const { getContactStore } = require('../../helpers/di-contact-store');
@@ -11,10 +12,13 @@ const { getContactStore } = require('../../helpers/di-contact-store');
  * @public
  */
 class ChatPendingDM extends Chat {
-    constructor(username) {
+    constructor(username, email, isReceived) {
         super(`pending-dm:${username}`, [{ username }], getChatStore());
         this.username = username;
+        this.email = email;
         this.loaded = true;
+        this.metaLoaded = true;
+        this.isReceived = isReceived;
     }
 
     get name() { return this.username; }
@@ -30,12 +34,58 @@ class ChatPendingDM extends Chat {
         return Promise.resolve();
     }
 
+    loadMessages() {
+        return Promise.resolve();
+    }
+
+    @computed get recentFiles() {
+        return [];
+    }
+
     get headLoaded() { return true; }
-    get disableActivate() { return true; }
+
+    // get disableActivate() { return true; }
+    get isInvite() { return true; }
+
+    // To prevent startChat from returning ChatPendingDM instance
+    hasSameParticipants() { return false; }
 
     @observable unreadCount = 0;
     @observable username;
     @observable timestamp;
+
+    @action.bound dismiss() {
+        getChatStore().unloadChat(this);
+        return Promise.resolve();
+        // return this.isReceived ? this.removeReceivedInvite(this.username)
+        //    : this.removeInvite(this.email);
+    }
+
+    @action.bound start() {
+        const chat = getChatStore().startChat([getContactStore().getContact(this.username)]);
+        when(() => chat.active, this.dismiss);
+    }
+
+    /**
+     * Removes invitation.
+     * @param {string} email
+     * @returns {Promise}
+     * @public
+     */
+    removeInvite(email) {
+        return socket.send('/auth/contacts/issued-invites/remove', { email });
+    }
+
+    /**
+     * Removes incoming invitation. This is useful for new users, logic automatically adds authors of received invites
+     * to favorites and then removes received invites.
+     * @param {string} username
+     * @returns {Promise}
+     * @public
+     */
+    removeReceivedInvite(username) {
+        return socket.send('/auth/contacts/received-invites/remove', { username });
+    }
 }
 
 module.exports = ChatPendingDM;

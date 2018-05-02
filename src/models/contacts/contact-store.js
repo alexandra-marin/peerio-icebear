@@ -200,8 +200,7 @@ class ContactStore {
                     if (c.username) {
                         return this.addContact(c.username)
                             .then(() => {
-                                console.log(`adding invitee ${c.username} to fake list`);
-                                getChatStore().pending.add(c.username);
+                                getChatStore().pending.add(c.username, c.email);
                             });
                         // .then(() => this.removeInvite(c.email));
                     }
@@ -209,7 +208,7 @@ class ContactStore {
                 }).then(() => {
                     return Promise.each(this.invites.received, username => {
                         return this.addContact(username)
-                            .then(() => getChatStore().pending.add(username));
+                            .then(() => getChatStore().pending.add(username, null, true));
                         // .then(() => this.removeReceivedInvite(username));
                     });
                 }).catch(err => {
@@ -342,27 +341,6 @@ class ContactStore {
                     warnings.add('snackbar_contactRemovedFavourite');
                 });
             });
-    }
-
-    /**
-     * Removes invitation.
-     * @param {string} email
-     * @returns {Promise}
-     * @public
-     */
-    removeInvite(email) {
-        return socket.send('/auth/contacts/issued-invites/remove', { email });
-    }
-
-    /**
-     * Removes incoming invitation. This is useful for new users, logic automatically adds authors of received invites
-     * to favorites and then removes received invites.
-     * @param {string} username
-     * @returns {Promise}
-     * @public
-     */
-    removeReceivedInvite(username) {
-        return socket.send('/auth/contacts/received-invites/remove', { username });
     }
 
     /**

@@ -5,8 +5,8 @@ class ChatStorePending {
         this.store = store;
     }
 
-    add(username) {
-        this.store.addChat(new ChatPendingDM(username));
+    add(username, email, received) {
+        this.store.addChat(new ChatPendingDM(username, email, received));
     }
 }
 

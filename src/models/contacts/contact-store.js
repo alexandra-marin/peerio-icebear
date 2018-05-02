@@ -5,6 +5,7 @@ const Contact = require('./contact');
 const { setContactStore } = require('../../helpers/di-contact-store');
 const MyContacts = require('../contacts/my-contacts');
 const Invites = require('../contacts/invites');
+const { EventEmitter } = require('eventemitter3');
 const warnings = require('../warnings');
 const createMap = require('../../helpers/dynamic-array-map');
 const { getFirstLetterUpperCase } = require('./../../helpers/string');
@@ -93,6 +94,17 @@ class ContactStore {
      * @member {Contact} currentUser
      */
     currentUser;
+
+    EVENT_TYPES = {
+        inviteAccepted: 'inviteAccepted'
+    };
+    /**
+     * Events emitter.
+     * @member {EventEmitter}
+     * @type {EventEmitter}
+     * @public
+     */
+    events = new EventEmitter();
 
     _checkSortValue(change) {
         switch (change.newValue) {
@@ -198,7 +210,8 @@ class ContactStore {
                 Promise.each(this.invitedContacts, c => {
                     if (c.username) {
                         return this.addContact(c.username)
-                            .then(() => this.removeInvite(c.email));
+                            .then(() => this.removeInvite(c.email))
+                            .then(() => this.onInviteAccepted({ contact: c }));
                     }
                     return null;
                 }).then(() => {
@@ -212,6 +225,10 @@ class ContactStore {
             }
         );
     });
+
+    onInviteAccepted = (props) => {
+        this.events.emit(this.EVENT_TYPES.inviteAccepted, props);
+    };
 
     /**
      * Tries to add contact to favorites.

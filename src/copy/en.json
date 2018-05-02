@@ -439,6 +439,8 @@
   "notification_manyNewMentions": "Mentioned multiple times",
   "notification_roomInviteTitle": "New room invitation",
   "notification_roomInviteBody": "{name} has invited you to the room #{room}",
+  "notification_inviteAcceptedTitle": "Invitation accepted",
+  "notification_inviteAcceptedBody": "Your contact {firstName} (@{username}) has joined Peerio",
   "title_contacts": "Contacts",
   "title_contactGroups": "Groups",
   "title_contactsAllowAccess": "Please allow accessing contacts",

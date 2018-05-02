@@ -196,24 +196,21 @@ class ContactStore {
         when(
             () => this.invites.loaded,
             () => {
-                Promise.each(this.invitedContacts, c => {
-                    if (c.username) {
-                        return this.addContact(c.username)
-                            .then(() => {
-                                getChatStore().pending.add(c.username, c.email);
-                            });
-                        // .then(() => this.removeInvite(c.email));
-                    }
-                    return null;
-                }).then(() => {
-                    return Promise.each(this.invites.received, username => {
-                        return this.addContact(username)
-                            .then(() => getChatStore().pending.add(username, null, true));
-                        // .then(() => this.removeReceivedInvite(username));
+                try {
+                    this.invitedContacts.forEach(c => {
+                        if (c.username) {
+                            this.getContactAndSave(c.username);
+                            getChatStore().pending.add(c.username, c.email);
+                        }
+                        return null;
                     });
-                }).catch(err => {
+                    this.invites.received.forEach(username => {
+                        this.getContactAndSave(username);
+                        getChatStore().pending.add(username, null, true);
+                    });
+                } catch (err) {
                     console.error('Error applying contact invites', err);
-                });
+                }
             }
         );
     });

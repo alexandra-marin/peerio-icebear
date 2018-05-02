@@ -21,9 +21,12 @@ class ChatPendingDM extends Chat {
         this.isReceived = isReceived;
     }
 
-    get name() { return this.username; }
+    get contact() {
+        return getContactStore().getContact(this.username);
+    }
 
     @computed get allParticipants() { return [getContactStore().getContact(this.username)]; }
+    @computed get otherParticipants() { return this.allParticipants; }
 
     // stub function to imitate chat
     loadMetadata() {
@@ -56,14 +59,16 @@ class ChatPendingDM extends Chat {
 
     @action.bound dismiss() {
         getChatStore().unloadChat(this);
-        return Promise.resolve();
-        // return this.isReceived ? this.removeReceivedInvite(this.username)
-        //    : this.removeInvite(this.email);
+        return this.isReceived ? this.removeReceivedInvite(this.username)
+            : this.removeInvite(this.email);
     }
 
     @action.bound start() {
-        const chat = getChatStore().startChat([getContactStore().getContact(this.username)]);
-        when(() => chat.active, this.dismiss);
+        const contact = getContactStore().getContact(this.username);
+        when(() => !contact.loading && !contact.notFound, () => {
+            const chat = getChatStore().startChat([contact]);
+            when(() => chat.active, this.dismiss);
+        });
     }
 
     /**

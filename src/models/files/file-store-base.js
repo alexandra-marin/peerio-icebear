@@ -20,7 +20,7 @@ class FileStoreBase {
         const m = createMap(this.files, 'fileId');
         this.fileMap = m.map;
         this.fileMapObservable = m.observableMap;
-        this.folders = new FileStoreFolders(this);
+        this.folderStore = new FileStoreFolders(this);
         this.bulk = new FileStoreBulk(this);
 
         tracker.subscribeToKegUpdates(kegDb ? kegDb.id : 'SELF', 'file', () => {
@@ -49,7 +49,7 @@ class FileStoreBase {
 
     // Subset of files and folders not currently hidden by any applied filters
     @computed get visibleFilesAndFolders() {
-        const folders = this.folders.searchAllFoldersByName(this.currentFilter);
+        const folders = this.folderStore.searchAllFoldersByName(this.currentFilter);
         return folders.concat(this.files.filter(f => f.show));
     }
 
@@ -58,7 +58,7 @@ class FileStoreBase {
 
     // Subset of folders not currently hidden by any applied filters
     @computed get visibleFolders() {
-        return this.folders.searchAllFoldersByName(this.folderFilter);
+        return this.folderStore.searchAllFoldersByName(this.folderFilter);
     }
 
     // Human readable maximum auto-expandable inline image size limit
@@ -137,7 +137,7 @@ class FileStoreBase {
 
     // Returns currently selected folders (folder.selected == true)
     get selectedFolders() {
-        return this.folders.selectedFolders;
+        return this.folderStore.selectedFolders;
     }
 
     @computed get selectedFilesOrFolders() {

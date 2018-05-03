@@ -1,9 +1,16 @@
 const { observable, computed } = require('mobx');
 const util = require('../../util');
-
+// todo: isRoot, and add orphaned files and folders to the list
 class AbstractFolder {
-    @observable.shallow files = [];
-    @observable.shallow folders = [];
+    constructor(store) {
+        this.store = store;
+    }
+    @computed get files() {
+        return this.store.files.filter(f => f.folderId === this.folderId);
+    }
+    @computed get folders() {
+        return this.store.folderStore.folders.filter(f => f.parent);
+    }
     @observable _name;
     @observable createdAt;
     @observable isDeleted;

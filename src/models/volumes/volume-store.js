@@ -153,17 +153,17 @@ class VolumeStore {
         const newFolder = await this.createVolume(participants, folder.name);
         // await this.copyFolderStructure(folder, newFolder);
         await this.copyFilesToVolume(folder, newFolder);
-        getFileStore().folders.deleteFolderSkipFiles(folder);
+        getFileStore().folderStore.deleteFolderSkipFiles(folder);
     }
     @action async copyFolderStructure(src, dst) {
         const copyFolders = (parentSrc, parentDst) => {
             parentSrc.folders.forEach(f => {
-                const folder = dst.fileStore.folders.createFolder(f.name, parentDst, f.id);
+                const folder = dst.fileStore.folderStore.createFolder(f.name, parentDst, f.id);
                 copyFolders(f, folder);
             });
         };
         copyFolders(src);
-        return dst.fileStore.folders.save();
+        return dst.fileStore.folderStore.save();
     }
     @action async copyFilesToVolume(src, dst) {
         src.progress = dst.progress = 0;

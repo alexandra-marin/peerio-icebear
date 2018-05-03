@@ -34,8 +34,8 @@ class FileStoreBulk {
             if (!await this.deleteFolderConfirmator(i)) return;
         }
         if (i.isFolder && !i.isShared) {
-            await this.fileStore.folders.deleteFolder(i);
-            if (!batch) this.fileStore.folders.save();
+            await this.fileStore.folderStore.deleteFolder(i);
+            if (!batch) this.fileStore.folderStore.save();
         } else if (i.isFolder) {
             await getVolumeStore().deleteVolume(i);
         } else {
@@ -55,7 +55,7 @@ class FileStoreBulk {
             promise = promise.then(() => this.removeOne(i, true));
         });
         await promise;
-        this.fileStore.folders.save();
+        this.fileStore.folderStore.save();
         this.fileStore.clearSelection();
     }
 
@@ -100,7 +100,7 @@ class FileStoreBulk {
             if (folder.isShared) {
                 warnings.add('title_itemMovedToFolder', null, { item: item.name, folder: folder.name });
             }
-            this.fileStore.folders.save();
+            this.fileStore.folderStore.save();
         }
     }
 
@@ -126,7 +126,7 @@ class FileStoreBulk {
         await promise;
         targetFolder.progress = null;
         targetFolder.progressMax = null;
-        await this.fileStore.folders.save();
+        await this.fileStore.folderStore.save();
     }
 
     @action.bound async downloadOne(item, path) {

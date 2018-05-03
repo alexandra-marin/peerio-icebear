@@ -34,7 +34,7 @@ class FileStore extends FileStoreBase {
     migrationQueue = new TaskQueue(1);
 
     @computed get isEmpty() {
-        return !this.files.length && !this.folders.root.folders.length;
+        return !this.files.length && !this.folderStore.root.folders.length;
     }
 
     updateDescriptors() {
@@ -289,7 +289,7 @@ class FileStore extends FileStoreBase {
                 });
                 // move file into folder as soon as we have file id
                 if (folderId) {
-                    when(() => keg.fileId, () => this.folders.getById(folderId).moveInto(keg));
+                    when(() => keg.fileId, () => this.folderStore.getById(folderId).moveInto(keg));
                 }
                 return ret;
             });

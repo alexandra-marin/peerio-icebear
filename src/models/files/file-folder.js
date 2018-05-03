@@ -12,8 +12,8 @@ function hasLegacyFilesPredicate(f) {
 }
 
 class FileFolder extends AbstractFolder {
-    constructor(name) {
-        super();
+    constructor(name, store) {
+        super(store);
         const m = createMap(this.files, 'fileId');
         this.name = name;
         this.fileMap = m.map;
@@ -57,7 +57,7 @@ class FileFolder extends AbstractFolder {
             folder.parent.freeFolder(folder);
         }
         folder.parent = this;
-        this.folders.push(folder);
+        this.store.folderStore.folders.push(folder);
         return folder;
     }
 
@@ -76,9 +76,9 @@ class FileFolder extends AbstractFolder {
     }
 
     freeFolder(folder) {
-        const i = this.folders.indexOf(folder);
+        const i = this.store.folderStore.folders.indexOf(folder);
         if (i !== -1) {
-            this.folders.splice(i, 1);
+            this.store.folderStore.folders.splice(i, 1);
             folder.parent = null;
         } else {
             console.error('free cannot find the folder');
@@ -143,7 +143,7 @@ class FileFolder extends AbstractFolder {
         folders && folders.map(f => {
             let folder = folderResolveMap[f.folderId];
             if (!folder) {
-                folder = new FileFolder();
+                folder = new FileFolder('', this.store);
             }
             folder.deserialize(f, this, folderResolveMap, newFolderResolveMap);
             newFolderResolveMap[f.folderId] = folder;

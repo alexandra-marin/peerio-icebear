@@ -498,6 +498,16 @@ class Chat {
      */
     @observable mostRecentMessage;
 
+    /**
+     * UI flag for chats created from chat-pending-dms
+     * Will be set to true if it was for user who just signed up
+     * @member {?Message} isChatWithJustRegisteredUser
+     * @memberof Chat
+     * @instance
+     * @public
+     */
+    @observable isChatCreatedFromPendingDM;
+
     _metaPromise = null;
     /**
      * @returns {Promise}

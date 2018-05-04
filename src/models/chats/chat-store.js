@@ -160,7 +160,7 @@ class ChatStore {
     }
 
     /**
-     * Subset of ChatStore#chats, contains only direct message chats
+     * Subset of ChatStore#chats, contains direct message chats and pending DMs
      * @member {Array<Chat>} directMessages
      * @type {Array<Chat>} directMessages
      * @memberof ChatStore
@@ -170,6 +170,32 @@ class ChatStore {
      */
     @computed get directMessages() {
         return this.chats.filter(chat => !chat.isChannel && chat.headLoaded);
+    }
+
+    /**
+     * Subset of ChatStore#chats, contains direct message chats and excluding pending DMs
+     * @member {Array<Chat>} directMessages
+     * @type {Array<Chat>} directMessages
+     * @memberof ChatStore
+     * @readonly
+     * @instance
+     * @public
+     */
+    @computed get directMessagesWithoutPending() {
+        return this.directMessages.filter(chat => !chat.isInvite);
+    }
+
+    /**
+     * Subset of ChatStore#chats, contains only pending DMs, i.e. sent invites that have been accepted
+     * @member {Array<Chat>} directMessages
+     * @type {Array<Chat>} directMessages
+     * @memberof ChatStore
+     * @readonly
+     * @instance
+     * @public
+     */
+    @computed get pendingDMs() {
+        return this.directMessages.filter(chat => chat.isInvite);
     }
 
     /**

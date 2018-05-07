@@ -124,6 +124,24 @@ class Chat {
     }
 
     /**
+     * The username of the person you're having a DM with
+     * @member {string} otherUsernameForDM
+     * @memberof Chat
+     * @instance
+     * @public
+     * @readonly
+     */
+    @computed get otherUsernameForDM() {
+        if (this.isChannel) {
+            console.error(`Should not call otherUsernameForDM for channel`);
+            return null;
+        }
+        const participant = this.otherParticipants.length && this.otherParticipants[0];
+        if (participant) return participant.username;
+        return null;
+    }
+
+    /**
      * Room api. For DM will work too, but doesn't make sense, just use 'allParticipants'
      * Includes only currently joined room participants and current user.
      * Excludes users awaiting to accept invite or get removed after leave.

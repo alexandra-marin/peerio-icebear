@@ -173,32 +173,6 @@ class ChatStore {
     }
 
     /**
-     * Subset of ChatStore#chats, contains direct message chats and excluding pending DMs
-     * @member {Array<Chat>} directMessages
-     * @type {Array<Chat>} directMessages
-     * @memberof ChatStore
-     * @readonly
-     * @instance
-     * @public
-     */
-    @computed get directMessagesWithoutPending() {
-        return this.directMessages.filter(chat => !chat.isInvite);
-    }
-
-    /**
-     * Subset of ChatStore#chats, contains only pending DMs, i.e. sent invites that have been accepted
-     * @member {Array<Chat>} directMessages
-     * @type {Array<Chat>} directMessages
-     * @memberof ChatStore
-     * @readonly
-     * @instance
-     * @public
-     */
-    @computed get pendingDMs() {
-        return this.directMessages.filter(chat => chat.isInvite);
-    }
-
-    /**
      * Subset of ChatStore#chats, contains only channel chats
      * @member {Array<Chat>} channels
      * @type {Array<Chat>} channels
@@ -355,7 +329,8 @@ class ChatStore {
         c.added = true;
         // console.log('Added chat ', c.id);
         if (this.myChats.hidden.includes(c.id)) c.unhide();
-        c.loadMetadata().then(() => c.loadMostRecentMessage());
+        c.loadMetadata().then(() => c.loadMostRecentMessage())
+            .then(() => this.pending.onChatAdded(c));
         if (this.loaded && !this.activeChat) this.activate(c.id);
     };
 

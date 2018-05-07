@@ -527,6 +527,16 @@ class Chat {
      */
     @observable isChatCreatedFromPendingDM;
 
+    /**
+     * UI flag for chats where user is a new user who accepted an invite to join
+     * Will be set to true in a DM with the user who invited this user
+     * @member {?Message} isChatWithJustRegisteredUser
+     * @memberof Chat
+     * @instance
+     * @public
+     */
+    @observable isNewUserFromInvite;
+
     _metaPromise = null;
     /**
      * @returns {Promise}

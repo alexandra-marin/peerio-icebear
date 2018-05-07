@@ -68,6 +68,7 @@ class ChatPendingDM extends Chat {
         when(() => !contact.loading && !contact.notFound, () => {
             const chat = getChatStore().startChat([contact]);
             chat.isChatCreatedFromPendingDM = true;
+            if (this.isReceived) chat.isNewUserFromInvite = true;
             when(() => chat.active, this.dismiss);
         });
     }

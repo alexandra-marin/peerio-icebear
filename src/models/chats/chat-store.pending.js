@@ -1,4 +1,3 @@
-const { computed } = require('mobx');
 const ChatPendingDM = require('./chat-pending-dm');
 
 class ChatStorePending {
@@ -6,19 +5,10 @@ class ChatStorePending {
         this.store = store;
     }
 
-    @computed get dmAndPendingMap() {
-        const result = {};
-        this.store.directMessages
-            .forEach(chat => {
-                result[chat.otherUsernameForDM] = chat;
-            });
-        return result;
-    }
-
     add(username, email, received) {
         // edge case: if the chat list loaded before invites
         // and there was already a DM created
-        if (this.dmAndPendingMap[username]) {
+        if (this.store.directMessages.find(s => s.otherUsernameForDM === username)) {
             console.error(`user invitation ${username} already has a created DM`);
             return;
         }
@@ -34,7 +24,7 @@ class ChatStorePending {
             return;
         }
         const username = chat.otherUsernameForDM;
-        const existing = this.dmAndPendingMap[username];
+        const existing = this.store.directMessages.find(s => s.isInvite && s.username === username);
         if (existing && existing.isInvite) {
             existing.dismiss();
         }

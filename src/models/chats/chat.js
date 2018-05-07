@@ -44,7 +44,8 @@ class Chat {
         this.db = new ChatKegDb(id, participants, isChannel);
         this._reactionsToDispose.push(
             reaction(
-                () => this.active && clientApp.isFocused && clientApp.isInChatsView,
+                () => this.active && clientApp.isFocused && clientApp.isReadingNewestMessages
+                    && clientApp.isInChatsView,
                 shouldSendReceipt => {
                     if (shouldSendReceipt) this._sendReceipt();
                 }

@@ -53,7 +53,7 @@ class ChatPendingDM extends Chat {
     // To prevent startChat from returning ChatPendingDM instance
     hasSameParticipants() { return false; }
 
-    @observable unreadCount = 0;
+    @observable unreadCount = 1;
     @observable username;
     @observable timestamp;
 

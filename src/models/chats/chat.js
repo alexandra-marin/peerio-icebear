@@ -520,7 +520,7 @@ class Chat {
     /**
      * UI flag for chats created from chat-pending-dms
      * Will be set to true if it was for user who just signed up
-     * @member {?Message} isChatWithJustRegisteredUser
+     * @member {boolean} isChatCreatedFromPendingDM
      * @memberof Chat
      * @instance
      * @public
@@ -530,7 +530,7 @@ class Chat {
     /**
      * UI flag for chats where user is a new user who accepted an invite to join
      * Will be set to true in a DM with the user who invited this user
-     * @member {?Message} isChatWithJustRegisteredUser
+     * @member {boolean} isNewUserFromInvite
      * @memberof Chat
      * @instance
      * @public

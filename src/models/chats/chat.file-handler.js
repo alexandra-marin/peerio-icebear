@@ -91,7 +91,7 @@ class ChatFileHandler {
      * @returns {File}
      * @public
      */
-    uploadAndShare(path, name, deleteAfterUpload = false, beforeShareCallback = null, message) {
+    uploadAndShare(path, name, deleteAfterUpload = false, message) {
         const file = fileStore.upload(path, name);
         file.uploadQueue = this.chat.uploadQueue; // todo: change, this is dirty
         this.chat.uploadQueue.push(file);
@@ -99,9 +99,6 @@ class ChatFileHandler {
         const deletedDisposer = when(() => file.deleted, removeFileFromQueue);
         when(() => file.readyForDownload, async () => {
             try {
-                if (beforeShareCallback) {
-                    await beforeShareCallback();
-                }
                 await this.share([file], message);
                 if (deleteAfterUpload) {
                     config.FileStream.delete(path);

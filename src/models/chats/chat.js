@@ -804,8 +804,8 @@ class Chat {
      * @returns {Promise}
      * @public
      */
-    uploadAndShareFile(path, name, deleteAfterUpload = false, beforeShareCallback = null, message = null) {
-        return this._fileHandler.uploadAndShare(path, name, deleteAfterUpload, beforeShareCallback, message);
+    uploadAndShareFile(path, name, deleteAfterUpload = false, message = null) {
+        return this._fileHandler.uploadAndShare(path, name, deleteAfterUpload, message);
     }
 
     /**

@@ -3,6 +3,7 @@ const socket = require('../../network/socket');
 const Chat = require('../chats/chat');
 const { getChatStore } = require('../../helpers/di-chat-store');
 const { getContactStore } = require('../../helpers/di-contact-store');
+const { retryUntilSuccess } = require('../../helpers/retry');
 
 /**
  * Pending DM helper class
@@ -83,7 +84,10 @@ class ChatPendingDM extends Chat {
      * @public
      */
     removeInvite(email) {
-        return socket.send('/auth/contacts/issued-invites/remove', { email });
+        return retryUntilSuccess(
+            () => socket.send('/auth/contacts/issued-invites/remove', { email }),
+            Math.random(),
+            10);
     }
 
     /**
@@ -94,7 +98,10 @@ class ChatPendingDM extends Chat {
      * @public
      */
     removeReceivedInvite(username) {
-        return socket.send('/auth/contacts/received-invites/remove', { username });
+        return retryUntilSuccess(
+            () => socket.send('/auth/contacts/received-invites/remove', { username }),
+            Math.random(),
+            10);
     }
 }
 

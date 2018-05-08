@@ -2,139 +2,77 @@ const { observable, action, reaction, computed } = require('mobx');
 const { getUser } = require('../../helpers/di-current-user');
 const tracker = require('../update-tracker');
 const FileFolder = require('./file-folder');
-const rootFolder = require('./root-folder');
 const FileFoldersKeg = require('./file-folders-keg');
 const cryptoUtil = require('../../crypto/util');
 const warnings = require('../warnings');
-const folderResolveMap = require('./folder-resolve-map');
+const createMap = require('../../helpers/dynamic-array-map');
 
 class FileStoreFolders {
     constructor(fileStore) {
         this.fileStore = fileStore;
+        this.root = new FileFolder(fileStore, '/');
+        this.currentFolder = this.root;
+
         tracker.onceUpdated(() => {
             this.keg = new FileFoldersKeg(getUser().kegDb);
             this.keg.onUpdated = () => { this.sync(); };
         });
         reaction(() => this.currentFolder.isDeleted, deleted => {
-            if (deleted) this.currentFolder = rootFolder;
+            if (deleted) this.currentFolder = this.root;
         });
+        const map = createMap(this.folders, 'folderId');
+        this.foldersMap = map.observableMap;
     }
+
+    // flat folders array
+    @observable.shallow folders = [];
+    // will update automatically when folders array changes
+    @observable foldersMap;
 
     @observable loaded = false;
     @observable keg = null;
 
-    root = rootFolder;
-    @observable currentFolder = rootFolder;
+    @observable currentFolder;
 
     folderIdReactions = {};
 
     getById(id) {
-        return folderResolveMap.get(id);
-    }
-
-    _addFile = (file) => {
-        const { root } = this;
-        this.folderIdReactions[file.fileId] =
-            reaction(() => file.folderId, folderId => {
-                const folderToResolve = this.getById(folderId);
-                if (file.folder && file.folder === folderToResolve) return;
-                if (folderToResolve) {
-                    file.folder && file.folder.free(file);
-                    folderToResolve.add(file, true);
-                } else {
-                    !file.folder && root.add(file, true);
-                }
-            }, true);
-    }
-
-    _removeFile = (file) => {
-        const { folder, fileId } = file;
-        if (folder) folder.free(file);
-        if (fileId && this.folderIdReactions[fileId]) {
-            this.folderIdReactions[fileId]();
-            delete this.folderIdReactions[fileId];
-        }
-    }
-
-    // TODO: this gets called too often on folder convert
-    @action sync() {
-        if (!this.fileStore.isMainStore) return;
-        const { files } = this.fileStore;
-        if (this._intercept) {
-            this._intercept();
-            this._intercept = null;
-        }
-        const { root } = this;
-        const newFolderResolveMap = {};
-        root.deserialize(this.keg, null, folderResolveMap, newFolderResolveMap);
-        // remove files from folders if they aren't present in the keg
-        files.forEach(f => {
-            if (f.folderId) {
-                const folder = this.getById(f.folderId);
-                if (folder) folder.moveInto(f);
-            } else if (f.folder) f.folder.free(f);
-        });
-        // remove folders if they aren't present in the keg and are not volumes
-        folderResolveMap.keys().forEach(folderId => {
-            if (!newFolderResolveMap[folderId]) {
-                const folder = folderResolveMap.get(folderId);
-                if (!folder.isShared) {
-                    folder.remove();
-                }
-            }
-        });
-        Object.keys(newFolderResolveMap).forEach(folderId => {
-            if (!folderResolveMap.has(folderId)) {
-                folderResolveMap.set(folderId, newFolderResolveMap[folderId]);
-            }
-        });
-        files.forEach(this._addFile);
-        this._intercept = files.observe(delta => {
-            delta.removed.forEach(this._removeFile);
-            delta.added.forEach(this._addFile);
-            return delta;
-        });
-        this.loaded = true;
-    }
-
-    @computed get folderResolveMapSorted() {
-        return folderResolveMap.values()
-            .sort((f1, f2) => f1.normalizedName > f2.normalizedName);
+        return this.foldersMap.get(id);
     }
 
     searchAllFoldersByName(name) {
         const q = name ? name.toLowerCase() : '';
-        return this.folderResolveMapSorted
+        return this.folders
             .filter(f => f.normalizedName.includes(q));
     }
 
     @computed get selectedFolders() {
-        return this.folderResolveMapSorted.filter(f => f.selected);
+        return this.folders.filter(f => f.selected);
     }
 
-    async deleteFolder(folder) {
-        // TODO: put the delete logic into the AbstractFolder (???)
-        const { files } = folder;
-        folder.progress = 0;
-        folder.progressMax = files.length;
-        folder.progressText = 'title_deletingFolder';
-        let promise = Promise.resolve();
-        files.forEach(file => {
-            promise = promise.then(async () => {
-                await file.remove();
-                folder.progress++;
-            });
-        });
-        await promise;
-        folder.progressMax = null;
-        folder.progress = null;
-        folder.progressText = null;
-        // there's a lag between deletion and file disappearance from the
-        // associated folder list. so to prevent confusion we clear files here
-        folder.files = [];
-        folder.remove();
-        this.save();
-    }
+    // async deleteFolder(folder) {
+    //     // TODO: put the delete logic into the AbstractFolder (???)
+    //     const { files } = folder;
+    //     folder.progress = 0;
+    //     folder.progressMax = files.length;
+    //     folder.progressText = 'title_deletingFolder';
+    //     let promise = Promise.resolve();
+    //     files.forEach(file => {
+    //         promise = promise.then(async () => {
+    //             await file.remove();
+    //             folder.progress++;
+    //         });
+    //     });
+    //     await promise;
+    //     folder.progressMax = null;
+    //     folder.progress = null;
+    //     folder.progressText = null;
+    //     // there's a lag between deletion and file disappearance from the
+    //     // associated folder list. so to prevent confusion we clear files here
+    //     folder.files = [];
+    //     folder.remove();
+    //     this.save();
+    // }
 
     /**
      * Deletes only the folder and does not delete files
@@ -153,11 +91,10 @@ class FileStoreFolders {
             warnings.addSevere('error_folderAlreadyExists');
             throw new Error('error_folderAlreadyExists');
         }
-        const folder = new FileFolder(name);
+        const folder = new FileFolder(parent.store, name);
         const folderId = id || cryptoUtil.getRandomShortIdHex();
         folder.folderId = folderId;
         folder.createdAt = Date.now();
-        folderResolveMap.set(folderId, folder);
         target.addFolder(folder);
         return folder;
     }
@@ -171,6 +108,22 @@ class FileStoreFolders {
             null,
             'error_savingFileFolders'
         ).catch(() => this.sync());
+    }
+
+    // to avoid recursive calls of action and action nesting in result
+    _syncFolder = (f, parentId) => {
+        const existing = this.foldersMap.get(f.folderId);
+        if (existing) {
+            existing.deserialize(f, parentId);
+        } else {
+            const folder = new FileFolder(this.fileStore);
+            folder.deserialize(f, parentId);
+            this.folders.push(folder);
+        }
+        f.folders.forEach((child) => this._syncFolder(child, f.folderId));
+    };
+    @action.bound sync() {
+        this.keg.folders.forEach((f) => this._syncFolder(f, null));
     }
 }
 

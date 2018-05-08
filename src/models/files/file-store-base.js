@@ -243,7 +243,7 @@ class FileStoreBase {
                     console.log('Hidden or deleted file kegs should not have been returned by server. kegid:', keg.id);
                     continue;
                 }
-                const file = new File(this.kegDb);
+                const file = new File(this.kegDb, this);
                 if (keg.collectionVersion > this.maxUpdateId) {
                     this.maxUpdateId = keg.collectionVersion;
                 }
@@ -322,7 +322,7 @@ class FileStoreBase {
                         continue;
                     }
                     const existing = this.getById(keg.props.fileId) || this.getByKegId(keg.kegId);
-                    const file = existing || new File(this.kegDb);
+                    const file = existing || new File(this.kegDb, this);
                     if (keg.deleted || keg.hidden) {
                         if (existing) this.files.remove(existing);
                         continue;

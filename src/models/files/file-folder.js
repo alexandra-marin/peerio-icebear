@@ -1,8 +1,7 @@
-const createMap = require('../../helpers/dynamic-array-map');
 const warnings = require('../warnings');
 const AbstractFolder = require('./abstract-folder');
 const { retryUntilSuccess } = require('../../helpers/retry');
-const { computed } = require('mobx');
+const { computed, action } = require('mobx');
 
 function isLegacyFilePredicate(f) {
     return !!(f && f.isLegacy);
@@ -12,118 +11,76 @@ function hasLegacyFilesPredicate(f) {
 }
 
 class FileFolder extends AbstractFolder {
-    constructor(name, store) {
-        super(store);
-        const m = createMap(this.files, 'fileId');
-        this.name = name;
-        this.fileMap = m.map;
-        this.fileMapObservable = m.observableMap;
-        const m2 = createMap(this.folders, 'folderId');
-        this.folderMap = m2.map;
+    constructor(store, name) {
+        super(store, name === '/');
+        this.name = this.isRoot ? '' : name;
     }
 
     @computed get hasLegacyFiles() {
         return !!(this.folders.find(hasLegacyFilesPredicate) || this.files.find(isLegacyFilePredicate));
     }
 
-    add(file, skipSaving) {
-        if (this.fileMap[file.fileId]) {
-            return;
+    // move file to this folder
+    @action.bound add(file) {
+        if (file.store !== this.store) {
+            console.error('Can\'t add file to a folder in another store');
+            return Promise.reject();
         }
-        if (file.folder) {
-            console.error('file already belongs to a folder');
-            return;
-        }
-        file.folder = this;
         file.folderId = this.isRoot ? null : this.folderId;
 
-        if (!skipSaving) {
-            retryUntilSuccess(
-                () => file.saveToServer(),
-                `moving file ${file.fileId}`,
-                2
-            );
-        }
-        this.files.push(file);
+        return retryUntilSuccess(
+            () => file.saveToServer(),
+            `saving file ${file.fileId}`,
+            5
+        ).tapCatch(() => {
+            file.load();
+        });
     }
 
-    addFolder(folder) {
-        if (folder.parent === this) return folder;
-        if (this.folderMap[folder.folderId]) {
-            return folder;
-        }
-        if (folder.parent) {
-            console.debug('moving folder from parent');
-            folder.parent.freeFolder(folder);
-        }
-        folder.parent = this;
-        this.store.folderStore.folders.push(folder);
-        return folder;
-    }
-
-    free(file) {
-        if (!this.fileMap[file.fileId]) {
-            console.error('file does not belong to the folder');
+    // move a folder to this folder
+    @action.bound addFolder(folder) {
+        if (folder.store !== this.store) {
+            console.error('Can\'t add folder to a folder in another store');
             return;
         }
-        const i = this.files.indexOf(file);
-        if (i !== -1) {
-            this.files.splice(i, 1);
-            file.folder = null;
-        } else {
-            console.error('free cannot find the file');
+        if (this.findFolderByName(folder.normalizedName)) {
+            warnings.addSevere('error_folderAlreadyExists');
+            return;
         }
+        folder.parentId = this.folderId;
+        if (!this.store.folderStore.getById(folder.folderId)) {
+            this.store.folderStore.folders.push(folder);
+        }
+        this.store.folderStore.save();
     }
 
-    freeFolder(folder) {
-        const i = this.store.folderStore.folders.indexOf(folder);
-        if (i !== -1) {
-            this.store.folderStore.folders.splice(i, 1);
-            folder.parent = null;
-        } else {
-            console.error('free cannot find the folder');
-        }
-    }
-
-    remove() {
+    // removed folder tree entirely, including files
+    remove(skipSave) {
         if (this.isRoot) return;
-        let root = this;
-        while (!root.isRoot) root = root.parent;
-        this.files.forEach(file => {
-            file.folder = null;
-            root.add(file);
-        });
-        this.files = [];
-        this.folders.forEach(folder => folder.remove());
-        this.folders = [];
-        this.parent && this.parent.freeFolder(this);
+        this.files.forEach(f => f.remove());
+        this.folders.forEach(f => f.remove(true));
         this.isDeleted = true;
+        this.store.folderStore.folders.remove(this);
+        if (skipSave) return;
+        this.store.folderStore.save();
     }
 
-    moveInto(file) {
-        if (file.isFolder) {
-            if (this.findFolderByName(file.normalizedName)) {
-                warnings.addSevere('error_folderAlreadyExists');
-                throw new Error('error_folderAlreadyExists');
-            }
-            if (file === this) {
-                console.error('cannot move folder in itself');
-                return;
-            }
-            file.parent.freeFolder(file);
-            this.addFolder(file);
+    // move file or
+    moveInto(fileOrFolder) {
+        if (fileOrFolder.isFolder) {
+            this.addFolder(fileOrFolder);
         } else {
-            if (file.folder) file.folder.free(file);
-            this.add(file);
+            this.add(fileOrFolder);
         }
     }
 
     rename(name) {
         if (this.parent.findFolderByName(name)) {
             warnings.addSevere('error_folderAlreadyExists');
-            throw new Error('error_folderAlreadyExists');
+            return;
         }
         this.name = name;
+        this.store.folderStore.save();
     }
 
     findFolderByName(name) {
@@ -137,19 +94,14 @@ class FileFolder extends AbstractFolder {
         return { name, folderId, createdAt, folders };
     }
 
-    deserialize(dataItem, parent, folderResolveMap, newFolderResolveMap) {
-        const { folderId, name, createdAt, folders } = dataItem;
-        Object.assign(this, { folderId, name, createdAt });
-        folders && folders.map(f => {
-            let folder = folderResolveMap[f.folderId];
-            if (!folder) {
-                folder = new FileFolder('', this.store);
-            }
-            folder.deserialize(f, this, folderResolveMap, newFolderResolveMap);
-            newFolderResolveMap[f.folderId] = folder;
-            return folder;
-        });
-        parent && parent.addFolder(this);
+    deserialize(data, parentId) {
+        if (this.folderId && data.folderId !== this.folderId) {
+            throw new Error('Trying to deserialize folder from a different folder data');
+        }
+        this.folderId = data.folderId;
+        this.name = data.name;
+        this.createdAt = data.createdAt;
+        this.parentId = parentId;
         return this;
     }
 }

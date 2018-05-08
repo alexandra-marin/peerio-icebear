@@ -34,8 +34,7 @@ class FileStoreBulk {
             if (!await this.deleteFolderConfirmator(i)) return;
         }
         if (i.isFolder && !i.isShared) {
-            await this.fileStore.folderStore.deleteFolder(i);
-            if (!batch) this.fileStore.folderStore.save();
+            await i.remove(batch);
         } else if (i.isFolder) {
             await getVolumeStore().deleteVolume(i);
         } else {

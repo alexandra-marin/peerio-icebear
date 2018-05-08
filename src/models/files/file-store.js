@@ -214,7 +214,7 @@ class FileStore extends FileStoreBase {
             file.deleted = true; // maybe not really, but it's the best option for now
             return file;
         }
-        const file = new File(chat.db);
+        const file = new File(chat.db, this);
         file.fileId = fileId;
         setTimeout(() => {
             let fileMap = this.chatFileMap.get(kegDbId);
@@ -264,7 +264,7 @@ class FileStore extends FileStoreBase {
      * @public
      */
     upload = (filePath, fileName, folderId) => {
-        const keg = new File(User.current.kegDb);
+        const keg = new File(User.current.kegDb, this);
         keg.folderId = folderId;
         config.FileStream.getStat(filePath).then(stat => {
             if (!User.current.canUploadFileSize(stat.size)) {

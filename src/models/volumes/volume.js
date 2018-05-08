@@ -1,5 +1,5 @@
 const { observable } = require('mobx');
-const createMap = require('../../helpers/dynamic-array-map');
+// const createMap = require('../../helpers/dynamic-array-map');
 // const warnings = require('../warnings');
 const AbstractFolder = require('../files/abstract-folder');
 const VolumeKegDb = require('../kegs/volume-keg-db');
@@ -12,8 +12,17 @@ const FileStoreBase = require('../files/file-store-base');
 const { asPromise } = require('../../helpers/prombservable');
 
 class Volume extends AbstractFolder {
+    constructor(id) {
+        super(null, true);
+        this.id = id;
+        this.db = new VolumeKegDb(id);
+        if (id) this.store = new FileStoreBase(this.db);
+    }
+
     isShared = true;
     @observable id = null;
+    @observable loadingMeta = false;
+    @observable metaLoaded = false;
 
     // TODO: maybe refactor it later to use folderId instead
     get folderId() { return this.id; }
@@ -27,21 +36,6 @@ class Volume extends AbstractFolder {
     set name(value) {
         if (this.chatHead) this.rename(value);
     }
-
-    constructor(id) {
-        super();
-        this.id = id;
-        this.db = new VolumeKegDb(id);
-        if (id) this.fileStore = new FileStoreBase(this.db);
-        const m = createMap(this.files, 'fileId');
-        this.fileMap = m.map;
-        this.fileMapObservable = m.observableMap;
-        const m2 = createMap(this.folders, 'folderId');
-        this.folderMap = m2.map;
-    }
-
-    @observable loadingMeta = false;
-    @observable metaLoaded = false;
 
     /**
      * @public
@@ -69,7 +63,7 @@ class Volume extends AbstractFolder {
         this.id = this.db.id;
         this.chatHead = new ChatHead(this.db);
         await asPromise(this.chatHead, 'loaded', true);
-        this.fileStore = new FileStoreBase(this.db);
+        this.store = new FileStoreBase(this.db);
         this.loadingMeta = false;
         this.metaLoaded = true;
     }
@@ -82,14 +76,14 @@ class Volume extends AbstractFolder {
             console.error('file already belongs to a folder');
             return;
         }
-        await file.copyTo(this.db);
+        await file.copyTo(this.db, this.store);
     }
 
     moveInto(file) {
         if (file.isFolder) {
-            file.allFiles.forEach(f => f.copyTo(this.db));
+            file.allFiles.forEach(f => f.copyTo(this.db, this.store));
         } else {
-            file.copyTo(this.db);
+            file.copyTo(this.db, this.store);
         }
     }
 

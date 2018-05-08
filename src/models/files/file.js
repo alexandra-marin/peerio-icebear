@@ -8,6 +8,7 @@ const socket = require('../../network/socket');
 const uploadModule = require('./file.upload');
 const downloadModule = require('./file.download');
 const { getUser } = require('../../helpers/di-current-user');
+const { getFileStore } = require('../../helpers/di-file-store');
 const { retryUntilSuccess } = require('../../helpers/retry');
 const { ServerError } = require('../../errors');
 const clientApp = require('../client-app');
@@ -19,8 +20,9 @@ const { asPromise } = require('../../helpers/prombservable');
  * @public
  */
 class File extends Keg {
-    constructor(db) {
+    constructor(db, store) {
         super(null, 'file', db);
+        this.store = store;
         this.format = 1;
         this.latestFormat = 1;
         this.descriptorFormat = 1;
@@ -203,7 +205,10 @@ class File extends Keg {
      * @instance
      * @public
      */
-    @observable folder;
+    @computed get folder() {
+        const folder = this.store.folderStore.getById(this.folderId);
+        return folder || this.store.folderStore.root;
+    }
 
     @computed get isLegacy() {
         return !this.format;
@@ -410,7 +415,7 @@ class File extends Keg {
      * @public
      */
     share(chat) {
-        return this.copyTo(chat.db);
+        return this.copyTo(chat.db, getFileStore());
     }
 
     /**
@@ -485,7 +490,7 @@ class File extends Keg {
      * Copies this file keg to another db
      * @param {KegDb} db
      */
-    copyTo(db) {
+    copyTo(db, store) {
         return retryUntilSuccess(() => {
             // to avoid creating empty keg
             return socket.send('/auth/kegs/db/query', {
@@ -496,7 +501,7 @@ class File extends Keg {
                 .then(resp => {
                     // file already exists in this db
                     if (resp.kegs.length) return Promise.resolve();
-                    const file = new File(db);
+                    const file = new File(db, store);
                     file.descriptorKey = this.descriptorKey;
                     file.fileId = this.fileId;
                     return file.saveToServer()

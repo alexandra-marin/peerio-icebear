@@ -2,10 +2,8 @@ const { observable, computed, action, when } = require('mobx');
 const { setVolumeStore } = require('../../helpers/di-volume-store');
 // const cryptoUtil = require('../../crypto/util');
 const Volume = require('./volume');
-const folderResolveMap = require('../files/folder-resolve-map');
 const socket = require('../../network/socket');
 const warnings = require('../warnings');
-const rootFolder = require('../files/root-folder');
 // const contactStore = require('../contacts/contact-store');
 // const Contact = require('../contacts/contact');
 // const User = require('../user/user');
@@ -15,6 +13,7 @@ const { getFileStore } = require('../../helpers/di-file-store');
 const dbListProvider = require('../../helpers/keg-db-list-provider');
 // const { asPromise } = require('../../helpers/prombservable');
 const tracker = require('../update-tracker');
+// const FileFolder = require('../files/file-folder');
 
 class VolumeStore {
     constructor() {
@@ -55,10 +54,8 @@ class VolumeStore {
 
         this.volumeMap[v.id] = v;
         this.volumes.push(v);
-        // important for UI
-        this.attachFolder(v);
         v.added = true;
-        v.loadMetadata().then(() => v.fileStore.loadAllFiles());
+        v.loadMetadata().then(() => v.store.loadAllFiles());
         return v;
     }
 
@@ -138,16 +135,6 @@ class VolumeStore {
             .sort((f1, f2) => f1.normalizedName > f2.normalizedName);
     }
 
-    attachFolder(folder) {
-        if (folderResolveMap.get(folder.folderId)) return;
-        // TODO: should have temporary id or something
-        // DEFINITELY NEEDS FIXING
-        when(() => folder.folderId, () => {
-            folder.parent = rootFolder;
-            folderResolveMap.set(folder.folderId, folder);
-        });
-    }
-
     @action.bound async shareFolder(folder, participants) {
         if (folder.isShared) return;
         const newFolder = await this.createVolume(participants, folder.name);
@@ -158,12 +145,12 @@ class VolumeStore {
     @action async copyFolderStructure(src, dst) {
         const copyFolders = (parentSrc, parentDst) => {
             parentSrc.folders.forEach(f => {
-                const folder = dst.fileStore.folderStore.createFolder(f.name, parentDst, f.id);
+                const folder = dst.store.folderStore.createFolder(f.name, parentDst, f.id);
                 copyFolders(f, folder);
             });
         };
         copyFolders(src);
-        return dst.fileStore.folderStore.save();
+        return dst.store.folderStore.save();
     }
     @action async copyFilesToVolume(src, dst) {
         src.progress = dst.progress = 0;
@@ -171,7 +158,7 @@ class VolumeStore {
         while (src.progress < src.progressMax) {
             const file = src.allFiles[src.progress];
             if (!file) break;
-            await file.copyTo(dst.db); // eslint-disable-line no-await-in-loop
+            await file.copyTo(dst.db, dst.store); // eslint-disable-line no-await-in-loop
             src.progressMax = dst.progressMax = src.totalFileCount;
             src.progress = ++dst.progress;
         }
@@ -207,7 +194,6 @@ class VolumeStore {
         const i = this.volumes.indexOf(volume);
         if (i !== -1) {
             this.volumes.splice(i, 1);
-            folderResolveMap.delete(volume.folderId);
         } else {
             console.error('volume-store: cannot find the folder');
         }

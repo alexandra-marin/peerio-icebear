@@ -47,15 +47,14 @@ class ChatPendingDM extends Chat {
 
     get headLoaded() { return true; }
 
-    // get disableActivate() { return true; }
     get isInvite() { return true; }
 
     // To prevent startChat from returning ChatPendingDM instance
     hasSameParticipants() { return false; }
 
     @observable unreadCount = 1;
-    @observable username;
-    @observable timestamp;
+    username;
+    timestamp;
 
     @action.bound dismiss() {
         getChatStore().unloadChat(this);
@@ -64,8 +63,12 @@ class ChatPendingDM extends Chat {
     }
 
     @action.bound start() {
-        const contact = getContactStore().getContact(this.username);
-        when(() => !contact.loading && !contact.notFound, () => {
+        const { contact } = this;
+        contact.whenLoaded(() => {
+            if (contact.notFound || contact.isDeleted) {
+                console.error(`contact is not found or deleted`);
+                return;
+            }
             const chat = getChatStore().startChat([contact]);
             chat.isChatCreatedFromPendingDM = true;
             if (this.isReceived) chat.isNewUserFromInvite = true;

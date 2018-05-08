@@ -125,15 +125,15 @@ class Chat {
 
     /**
      * The username of the person you're having a DM with
-     * @member {string} otherUsernameForDM
+     * @member {string} dmPartnerUsername
      * @memberof Chat
      * @instance
      * @public
      * @readonly
      */
-    @computed get otherUsernameForDM() {
+    @computed get dmPartnerUsername() {
         if (this.isChannel) {
-            console.error(`Should not call otherUsernameForDM for channel`);
+            console.error(`Should not call dmPartnerUsername for channel`);
             return null;
         }
         const participant = this.otherParticipants.length && this.otherParticipants[0];

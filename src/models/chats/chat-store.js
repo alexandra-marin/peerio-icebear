@@ -526,7 +526,6 @@ class ChatStore {
     @action activate(id) {
         const chat = this.chatMap[id];
         if (!chat) return;
-        if (chat.disableActivate) return;
         TinyDb.user.setValue('lastUsedChat', id);
         if (this.activeChat) {
             this.activeChat.active = false;

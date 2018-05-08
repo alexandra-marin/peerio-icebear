@@ -13,6 +13,7 @@ const { getUser } = require('../../helpers/di-current-user');
 const { getChatStore } = require('../../helpers/di-chat-store');
 const tofuStore = require('./tofu-store');
 const { asPromise } = require('../../helpers/prombservable');
+const { retryUntilSuccess } = require('../../helpers/retry');
 
 /**
  * Contact store handles all Peerio users you(your app) are in some contact with,
@@ -354,6 +355,33 @@ class ContactStore {
                     warnings.add('snackbar_contactRemovedFavourite');
                 });
             });
+    }
+
+    /**
+     * Removes invitation.
+     * @param {string} email
+     * @returns {Promise}
+     * @public
+     */
+    removeInvite(email) {
+        return retryUntilSuccess(
+            () => socket.send('/auth/contacts/issued-invites/remove', { email }),
+            Math.random(),
+            10);
+    }
+
+    /**
+     * Removes incoming invitation. This is useful for new users, logic automatically adds authors of received invites
+     * to favorites and then removes received invites.
+     * @param {string} username
+     * @returns {Promise}
+     * @public
+     */
+    removeReceivedInvite(username) {
+        return retryUntilSuccess(
+            () => socket.send('/auth/contacts/received-invites/remove', { username }),
+            Math.random(),
+            10);
     }
 
     /**

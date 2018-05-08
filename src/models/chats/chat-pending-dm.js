@@ -1,9 +1,7 @@
 const { observable, computed, action, when } = require('mobx');
-const socket = require('../../network/socket');
 const Chat = require('../chats/chat');
 const { getChatStore } = require('../../helpers/di-chat-store');
 const { getContactStore } = require('../../helpers/di-contact-store');
-const { retryUntilSuccess } = require('../../helpers/retry');
 
 /**
  * Pending DM helper class
@@ -59,8 +57,8 @@ class ChatPendingDM extends Chat {
 
     @action.bound dismiss() {
         getChatStore().unloadChat(this);
-        return this.isReceived ? this.removeReceivedInvite(this.username)
-            : this.removeInvite(this.email);
+        return this.isReceived ? getContactStore().removeReceivedInvite(this.username)
+            : getContactStore().removeInvite(this.email);
     }
 
     @action.bound start() {
@@ -75,33 +73,6 @@ class ChatPendingDM extends Chat {
             if (this.isReceived) chat.isNewUserFromInvite = true;
             when(() => chat.active, this.dismiss);
         });
-    }
-
-    /**
-     * Removes invitation.
-     * @param {string} email
-     * @returns {Promise}
-     * @public
-     */
-    removeInvite(email) {
-        return retryUntilSuccess(
-            () => socket.send('/auth/contacts/issued-invites/remove', { email }),
-            Math.random(),
-            10);
-    }
-
-    /**
-     * Removes incoming invitation. This is useful for new users, logic automatically adds authors of received invites
-     * to favorites and then removes received invites.
-     * @param {string} username
-     * @returns {Promise}
-     * @public
-     */
-    removeReceivedInvite(username) {
-        return retryUntilSuccess(
-            () => socket.send('/auth/contacts/received-invites/remove', { username }),
-            Math.random(),
-            10);
     }
 }
 

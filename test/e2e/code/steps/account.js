@@ -121,3 +121,20 @@ Then('I have received all bonuses', async function() {
     await this.waitFor(() => this.ice.User.current.hasAccountKeyBackedUpBonus);
     await this.waitFor(() => this.ice.User.current.hasInstallBonus);
 });
+
+Then('I can edit specialization, medical ID, country and role', async function() {
+    const medcryptorData = {
+        specialization: 'doctor',
+        medicalID: '001',
+        country: 'Canada',
+        role: 'admin'
+    };
+
+    this.ice.User.current.props = medcryptorData;
+    await this.ice.User.current.saveProfile();
+    
+    await this.app.restart();
+    await this.login();
+
+    this.ice.User.current.props.should.deep.equal(medcryptorData);
+});

@@ -132,7 +132,7 @@ Then('I can edit specialization, medical ID, country and role', async function()
 
     this.ice.User.current.props = medcryptorData;
     await this.ice.User.current.saveProfile();
-    
+
     await this.app.restart();
     await this.login();
 

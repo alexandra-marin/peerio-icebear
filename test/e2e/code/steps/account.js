@@ -132,7 +132,9 @@ Given('I create a MedCryptor account', { timeout: 60000 }, async function() {
     };
 
     await this.createMedcryptorAccount(medcryptorData);
-    console.log(this.ice.User.current.props);
+    await this.app.restart();
+    await this.login();
+
     this.ice.User.current.props.should.deep.equal(medcryptorData);
 });
 

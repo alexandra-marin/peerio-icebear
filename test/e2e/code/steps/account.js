@@ -121,4 +121,3 @@ Then('I have received all bonuses', async function() {
     await this.waitFor(() => this.ice.User.current.hasAccountKeyBackedUpBonus);
     await this.waitFor(() => this.ice.User.current.hasInstallBonus);
 });
-

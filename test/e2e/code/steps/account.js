@@ -122,11 +122,25 @@ Then('I have received all bonuses', async function() {
     await this.waitFor(() => this.ice.User.current.hasInstallBonus);
 });
 
-Then('I can edit specialization, medical ID, country and role', async function() {
+Given('I create a MedCryptor account', { timeout: 60000 }, async function() {
+    this.ice.config.appLabel = 'medcryptor';
     const medcryptorData = {
-        specialization: 'doctor',
+        specialization: 'cardiology',
         medicalID: '001',
         country: 'Canada',
+        role: 'doctor'
+    };
+
+    await this.createMedcryptorAccount(medcryptorData);
+    console.log(this.ice.User.current.props);
+    this.ice.User.current.props.should.deep.equal(medcryptorData);
+});
+
+Then('I can edit specialization, medical ID, country and role', async function() {
+    const medcryptorData = {
+        specialization: 'admin',
+        medicalID: '002',
+        country: 'Australia',
         role: 'admin'
     };
 

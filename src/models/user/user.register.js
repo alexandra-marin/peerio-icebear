@@ -32,7 +32,7 @@ module.exports = function mixUserRegisterModule() {
                     clientVersion: config.appVersion,
                     sdkVersion: config.sdkVersion,
                     appLabel: config.appLabel,
-                    props: this.props
+                    props: this.props || {}
                 };
                 return socket.send('/noauth/register', request);
             })

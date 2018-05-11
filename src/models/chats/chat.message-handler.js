@@ -140,7 +140,11 @@ class ChatMessageHandler {
     }
 
     markAllAsSeen() {
-        if (!clientApp.isFocused || !clientApp.isInChatsView || !this.chat.active) return;
+        if (!clientApp.isFocused
+            || !clientApp.isInChatsView
+            || !this.chat.active
+            || !clientApp.isReadingNewestMessages
+        ) return;
         this._markAsSeenTimer = setTimeout(() => {
             this._markAsSeenTimer = null;
             if (!clientApp.isFocused || !clientApp.isInChatsView || !this.chat.active) return;

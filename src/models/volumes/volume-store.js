@@ -1,19 +1,10 @@
 const { observable, computed, action, when } = require('mobx');
 const { setVolumeStore } = require('../../helpers/di-volume-store');
-// const cryptoUtil = require('../../crypto/util');
 const Volume = require('./volume');
 const socket = require('../../network/socket');
 const warnings = require('../warnings');
-// const contactStore = require('../contacts/contact-store');
-// const Contact = require('../contacts/contact');
-// const User = require('../user/user');
-// const SharedDbBootKeg = require('../kegs/shared-db-boot-keg');
-// const { getChatStore } = require('../../helpers/di-chat-store');
-const { getFileStore } = require('../../helpers/di-file-store');
 const dbListProvider = require('../../helpers/keg-db-list-provider');
-// const { asPromise } = require('../../helpers/prombservable');
 const tracker = require('../update-tracker');
-// const FileFolder = require('../files/file-folder');
 
 class VolumeStore {
     constructor() {
@@ -101,6 +92,7 @@ class VolumeStore {
             // in case instance has changed. otherwise it will immediately resolve
             await volume.loadMetadata();
             await volume.rename(name);
+            volume.loadAllFiles();
             volume.addParticipants(participants.filter(p => !p.isMe));
             return volume;
         } catch (err) {
@@ -139,64 +131,18 @@ class VolumeStore {
         if (folder.isShared) return;
         const newFolder = await this.createVolume(participants, folder.name);
         // await this.copyFolderStructure(folder, newFolder);
-        await this.copyFilesToVolume(folder, newFolder);
-        getFileStore().folderStore.deleteFolderSkipFiles(folder);
+        await folder.copyFilesToVolume(newFolder);
+        folder.remove(true);
     }
     @action async copyFolderStructure(src, dst) {
         const copyFolders = (parentSrc, parentDst) => {
             parentSrc.folders.forEach(f => {
-                const folder = dst.store.folderStore.createFolder(f.name, parentDst, f.id);
+                const folder = parentDst.createFolder(f.name, f.id);
                 copyFolders(f, folder);
             });
         };
         copyFolders(src);
         return dst.store.folderStore.save();
-    }
-    @action async copyFilesToVolume(src, dst) {
-        src.progress = dst.progress = 0;
-        src.progressMax = dst.progressMax = src.totalFileCount;
-        while (src.progress < src.progressMax) {
-            const file = src.allFiles[src.progress];
-            if (!file) break;
-            await file.copyTo(dst.db, dst.store); // eslint-disable-line no-await-in-loop
-            src.progressMax = dst.progressMax = src.totalFileCount;
-            src.progress = ++dst.progress;
-        }
-        src.progress = dst.progress = 0;
-        src.progressMax = dst.progressMax = 0;
-    }
-
-    @action.bound async deleteVolume(volume) {
-        // TODO: put the delete logic into the AbstractFolder (???)
-        const { files } = volume;
-        volume.progress = 0;
-        volume.progressMax = files.length;
-        volume.progressText = 'title_deletingSharedFolder';
-        let promise = Promise.resolve();
-        files.forEach(file => {
-            promise = promise.then(async () => {
-                await file.remove();
-                volume.progress++;
-            });
-        });
-        await promise;
-        volume.progressMax = null;
-        volume.progress = null;
-        // there's a lag between deletion and file disappearance from the
-        // associated folder list. so to prevent confusion we clear files here
-        volume.files = [];
-        try {
-            await volume.delete();
-        } catch (e) {
-            console.error(e);
-            return;
-        }
-        const i = this.volumes.indexOf(volume);
-        if (i !== -1) {
-            this.volumes.splice(i, 1);
-        } else {
-            console.error('volume-store: cannot find the folder');
-        }
     }
 }
 

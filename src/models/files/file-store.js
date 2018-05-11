@@ -13,11 +13,14 @@ const { getChatStore } = require('../../helpers/di-chat-store');
 const FileStoreMigration = require('./file-store.migration');
 const errorCodes = require('../../errors').ServerError.codes;
 const FileStoreBase = require('./file-store-base');
+const FileStoreBulk = require('./file-store.bulk');
+const util = require('../../util');
 
 class FileStore extends FileStoreBase {
     isMainStore = true;
     constructor() {
-        super();
+        super(null, null, 'main');
+        this.bulk = new FileStoreBulk(this);
         this.migration = new FileStoreMigration(this);
         this.chatFileMap = observable.map();
 
@@ -29,6 +32,11 @@ class FileStore extends FileStoreBase {
 
         when(() => this.loaded, this.onFinishLoading);
     }
+
+    // Human readable maximum auto-expandable inline image size limit
+    inlineImageSizeLimitFormatted = util.formatBytes(config.chat.inlineImageSizeLimit);
+    // Human readable maximum cutoff inline image size limit
+    inlineImageSizeLimitCutoffFormatted = util.formatBytes(config.chat.inlineImageSizeLimitCutoff);
 
     uploadQueue = new TaskQueue(1);
     migrationQueue = new TaskQueue(1);
@@ -184,6 +192,7 @@ class FileStore extends FileStoreBase {
         });
 
         FileStoreBase.instances.forEach(store => {
+            if (store === this) return;
             const f = store.getById(fileId);
             if (f) files.push(f);
         });
@@ -263,9 +272,11 @@ class FileStore extends FileStoreBase {
      * @param {string} [fileName] - if u want to override name in filePath
      * @public
      */
-    upload = (filePath, fileName, folderId) => {
+    upload = (filePath, fileName, folder) => {
         const keg = new File(User.current.kegDb, this);
-        keg.folderId = folderId;
+        // if user uploads to main store folder - we place the file there
+        // otherwise place it in the root of main store and then copy to volume
+
         config.FileStream.getStat(filePath).then(stat => {
             if (!User.current.canUploadFileSize(stat.size)) {
                 keg.deleted = true;
@@ -288,8 +299,9 @@ class FileStore extends FileStoreBase {
                     disposer();
                 });
                 // move file into folder as soon as we have file id
-                if (folderId) {
-                    when(() => keg.fileId, () => this.folderStore.getById(folderId).moveInto(keg));
+                // it will either move it to local folder or volume
+                if (folder) {
+                    when(() => keg.fileId, () => folder.attach(keg));
                 }
                 return ret;
             });

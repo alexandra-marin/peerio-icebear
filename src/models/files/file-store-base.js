@@ -2,37 +2,35 @@ const { observable, action, computed } = require('mobx');
 const socket = require('../../network/socket');
 const File = require('./file');
 const tracker = require('../update-tracker');
-const config = require('../../config');
-const util = require('../../util');
 const _ = require('lodash');
 const { retryUntilSuccess } = require('../../helpers/retry');
 const createMap = require('../../helpers/dynamic-array-map');
 const FileStoreFolders = require('./file-store.folders');
-const FileStoreBulk = require('./file-store.bulk');
 const { getUser } = require('../../helpers/di-current-user');
+const { getRandomShortIdHex } = require('../../crypto/util.random');
 
 class FileStoreBase {
-    static instances = [];
+    static instances = new Map();
 
-    constructor(kegDb) {
-        FileStoreBase.instances.push(this);
+    constructor(kegDb, root = null, id) {
+        this.id = id || getRandomShortIdHex(); // something to identify this instance in runtime
+        FileStoreBase.instances.set(this.id, this);
         this._kegDb = kegDb;
         const m = createMap(this.files, 'fileId');
         this.fileMap = m.map;
         this.fileMapObservable = m.observableMap;
-        this.folderStore = new FileStoreFolders(this);
-        this.bulk = new FileStoreBulk(this);
+        this.folderStore = new FileStoreFolders(this, root);
 
         tracker.subscribeToKegUpdates(kegDb ? kegDb.id : 'SELF', 'file', () => {
             console.log('Files update event received');
             this.onFileDigestUpdate();
         });
     }
-
+    getFileStoreById(id) {
+        return FileStoreBase.instances.get(id);
+    }
     dispose() {
-        const ind = FileStoreBase.instances.indexOf(this);
-        if (ind < 0) return;
-        FileStoreBase.instances.splice(ind, 1);
+        FileStoreBase.instances.delete(this.id);
     }
 
     get kegDb() {
@@ -60,11 +58,6 @@ class FileStoreBase {
     @computed get visibleFolders() {
         return this.folderStore.searchAllFoldersByName(this.folderFilter);
     }
-
-    // Human readable maximum auto-expandable inline image size limit
-    inlineImageSizeLimitFormatted = util.formatBytes(config.chat.inlineImageSizeLimit);
-    // Human readable maximum cutoff inline image size limit
-    inlineImageSizeLimitCutoffFormatted = util.formatBytes(config.chat.inlineImageSizeLimitCutoff);
 
     // Store is loading full file list for the first time.
     @observable loading = false;
@@ -155,6 +148,9 @@ class FileStoreBase {
         for (let i = 0; i < selFolders.length; i++) {
             selFolders[i].selected = false;
         }
+        if (this.isMainStore) {
+            FileStoreBase.instances.forEach(store => store !== this && store.clearSelection());
+        }
     }
 
     // Selects all files
@@ -190,6 +186,9 @@ class FileStoreBase {
         this.currentFilter = '';
         for (let i = 0; i < this.files.length; i++) {
             this.files[i].show = true;
+        }
+        if (this.isMainStore) {
+            FileStoreBase.instances.forEach(store => store !== this && store.clearFilter());
         }
     }
 

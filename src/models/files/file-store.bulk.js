@@ -31,15 +31,9 @@ class FileStoreBulk {
 
     async removeOne(i, batch) {
         if (i.isFolder && this.deleteFolderConfirmator) {
-            if (!await this.deleteFolderConfirmator(i)) return;
+            if (!await this.deleteFolderConfirmator(i)) return Promise.reject();
         }
-        if (i.isFolder && !i.isShared) {
-            await i.remove(batch);
-        } else if (i.isFolder) {
-            await getVolumeStore().deleteVolume(i);
-        } else {
-            await i.remove();
-        }
+        return i.remove(batch);
     }
 
     @action.bound async remove() {
@@ -94,7 +88,7 @@ class FileStoreBulk {
         item.selected = false;
         if (item.folderId === folder.folderId) return;
         if (item.isShared) return;
-        folder.moveInto(item);
+        folder.attach(item);
         if (!bulk) {
             if (folder.isShared) {
                 warnings.add('title_itemMovedToFolder', null, { item: item.name, folder: folder.name });
@@ -118,7 +112,7 @@ class FileStoreBulk {
                 i.selected = false;
                 if (i.folderId === targetFolder.folderId) return;
                 if (i.isShared) return;
-                targetFolder.moveInto(i);
+                targetFolder.attach(i);
                 targetFolder.progress++;
             });
         });

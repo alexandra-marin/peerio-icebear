@@ -1,7 +1,7 @@
-const { observable } = require('mobx');
+const { observable, computed } = require('mobx');
 // const createMap = require('../../helpers/dynamic-array-map');
 // const warnings = require('../warnings');
-const AbstractFolder = require('../files/abstract-folder');
+const FileFolder = require('../files/file-folder');
 const VolumeKegDb = require('../kegs/volume-keg-db');
 const ChatHead = require('../chats/chat-head');
 const contactStore = require('../contacts/contact-store');
@@ -10,25 +10,25 @@ const socket = require('../../network/socket');
 const warnings = require('../warnings');
 const FileStoreBase = require('../files/file-store-base');
 const { asPromise } = require('../../helpers/prombservable');
+const { getFileStore } = require('../../helpers/di-file-store');
 
-class Volume extends AbstractFolder {
+class Volume extends FileFolder {
     constructor(id) {
-        super(null, true);
+        super(null, '/', true);
         this.id = id;
         this.db = new VolumeKegDb(id);
-        if (id) this.store = new FileStoreBase(this.db);
+        // if (id) this.store = new FileStoreBase(this.db, this);
     }
 
-    isShared = true;
+    // volume id
     @observable id = null;
     @observable loadingMeta = false;
     @observable metaLoaded = false;
 
-    // TODO: maybe refactor it later to use folderId instead
     get folderId() { return this.id; }
-    set folderId(value) { this.id = value; }
+    // set folderId(value) { this.id = value; }
 
-    get name() {
+    @computed get name() {
         // uses AbstractFolder observable as a fallback
         return this.chatHead && this.chatHead.loaded ? this.chatHead.chatName : '';
     }
@@ -63,28 +63,10 @@ class Volume extends AbstractFolder {
         this.id = this.db.id;
         this.chatHead = new ChatHead(this.db);
         await asPromise(this.chatHead, 'loaded', true);
-        this.store = new FileStoreBase(this.db);
+        if (!this.store) this.store = new FileStoreBase(this.db, this);
         this.loadingMeta = false;
         this.metaLoaded = true;
-    }
-
-    async add(file) {
-        if (this.fileMap[file.fileId]) {
-            return;
-        }
-        if (file.folder) {
-            console.error('file already belongs to a folder');
-            return;
-        }
-        await file.copyTo(this.db, this.store);
-    }
-
-    moveInto(file) {
-        if (file.isFolder) {
-            file.allFiles.forEach(f => f.copyTo(this.db, this.store));
-        } else {
-            file.copyTo(this.db, this.store);
-        }
+        this.mount();
     }
 
     async addParticipants(participants) {
@@ -136,12 +118,15 @@ class Volume extends AbstractFolder {
      * @returns {Promise}
      * @public
      */
-    async delete() {
+    async remove() {
         // this is an ugly-ish flag to prevent chat store from creating a warning about user being kicked from channel
         this.deletedByMyself = true;
         console.log(`Deleting volume ${this.id}.`);
         try {
             await socket.send('/auth/kegs/channel/delete', { kegDbId: this.id });
+            this.isDeleted = true;
+            this.unmount();
+
             console.log(`Volume ${this.id} has been deleted.`);
             warnings.add('title_volumeDeleted');
         } catch (err) {
@@ -163,6 +148,18 @@ class Volume extends AbstractFolder {
         } finally {
             this.leaving = false;
         }
+    }
+
+    mount() {
+        const folderStore = getFileStore().folderStore;
+        if (folderStore.getById(this.id)) return;
+        this.parentId = 'root';
+        folderStore.folders.push(this);
+    }
+
+    unmount() {
+        this.parentId = null;
+        getFileStore().folderStore.folders.remove(this);
     }
 }
 

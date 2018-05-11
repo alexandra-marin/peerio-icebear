@@ -192,7 +192,6 @@ class FileStore extends FileStoreBase {
         });
 
         FileStoreBase.instances.forEach(store => {
-            if (store === this) return;
             const f = store.getById(fileId);
             if (f) files.push(f);
         });

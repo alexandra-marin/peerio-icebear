@@ -8,18 +8,19 @@ const createMap = require('../../helpers/dynamic-array-map');
 const FileStoreFolders = require('./file-store.folders');
 const { getUser } = require('../../helpers/di-current-user');
 const { getRandomShortIdHex } = require('../../crypto/util.random');
+const { getFileStore } = require('../../helpers/di-file-store');
 
 class FileStoreBase {
-    static instances = new Map();
+    static instances = observable.map();
 
     constructor(kegDb, root = null, id) {
         this.id = id || getRandomShortIdHex(); // something to identify this instance in runtime
-        FileStoreBase.instances.set(this.id, this);
         this._kegDb = kegDb;
         const m = createMap(this.files, 'fileId');
         this.fileMap = m.map;
         this.fileMapObservable = m.observableMap;
         this.folderStore = new FileStoreFolders(this, root);
+        if (id !== 'main') FileStoreBase.instances.set(this.id, this);
 
         tracker.subscribeToKegUpdates(kegDb ? kegDb.id : 'SELF', 'file', () => {
             console.log('Files update event received');
@@ -27,7 +28,12 @@ class FileStoreBase {
         });
     }
     getFileStoreById(id) {
+        if (id === 'main') return getFileStore();
         return FileStoreBase.instances.get(id);
+    }
+
+    getFileStoreInstances() {
+        return FileStoreBase.instances;
     }
     dispose() {
         FileStoreBase.instances.delete(this.id);
@@ -37,18 +43,26 @@ class FileStoreBase {
         return this._kegDb || getUser().kegDb;
     }
 
-    // Full list of user's files.
+    // Full list of user's files in SELF.
     @observable.shallow files = [];
+
+    // all files currently loaded in RAM, including volumes, excluding chats
+    @computed get allFiles() {
+        let ret = this.files;
+        if (this.isMainStore) {
+            FileStoreBase.instances.forEach(store => { ret = ret.concat(store.files.slice()); });
+        }
+        return ret;
+    }
 
     // Subset of files not currently hidden by any applied filters
     @computed get visibleFiles() {
-        return this.files.filter(f => f.show);
+        return this.allFiles.filter(f => f.show);
     }
 
     // Subset of files and folders not currently hidden by any applied filters
     @computed get visibleFilesAndFolders() {
-        const folders = this.folderStore.searchAllFoldersByName(this.currentFilter);
-        return folders.concat(this.files.filter(f => f.show));
+        return this.visibleFolders.concat(this.visibleFiles);
     }
 
     // Filter to apply when computing visible folders
@@ -91,7 +105,7 @@ class FileStoreBase {
     }
 
     @computed get hasSelectedFiles() {
-        return this.files.some(FileStoreBase.isFileSelected);
+        return this.allFiles.some(FileStoreBase.isFileSelected);
     }
 
     @computed get hasSelectedFilesOrFolders() {
@@ -99,85 +113,61 @@ class FileStoreBase {
     }
 
     @computed get canShareSelectedFiles() {
-        return this.hasSelectedFiles && this.files.every(FileStoreBase.isSelectedFileShareable);
+        return this.hasSelectedFiles && this.allFiles.every(FileStoreBase.isSelectedFileShareable);
     }
 
     @computed get allVisibleSelected() {
-        for (let i = 0; i < this.files.length; i++) {
-            if (!this.files[i].show) continue;
-            if (this.files[i].selected === false) return false;
+        for (let i = 0; i < this.allFiles.length; i++) {
+            if (!this.allFiles[i].show) continue;
+            if (this.allFiles[i].selected === false) return false;
         }
         return true;
     }
 
     @computed get selectedCount() {
-        let ret = 0;
-        for (let i = 0; i < this.files.length; i++) {
-            if (this.files[i].selected) ret += 1;
-        }
-        return ret;
+        return this.getSelectedFiles().length;
     }
 
     // Returns currently selected files (file.selected == true)
     getSelectedFiles() {
-        return this.files.filter(FileStoreBase.isFileSelected);
+        return this.allFiles.filter(FileStoreBase.isFileSelected);
     }
 
     // Returns currently selected files that are also shareable.
     getShareableSelectedFiles() {
-        return this.files.filter(FileStoreBase.isFileSelectedAndShareable);
+        return this.allFiles.filter(FileStoreBase.isFileSelectedAndShareable);
     }
 
     // Returns currently selected folders (folder.selected == true)
     get selectedFolders() {
-        return this.folderStore.selectedFolders;
+        return getFileStore().folderStore.selectedFolders;
     }
 
     @computed get selectedFilesOrFolders() {
-        return this.selectedFolders.slice().concat(this.getSelectedFiles());
+        return this.selectedFolders.concat(this.getSelectedFiles());
     }
 
     // Deselects all files and folders
-
     @action clearSelection() {
-        for (let i = 0; i < this.files.length; i++) {
-            this.files[i].selected = false;
-        }
-        // selectedFolders is computable, do not recalculate it
-        const selFolders = this.selectedFolders;
-        for (let i = 0; i < selFolders.length; i++) {
-            selFolders[i].selected = false;
-        }
-        if (this.isMainStore) {
-            FileStoreBase.instances.forEach(store => store !== this && store.clearSelection());
-        }
-    }
-
-    // Selects all files
-    @action selectAll() {
-        for (let i = 0; i < this.files.length; i++) {
-            const file = this.files[i];
-            if (!file.show || !file.readyForDownload) continue;
-            this.files[i].selected = true;
-        }
+        this.selectedFilesOrFolders.forEach(f => { f.selected = false; });
     }
 
     // Deselects unshareable files
     @action deselectUnshareableFiles() {
-        for (let i = 0; i < this.files.length; i++) {
-            const file = this.files[i];
-            if (file.canShare) continue;
-            if (file.selected) file.selected = false;
-        }
+        this.selectedFilesOrFolders.forEach(f => {
+            if (f.canShare) return;
+            f.selected = false;
+        });
     }
 
     // Applies filter to files.
     @action filterByName(query) {
         this.currentFilter = query;
         const regex = new RegExp(_.escapeRegExp(query), 'i');
-        for (let i = 0; i < this.files.length; i++) {
-            this.files[i].show = regex.test(this.files[i].name);
-            if (!this.files[i].show) this.files[i].selected = false;
+        for (let i = 0; i < this.allFiles.length; i++) {
+            const f = this.allFiles[i];
+            f.show = regex.test(f.name);
+            if (!f.show) f.selected = false;
         }
     }
 
@@ -188,7 +178,7 @@ class FileStoreBase {
             this.files[i].show = true;
         }
         if (this.isMainStore) {
-            FileStoreBase.instances.forEach(store => store !== this && store.clearFilter());
+            FileStoreBase.instances.forEach(store => store.clearFilter());
         }
     }
 

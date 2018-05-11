@@ -204,9 +204,11 @@ class FileFolder {
             // this is an inter-volume operation!
             await file.copyTo(this.db, this.store);
             // if file was shared not from SELF - remove it
-            if (file.store.id !== 'main') {
+            // file kegs in SELF will get hidden by server
+            if (!file.store.isMainStore) {
                 await file.remove();
             }
+            // file instance is removed, destination will reload it
             return Promise.resolve();
         }
         file.folderId = this.isRoot ? null : this.folderId;
@@ -221,12 +223,15 @@ class FileFolder {
     }
 
     // adds exiting folder instance to this folder
-    @action.bound async attachFolder(folder) {
+    @action.bound async attachFolder(folder, skipSave) {
         if (folder.store !== this.store) {
-            await this.copyFilesToVolume(folder);
-            if (folder.store.id !== 'main') {
-                this.remove();
-            }
+            // 1. we copy folder structure to another kegdb
+            await folder.copyFolderStructureTo(this);
+            // 2. we copy files
+            await folder.copyFilesTo(this);
+            // 3. we remove original files and folders
+            folder.remove(folder.store.isMainStore);
+            return Promise.resolve();
         }
         if (this.findFolderByName(folder.normalizedName)) {
             warnings.addSevere('error_folderAlreadyExists');
@@ -236,23 +241,37 @@ class FileFolder {
         if (!this.store.folderStore.getById(folder.folderId)) {
             this.store.folderStore.folders.push(folder);
         }
-        return this.store.folderStore.save(); // retry handled inside
+        return skipSave ? Promise.resolve() : this.store.folderStore.save(); // retry handled inside
     }
 
-    @action async copyFilesToVolume(dst) {
+    // private api, copies files from one db to another, preserving folder ids
+    @action async copyFilesTo(dst) {
         const src = this;
         src.progress = dst.progress = 0;
         src.progressMax = dst.progressMax = src.allFiles.length;
         Promise.map(src.allFiles, file => {
             src.progress = ++dst.progress;
-            return file.copyTo(dst.db, dst.store);
+            return dst.attachFile(file);
         }, { concurrency: 1 });
         src.progress = dst.progress = 0;
         src.progressMax = dst.progressMax = 0;
     }
 
+    // private api
+    @action async copyFolderStructureTo(dst) {
+        const src = this;
+        const copyFolders = (parentSrc, parentDst) => {
+            parentSrc.folders.forEach(f => {
+                const folder = parentDst.createFolder(f.name, f.id, true);
+                copyFolders(f, folder);
+            });
+        };
+        const dstRoot = dst.createFolder(src.name, src.id, true);
+        copyFolders(src, dstRoot);
+        return dst.store.folderStore.save();
+    }
     // creates new child folder
-    createFolder(name, id) {
+    createFolder(name, id, skipSave = false) {
         if (this.findFolderByName(name)) {
             warnings.addSevere('error_folderAlreadyExists');
             throw new Error('error_folderAlreadyExists');
@@ -261,7 +280,7 @@ class FileFolder {
         const folderId = id || cryptoUtil.getRandomShortIdHex();
         folder.folderId = folderId;
         folder.createdAt = Date.now();
-        this.attachFolder(folder);
+        this.attachFolder(folder, skipSave);
         return folder;
     }
 

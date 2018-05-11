@@ -92,7 +92,7 @@ class VolumeStore {
             // in case instance has changed. otherwise it will immediately resolve
             await volume.loadMetadata();
             await volume.rename(name);
-            volume.loadAllFiles();
+            volume.store.loadAllFiles();
             volume.addParticipants(participants.filter(p => !p.isMe));
             return volume;
         } catch (err) {
@@ -128,21 +128,9 @@ class VolumeStore {
     }
 
     @action.bound async shareFolder(folder, participants) {
-        if (folder.isShared) return;
+        if (folder.store.id !== 'main') return Promise.reject(new Error('Can only share local folders'));
         const newFolder = await this.createVolume(participants, folder.name);
-        // await this.copyFolderStructure(folder, newFolder);
-        await folder.copyFilesToVolume(newFolder);
-        folder.remove(true);
-    }
-    @action async copyFolderStructure(src, dst) {
-        const copyFolders = (parentSrc, parentDst) => {
-            parentSrc.folders.forEach(f => {
-                const folder = parentDst.createFolder(f.name, f.id);
-                copyFolders(f, folder);
-            });
-        };
-        copyFolders(src);
-        return dst.store.folderStore.save();
+        return newFolder.attach(folder);
     }
 }
 

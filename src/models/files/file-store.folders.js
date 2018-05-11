@@ -43,12 +43,18 @@ class FileStoreFolders {
 
     searchAllFoldersByName(name) {
         const q = name ? name.toLowerCase() : '';
-        return this.folders
+        return this.root.Allfolders
             .filter(f => f.normalizedName.includes(q));
     }
 
     @computed get selectedFolders() {
-        return this.folders.filter(f => f.selected);
+        let ret = this.folders.filter(f => f.selected);
+        if (!this.fileStore.isMainStore) return ret;
+        this.fileStore.getFileStoreInstances()
+            .forEach(store => {
+                ret = ret.concat(store.folderStore.folders.filter(f => f.selected));
+            });
+        return ret;
     }
 
     // saves folder structure to keg

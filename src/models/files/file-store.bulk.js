@@ -1,5 +1,6 @@
 const { action, computed } = require('mobx');
 const { getChatStore } = require('../../helpers/di-chat-store');
+const { getFileStore } = require('../../helpers/di-file-store');
 const { getVolumeStore } = require('../../helpers/di-volume-store');
 const config = require('../../config');
 const warnings = require('../warnings');
@@ -26,7 +27,7 @@ class FileStoreBulk {
     }
 
     @computed get canMove() {
-        return !this.fileStore.selectedFilesOrFolders.some(f => f.isFolder && f.isShared);
+        return !getFileStore().selectedFilesOrFolders.some(f => f.isFolder && f.isShared);
     }
 
     async removeOne(i, batch) {
@@ -37,7 +38,7 @@ class FileStoreBulk {
     }
 
     @action.bound async remove() {
-        const items = this.fileStore.selectedFilesOrFolders;
+        const items = getFileStore().selectedFilesOrFolders;
         if (this.deleteFilesConfirmator) {
             const files = items.filter(i => !i.isFolder);
             const sharedFiles = items.filter(i => i.shared);
@@ -49,7 +50,7 @@ class FileStoreBulk {
         });
         await promise;
         this.fileStore.folderStore.save();
-        this.fileStore.clearSelection();
+        getFileStore().clearSelection();
     }
 
     @action.bound async share() {
@@ -57,7 +58,7 @@ class FileStoreBulk {
             console.error(`shareWithSelector has not been set`);
             return;
         }
-        const items = this.fileStore.selectedFilesOrFolders;
+        const items = getFileStore().selectedFilesOrFolders;
         if (!items || !items.length) {
             console.log('no items selected');
             return;
@@ -81,7 +82,7 @@ class FileStoreBulk {
             }
         });
         await promise;
-        this.fileStore.clearSelection();
+        getFileStore().clearSelection();
     }
 
     @action.bound moveOne(item, folder, bulk) {
@@ -98,7 +99,7 @@ class FileStoreBulk {
     }
 
     @action.bound async move(targetFolder) {
-        const items = this.fileStore.selectedFilesOrFolders;
+        const items = getFileStore().selectedFilesOrFolders;
         // currently progress is too quick, but in the future
         // it may make sense to show progress bar
         targetFolder.progress = 0;
@@ -147,7 +148,7 @@ class FileStoreBulk {
         }
         const path = await this.downloadFolderSelector();
         if (!path) return;
-        const items = this.fileStore.selectedFilesOrFolders;
+        const items = getFileStore().selectedFilesOrFolders;
         let promise = Promise.resolve();
         items.forEach(item => {
             promise = promise.then(() => this.downloadOne(item, path));

@@ -190,11 +190,11 @@ class FileFolder {
     }
 
     // move file or folder
-    attach(fileOrFolder) {
+    attach(fileOrFolder, ...rest) {
         if (fileOrFolder.isFolder) {
-            this.attachFolder(fileOrFolder);
+            this.attachFolder(fileOrFolder, ...rest);
         } else {
-            this.attachFile(fileOrFolder);
+            this.attachFile(fileOrFolder, ...rest);
         }
     }
 
@@ -223,10 +223,10 @@ class FileFolder {
     }
 
     // adds exiting folder instance to this folder
-    @action.bound async attachFolder(folder, skipSave) {
+    @action.bound async attachFolder(folder, skipSave, skipRootFolder) {
         if (folder.store !== this.store) {
             // 1. we copy folder structure to another kegdb
-            await folder.copyFolderStructureTo(this);
+            await folder.copyFolderStructureTo(this, skipRootFolder);
             // 2. we copy files
             await folder.copyFilesTo(this);
             // 3. we remove original files and folders
@@ -258,7 +258,7 @@ class FileFolder {
     }
 
     // private api
-    @action async copyFolderStructureTo(dst) {
+    @action async copyFolderStructureTo(dst, skipRootFolder) {
         const src = this;
         const copyFolders = (parentSrc, parentDst) => {
             parentSrc.folders.forEach(f => {
@@ -266,7 +266,7 @@ class FileFolder {
                 copyFolders(f, folder);
             });
         };
-        const dstRoot = dst.createFolder(src.name, src.id, true);
+        const dstRoot = skipRootFolder ? dst : dst.createFolder(src.name, src.id, true);
         copyFolders(src, dstRoot);
         return dst.store.folderStore.save();
     }

@@ -15,6 +15,7 @@ const errorCodes = require('../../errors').ServerError.codes;
 const FileStoreBase = require('./file-store-base');
 const FileStoreBulk = require('./file-store.bulk');
 const util = require('../../util');
+const { asPromise } = require('../../helpers/prombservable');
 
 class FileStore extends FileStoreBase {
     isMainStore = true;
@@ -238,7 +239,18 @@ class FileStore extends FileStoreBase {
                     filter: { fileId }
                 }, false);
             }, undefined, 5)
-                .then(resp => {
+                .then(async resp => {
+                    if (!resp.kegs[0]) {
+                        await asPromise(this, 'loaded', true);
+                        // might be an unmigrated file (keg not created in chat db yet)
+                        const personalFile = this.getById(fileId);
+                        if (personalFile && personalFile.isLegacy) {
+                            // kinda hacky, but this keg is supposed to be used in a very limited scope (download)
+                            file.unmigrated = true;
+                            Object.assign(file, personalFile);
+                            return;
+                        }
+                    }
                     if (!resp.kegs[0] || !file.loadFromKeg(resp.kegs[0])) {
                         file.deleted = true;
                         file.loaded = true;

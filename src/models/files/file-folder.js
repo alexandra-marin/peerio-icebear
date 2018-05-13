@@ -3,6 +3,7 @@ const { retryUntilSuccess } = require('../../helpers/retry');
 const { observable, computed, action } = require('mobx');
 const util = require('../../util');
 const { getFileStore } = require('../../helpers/di-file-store');
+const { getUser } = require('../../helpers/di-current-user');
 const cryptoUtil = require('../../crypto/util');
 
 function isLegacyFilePredicate(f) {
@@ -77,6 +78,14 @@ class FileFolder {
         }
         const p = this.store.folderStore.getById(this.parentId);
         return p || this.store.folderStore.root;
+    }
+
+    @computed get owner() {
+        if (!this.isShared) return getUser().username;
+        // store and kegDb already exist and never change.
+        // boot is observable
+        const boot = this.store.kegDb.boot;
+        return boot.loaded ? boot.owner : null;
     }
 
     // Variables for bulk actions and share-related actions

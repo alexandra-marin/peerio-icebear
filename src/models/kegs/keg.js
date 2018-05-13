@@ -5,6 +5,7 @@ const { observable, action } = require('mobx');
 const { getContactStore } = require('../../helpers/di-contact-store');
 const { getUser } = require('../../helpers/di-current-user');
 const { asPromise, asPromiseMultiValue } = require('../../helpers/prombservable');
+const { DecryptionError } = require('../../errors');
 
 let temporaryKegId = 0;
 function getTemporaryKegId() {
@@ -458,6 +459,10 @@ class Keg {
             return this;
         } catch (err) {
             console.error(err, this.id);
+            // TODO: refactor this fucntion to return error code instead
+            if (err instanceof DecryptionError) {
+                this.decryptionError = true;
+            }
             this.lastLoadHadError = true;
             return false;
         }

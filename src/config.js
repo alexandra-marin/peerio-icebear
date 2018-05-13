@@ -377,6 +377,9 @@ const config = new class {
         }
     };
 
+    /**
+     * How long to wait for external server to respond when unfurling urls posted in messages.
+     */
     unfurlTimeout = 30000;
 
     /**

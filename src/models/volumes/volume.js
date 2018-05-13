@@ -125,7 +125,6 @@ class Volume extends FileFolder {
         try {
             await socket.send('/auth/kegs/channel/delete', { kegDbId: this.id });
             this.isDeleted = true;
-            this.unmount();
 
             console.log(`Volume ${this.id} has been deleted.`);
             warnings.add('title_volumeDeleted');
@@ -144,7 +143,6 @@ class Volume extends FileFolder {
         } catch (err) {
             console.error('Failed to leave volume.', this.id, err);
             warnings.add('error_volumeLeave');
-            this.leaving = false;
         } finally {
             this.leaving = false;
         }
@@ -160,6 +158,11 @@ class Volume extends FileFolder {
     unmount() {
         this.parentId = null;
         getFileStore().folderStore.folders.remove(this);
+    }
+
+    dispose() {
+        this.unmount();
+        this.store.dispose();
     }
 }
 

@@ -81,14 +81,16 @@ class VolumeStore {
 
     @action async createVolume(participants = [], name) {
         try {
-            // we can't add participants before setting volume name because
+            // 1. we can't add participants before setting volume name because
             // server will trigger invites and send empty volume name to user
+            // 2. this is really a temporary instance, 'create volume and boot keg' needs to be extracted (TODO)
             let volume = new Volume(null, []);
-            // this call will create or load meta
-            await volume.loadMetadata();
+            // this call will create metadata only
+            await volume.db.loadMeta();
             // due to concurrency with db added event from update tracker,
-            // we need to make sure we have the right instance before we proceed
-            volume = this.addVolume(volume);
+            // we need to get the instance that was created from event
+            // or maybe event got a bit delayed, in which case we'll receive a new Volume instance anyway
+            volume = this.addVolume(volume.db.id);
             // in case instance has changed. otherwise it will immediately resolve
             await volume.loadMetadata();
             await volume.rename(name);

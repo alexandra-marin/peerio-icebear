@@ -11,6 +11,7 @@ const warnings = require('../warnings');
 const FileStoreBase = require('../files/file-store-base');
 const { asPromise } = require('../../helpers/prombservable');
 const { getFileStore } = require('../../helpers/di-file-store');
+const { getUser } = require('../../helpers/di-current-user');
 
 class Volume extends FileFolder {
     constructor(id) {
@@ -119,6 +120,10 @@ class Volume extends FileFolder {
      * @public
      */
     async remove() {
+        if (this.owner !== getUser().username) {
+            this.leave();
+            return;
+        }
         // this is an ugly-ish flag to prevent chat store from creating a warning about user being kicked from channel
         this.deletedByMyself = true;
         console.log(`Deleting volume ${this.id}.`);

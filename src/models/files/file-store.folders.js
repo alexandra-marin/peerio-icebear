@@ -72,14 +72,14 @@ class FileStoreFolders {
     }
 
     // to avoid recursive calls of action and action nesting in result
-    _syncFolder = (f, folderId, newTreeMap) => {
+    _syncFolder = (f, parentId, newTreeMap) => {
         newTreeMap[f.id] = 1; // just to mark existence
         const existing = this.foldersMap.get(f.id);
         if (existing) {
-            existing.deserialize(f, folderId);
+            existing.deserialize(f, parentId);
         } else {
             const folder = new FileFolder(this.fileStore);
-            folder.deserialize(f, folderId);
+            folder.deserialize(f, parentId);
             this.folders.push(folder);
         }
         f.folders.forEach((child) => this._syncFolder(child, f.id, newTreeMap));

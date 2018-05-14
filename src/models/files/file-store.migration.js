@@ -22,7 +22,6 @@ class FileStoreMigration {
     }
 
     @observable pending = false;
-    @observable awaitingConfirmation = false;
     @observable started = false;
     @observable progress = 0;
     @observable performedByAnotherClient = false;

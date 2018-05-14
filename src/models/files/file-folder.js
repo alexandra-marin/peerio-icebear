@@ -316,19 +316,20 @@ class FileFolder {
 
 
     serialize() {
+        // folderId is same as this.id, due to historical reasons.
         const { name, id, createdAt } = this;
         const folders = this.folders.filter(f => !f.isShared).map(f => f.serialize());
-        return { name, id, createdAt, folders };
+        return { name, folderId: id, createdAt, folders };
     }
 
-    deserialize(data, folderId) {
+    deserialize(data, parentId) {
         if (this.id && data.id !== this.id) {
             throw new Error('Trying to deserialize folder from a different folder data');
         }
-        this.id = data.id;
+        this.id = data.folderId; // 'folderId' is legacy name, don't want to migrate
         this.name = data.name;
         this.createdAt = data.createdAt;
-        this.folderId = folderId;
+        this.folderId = parentId;
         return this;
     }
 }

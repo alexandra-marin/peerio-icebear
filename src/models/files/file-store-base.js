@@ -182,7 +182,7 @@ class FileStoreBase {
         }
     }
 
-    onFileDigestUpdate = _.throttle(() => {
+    onFileDigestUpdate = _.debounce(() => {
         if (this.paused) return;
 
         const digest = tracker.getDigest(this.kegDb.id, 'file');
@@ -192,8 +192,8 @@ class FileStoreBase {
             return;
         }
         this.maxUpdateId = digest.maxUpdateId;
-        this.updateFiles(this.maxUpdateId);
-    }, 1500);
+        this.updateFiles();
+    }, 2000, { leading: true, maxWait: 4000 });
 
     _getFiles() {
         const filter = this.knownUpdateId ? { minCollectionVersion: this.knownUpdateId } : {};
@@ -273,7 +273,7 @@ class FileStoreBase {
         this.loaded = true;
         socket.onDisconnect(() => { this.updatedAfterReconnect = false; });
         tracker.onUpdated(this.onFileDigestUpdate);
-        setTimeout(this.updateFiles);
+        setTimeout(this.onFileDigestUpdate);
         tracker.seenThis(this.kegDb.id, 'file', this.knownUpdateId);
     }
 
@@ -293,9 +293,9 @@ class FileStoreBase {
 
     // this essentially does the same as loadAllFiles but with filter,
     // we reserve this way of updating anyway for future, when we'll not gonna load entire file list on start
-    updateFiles = (maxId) => {
-        if (!this.loaded || this.updating) return;
-        if (!maxId) maxId = this.maxUpdateId; // eslint-disable-line
+    updateFiles = () => {
+        if (!this.loaded || this.updating || this.knownUpdateId === this.maxUpdateId) return;
+        const maxId = this.maxUpdateId; // eslint-disable-line
         console.log(`Proceeding to file update. Known collection version: ${this.knownUpdateId}`);
         this.updating = true;
         let dirty = false;
@@ -326,11 +326,8 @@ class FileStoreBase {
                 // need this because if u delete all files knownUpdateId won't be set at all after initial load
                 if (this.knownUpdateId < maxId) this.knownUpdateId = maxId;
                 // in case we missed another event while updating
-                if (kegs.length || (this.maxUpdateId && this.knownUpdateId < this.maxUpdateId)) {
-                    setTimeout(this.updateFiles);
-                } else {
-                    setTimeout(this.onFileDigestUpdate);
-                }
+                setTimeout(this.onFileDigestUpdate);
+
                 this.updatedAfterReconnect = true;
                 tracker.seenThis(this.kegDb.id, 'file', this.knownUpdateId);
                 if (this.onAfterUpdate) {

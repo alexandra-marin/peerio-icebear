@@ -130,6 +130,7 @@ class File extends Keg {
      * @public
      */
     @observable progressMax = 0;
+
     /**
      * currently mobile only: flag means file was downloaded and is available locally
      * @member {boolean} cached
@@ -139,7 +140,38 @@ class File extends Keg {
      */
     @observable cached = false;
 
+    /**
+     * file was downloaded for inline image display
+     * @member {boolean} tmpCached
+     * @memberof File
+     * @instance
+     * @public
+     */
     @observable tmpCached = false;
+
+    /**
+     * File was uploaded in this session from this device
+     * and we saved it's original upload path. Useful for preview
+     * launch
+     * @member {String} originalUploadPath
+     * @memberof File
+     * @instance
+     * @public
+     */
+    @observable originalUploadPath;
+
+    /**
+     * We have some type of path available for our file
+     * It was cached for inline image view, uploaded during this session
+     * or downloaded manually by user
+     * @member {String} originalUploadPath
+     * @memberof File
+     * @instance
+     * @public
+     */
+    get hasFileAvailableForPreview() {
+        return this.originalUploadPath || this.cached || this.tmpCached;
+    }
 
     /**
      * Is this file selected in file pickers for group operations.
@@ -388,11 +420,18 @@ class File extends Keg {
 
     /**
      * Open file with system's default file type handler app.
-     * @param {string} [path] - tries this.cachePath if path is not passed
+     * @param {string} [path] - tries cachePath, tmpCachePath and originalUploadPath if path is not passed
      * @public
      */
     launchViewer(path) {
-        return config.FileStream.launchViewer(path || this.cachePath);
+        let filePath = null;
+        // if inline image was saved for preview
+        if (this.tmpCached) filePath = this.tmpCachePath;
+        // if file was downloaded manually by user
+        if (this.cached) filePath = this.cachePath;
+        // if we uploaded file in this session
+        if (this.originalUploadPath) filePath = this.originalUploadPath;
+        return config.FileStream.launchViewer(path || filePath);
     }
 
     /**

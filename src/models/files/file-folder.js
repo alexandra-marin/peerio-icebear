@@ -20,12 +20,12 @@ class FileFolder {
         this.name = this.isRoot ? '' : name;
         this.isShared = isShared;
         if (this.isRoot && !isShared) {
-            this.folderId = 'root';
+            this.id = 'root';
         }
     }
 
     // unique global id (local folder id, or volume id)
-    // folderId;
+    @observable id = null;
     // to be able to filter easier when files and folders are in the same list
     isFolder = true;
     // to indicate root folder or volume root
@@ -35,7 +35,7 @@ class FileFolder {
 
     @observable name;
     // string, `parent` property depends on it
-    @observable parentId;
+    @observable folderId;
     // number
     @observable createdAt;
     // to let systems know that this instance is no good anymore
@@ -50,7 +50,7 @@ class FileFolder {
                 if (!this.store.folderStore.getById(f.folderId)) return true;
                 return false;
             }
-            return f.folderId === this.folderId;
+            return f.folderId === this.id;
         });
     }
 
@@ -60,23 +60,27 @@ class FileFolder {
             if (this.isRoot) {
                 // orphaned folders belong to root
                 if (!f.parent) return true;
-                // if this folder is in root of volume, parent will be root too
-                if (f.parent.isRoot || f.parent.isDeleted || !this.store.folderStore.getById(f.parent.folderId)) {
+                // if this folder(f) is in root of volume, parent(this) will be root too
+                if (f.parent.isRoot) {
+                    return true;
+                }
+                // items with deleted or unmounted parents also go to the root (this)
+                if (f.parent.isDeleted || !this.store.folderStore.getById(f.parent.id)) {
                     return true;
                 }
                 return false;
             }
-            return f.parent && f.parent.folderId === this.folderId;
+            return f.folderId === this.id;
         });
     }
 
     // parent folder instance
     @computed get parent() {
         if (this.isRoot) {
-            if (this.isShared && this.parentId === 'root') return getFileStore().folderStore.root;
+            if (this.isShared && this.folderId === 'root') return getFileStore().folderStore.root;
             return null;
         }
-        const p = this.store.folderStore.getById(this.parentId);
+        const p = this.store.folderStore.getById(this.folderId);
         return p || this.store.folderStore.root;
     }
 
@@ -220,7 +224,7 @@ class FileFolder {
             // file instance is removed, destination will reload it
             return Promise.resolve();
         }
-        file.folderId = this.isRoot ? null : this.folderId;
+        file.folderId = this.isRoot ? null : this.id;
 
         return retryUntilSuccess(
             () => file.saveToServer(),
@@ -246,8 +250,8 @@ class FileFolder {
             warnings.addSevere('error_folderAlreadyExists');
             return Promise.reject();
         }
-        folder.parentId = this.folderId;
-        if (!this.store.folderStore.getById(folder.folderId)) {
+        folder.folderId = this.id;
+        if (!this.store.folderStore.getById(folder.id)) {
             this.store.folderStore.folders.push(folder);
         }
         return skipSave ? Promise.resolve() : this.store.folderStore.save(); // retry handled inside
@@ -286,8 +290,8 @@ class FileFolder {
             throw new Error('error_folderAlreadyExists');
         }
         const folder = new FileFolder(this.store, name);
-        const folderId = id || cryptoUtil.getRandomShortIdHex();
-        folder.folderId = folderId;
+        const newFolderId = id || cryptoUtil.getRandomShortIdHex();
+        folder.id = newFolderId;
         folder.createdAt = Date.now();
         this.attachFolder(folder, skipSave);
         return folder;
@@ -316,19 +320,19 @@ class FileFolder {
 
 
     serialize() {
-        const { name, folderId, createdAt } = this;
+        const { name, id, createdAt } = this;
         const folders = this.folders.filter(f => !f.isShared).map(f => f.serialize());
-        return { name, folderId, createdAt, folders };
+        return { name, id, createdAt, folders };
     }
 
-    deserialize(data, parentId) {
-        if (this.folderId && data.folderId !== this.folderId) {
+    deserialize(data, folderId) {
+        if (this.id && data.id !== this.id) {
             throw new Error('Trying to deserialize folder from a different folder data');
         }
-        this.folderId = data.folderId;
+        this.id = data.id;
         this.name = data.name;
         this.createdAt = data.createdAt;
-        this.parentId = parentId;
+        this.folderId = folderId;
         return this;
     }
 }

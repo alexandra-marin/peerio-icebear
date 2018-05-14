@@ -21,13 +21,8 @@ class Volume extends FileFolder {
         // if (id) this.store = new FileStoreBase(this.db, this);
     }
 
-    // volume id
-    @observable id = null;
     @observable loadingMeta = false;
     @observable metaLoaded = false;
-
-    get folderId() { return this.id; }
-    // set folderId(value) { this.id = value; }
 
     @computed get name() {
         // uses AbstractFolder observable as a fallback
@@ -156,12 +151,12 @@ class Volume extends FileFolder {
     mount() {
         const folderStore = getFileStore().folderStore;
         if (folderStore.getById(this.id)) return;
-        this.parentId = 'root';
+        this.folderId = 'root';
         folderStore.folders.push(this);
     }
 
     unmount() {
-        this.parentId = null;
+        this.folderId = null;
         getFileStore().folderStore.folders.remove(this);
     }
 

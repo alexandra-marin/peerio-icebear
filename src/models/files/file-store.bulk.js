@@ -87,7 +87,7 @@ class FileStoreBulk {
 
     @action.bound moveOne(item, folder, bulk) {
         item.selected = false;
-        if (item.folderId === folder.folderId) return;
+        if (item.folderId === folder.id) return;
         if (item.isShared) return;
         folder.attach(item);
         if (!bulk) {
@@ -111,7 +111,7 @@ class FileStoreBulk {
                 // TODO: remove timeout
                 await new Promise(resolve => setTimeout(resolve, 300));
                 i.selected = false;
-                if (i.folderId === targetFolder.folderId) return;
+                if (i.folderId === targetFolder.id) return;
                 if (i.isShared) return;
                 targetFolder.attach(i);
                 targetFolder.progress++;

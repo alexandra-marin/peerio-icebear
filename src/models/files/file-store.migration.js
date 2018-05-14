@@ -22,6 +22,7 @@ class FileStoreMigration {
     }
 
     @observable pending = false;
+    @observable awaitingConfirmation = false;
     @observable started = false;
     @observable progress = 0;
     @observable performedByAnotherClient = false;
@@ -46,7 +47,7 @@ class FileStoreMigration {
      * migration will auto-start next time, if interrupted.
      */
     confirmMigration = async () => {
-        if (!this.pending || this.started || this.migrationKeg.accountVersion === 1) return;
+        if (this.started || this.performedByAnotherClient || this.migrationKeg.accountVersion === 1) return;
         this.started = true;
         await this.waitForStores();
         // in case another client has migrated while were waiting for stores
@@ -77,7 +78,6 @@ class FileStoreMigration {
      */
     async migrateToAccountVersion1() {
         if (this.migrationKeg.accountVersion === 1) return;
-        this.pending = true;
         this.performedByAnotherClient = false;
         this.fileStore.pause();
 
@@ -85,6 +85,7 @@ class FileStoreMigration {
         if (!await this.canStartMigration()) {
             console.log('Migration is performed by another client');
             this.performedByAnotherClient = true;
+            this.pending = true;
             this.started = false;
             // Handle the case when another client disconnects during migration.
             const unsubscribe = socket.subscribe(socket.APP_EVENTS.fileMigrationUnlocked, async () => {
@@ -119,6 +120,7 @@ class FileStoreMigration {
         // in case we already have file list stored - no confirmation is needed
         if (this.migrationKeg.migration.files) {
             this.legacySharedFiles = this.migrationKeg.migration.files;
+            this.pending = true;
             this.started = true;
             this.doMigrate();
         } else {
@@ -126,6 +128,8 @@ class FileStoreMigration {
             // new user or user with no shared files to migrate
             if (!this.legacySharedFiles.length) {
                 this.confirmMigration();
+            } else {
+                this.pending = true;
             }
         }
     }

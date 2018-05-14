@@ -25,7 +25,6 @@ class Volume extends FileFolder {
     @observable metaLoaded = false;
 
     @computed get name() {
-        // uses AbstractFolder observable as a fallback
         return this.chatHead && this.chatHead.loaded ? this.chatHead.chatName : '';
     }
 

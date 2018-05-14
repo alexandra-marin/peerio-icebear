@@ -246,10 +246,6 @@ class FileFolder {
             folder.remove(folder.store.isMainStore);
             return Promise.resolve();
         }
-        if (this.findFolderByName(folder.normalizedName)) {
-            warnings.addSevere('error_folderAlreadyExists');
-            return Promise.reject();
-        }
         folder.folderId = this.id;
         if (!this.store.folderStore.getById(folder.id)) {
             this.store.folderStore.folders.push(folder);

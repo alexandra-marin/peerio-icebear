@@ -2,6 +2,7 @@
 
 const { observable, action, computed, reaction, autorunAsync, isObservableArray, when, runInAction } = require('mobx');
 const Chat = require('./chat');
+const ChatStorePending = require('./chat-store.pending.js');
 const socket = require('../../network/socket');
 const tracker = require('../update-tracker');
 const { EventEmitter } = require('eventemitter3');
@@ -28,6 +29,8 @@ const Contact = require('../contacts/contact');
  */
 class ChatStore {
     constructor() {
+        this.pending = new ChatStorePending(this);
+
         reaction(() => this.activeChat, chat => {
             if (chat) chat.loadMessages();
         });
@@ -157,7 +160,7 @@ class ChatStore {
     }
 
     /**
-     * Subset of ChatStore#chats, contains only direct message chats
+     * Subset of ChatStore#chats, contains direct message chats and pending DMs
      * @member {Array<Chat>} directMessages
      * @type {Array<Chat>} directMessages
      * @memberof ChatStore
@@ -245,6 +248,17 @@ class ChatStore {
             // a is fav, b is not fav
             return -1;
         } else if (!b.isFavorite) {
+            // if it is a pending DM
+            if (a.isInvite) {
+                if (b.isInvite) {
+                    return a.name.localeCompare(b.name);
+                }
+                // a is pending dm, b is not
+                return -1;
+            } else if (b.isInvite) {
+                // b is pending dm, a is not
+                return 1;
+            }
             // non favorite chats sort by a weird combination unread count and then by update time
             if (unreadOnTop) {
                 // we want chats with unread count > 0 to always come first
@@ -315,7 +329,8 @@ class ChatStore {
         c.added = true;
         // console.log('Added chat ', c.id);
         if (this.myChats.hidden.includes(c.id)) c.unhide();
-        c.loadMetadata().then(() => c.loadMostRecentMessage());
+        c.loadMetadata().then(() => c.loadMostRecentMessage())
+            .then(() => this.pending.onChatAdded(c));
         if (this.loaded && !this.activeChat) this.activate(c.id);
     };
 

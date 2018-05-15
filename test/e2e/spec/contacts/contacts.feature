@@ -33,8 +33,9 @@ Feature: Contact management
         When  I create a test account with invited email
         And   I confirm the primary email
         And   I restart
-        Then  the invite is converted to favorite contact
+        Then  the invite is converted to pending dm
 
+    @wip
     Scenario: Remove invite before invited email is confirmed
         Given I create my account
         And   I invite random email
@@ -43,4 +44,4 @@ Feature: Contact management
         When  I create a test account with invited email
         And   I confirm the primary email
         When  I restart
-        Then  I don't have favorite contacts
+        Then  I don't have pending dm

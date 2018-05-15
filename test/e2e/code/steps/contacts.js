@@ -57,19 +57,20 @@ When('I create a test account with invited email', function() {
     return this.createTestAccount(null, this.invitedEmail);
 });
 
-Then('the invite is converted to favorite contact', async function() {
-    let c = this.ice.contactStore.getContact(this.invitedEmail);
+Then('the invite is converted to pending dm', async function() {
+    const c = this.ice.contactStore.getContact(this.invitedEmail);
     await this.waitFor(() => !c.loading, 5000);
-    c.username.should.equal(this.testAccount.username);
-    // previous instance of c myight be temporary bcs we searched by email
-    c = this.ice.contactStore.getContact(c.username);
-    await this.waitFor(() => c.isAdded, 5000);
+    expect(!!this.ice.chatStore.directMessages.find(
+        chat => chat.isInvite && chat.username === c.username)).to.be.true;
 });
 
 When('I delete invited random email', function() {
     return this.ice.contactStore.removeInvite(this.invitedEmail);
 });
 
-Then('I don\'t have favorite contacts', function() {
-    Object.keys(this.ice.contactStore.myContacts.contacts).length.should.equal(0);
+Then('I don\'t have pending dm', async function() {
+    const c = this.ice.contactStore.getContact(this.invitedEmail);
+    await this.waitFor(() => !c.loading, 5000);
+    expect(!!this.ice.chatStore.directMessages.find(
+        chat => chat.isInvite && chat.username === c.username)).to.be.false;
 });

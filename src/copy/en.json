@@ -726,5 +726,13 @@
   "title_addPeopleToRoom": "Add people to this room",
   "title_contactAdded": "{name} has been added",
   "dialog_fileTypeForExtension": "{extension} File",
-  "dialog_fileTypeAllFiles": "All Files"
+  "dialog_fileTypeAllFiles": "All Files",
+  "title_medicalId": "AHPRA number",
+  "title_medicalIdDescription": "Example: MED1234567890",
+  "title_yourRole": "Your role",
+  "title_specialty": "Specialty",
+  "title_countryOfPractice": "Country of practice",
+  "title_selectYourSpecialty": "Select your specialty.",
+  "title_enterValidAhpra": "Please enter a valid AHPRA number.",
+  "title_selectYourRole": "Select your role."
 }

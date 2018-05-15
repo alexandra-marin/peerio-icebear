@@ -41,7 +41,7 @@ class FileStoreFolders {
 
     searchAllFoldersByName(name) {
         const q = name ? name.toLowerCase() : '';
-        return this.root.AllFolders
+        return this.root.allFolders
             .filter(f => f.normalizedName.includes(q));
     }
 

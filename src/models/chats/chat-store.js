@@ -17,6 +17,7 @@ const warnings = require('../warnings');
 const { setChatStore } = require('../../helpers/di-chat-store');
 const { getFileStore } = require('../../helpers/di-file-store');
 const { cryptoUtil } = require('../../crypto');
+const chatInviteStore = require('./chat-invite-store');
 
 // Used for typechecking
 // eslint-disable-next-line no-unused-vars
@@ -198,6 +199,39 @@ class ChatStore {
         return !!this.channels.length;
     }
 
+    /**
+     * Number of unread messages and invitations
+     * @member {number} badgeCount
+     * @type {number} badgeCount
+     * @memberof ChatStore
+     * @readonly
+     * @instance
+     * @public
+     */
+    @computed
+    get badgeCount() {
+        return this.unreadMessages + chatInviteStore.received.length;
+    }
+
+    /**
+     * List of user's channels and invites
+     * @member {Array} allRooms
+     * @type {Array} allRooms
+     * @memberof ChatStore
+     * @readonly
+     * @instance
+     * @public
+     */
+    @computed
+    get allRooms() {
+        const allRooms = chatInviteStore.received.concat(this.channels);
+        allRooms.sort((a, b) => {
+            const first = a.name || a.channelName;
+            const second = b.name || b.channelName;
+            return first.localeCompare(second);
+        });
+        return allRooms;
+    }
 
     /**
      * Does smart and efficient 'in-place' sorting of observable array.
@@ -465,8 +499,9 @@ class ChatStore {
 
     /**
      * Sets activeChat to first chat in list
-     * @protected
+     * @public
      */
+    @action.bound
     switchToFirstChat() {
         for (let i = 0; i < this.chats.length; i++) {
             const chat = this.chats[i];

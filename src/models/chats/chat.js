@@ -1227,9 +1227,6 @@ class Chat {
                 console.error('Failed to leave channel.', this.id, err);
                 warnings.add('error_channelLeave');
                 this.leaving = false;
-            })
-            .then(() => {
-                this.store.switchToFirstChat();
             });
     }
     /**

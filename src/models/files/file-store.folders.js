@@ -72,17 +72,17 @@ class FileStoreFolders {
     }
 
     // to avoid recursive calls of action and action nesting in result
-    _syncFolder = (f, parentId, newTreeMap) => {
-        newTreeMap[f.id] = 1; // just to mark existence
-        const existing = this.foldersMap.get(f.id);
+    _syncFolder = (folderData, parentId, newTreeMap) => {
+        newTreeMap[folderData.folderId] = 1; // just to mark existence
+        const existing = this.foldersMap.get(folderData.folderId);
         if (existing) {
-            existing.deserialize(f, parentId);
+            existing.deserialize(folderData, parentId);
         } else {
             const folder = new FileFolder(this.fileStore);
-            folder.deserialize(f, parentId);
+            folder.deserialize(folderData, parentId);
             this.folders.push(folder);
         }
-        f.folders.forEach((child) => this._syncFolder(child, f.id, newTreeMap));
+        folderData.folders.forEach((child) => this._syncFolder(child, folderData.folderId, newTreeMap));
     };
 
     // reconstructs folder structure from keg data
@@ -90,10 +90,10 @@ class FileStoreFolders {
         // we will collect all id from keg data in here during sync
         // so we can detect removed folders afterwards
         const newTreeMap = {};
-        this.keg.folders.forEach((f) => this._syncFolder(f, null, newTreeMap));
-        this.folders.forEach(f => {
-            if (!f.isRoot && !newTreeMap[f.id]) {
-                this.folders.remove(f);
+        this.keg.folders.forEach((folderData) => this._syncFolder(folderData, null, newTreeMap));
+        this.folders.forEach(folder => {
+            if (!folder.isRoot && !newTreeMap[folder.id]) {
+                this.folders.remove(folder);
             }
         });
     }

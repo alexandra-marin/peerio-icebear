@@ -24,6 +24,8 @@ class Volume extends FileFolder {
     @observable loadingMeta = false;
     @observable metaLoaded = false;
 
+    @observable convertingFromFolder = false;
+
     @computed get name() {
         return this.chatHead && this.chatHead.loaded ? this.chatHead.chatName : '';
     }

@@ -41,6 +41,8 @@ class FileFolder {
     // to let systems know that this instance is no good anymore
     @observable isDeleted;
 
+    @observable convertingToVolume = false;
+
     // array of files in the root of this folder
     @computed get files() {
         return this.store.files.filter(f => {
@@ -237,11 +239,12 @@ class FileFolder {
 
     // adds exiting folder instance to this folder
     @action.bound async attachFolder(folder, skipSave, skipRootFolder) {
+        if (folder === this) return Promise.resolve();
         if (folder.store !== this.store) {
             // 1. we copy folder structure to another kegdb
-            await folder.copyFolderStructureTo(this, skipRootFolder);
+            const map = await folder.copyFolderStructureTo(this, skipRootFolder);
             // 2. we copy files
-            await folder.copyFilesTo(this);
+            await folder.copyFilesTo(this, map);
             // 3. we remove original files and folders
             folder.remove(folder.store.isMainStore);
             return Promise.resolve();
@@ -254,13 +257,14 @@ class FileFolder {
     }
 
     // private api, copies files from one db to another, preserving folder ids
-    @action async copyFilesTo(dst) {
+    @action async copyFilesTo(dst, folderIdMap) {
         const src = this;
         src.progress = dst.progress = 0;
         src.progressMax = dst.progressMax = src.allFiles.length;
         Promise.map(src.allFiles, file => {
             src.progress = ++dst.progress;
-            return dst.attachFile(file);
+            const dstFolder = dst.store.folderStore.getById(folderIdMap[file.folderId]) || dst;
+            return dstFolder.attachFile(file);
         }, { concurrency: 1 });
         src.progress = dst.progress = 0;
         src.progressMax = dst.progressMax = 0;
@@ -269,15 +273,23 @@ class FileFolder {
     // private api
     @action async copyFolderStructureTo(dst, skipRootFolder) {
         const src = this;
+        const folderIdMap = {}; // mapping between source folder ids and destination
         const copyFolders = (parentSrc, parentDst) => {
             parentSrc.folders.forEach(f => {
-                const folder = parentDst.createFolder(f.name, f.id, true);
+                const folder = parentDst.createFolder(f.name, null, true);
+                folderIdMap[f.id] = folder.id;
                 copyFolders(f, folder);
             });
         };
-        const dstRoot = skipRootFolder ? dst : dst.createFolder(src.name, src.id, true);
+        let dstRoot;
+        if (skipRootFolder) {
+            dstRoot = dst;
+        } else {
+            dstRoot = dst.createFolder(src.name, null, true);
+            folderIdMap[src.id] = dstRoot.id;
+        }
         copyFolders(src, dstRoot);
-        return dst.store.folderStore.save();
+        return dst.store.folderStore.save().return(folderIdMap);
     }
     // creates new child folder
     createFolder(name, id, skipSave = false) {

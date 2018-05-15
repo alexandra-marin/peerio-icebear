@@ -490,7 +490,7 @@ class File extends Keg {
      * Copies this file keg to another db
      * @param {KegDb} db
      */
-    copyTo(db, store) {
+    copyTo(db, store, folderId) {
         return retryUntilSuccess(() => {
             // to avoid creating empty keg
             return socket.send('/auth/kegs/db/query', {
@@ -504,7 +504,7 @@ class File extends Keg {
                     const file = new File(db, store);
                     file.descriptorKey = this.descriptorKey;
                     file.fileId = this.fileId;
-                    file.folderId = this.folderId;
+                    file.folderId = folderId;
                     return file.saveToServer()
                         .catch(err => {
                             if (err && err.code === ServerError.codes.fileKegAlreadyExists) {

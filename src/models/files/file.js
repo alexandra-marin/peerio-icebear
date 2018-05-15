@@ -164,6 +164,7 @@ class File extends Keg {
      * We have some type of path available for our file
      * It was cached for inline image view, uploaded during this session
      * or downloaded manually by user
+     * TODO: REVIEW THIS AFTER NEWFS MERGE
      * @member {String} originalUploadPath
      * @memberof File
      * @instance

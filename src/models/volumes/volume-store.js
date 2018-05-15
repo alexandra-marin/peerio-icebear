@@ -135,8 +135,9 @@ class VolumeStore {
         const newFolder = await this.createVolume(participants, folder.name);
         newFolder.convertingFromFolder = true;
         await newFolder.attach(folder, false, true);
+        folder.progress = newFolder.progress = folder.progressMax = newFolder.progressMax = 0;
         folder.convertingToVolume = false;
-        folder.convertingFromFolder = false;
+        newFolder.convertingFromFolder = false;
         return Promise.resolve();
     }
 }

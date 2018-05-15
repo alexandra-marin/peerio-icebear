@@ -58,6 +58,7 @@ function upload(filePath, fileName, resume) {
         this.progress = 0;
         this._resetUploadState();
         this.uploading = true;
+        this.originalUploadPath = filePath;
         let p = Promise.resolve(null);
         if (resume) {
             p = this._getUlResumeParams(filePath);

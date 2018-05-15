@@ -207,17 +207,16 @@ class FileFolder {
     // move file or folder
     attach(fileOrFolder, ...rest) {
         if (fileOrFolder.isFolder) {
-            this.attachFolder(fileOrFolder, ...rest);
-        } else {
-            this.attachFile(fileOrFolder, ...rest);
+            return this.attachFolder(fileOrFolder, ...rest);
         }
+        return this.attachFile(fileOrFolder, ...rest);
     }
 
     // move file to this folder
     @action.bound async attachFile(file) {
         if (file.store !== this.store) {
             // this is an inter-volume operation!
-            await file.copyTo(this.db, this.store);
+            await file.copyTo(this.store.kegDb, this.store, this.isRoot ? null : this.id);
             // if file was shared not from SELF - remove it
             // file kegs in SELF will get hidden by server
             if (!file.store.isMainStore) {
@@ -245,8 +244,9 @@ class FileFolder {
             const map = await folder.copyFolderStructureTo(this, skipRootFolder);
             // 2. we copy files
             await folder.copyFilesTo(this, map);
-            // 3. we remove original files and folders
-            folder.remove(folder.store.isMainStore);
+            // 3. we remove original folders, files have been removed individually already
+            //    if user has added some files after process has started - they're safely in root now
+            folder.remove(true);
             return Promise.resolve();
         }
         folder.folderId = this.id;
@@ -261,7 +261,7 @@ class FileFolder {
         const src = this;
         src.progress = dst.progress = 0;
         src.progressMax = dst.progressMax = src.allFiles.length;
-        Promise.map(src.allFiles, file => {
+        await Promise.map(src.allFiles, file => {
             src.progress = ++dst.progress;
             const dstFolder = dst.store.folderStore.getById(folderIdMap[file.folderId]) || dst;
             return dstFolder.attachFile(file);

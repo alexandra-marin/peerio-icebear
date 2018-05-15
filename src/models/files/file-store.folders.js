@@ -57,7 +57,7 @@ class FileStoreFolders {
 
     // saves folder structure to keg
     save() {
-        retryUntilSuccess(
+        return retryUntilSuccess(
             () => this.keg.save(
                 () => {
                     this.keg.folders = this.root.folders.filter(f => !f.isShared).map(f => f.serialize());

@@ -241,7 +241,8 @@ class FileStoreBase {
                 }
                 if (file.loadFromKeg(keg)) {
                     if (!file.fileId) {
-                        console.error('File keg missing fileId', file.id);
+                        if (file.version > 1) console.error('File keg missing fileId', file.id);
+                        // we can get a freshly created keg, it's not a big deal
                         continue;
                     }
                     if (this.fileMap[file.fileId]) {

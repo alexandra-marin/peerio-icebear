@@ -540,7 +540,12 @@ class File extends Keg {
             }, false)
                 .then(resp => {
                     // file already exists in this db
-                    if (resp.kegs.length) return Promise.resolve();
+                    if (resp.kegs.length) {
+                        const existingKeg = new File(db, store);
+                        existingKeg.loadFromKeg(resp.kegs[0]);
+                        existingKeg.folderId = folderId;
+                        return existingKeg.saveToServer();
+                    }
                     const file = new File(db, store);
                     file.descriptorKey = this.descriptorKey;
                     file.fileId = this.fileId;

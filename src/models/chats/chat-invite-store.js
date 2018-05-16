@@ -144,10 +144,12 @@ class ChatInviteStore {
             .then(action(res => {
                 const newReceivedInvites = res.map(i => {
                     const channelName = this.decryptChannelName(i);
+                    const participants = this.getParticipants(i);
                     return new ReceivedInvite({
                         username: i.admin,
                         kegDbId: i.channel,
                         timestamp: i.timestamp,
+                        participants,
                         channelName
                     });
                 });
@@ -188,6 +190,15 @@ class ChatInviteStore {
                 }
             }));
     };
+
+    getParticipants(data) {
+        const { bootKeg, chatHeadKeg } = data;
+        const keyId = (chatHeadKeg.keyId || 0).toString();
+        const participantsList = bootKeg.payload.encryptedKeys[keyId].keys;
+        const usernames = Object.keys(participantsList);
+
+        return usernames;
+    }
 
     /**
      * @param {Object} data - invite objects

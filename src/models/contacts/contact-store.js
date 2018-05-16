@@ -10,8 +10,10 @@ const warnings = require('../warnings');
 const createMap = require('../../helpers/dynamic-array-map');
 const { getFirstLetterUpperCase } = require('./../../helpers/string');
 const { getUser } = require('../../helpers/di-current-user');
+const { getChatStore } = require('../../helpers/di-chat-store');
 const tofuStore = require('./tofu-store');
 const { asPromise } = require('../../helpers/prombservable');
+const { retryUntilSuccess } = require('../../helpers/retry');
 
 /**
  * Contact store handles all Peerio users you(your app) are in some contact with,
@@ -207,21 +209,21 @@ class ContactStore {
         when(
             () => this.invites.loaded,
             () => {
-                Promise.each(this.invitedContacts, c => {
-                    if (c.username) {
-                        return this.addContact(c.username)
-                            .then(() => this.removeInvite(c.email))
-                            .then(() => this.onInviteAccepted({ contact: c }));
-                    }
-                    return null;
-                }).then(() => {
-                    return Promise.each(this.invites.received, username => {
-                        return this.addContact(username)
-                            .then(() => this.removeReceivedInvite(username));
+                try {
+                    this.invitedContacts.forEach(c => {
+                        if (c.username) {
+                            this.getContactAndSave(c.username);
+                            getChatStore().pending.add(c.username, c.email);
+                        }
+                        return null;
                     });
-                }).catch(err => {
+                    this.invites.received.forEach(username => {
+                        this.getContactAndSave(username);
+                        getChatStore().pending.add(username, null, true);
+                    });
+                } catch (err) {
                     console.error('Error applying contact invites', err);
-                });
+                }
             }
         );
     });
@@ -362,7 +364,10 @@ class ContactStore {
      * @public
      */
     removeInvite(email) {
-        return socket.send('/auth/contacts/issued-invites/remove', { email });
+        return retryUntilSuccess(
+            () => socket.send('/auth/contacts/issued-invites/remove', { email }),
+            Math.random(),
+            10);
     }
 
     /**
@@ -373,7 +378,10 @@ class ContactStore {
      * @public
      */
     removeReceivedInvite(username) {
-        return socket.send('/auth/contacts/received-invites/remove', { username });
+        return retryUntilSuccess(
+            () => socket.send('/auth/contacts/received-invites/remove', { username }),
+            Math.random(),
+            10);
     }
 
     /**

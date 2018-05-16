@@ -2,6 +2,36 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.18.2"></a>
+## [4.18.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.18.1...v4.18.2) (2018-05-15)
+
+
+
+<a name="4.18.1"></a>
+## [4.18.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.18.0...v4.18.1) (2018-05-15)
+
+
+
+<a name="4.18.0"></a>
+# [4.18.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.17.1...v4.18.0) (2018-05-15)
+
+
+### Bug Fixes
+
+* add retry ([f90cdc5](https://github.com/PeerioTechnologies/peerio-icebear/commit/f90cdc5))
+* check for invites more correctly ([2f7af12](https://github.com/PeerioTechnologies/peerio-icebear/commit/2f7af12))
+* tests ([bcb0f73](https://github.com/PeerioTechnologies/peerio-icebear/commit/bcb0f73))
+
+
+### Features
+
+* add originalUploadPath to not redownload things when opening ([43886e0](https://github.com/PeerioTechnologies/peerio-icebear/commit/43886e0))
+* isChatCreatedFromPendingDM ([2f0653d](https://github.com/PeerioTechnologies/peerio-icebear/commit/2f0653d))
+* pending DM is unread to show indicator ([6050d27](https://github.com/PeerioTechnologies/peerio-icebear/commit/6050d27))
+* remove invites when DM is created by other person or other method ([1b53858](https://github.com/PeerioTechnologies/peerio-icebear/commit/1b53858))
+
+
+
 <a name="4.17.1"></a>
 ## [4.17.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.17.0...v4.17.1) (2018-05-10)
 

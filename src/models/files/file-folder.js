@@ -216,6 +216,12 @@ class FileFolder {
     // move file to this folder
     @action.bound async attachFile(file) {
         if (file.store !== this.store) {
+            if (file.isLegacy) {
+                console.error('can not share legacy file', file.fileId);
+                // don't want to break batch process or initiate retry, this is the fastest way
+                // since this should not really happen if UI is not buggy, it's acceptable
+                return Promise.resolve();
+            }
             // this is an inter-volume operation!
             await file.copyTo(this.store.kegDb, this.store, this.isRoot ? null : this.id);
             // if file was shared not from SELF - remove it

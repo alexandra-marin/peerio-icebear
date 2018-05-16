@@ -46,6 +46,7 @@ class FileFolder {
     // array of files in the root of this folder
     @computed get files() {
         return this.store.files.filter(f => {
+            if (f.hidden) return false;
             if (this.isRoot) {
                 // orphaned files belong to root
                 if (!f.folderId) return true;
@@ -222,6 +223,9 @@ class FileFolder {
             if (!file.store.isMainStore) {
                 await file.remove();
             }
+            // in any case we want this file to not be visible anymore,
+            // there might be a slight delay until server hides the keg and the data will get updated
+            file.hidden = true;
             // file instance is removed, destination will reload it
             return Promise.resolve();
         }

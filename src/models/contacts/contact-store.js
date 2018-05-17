@@ -258,7 +258,6 @@ class ContactStore {
                         // because own keg writes don't trigger digest update
                         c.isAdded = true;
                         this.applyMyContactsData();
-                        warnings.add('snackbar_contactFavourited');
                         resolve(true);
                     }).catch(reject);
                 }

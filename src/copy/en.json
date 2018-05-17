@@ -276,6 +276,7 @@
   "title_filesInQueue": "Files in queue for sharing",
   "title_filesLeftCount": "files left",
   "title_sharingCount": "Sharing {count} files",
+  "title_sharingFiles": "Sharing files",
   "title_sharingCountInFolder": "Sharing {count} files in {name}",
   "title_invalidFileSignature": "Invalid file signature",
   "title_filesNull1": "Let's encrypt a file.",

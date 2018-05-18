@@ -207,7 +207,7 @@ class ContactStore {
     applyInvitesData = action(() => {
         this.invitedContacts = this.invites.issued;
         when(
-            () => this.invites.loaded && tofuStore.loaded,
+            () => this.invites.loaded && tofuStore.loaded && getChatStore().loaded,
             () => {
                 try {
                     this.invitedContacts.forEach(c => {
@@ -216,7 +216,7 @@ class ContactStore {
                             // But, if same username isn't in _contactMap, current user has not yet viewed this,
                             // so emit `onInviteAccepted` event (on desktop this shows a notification).
                             if (!tofuStore.cache[c.username]) {
-                                this.onInviteAccepted({ contact: c });
+                                setTimeout(() => this.onInviteAccepted({ contact: c }));
                             }
 
                             this.getContactAndSave(c.username);

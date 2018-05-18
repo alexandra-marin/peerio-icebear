@@ -558,6 +558,7 @@
   "title_TryUsernameOrEmail": "Try a username, name or email",
   "title_roomParticipants": "this Room's participants ",
   "title_allYourContacts": "All your contacts ( {found} )",
+  "title_contactsNumber": "Contacts ({found})",
   "title_allYourInvited": "All your invites ( {found} )",
   "title_allContacts": "All Contacts",
   "title_exactMatch": "Exact match",

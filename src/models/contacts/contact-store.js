@@ -207,11 +207,19 @@ class ContactStore {
     applyInvitesData = action(() => {
         this.invitedContacts = this.invites.issued;
         when(
-            () => this.invites.loaded,
+            () => this.invites.loaded && tofuStore.loaded,
             () => {
                 try {
+                    console.log(this._contactMap);
                     this.invitedContacts.forEach(c => {
                         if (c.username) {
+                            // If c.username exists, then invited user has indeed joined Peerio & confirmed email.
+                            // But, if same username isn't in _contactMap, current user has not yet viewed this,
+                            // so emit `onInviteAccepted` event (on desktop this shows a notification).
+                            if (!this._contactMap[c.username]) {
+                                setTimeout(() => this.onInviteAccepted({ contact: c }), 0);
+                            }
+
                             this.getContactAndSave(c.username);
                             getChatStore().pending.add(c.username, c.email);
                         }

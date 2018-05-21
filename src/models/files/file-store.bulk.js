@@ -29,6 +29,10 @@ class FileStoreBulk {
     @computed get canMove() {
         return !getFileStore().selectedFilesOrFolders.some(f => f.isFolder && f.isShared);
     }
+    @computed get canShare() {
+        return !getFileStore().selectedFilesOrFolders
+            .some(f => f.isFolder && (f.isShared || f.root.isShared) || f.isLegacy);
+    }
 
     async removeOne(i, batch) {
         if (i.isFolder && this.deleteFolderConfirmator) {

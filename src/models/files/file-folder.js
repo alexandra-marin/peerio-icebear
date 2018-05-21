@@ -43,6 +43,10 @@ class FileFolder {
 
     @observable convertingToVolume = false;
 
+    get root() {
+        return this.store.folderStore.root;
+    }
+
     // array of files in the root of this folder
     @computed get files() {
         return this.store.files.filter(f => {
@@ -84,7 +88,7 @@ class FileFolder {
             return null;
         }
         const p = this.store.folderStore.getById(this.folderId);
-        return p || this.store.folderStore.root;
+        return p || this.root;
     }
 
     @computed get owner() {

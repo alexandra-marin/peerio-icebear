@@ -443,7 +443,7 @@ class ContactStore {
     invite(email) {
         return socket.send('/auth/contacts/invite', { email })
             .then(() => {
-                warnings.add('snackbar_emailInviteSent');
+                warnings.add('snackbar_contactInvited');
             })
             .catch(() => {
                 warnings.add('error_emailInviteSend');

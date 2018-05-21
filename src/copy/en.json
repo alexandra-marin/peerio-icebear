@@ -85,7 +85,6 @@
   "title_syncContacts": "Sync contacts",
   "title_permissionContacts": "Permission to access contacts",
   "title_permissionContactsDescroption": "Peerio would like to access your contact list. Peerio will only use this to connect you with your contacts on Peerio.",
-  "title_zeroStateContacts": "See who you already know on Peerio",
   "title_zeroStateFindContacts": "Find contacts",
   "title_contactsOnPeerio": "Contacts on Peerio",
   "title_deselectAll": "Deselect All",
@@ -735,5 +734,6 @@
   "title_addPeopleToRoom": "Add people to this room",
   "title_contactAdded": "{name} has been added",
   "dialog_fileTypeForExtension": "{extension} File",
-  "dialog_fileTypeAllFiles": "All Files"
+  "dialog_fileTypeAllFiles": "All Files",
+  "mcr_title_zero_screen": "Find your fellow doctors and administrators"
 }

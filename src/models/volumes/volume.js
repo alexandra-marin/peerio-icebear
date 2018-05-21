@@ -124,11 +124,12 @@ class Volume extends FileFolder {
         this.deletedByMyself = true;
         console.log(`Deleting volume ${this.id}.`);
         try {
+            const folderName = this.name;
             await socket.send('/auth/kegs/volume/delete', { kegDbId: this.id });
             this.isDeleted = true;
 
             console.log(`Volume ${this.id} has been deleted.`);
-            warnings.add('title_volumeDeleted');
+            warnings.add('warning_folderDeleted', null, { folderName });
         } catch (err) {
             console.error('Failed to delete volume', err);
             this.deletedByMyself = false;

@@ -277,10 +277,37 @@ class FileStore extends FileStoreBase {
     }
 
     /**
+     * Uploads a folder reconstructing folder structure in Peerio
+     * @param {{
+     *           name: 'folderName',
+     *           files: ['path', ...],
+     *           folders: [same object recursively]
+     *        }} tree - folder tree info
+     * @param {FileFolder} folder - existing folder to attach uploading folder to
+     */
+    async uploadFolder(tree, folder) {
+        const uploadOneLevel = (folders, parent) => {
+            // we received a list of folder and we iterate them
+            Promise.map(folders, f => {
+                // we create the next folder in list
+                const newParent = parent.createFolder(f.name, null, true);
+                // we upload files in the folder
+                f.files.forEach(file => this.upload(file, null, newParent));
+                // we recursively upload folders in this folder
+                return uploadOneLevel(f.folders, newParent);
+            });
+        };
+
+        await uploadOneLevel([tree], folder || this.folderStore.root);
+        return folder ? folder.store.folderStore.save() : this.folderStore.save();
+    }
+
+    /**
      * Start new file upload and get the file keg for it.
      * @function upload
      * @param {string} filePath - full path with name
      * @param {string} [fileName] - if u want to override name in filePath
+     * @param {FileFolder} [folder] - where to put the file
      * @public
      */
     upload = (filePath, fileName, folder) => {

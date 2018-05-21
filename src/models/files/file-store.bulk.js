@@ -31,7 +31,7 @@ class FileStoreBulk {
     }
     @computed get canShare() {
         return !getFileStore().selectedFilesOrFolders
-            .some(f => f.isFolder && (f.isShared || f.root.isShared) || f.isLegacy);
+            .some(f => f.isFolder && !f.isRoot && (f.isShared || f.root.isShared) || f.isLegacy);
     }
 
     async removeOne(i, batch) {

@@ -57,6 +57,25 @@ describe('File helper should', () => {
         'also\\windows\\'
     ];
 
+    const unicode = [
+        {
+            name: 'photo\u202egnp.js',
+            expectedSanitizedName: 'photo\u202egnp\u202c.js'
+        },
+        {
+            name: '2photo\u202egnp.js\u2067',
+            expectedSanitizedName: '2photo\u202egnp\u202c.js\u2067\u2069'
+        },
+        {
+            name: '\u202c\u202cphoto\u202egnp.js',
+            expectedSanitizedName: '\u202c\u202cphoto\u202egnp\u202c.js'
+        },
+        {
+            name: '\u202c\u202cphoto\u202c\u202egnp.js',
+            expectedSanitizedName: '\u202c\u202cphoto\u202c\u202egnp\u202c.js'
+        }
+    ];
+
     folders.forEach(f => {
         paths.concat(paths.map(p => f + p));
     });
@@ -75,6 +94,13 @@ describe('File helper should', () => {
         it(`return extension from path ${testCase.data}`, () => {
             const actual = helper.getFileExtension(testCase.data);
             actual.should.equal(testCase.expectedExt);
+        });
+    });
+
+    unicode.forEach((testCase) => {
+        it('sanitizes broken bi-directional formatting', () => {
+            const sanitized = helper.sanitizeBidirectionalFilename(testCase.name);
+            sanitized.should.equal(testCase.expectedSanitizedName);
         });
     });
 });

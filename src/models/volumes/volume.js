@@ -26,6 +26,19 @@ class Volume extends FileFolder {
 
     @observable convertingFromFolder = false;
 
+    compareContacts = (c1, c2) => {
+        return c1.fullNameAndUsername.localeCompare(c2.fullNameAndUsername);
+    }
+
+    @computed get allParticipants() {
+        if (!this.db.boot || !this.db.boot.participants) return [];
+        return this.db.boot.participants.sort(this.compareContacts);
+    }
+
+    @computed get otherParticipants() {
+        return this.allParticipants.filter(p => p.username !== getUser().username);
+    }
+
     @computed get name() {
         return this.chatHead && this.chatHead.loaded ? this.chatHead.chatName : '';
     }

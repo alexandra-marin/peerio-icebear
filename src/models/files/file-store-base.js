@@ -128,6 +128,9 @@ class FileStoreBase {
         return this.getSelectedFiles().length;
     }
 
+    getFilesSharedBy(username) {
+        return this.files.filter(f => f.owner === username);
+    }
     // Returns currently selected files (file.selected == true)
     getSelectedFiles() {
         return this.allFiles.filter(FileStoreBase.isFileSelected);

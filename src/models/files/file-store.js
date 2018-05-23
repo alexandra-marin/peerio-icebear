@@ -216,6 +216,29 @@ class FileStore extends FileStoreBase {
         return file;
     }
 
+    async loadKegByFileId(fileId) {
+        try {
+            const file = new File(this.kegDb, this);
+            const resp = await retryUntilSuccess(() => {
+                return socket.send('/auth/kegs/db/query', {
+                    kegDbId: this.kegDb.id,
+                    type: 'file',
+                    filter: { fileId }
+                }, false);
+            }, undefined, 3);
+            if (!resp || !resp.kegs[0] || !file.loadFromKeg(resp.kegs[0])) {
+                return null;
+            }
+            if (file.deleted) {
+                return null;
+            }
+            return file;
+        } catch (err) {
+            console.error(err);
+            return null;
+        }
+    }
+
     loadChatFile(fileId, kegDbId) {
         const chat = getChatStore().chatMap[kegDbId];
         if (!chat) {

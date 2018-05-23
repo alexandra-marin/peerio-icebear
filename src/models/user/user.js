@@ -155,7 +155,7 @@ class User {
      * @instance
      * @public
      */
-    @observable props = {};
+    props = {};
     /**
      * Indicates 2fa state on current user.
      * @member {boolean} twoFAEnabled

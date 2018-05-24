@@ -136,6 +136,12 @@ class Contact {
      * @public
      */
     @observable isDeleted = false;
+    /**
+     * '@appLabel'
+     * @member {string}
+     * @public
+     */
+    appLabel;
 
     /**
      * RGB string built based on hashed signing public key, not cryptographically strong, just for better UX
@@ -357,6 +363,7 @@ class Contact {
                 }
                 this.username = profile.username;
                 this.usernameTag = `@${this.username}`;
+                this.appLabel = profile.appLabel || 'peerio';
                 this.firstName = profile.firstName || '';
                 this.lastName = profile.lastName || '';
                 this.urlSalt = profile.urlSalt;

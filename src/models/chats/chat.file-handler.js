@@ -7,12 +7,6 @@ const TaskQueue = require('../../helpers/task-queue');
 const { retryUntilSuccess } = require('../../helpers/retry');
 const socket = require('../../network/socket');
 
-// for typechecking:
-/* eslint-disable no-unused-vars */
-const Chat = require('./chat');
-const File = require('../files/file');
-/* eslint-enable no-unused-vars */
-
 /**
  * File handling module for Chat. Extracted for readability.
  * @param {Chat} chat - chat creates an instance and passes itself to it.

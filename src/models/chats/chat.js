@@ -124,6 +124,24 @@ class Chat {
     }
 
     /**
+     * The username of the person you're having a DM with
+     * @member {string} dmPartnerUsername
+     * @memberof Chat
+     * @instance
+     * @public
+     * @readonly
+     */
+    @computed get dmPartnerUsername() {
+        if (this.isChannel) {
+            console.error(`Should not call dmPartnerUsername for channel`);
+            return null;
+        }
+        const participant = this.otherParticipants.length && this.otherParticipants[0];
+        if (participant) return participant.username;
+        return null;
+    }
+
+    /**
      * Room api. For DM will work too, but doesn't make sense, just use 'allParticipants'
      * Includes only currently joined room participants and current user.
      * Excludes users awaiting to accept invite or get removed after leave.
@@ -498,6 +516,26 @@ class Chat {
      * @public
      */
     @observable mostRecentMessage;
+
+    /**
+     * UI flag for chats created from chat-pending-dms
+     * Will be set to true if it was for user who just signed up
+     * @member {boolean} isChatCreatedFromPendingDM
+     * @memberof Chat
+     * @instance
+     * @public
+     */
+    @observable isChatCreatedFromPendingDM;
+
+    /**
+     * UI flag for chats where user is a new user who accepted an invite to join
+     * Will be set to true in a DM with the user who invited this user
+     * @member {boolean} isNewUserFromInvite
+     * @memberof Chat
+     * @instance
+     * @public
+     */
+    @observable isNewUserFromInvite;
 
     _metaPromise = null;
     /**
@@ -1189,9 +1227,6 @@ class Chat {
                 console.error('Failed to leave channel.', this.id, err);
                 warnings.add('error_channelLeave');
                 this.leaving = false;
-            })
-            .then(() => {
-                this.store.switchToFirstChat();
             });
     }
     /**

@@ -385,6 +385,7 @@
   "dialog_toExternal": "Downloads will be decrypted and saved to a shared directory to give access to other apps.",
   "snackbar_uploadComplete": "Upload complete",
   "snackbar_downloadComplete": "Download complete",
+  "snackbar_downloadsComplete": "Downloads complete",
   "snackbar_contactInvited": "Contact was invited to join Peerio",
   "error_emailInviteSend": "Error sending invite",
   "error_uploadFailed": "Upload failed",

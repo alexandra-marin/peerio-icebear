@@ -127,7 +127,7 @@ class FileStoreBulk {
         await this.fileStore.folderStore.save();
     }
 
-    @action.bound async downloadOne(item, path) {
+    @action.bound async downloadOne(item, path, suppressSnackbar) {
         item.selected = false;
         const downloadPath = await this.pickPathSelector(
             path,
@@ -137,7 +137,7 @@ class FileStoreBulk {
         if (item.isFolder) {
             await item.download(path, this.pickPathSelector, config.FileStream.createDir);
         } else {
-            await item.download(downloadPath);
+            await item.download(downloadPath, false, false, suppressSnackbar);
         }
     }
 
@@ -155,9 +155,10 @@ class FileStoreBulk {
         const items = getFileStore().selectedFilesOrFolders;
         let promise = Promise.resolve();
         items.forEach(item => {
-            promise = promise.then(() => this.downloadOne(item, path));
+            promise = promise.then(() => this.downloadOne(item, path, true));
         });
         await promise;
+        warnings.add('snackbar_downloadsComplete');
     }
 }
 

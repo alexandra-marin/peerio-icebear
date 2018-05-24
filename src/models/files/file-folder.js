@@ -99,6 +99,10 @@ class FileFolder {
         return boot.loaded ? boot.owner : null;
     }
 
+    get canShare() {
+        return !this.isShared && !this.root.isShared;
+    }
+
     // Variables for bulk actions and share-related actions
     @observable selected = false;
     // for whatever long-running process is being performed on the folder

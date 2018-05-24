@@ -125,14 +125,14 @@ class FileStoreBase {
     }
 
     @computed get selectedCount() {
-        return this.getSelectedFiles().length;
+        return this.selectedFiles.length;
     }
 
     getFilesSharedBy(username) {
         return this.files.filter(f => f.owner === username);
     }
     // Returns currently selected files (file.selected == true)
-    getSelectedFiles() {
+    @computed get selectedFiles() {
         return this.allFiles.filter(FileStoreBase.isFileSelected);
     }
 
@@ -147,7 +147,7 @@ class FileStoreBase {
     }
 
     @computed get selectedFilesOrFolders() {
-        return this.selectedFolders.concat(this.getSelectedFiles());
+        return this.selectedFolders.concat(this.selectedFiles);
     }
 
     // Deselects all files and folders

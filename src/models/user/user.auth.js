@@ -22,7 +22,6 @@ module.exports = function mixUserAuthModule() {
                 switch (e.code) {
                     case errors.ServerError.codes.sdkVersionDeprecated:
                     case errors.ServerError.codes.clientVersionDeprecated:
-                        warnings.addSevere('warning_deprecated');
                         clientApp.clientVersionDeprecated = true;
                         break;
                     case errors.ServerError.codes.twoFAAuthRequired:

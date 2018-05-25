@@ -11,8 +11,6 @@ const { publicCrypto } = require('../../crypto/index');
 const { formatBytes, tryToGet } = require('../../util');
 const config = require('../../config');
 const MRUList = require('../../helpers/mru-list');
-const migrator = require('../../legacy/account_migrator');
-const { ServerError } = require('../../errors');
 const warnings = require('../warnings');
 const clientApp = require('../client-app');
 
@@ -638,15 +636,6 @@ class User {
             })
             .then(() => this._postAuth())
             .catch(e => {
-                if (e && (e.code === ServerError.codes.accountMigrationRequired)) {
-                    return migrator.authenticate(this.username, this.passphrase)
-                        .then((data) => {
-                            this.firstName = data.firstName || this.username;
-                            this.lastName = data.lastName || this.username;
-                            this.email = data.primaryEmail || 'enter_your_email@localhost';
-                            return this.createAccountAndLogin();
-                        });
-                }
                 if (!socket.authenticated && !clientApp.clientVersionDeprecated && !clientApp.clientSessionExpired) {
                     socket.reset();
                 }

@@ -34,6 +34,9 @@ module.exports = function mixUserRegisterModule() {
                     appLabel: config.appLabel,
                     props: this.props || {}
                 };
+                if (config.appLabel) {
+                    request.appLabel = config.appLabel;
+                }
                 return socket.send('/noauth/register', request);
             })
             .then(this._handleAccountCreationChallenge);

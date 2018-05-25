@@ -1,5 +1,3 @@
-// @ts-check
-
 const { observable, computed, action, when, reaction } = require('mobx');
 const Message = require('./message');
 const ChatKegDb = require('../kegs/chat-keg-db');
@@ -16,6 +14,8 @@ const socket = require('../../network/socket');
 const warnings = require('../warnings');
 const Contact = require('../contacts/contact');
 const chatInviteStore = require('../chats/chat-invite-store');
+const { asPromise } = require('../../helpers/prombservable');
+// const volumeStore = require('../volumes/volume-store');
 
 // to assign when sending a message and don't have an id yet
 let temporaryChatId = 0;
@@ -843,8 +843,8 @@ class Chat {
      * @returns {Promise}
      * @public
      */
-    uploadAndShareFile(path, name, deleteAfterUpload = false, beforeShareCallback = null, message = null) {
-        return this._fileHandler.uploadAndShare(path, name, deleteAfterUpload, beforeShareCallback, message);
+    uploadAndShareFile(path, name, deleteAfterUpload = false, message = null) {
+        return this._fileHandler.uploadAndShare(path, name, deleteAfterUpload, message);
     }
 
     /**
@@ -854,6 +854,41 @@ class Chat {
      */
     shareFiles(files) {
         return this._fileHandler.share(files);
+    }
+    unshareFile(file) {
+        return this._fileHandler.unshare(file);
+    }
+
+    // we don't share folders with chats yet // Anri
+    // shareFolders(folders) {
+    //     folders.forEach(folder => this.uploadQueue.push(folder));
+    //     let promise = Promise.resolve();
+    //     folders.forEach(folder => {
+    //         promise = promise.then(async () => {
+    //             // retry and error handling
+    //             // is done in store implementations
+    //             try {
+    //                 await volumeStore.convertFolder(folder);
+    //                 await this.sendSharedFolder(folder);
+    //             } catch (e) {
+    //                 console.error(e);
+    //             }
+    //             this.uploadQueue.remove(folder);
+    //         });
+    //     });
+    //     return promise;
+    // }
+
+    async shareFilesAndFolders(filesAndFolders) {
+        const files = filesAndFolders.filter(f => !f.isFolder);
+        const folders = filesAndFolders.filter(f => f.isFolder);
+        if (files.length) {
+            await this.shareFiles(files);
+        }
+        if (folders.length) {
+            // we don't share folders with chats yet // Anri
+            // await this.shareFolders(folders);
+        }
     }
 
     /**
@@ -1249,6 +1284,16 @@ class Chat {
     }
 
     /**
+    * TODO: replace with the real thing
+    */
+    sendSharedFolder(folder) {
+        const m = new Message(this.db);
+        m.sendSharedFolder(folder);
+        return this._sendMessage(m);
+    }
+
+
+    /**
      * Checks if there are any file attachments in new message batch and adds them to _recentFiles if needed.
      * @private
      */
@@ -1279,6 +1324,10 @@ class Chat {
             this.messages[i].parseExternalContent();
         }
         this.resetScheduled = false;
+    }
+
+    ensureMetaLoaded() {
+        return asPromise(this, 'metaLoaded', true);
     }
 
     dispose() {

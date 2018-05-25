@@ -2,6 +2,132 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.0.1"></a>
+## [5.0.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.0.0...v5.0.1) (2018-05-25)
+
+
+### Bug Fixes
+
+* progress starts at 1 [ch7603] ([4e55413](https://github.com/PeerioTechnologies/peerio-icebear/commit/4e55413))
+
+
+
+<a name="5.0.0"></a>
+# [5.0.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.18.2...v5.0.0) (2018-05-25)
+
+
+* Merge pull request #168 from PeerioTechnologies/newfs ([ef8d8e9](https://github.com/PeerioTechnologies/peerio-icebear/commit/ef8d8e9)), closes [#168](https://github.com/PeerioTechnologies/peerio-icebear/issues/168)
+
+
+### Bug Fixes
+
+* account for files in chats when dealing with file selection ([7ee9144](https://github.com/PeerioTechnologies/peerio-icebear/commit/7ee9144))
+* account version keg loading ([74e4469](https://github.com/PeerioTechnologies/peerio-icebear/commit/74e4469))
+* better debounce file store updates ([5aca3ad](https://github.com/PeerioTechnologies/peerio-icebear/commit/5aca3ad))
+* bring back removal of faulty old file kegs ([4b26767](https://github.com/PeerioTechnologies/peerio-icebear/commit/4b26767))
+* canShare ([1cedbe4](https://github.com/PeerioTechnologies/peerio-icebear/commit/1cedbe4))
+* channel check for file copy ([a972baa](https://github.com/PeerioTechnologies/peerio-icebear/commit/a972baa))
+* correct copy for deleting folder ([a239545](https://github.com/PeerioTechnologies/peerio-icebear/commit/a239545))
+* createMeta ([1729eb3](https://github.com/PeerioTechnologies/peerio-icebear/commit/1729eb3))
+* descriptorKey == blobKey for migrated files ([946c084](https://github.com/PeerioTechnologies/peerio-icebear/commit/946c084))
+* digest ([d056259](https://github.com/PeerioTechnologies/peerio-icebear/commit/d056259))
+* digest issues ([1904987](https://github.com/PeerioTechnologies/peerio-icebear/commit/1904987))
+* disable folders inside volume, fix moveInto ([1d3098d](https://github.com/PeerioTechnologies/peerio-icebear/commit/1d3098d))
+* disable share volume subfolders ([844be3c](https://github.com/PeerioTechnologies/peerio-icebear/commit/844be3c))
+* display unmigrated files in chats ([6ed267f](https://github.com/PeerioTechnologies/peerio-icebear/commit/6ed267f))
+* do not auto-remove damaged file kegs for now ([fdc3a95](https://github.com/PeerioTechnologies/peerio-icebear/commit/fdc3a95))
+* do not call finish migration api when you're not the one finishing it ([b3da627](https://github.com/PeerioTechnologies/peerio-icebear/commit/b3da627))
+* don't throw if no results returned to file lookup ([412cf2a](https://github.com/PeerioTechnologies/peerio-icebear/commit/412cf2a))
+* file kegs can start from id 1000 ([6c9e6c6](https://github.com/PeerioTechnologies/peerio-icebear/commit/6c9e6c6))
+* file timestamp ([a6b2d70](https://github.com/PeerioTechnologies/peerio-icebear/commit/a6b2d70))
+* file timestamps ([3d212fb](https://github.com/PeerioTechnologies/peerio-icebear/commit/3d212fb))
+* files loading ([42d3777](https://github.com/PeerioTechnologies/peerio-icebear/commit/42d3777))
+* folder id serialization ([07667d9](https://github.com/PeerioTechnologies/peerio-icebear/commit/07667d9))
+* folder owner property ([b7961d4](https://github.com/PeerioTechnologies/peerio-icebear/commit/b7961d4))
+* folder reconstruction ([636bfeb](https://github.com/PeerioTechnologies/peerio-icebear/commit/636bfeb))
+* folder structure reconstruction ([054df07](https://github.com/PeerioTechnologies/peerio-icebear/commit/054df07))
+* forgot tot fix migration call ([e150a67](https://github.com/PeerioTechnologies/peerio-icebear/commit/e150a67))
+* hide moved files before receiving server confirmation ([ad0b862](https://github.com/PeerioTechnologies/peerio-icebear/commit/ad0b862))
+* invalid retryUntilSuccess usage ([5a39547](https://github.com/PeerioTechnologies/peerio-icebear/commit/5a39547))
+* leave volume instead of delete in case I'm not the owner ([7b176cc](https://github.com/PeerioTechnologies/peerio-icebear/commit/7b176cc))
+* make keg#format  observable ([8918e6e](https://github.com/PeerioTechnologies/peerio-icebear/commit/8918e6e))
+* migration ([e5233dc](https://github.com/PeerioTechnologies/peerio-icebear/commit/e5233dc))
+* migration ([108f0fe](https://github.com/PeerioTechnologies/peerio-icebear/commit/108f0fe))
+* migration dialog flickering ([7dfaa06](https://github.com/PeerioTechnologies/peerio-icebear/commit/7dfaa06))
+* migration typo ([ee1c913](https://github.com/PeerioTechnologies/peerio-icebear/commit/ee1c913))
+* move to correct folder when putting file back to SELF ([96b63a3](https://github.com/PeerioTechnologies/peerio-icebear/commit/96b63a3))
+* multiple digest and not only issues ([#184](https://github.com/PeerioTechnologies/peerio-icebear/issues/184)) ([5819ae9](https://github.com/PeerioTechnologies/peerio-icebear/commit/5819ae9))
+* new account do not have legacy files ([bbe2f23](https://github.com/PeerioTechnologies/peerio-icebear/commit/bbe2f23))
+* prohibit sharing of unmigrated files ([a97f60c](https://github.com/PeerioTechnologies/peerio-icebear/commit/a97f60c))
+* proper legacy files list text ([4628e8d](https://github.com/PeerioTechnologies/peerio-icebear/commit/4628e8d))
+* receipts won't load every time chat is activated anymore ([d2e467d](https://github.com/PeerioTechnologies/peerio-icebear/commit/d2e467d))
+* remove circular dependencies for volumeStore ([9b3ba21](https://github.com/PeerioTechnologies/peerio-icebear/commit/9b3ba21))
+* remove hack since server api has been fixed ([5f3f46f](https://github.com/PeerioTechnologies/peerio-icebear/commit/5f3f46f))
+* remove npm dependency ([3fd4290](https://github.com/PeerioTechnologies/peerio-icebear/commit/3fd4290))
+* remove restarting migration on disconnect ([0e4f261](https://github.com/PeerioTechnologies/peerio-icebear/commit/0e4f261))
+* safer this way ([6a78cc0](https://github.com/PeerioTechnologies/peerio-icebear/commit/6a78cc0))
+* set migrationPerformedByAnotherClient to false regardless if we ([098cd4e](https://github.com/PeerioTechnologies/peerio-icebear/commit/098cd4e))
+* share folder dialog ([42712f2](https://github.com/PeerioTechnologies/peerio-icebear/commit/42712f2))
+* sharing ([67da7ea](https://github.com/PeerioTechnologies/peerio-icebear/commit/67da7ea))
+* small issues ([1ba6f71](https://github.com/PeerioTechnologies/peerio-icebear/commit/1ba6f71))
+* some fixes ([e59812b](https://github.com/PeerioTechnologies/peerio-icebear/commit/e59812b))
+* synced keg now cleans up properly after failed login attempts ([1f0cd5d](https://github.com/PeerioTechnologies/peerio-icebear/commit/1f0cd5d))
+* timer test ([c2933f5](https://github.com/PeerioTechnologies/peerio-icebear/commit/c2933f5))
+* **copy:** spelling mistake ([6b51a93](https://github.com/PeerioTechnologies/peerio-icebear/commit/6b51a93))
+* **file-store:** pause descriptors updates ([100dcd2](https://github.com/PeerioTechnologies/peerio-icebear/commit/100dcd2))
+* **migration:** async ([d65abda](https://github.com/PeerioTechnologies/peerio-icebear/commit/d65abda))
+* **migration:** clear migrationStarted flag when migrationPerformedByAnotherClient ([e9672c9](https://github.com/PeerioTechnologies/peerio-icebear/commit/e9672c9))
+* typo in AllFolders => allFolders ([edc99fc](https://github.com/PeerioTechnologies/peerio-icebear/commit/edc99fc))
+* update descriptors on resume() ([5bbd1c0](https://github.com/PeerioTechnologies/peerio-icebear/commit/5bbd1c0))
+* urlName ([b04db64](https://github.com/PeerioTechnologies/peerio-icebear/commit/b04db64))
+* **migration:** handle additional case of finishing by another client ([6e783ef](https://github.com/PeerioTechnologies/peerio-icebear/commit/6e783ef))
+* **migration:** make accountVersion observable ([aa33b6e](https://github.com/PeerioTechnologies/peerio-icebear/commit/aa33b6e))
+* **migration:** status with % when taking over from other client ([911a38a](https://github.com/PeerioTechnologies/peerio-icebear/commit/911a38a))
+* volume construction and removal ([2004ea2](https://github.com/PeerioTechnologies/peerio-icebear/commit/2004ea2))
+
+
+### Features
+
+* a method to load single file keg in any state ([a9daff8](https://github.com/PeerioTechnologies/peerio-icebear/commit/a9daff8))
+* add bulk delete for shared folders ([52d7828](https://github.com/PeerioTechnologies/peerio-icebear/commit/52d7828))
+* add custom owner ([eeff253](https://github.com/PeerioTechnologies/peerio-icebear/commit/eeff253))
+* add deleted flag to the volume ([ffdaf2a](https://github.com/PeerioTechnologies/peerio-icebear/commit/ffdaf2a))
+* add keg db list provider and change chat store loadAllFiles to use it ([18fc609](https://github.com/PeerioTechnologies/peerio-icebear/commit/18fc609))
+* add reshare mock and copy ([49d1d05](https://github.com/PeerioTechnologies/peerio-icebear/commit/49d1d05))
+* add retryUntilSuccess for moving files across folders ([7d90b33](https://github.com/PeerioTechnologies/peerio-icebear/commit/7d90b33))
+* add retryUntilSuccess for moving files across folders ([2f83925](https://github.com/PeerioTechnologies/peerio-icebear/commit/2f83925))
+* auto copy files from db to my drive ([d8d5fd6](https://github.com/PeerioTechnologies/peerio-icebear/commit/d8d5fd6))
+* bail retry on fatal errors ([f3e1099](https://github.com/PeerioTechnologies/peerio-icebear/commit/f3e1099))
+* bulk download for files ([7b2e468](https://github.com/PeerioTechnologies/peerio-icebear/commit/7b2e468))
+* bulk move ([d207f8d](https://github.com/PeerioTechnologies/peerio-icebear/commit/d207f8d))
+* delete files confirmation ([64a72ef](https://github.com/PeerioTechnologies/peerio-icebear/commit/64a72ef))
+* delete files in local folder. rename shareProgress to progress and add progressMax ([caf85eb](https://github.com/PeerioTechnologies/peerio-icebear/commit/caf85eb))
+* e2e tests onboarding ([#148](https://github.com/PeerioTechnologies/peerio-icebear/issues/148)) ([ad39544](https://github.com/PeerioTechnologies/peerio-icebear/commit/ad39544))
+* folders 'selected' bool for bulk actions ([730ffe7](https://github.com/PeerioTechnologies/peerio-icebear/commit/730ffe7))
+* for multiple downloads show only one snackbar ([3d3be0a](https://github.com/PeerioTechnologies/peerio-icebear/commit/3d3be0a))
+* leaving shared folder ([8ee98a1](https://github.com/PeerioTechnologies/peerio-icebear/commit/8ee98a1))
+* migration ([af83fb0](https://github.com/PeerioTechnologies/peerio-icebear/commit/af83fb0))
+* support for hidden files ([d5a94b5](https://github.com/PeerioTechnologies/peerio-icebear/commit/d5a94b5))
+* support for legacy files ([000f210](https://github.com/PeerioTechnologies/peerio-icebear/commit/000f210))
+* **file-store:** add pause() and resume() ([f69f707](https://github.com/PeerioTechnologies/peerio-icebear/commit/f69f707))
+* **migration:** block migration for more than one client ([97b6479](https://github.com/PeerioTechnologies/peerio-icebear/commit/97b6479))
+* upload folder preserving folder structure ([8e1d071](https://github.com/PeerioTechnologies/peerio-icebear/commit/8e1d071))
+* use refactored volume keg ([ea5efce](https://github.com/PeerioTechnologies/peerio-icebear/commit/ea5efce))
+
+
+### Performance Improvements
+
+* socket binary flag ([b5a7d2c](https://github.com/PeerioTechnologies/peerio-icebear/commit/b5a7d2c))
+
+
+### BREAKING CHANGES
+
+* new file system
+startChat() startChatAndShareFiles() returns promise now
+uploadAndShareFile() beforesharecallback argument removed
+
+
+
 <a name="4.18.2"></a>
 ## [4.18.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v4.18.1...v4.18.2) (2018-05-15)
 

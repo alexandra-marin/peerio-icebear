@@ -6,7 +6,7 @@ describe('Timer should', () => {
     it('count down', (done) => {
         let timer = new Timer();
         const started = performance.now();
-        timer.countDown(10);
+        timer.countDown(3);
 
         return when(() => timer.counter === 0, () => {
             timer.stop();
@@ -14,8 +14,7 @@ describe('Timer should', () => {
 
             const ended = performance.now();
             const elapsed = ended - started;
-            console.log(`Clock ran for ${elapsed} milliseconds.`);
-            elapsed.should.be.above(9950).and.below(10050);
+            elapsed.should.be.above(2500).and.below(3500);
 
             done();
         });
@@ -24,16 +23,15 @@ describe('Timer should', () => {
     it('count up', (done) => {
         let timer = new Timer();
         const started = performance.now();
-        timer.countUp(10);
+        timer.countUp(3);
 
-        return when(() => timer.counter === 10, () => {
+        return when(() => timer.counter === 3, () => {
             timer.stop();
             timer = null;
 
             const ended = performance.now();
             const elapsed = ended - started;
-            console.log(`Clock ran for ${elapsed} milliseconds.`);
-            elapsed.should.be.above(9950).and.below(10050);
+            elapsed.should.be.above(2500).and.below(3500);
 
             done();
         });

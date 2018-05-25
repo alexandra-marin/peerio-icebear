@@ -1,6 +1,6 @@
 const Keg = require('./../kegs/keg');
-const { observable, computed, action, isObservableArray } = require('mobx');
-const { cryptoUtil, secret } = require('../../crypto');
+const { observable, computed, action } = require('mobx');
+const { cryptoUtil, secret, sign: { signDetached } } = require('../../crypto');
 const fileHelper = require('../../helpers/file');
 const util = require('../../util');
 const config = require('../../config');
@@ -8,10 +8,11 @@ const socket = require('../../network/socket');
 const uploadModule = require('./file.upload');
 const downloadModule = require('./file.download');
 const { getUser } = require('../../helpers/di-current-user');
+const { getFileStore } = require('../../helpers/di-file-store');
 const { retryUntilSuccess } = require('../../helpers/retry');
 const { ServerError } = require('../../errors');
 const clientApp = require('../client-app');
-
+const { asPromise } = require('../../helpers/prombservable');
 /**
  * File keg and model.
  * @param {KegDb} db
@@ -19,22 +20,16 @@ const clientApp = require('../client-app');
  * @public
  */
 class File extends Keg {
-    constructor(db) {
+    constructor(db, store) {
         super(null, 'file', db);
+        this.store = store;
+        this.format = 1;
+        this.latestFormat = 1;
+        this.descriptorFormat = 1;
     }
 
-    /**
-     * Blob key
-     * @member {Uint8Array}
-     * @public
-     */
-    key;
-    /**
-     * Blob nonce. It's separate because this is a base nonce, every chunk adds its number to it to decrypt.
-     * @member {Uint8Array}
-     * @public
-     */
-    nonce;
+    @observable migrating = false;
+
     /**
      * System-wide unique client-generated id
      * @member {string} fileId
@@ -192,6 +187,7 @@ class File extends Keg {
      * @public
      */
     @observable show = true;
+
     /**
      * Is this file currently shared with anyone.
      * @member {boolean} shared
@@ -242,7 +238,17 @@ class File extends Keg {
      * @instance
      * @public
      */
-    @observable folder;
+    @computed get folder() {
+        const folder = this.store.folderStore.getById(this.folderId);
+        return folder || this.store.folderStore.root;
+    }
+
+    @computed get isLegacy() {
+        return !this.format;
+    }
+
+
+    descriptorVersion = 0;
 
     /**
      * @member {string} nameWithoutExt
@@ -305,7 +311,7 @@ class File extends Keg {
      * @public
      */
     @computed get canShare() {
-        return true; // getUser().username === this.fileOwner;
+        return this.format === 1;
     }
     /**
      * Bytes
@@ -325,98 +331,124 @@ class File extends Keg {
     }
 
     serializeKegPayload() {
+        if (!this.format) {
+            return {
+                name: this.name,
+                key: this.blobKey,
+                nonce: this.blobNonce
+            };
+        }
         return {
-            name: this.name,
-            key: this.key,
-            nonce: this.nonce
+            descriptorKey: this.descriptorKey
         };
     }
 
     @action deserializeKegPayload(data) {
-        this.name = data.name;
-        this.key = data.key;
-        this.nonce = data.nonce;
+        if (!this.format) {
+            this.name = data.name;
+            this.blobKey = data.key;
+            this.blobNonce = data.nonce;
+        } else {
+            this.descriptorKey = data.descriptorKey;
+        }
     }
 
     serializeProps() {
         return {
             fileId: this.fileId,
-            folderId: this.folderId,
-            size: this.size,
-            ext: this.ext, // don't really need to store, since it's computed, but we want to search by extension
-            uploadedAt: this.uploadedAt.valueOf(),
-            chunkSize: this.chunkSize
+            folderId: this.folderId
         };
     }
 
     @action deserializeProps(props) {
         this.fileId = props.fileId;
         this.folderId = props.folderId;
-        this.readyForDownload = props.fileProcessingState === 'ready' || !!props.sharedBy;
-        this.size = +props.size;
-        this.uploadedAt = new Date(+props.uploadedAt);
-        this.fileOwner = props.owner || this.owner;
-        this.sharedBy = props.sharedBy;
-        this.chunkSize = +props.chunkSize;
-        this.shared = props.shared;
+        if (!this.format) {
+            this.readyForDownload = true;
+            this.size = +props.size;
+            this.uploadedAt = new Date(+props.uploadedAt);
+            this.fileOwner = props.owner || this.owner;
+            this.sharedBy = props.sharedBy;
+            this.chunkSize = +props.chunkSize;
+            this.shared = props.shared;
+        }
+    }
+
+    async serializeDescriptor() {
+        let payload = {
+            name: this.name,
+            blobKey: this.blobKey,
+            blobNonce: this.blobNonce
+        };
+        payload = JSON.stringify(payload);
+        payload = secret.encryptString(payload, cryptoUtil.b64ToBytes(this.descriptorKey));
+
+        let signature = await signDetached(payload, getUser().signKeys.secretKey);
+        signature = cryptoUtil.bytesToB64(signature);
+
+        const descriptor = {
+            fileId: this.fileId,
+            payload: payload.buffer,
+            ext: this.ext,
+            format: this.descriptorFormat,
+            signature,
+            signedBy: getUser().username
+        };
+        return descriptor;
+    }
+    deserializeDescriptor(d) {
+        if (this.fileId && this.fileId !== d.fileId) throw new Error('Descriptor fileId mismatch');
+        if (!this.descriptorKey) {
+            // this is a legacy file, owner migrated it and by default descriptorKey == blobKey during migration
+            this.descriptorKey = this.blobKey;
+        }
+        this.uploadedAt = new Date(+d.createdAt);
+        this.updatedAt = new Date(+d.updatedAt);
+        this.readyForDownload = d.blobAvailable;
+        this.fileOwner = d.owner;
+        this.sharedBy = '';// TODO: maybe
+        this.chunkSize = +d.chunkSize;
+        this.size = +d.size;
+        this.descriptorFormat = d.format;
+        this.shared = d.shared;
+        this.role = d.effectiveRole;
+        this.descriptorVersion = d.version;
+        let payload = new Uint8Array(d.payload);
+        payload = secret.decryptString(payload, cryptoUtil.b64ToBytes(this.descriptorKey));
+        payload = JSON.parse(payload);
+        this.name = payload.name;
+        this.blobKey = payload.blobKey;
+        this.blobNonce = payload.blobNonce;
+    }
+
+    async createDescriptor() {
+        const descriptor = await this.serializeDescriptor();
+        descriptor.size = this.size;
+        descriptor.chunkSize = this.chunkSize;
+        return socket.send('/auth/file/descriptor/create', descriptor, true);
+    }
+
+    async updateDescriptor() {
+        const descriptor = await this.serializeDescriptor();
+        const version = this.descriptorVersion + 1;
+        descriptor.version = version;
+        return socket.send('/auth/file/descriptor/update', descriptor, true)
+            .then(() => {
+                // in case descriptor was updated while waiting for response
+                if (this.descriptorVersion + 1 === version) {
+                    this.descriptorVersion = version;
+                }
+            });
     }
 
     /**
-     * Share file with contacts
-     * @param {Contact|Array<Contact>|ObservableArray<Contact>} contactOrContacts
+     * Shares file with a chat (creates a copy of the keg)
+     * @param {Chat} any chat instance
      * @returns {Promise}
      * @public
      */
-    share(contactOrContacts) {
-        const contacts =
-            (Array.isArray(contactOrContacts) || isObservableArray(contactOrContacts))
-                ? contactOrContacts
-                : [contactOrContacts];
-
-        // Generate a new random payload key.
-        const payloadKey = cryptoUtil.getRandomBytes(32);
-
-        // Serialize payload.
-        const payload = JSON.stringify(this.serializeKegPayload());
-
-        // Encrypt payload with the payload key.
-        const encryptedPayload = secret.encryptString(payload, payloadKey);
-
-        // Encrypt message key for each recipient's public key.
-        //
-        // {
-        //   "user1": { "publicKey": ..., "encryptedKey": ... },
-        //   "user2": { "publicKey": ..., "encryptedKey": ... }
-        //   ...
-        //  }
-        //
-        const recipients = {};
-        contacts.forEach(contact => {
-            recipients[contact.username] = {
-                publicKey: cryptoUtil.bytesToB64(contact.encryptionPublicKey),
-                encryptedPayloadKey: cryptoUtil.bytesToB64(
-                    secret.encrypt(payloadKey, getUser().getSharedKey(contact.encryptionPublicKey))
-                )
-            };
-        });
-
-        const data = {
-            recipients,
-            originalKegId: this.id,
-            keg: {
-                type: this.type,
-                payload: encryptedPayload.buffer,
-                // todo: this is questionable, could we leak properties we don't want to this way?
-                // todo: on the other hand we can forget to add properties that we do want to share
-                props: this.serializeProps()
-            }
-        };
-
-        // when we implement key change history, this will help to figure out which key to use
-        // this properties should not be blindly trusted, recipient verifies them
-        data.keg.props.sharedKegSenderPK = cryptoUtil.bytesToB64(getUser().encryptionKeys.publicKey);
-
-        return retryUntilSuccess(() => socket.send('/auth/kegs/share', data));
+    share(chat) {
+        return this.copyTo(chat.db, getFileStore());
     }
 
     /**
@@ -452,7 +484,10 @@ class File extends Keg {
         this._resetUploadState();
         this._resetDownloadState();
         if (!this.id) return Promise.resolve();
-        return retryUntilSuccess(() => super.remove(), `remove file ${this.id}`, 3)
+        return retryUntilSuccess(
+            () => super.remove(),
+            `remove file ${this.id} from ${this.db.id}`,
+            5)
             .then(() => { this.deleted = true; });
     }
 
@@ -466,14 +501,14 @@ class File extends Keg {
     rename(newName) {
         return retryUntilSuccess(() => {
             this.name = newName;
-            return this.saveToServer()
+            return this.updateDescriptor()
                 .catch(err => {
-                    if (err instanceof ServerError && err.code === ServerError.codes.malformedRequest) {
-                        return this.load();
+                    if (err && err.code === ServerError.codes.malformedRequest) {
+                        return this.load(); // mitigating optimistic concurrency issues
                     }
                     return Promise.reject(err);
                 });
-        }, 5);
+        }, undefined, 5);
     }
 
     tryToCacheTemporarily(force) {
@@ -485,6 +520,46 @@ class File extends Keg {
             || this.cachingFailed) return;
 
         this.downloadToTmpCache();
+    }
+
+    ensureLoaded() {
+        return asPromise(this, 'loaded', true);
+    }
+
+    /**
+     * Copies this file keg to another db
+     * @param {KegDb} db
+     */
+    copyTo(db, store, folderId) {
+        return retryUntilSuccess(() => {
+            // to avoid creating empty keg
+            return socket.send('/auth/kegs/db/query', {
+                kegDbId: db.id,
+                type: 'file',
+                filter: { fileId: this.fileId }
+            }, false)
+                .then(resp => {
+                    // file already exists in this db
+                    if (resp.kegs.length) {
+                        const existingKeg = new File(db, store);
+                        existingKeg.loadFromKeg(resp.kegs[0]);
+                        existingKeg.folderId = folderId;
+                        return existingKeg.saveToServer();
+                    }
+                    const file = new File(db, store);
+                    file.descriptorKey = this.descriptorKey;
+                    file.fileId = this.fileId;
+                    file.folderId = folderId;
+                    return file.saveToServer()
+                        .catch(err => {
+                            if (err && err.code === ServerError.codes.fileKegAlreadyExists) {
+                                // need to delete empty keg
+                                return file.remove();
+                            }
+                            return Promise.reject(err);
+                        });
+                });
+        }, `copying ${this.fileId} to ${db.id}`, 10);
     }
 }
 

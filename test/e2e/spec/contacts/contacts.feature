@@ -45,3 +45,16 @@ Feature: Contact management
         And   I confirm the primary email
         When  I restart
         Then  I don't have pending dm
+
+    Scenario: Sending email templates
+        Given I create my account
+        When  I invite someone to Peerio
+        Then  they receive Peerio templated email
+        And   Peerio invites default to Peerio templated email
+        And   I restart without login
+        Given I create a MedCryptor account
+        When  I invite a MedCryptor doctor
+        Then  they receive MedCryptor doctor templated email
+        When  I invite a MedCryptor patient
+        Then  they receive MedCryptor patient templated email
+        And   MedCryptor invites default to doctor templated email

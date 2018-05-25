@@ -40,3 +40,7 @@ When('I restart without login', function() {
     return this.app.restart();
 });
 
+Given('I create a MedCryptor account', { timeout: 60000 }, async function() {
+    this.ice.config.appLabel = 'medcryptor';
+    await this.createAccount();
+});

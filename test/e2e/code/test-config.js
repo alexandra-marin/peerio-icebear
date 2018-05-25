@@ -15,6 +15,10 @@ module.exports = {
     emailConfirmUrlRegex: /"(https:\/\/hocuspocus\.peerio\.com\/confirm-address\/.*?)"/,
     // email subject when receiving a Peerio email invitation to join from another user
     inviteEmailSubject: 'Firstname Lastname has invited you to Peerio (Staging)!',
+    // email subject when receiving a MC doctor email invitation to join from a MC admin/doctor
+    inviteEmailSubjectMCDoctor: 'Firstname Lastname has invited you to Medcryptor!',
+    // email subject when receiving a Peerio email invitation to join from an MC user
+    inviteEmailSubjectMCPatient: 'Your doctor wants to connect with you on Peerio',
     // will output every websocket message, incoming and outgoing to console
     logSocketMessages: false,
     // will output application logs to console

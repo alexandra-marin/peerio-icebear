@@ -1,5 +1,7 @@
 const { Then, When } = require('cucumber');
-const { getRandomUsername, getRandomEmail } = require('../helpers/random-data');
+const { getRandomUsername } = require('../helpers/random-data');
+const { waitForEmail } = require('../helpers/maildrop');
+const testConfig = require('../test-config');
 
 async function findContact(query) {
     const contact = this.ice.contactStore.getContact(query);
@@ -49,8 +51,7 @@ When('the test account is not my favorite contact', function() {
 });
 
 When('I invite random email', function() {
-    this.invitedEmail = getRandomEmail();
-    return this.ice.contactStore.invite(this.invitedEmail);
+    return this.inviteRandomEmail();
 });
 
 When('I create a test account with invited email', function() {
@@ -73,4 +74,38 @@ Then('I don\'t have pending dm', async function() {
     await this.waitFor(() => !c.loading, 5000);
     expect(!!this.ice.chatStore.directMessages.find(
         chat => chat.isInvite && chat.username === c.username)).to.be.false;
+});
+
+When('I invite someone to Peerio', async function() {
+    return this.inviteRandomEmailWithTemplate('peerio');
+});
+
+When('I invite a MedCryptor doctor', async function() {
+    return this.inviteRandomEmailWithTemplate('medcryptor-doctor');
+});
+
+When('I invite a MedCryptor patient', function() {
+    return this.inviteRandomEmailWithTemplate('medcryptor-patient');
+});
+
+Then('they receive Peerio templated email', { timeout: 120000 }, async function() {
+    return waitForEmail(this.invitedEmail, testConfig.inviteEmailSubject);
+});
+
+Then('they receive MedCryptor doctor templated email', { timeout: 120000 }, async function() {
+    return waitForEmail(this.invitedEmail, testConfig.inviteEmailSubjectMCDoctor);
+});
+
+Then('they receive MedCryptor patient templated email', { timeout: 120000 }, async function() {
+    return waitForEmail(this.invitedEmail, testConfig.inviteEmailSubjectMCPatient);
+});
+
+Then('Peerio invites default to Peerio templated email', { timeout: 120000 }, async function() {
+    await this.inviteRandomEmail();
+    await waitForEmail(this.invitedEmail, testConfig.inviteEmailSubject);
+});
+
+Then('MedCryptor invites default to doctor templated email', { timeout: 120000 }, async function() {
+    await this.inviteRandomEmail();
+    await waitForEmail(this.invitedEmail, testConfig.inviteEmailSubjectMCDoctor);
 });

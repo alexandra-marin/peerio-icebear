@@ -440,8 +440,8 @@ class ContactStore {
      * @returns {Promise}
      * @public
      */
-    invite(email) {
-        return socket.send('/auth/contacts/invite', { email })
+    invite(email, context) {
+        return this.inviteNoWarning(email, context)
             .then(() => {
                 warnings.add('snackbar_contactInvited');
             })
@@ -456,8 +456,8 @@ class ContactStore {
      * @returns {Promise}
      * @public
      */
-    inviteNoWarning(email) {
-        return socket.send('/auth/contacts/invite', { email });
+    inviteNoWarning(email, context) {
+        return socket.send('/auth/contacts/invite', { email, context });
     }
 
     _merge(usernames) {

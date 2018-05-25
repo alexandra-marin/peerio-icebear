@@ -1,7 +1,7 @@
 const { setWorldConstructor } = require('cucumber');
 const { getUrl } = require('./helpers/https');
 const { waitForEmail } = require('./helpers/maildrop');
-const { getRandomUsername } = require('./helpers/random-data');
+const { getRandomUsername, getRandomEmail } = require('./helpers/random-data');
 const testConfig = require('./test-config');
 
 /**
@@ -92,6 +92,16 @@ class PeerioAppWorld {
 
     createTestAccount = async (username = null, email = null) => {
         return this.createAccount(username, email, true);
+    }
+
+    inviteRandomEmail = async () => {
+        this.invitedEmail = getRandomEmail();
+        await this.ice.contactStore.invite(this.invitedEmail);
+    }
+
+    inviteRandomEmailWithTemplate = async (template) => {
+        this.invitedEmail = getRandomEmail();
+        await this.ice.contactStore.invite(this.invitedEmail, template);
     }
 }
 

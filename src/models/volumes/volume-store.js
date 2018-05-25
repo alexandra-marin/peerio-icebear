@@ -104,6 +104,7 @@ class VolumeStore {
     }
 
     @action unloadVolume(volume) {
+        volume.deleted = true;
         volume.dispose();
         delete this.volumeMap[volume.id];
         this.volumes.remove(volume);

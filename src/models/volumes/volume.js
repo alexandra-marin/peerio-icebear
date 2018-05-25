@@ -23,6 +23,7 @@ class Volume extends FileFolder {
 
     @observable loadingMeta = false;
     @observable metaLoaded = false;
+    @observable deleted = false;
 
     @observable convertingFromFolder = false;
 

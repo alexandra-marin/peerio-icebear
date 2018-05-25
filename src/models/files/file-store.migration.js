@@ -23,7 +23,7 @@ class FileStoreMigration {
 
     @observable pending = false;
     @observable started = false;
-    @observable progress = 0;
+    @observable progress = 1;
     @observable performedByAnotherClient = false;
     @observable.shallow legacySharedFiles = null;
 

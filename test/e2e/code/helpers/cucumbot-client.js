@@ -1,5 +1,6 @@
 const cp = require('child_process');
 const CucumbotBase = require('./cucumbot-base');
+const testConfig = require('../test-config');
 
 class CucumbotClient extends CucumbotBase {
     finished = false;
@@ -12,7 +13,11 @@ class CucumbotClient extends CucumbotBase {
         this.name = name;
     }
 
-    start() {
+    start(noAccount) {
+        let env = Object.assign({ CUCUMBOT: 1 }, process.env);
+        if (noAccount) {
+            env = Object.assign({ CUCUMBOT_DONT_CREATE_ACCOUNT: 1 }, env);
+        }
         const child = cp.spawn(
             'node',
             [
@@ -28,7 +33,7 @@ class CucumbotClient extends CucumbotBase {
             ],
             {
                 stdio: [null, 'pipe', 'pipe', 'ipc'], // stdin, stdout, stderr, + open ipc channel
-                env: Object.assign({ CUCUMBOT: 1 }, process.env)
+                env
             }
         );
 
@@ -41,10 +46,12 @@ class CucumbotClient extends CucumbotBase {
             this.emit('finished');
         });
 
-        child.stdout.on('data', data => {
-            const msg = data.toString().split('\n');
-            msg.forEach(m => console._log('CUCUMBOT:', m));
-        });
+        if (!testConfig.muteCucumbot) {
+            child.stdout.on('data', data => {
+                const msg = data.toString().split('\n');
+                msg.forEach(m => m && console._log('>>>>>>BOT:', m));
+            });
+        }
 
         this.botProcess = child;
 

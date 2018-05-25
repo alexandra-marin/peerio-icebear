@@ -1,35 +1,13 @@
 const { When, Then } = require('cucumber');
+const { startDmWithCucumbot, sendMessage, findIncomingMessage, findAnyMessage } = require('./dm.helpers');
 
-async function startDm() {
-    const contact = this.ice.contactStore.getContact((this.cucumbotClient || this.cucumbotServer).username);
-    await contact.ensureLoaded();
-    const chat = this.ice.chatStore.startChat([contact]);
-    await this.waitFor(() => !!this.ice.chatStore.activeChat);
-    chat.id.should.be.equal(this.ice.chatStore.activeChat.id);
-}
-When('I start a DM with Cucumbot', startDm);
-When('Cucumbot starts a DM with me', startDm);
+When('I start a DM with Cucumbot', { timeout: 40000 }, startDmWithCucumbot);
+When('Cucumbot starts a DM with me', { timeout: 40000 }, startDmWithCucumbot);
+When('I send a message {string}', { timeout: 40000 }, sendMessage);
+When('Cucumbot sends a message {string}', { timeout: 40000 }, sendMessage);
+Then('Cucumbot receives a message {string}', { timeout: 40000 }, findIncomingMessage);
+Then('Cucumbot receives own message {string}', { timeout: 40000 }, findAnyMessage);
+Then('I receive a message {string}', { timeout: 40000 }, findIncomingMessage);
+Then('I receive own message {string}', { timeout: 40000 }, findAnyMessage);
 
-// -----------------------
-
-async function sendMessage(string) {
-    await this.waitFor(() => this.ice.chatStore.activeChat && this.ice.chatStore.activeChat.metaLoaded);
-    return this.ice.chatStore.activeChat.sendMessage(string);
-}
-When('I send a message {string}', sendMessage);
-When('Cucumbot sends a message {string}', sendMessage);
-
-// -----------------------
-
-function findIncomingMessage(string) {
-    return this.waitFor(
-        () => {
-            return this.ice.chatStore.activeChat
-                && this.ice.chatStore.activeChat.messages
-                    .find(m => m.text === string && m.sender.username !== this.username);
-        }
-    );
-}
-Then('Cucumbot receives a message {string}', findIncomingMessage);
-Then('I receive a message {string}', findIncomingMessage);
-
+module.exports = { startDmWithCucumbot };

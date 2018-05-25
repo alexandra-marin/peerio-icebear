@@ -4,8 +4,8 @@
  * @protected
  */
 
-const socket = require('../network/socket');
 const errors = require('../errors');
+const tracker = require('../models/update-tracker');
 
 const maxRetryCount = 120; // will bail out after this amount of retries
 const minRetryInterval = 1000; // will start with this interval between retries
@@ -30,7 +30,7 @@ function retryUntilSuccess(fn, id = Math.random(), maxRetries = maxRetryCount, t
     // don't make parallel calls
     if (!thisIsRetry && callInfo) return callInfo.promise;
     if (!callInfo) {
-        callInfo = { retryCount: 0, maxRetries };
+        callInfo = { retryCount: 0, maxRetries, fatalErrorCount: 0 };
         callInfo.promise = new Promise((resolve, reject) => {
             callInfo.resolve = resolve;
             callInfo.reject = reject;
@@ -41,9 +41,12 @@ function retryUntilSuccess(fn, id = Math.random(), maxRetries = maxRetryCount, t
         callInfo.resolve(res);
         delete callsInProgress[id];
     }).catch(err => {
+        console.error(err);
         callInfo.lastError = err;
+        if (err && err.code === 404) {
+            callInfo.fatalErrorCount++;
+        }
         scheduleRetry(fn, id);
-        console.debug(err);
     });
 
     return callInfo.promise;
@@ -51,7 +54,7 @@ function retryUntilSuccess(fn, id = Math.random(), maxRetries = maxRetryCount, t
 // todo: don't retry if throttled
 function scheduleRetry(fn, id) {
     const callInfo = callsInProgress[id];
-    if (callInfo.retryCount++ > callInfo.maxRetries) {
+    if (callInfo.retryCount++ > callInfo.maxRetries || callInfo.fatalErrorCount > 2) {
         console.error(`Maximum retry count reached for action id ${id}. Giving up, rejecting promise.`);
         console.debug(fn);
         callInfo.reject(errors.normalize(callInfo.lastError));
@@ -59,8 +62,11 @@ function scheduleRetry(fn, id) {
     }
     const delay = minRetryInterval + Math.min(maxRetryInterval, (callInfo.retryCount * retryIntervalMultFactor));
     console.debug(`Retrying ${id} in ${delay} second`);
-    setTimeout(() => socket.onceAuthenticated(() => retryUntilSuccess(fn, id, callInfo.maxRetries, true)), delay);
+    setTimeout(() => tracker.onceUpdated(() => retryUntilSuccess(fn, id, callInfo.maxRetries, true)), delay);
 }
 
+function isRunning(id) {
+    return !!callsInProgress[id];
+}
 
-module.exports = { retryUntilSuccess };
+module.exports = { retryUntilSuccess, isRunning };

@@ -11,7 +11,7 @@ class TofuStore {
 
     // todo: paging
     @action.bound load() {
-        if (this.loading) return;
+        if (this.loading || this.loaded) return;
         this.loading = true;
 
         console.log('Precaching tofu kegs');
@@ -21,7 +21,7 @@ class TofuStore {
                 type: 'tofu',
                 reverse: false
             }
-        }).then(res => {
+        }, false).then(res => {
             if (!res.kegs || !res.kegs.length) {
                 return;
             }
@@ -43,6 +43,7 @@ class TofuStore {
             this.preCacheRequests = [];
         }).finally(() => {
             this.loaded = true;
+            this.loading = false;
         });
     }
 
@@ -68,7 +69,7 @@ class TofuStore {
                 reverse: false
             },
             filter: { username }
-        }).then(res => {
+        }, false).then(res => {
             if (!res.kegs || !res.kegs.length) return null;
             const keg = new Tofu(getUser().kegDb);
             keg.loadFromKeg(res.kegs[0]); // TODO: detect and delete excess? shouldn't really happen though

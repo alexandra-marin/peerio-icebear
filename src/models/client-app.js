@@ -91,7 +91,7 @@ class ClientApp {
         return socket.connected && !(
             getChatStore().updatedAfterReconnect
             && getFileStore().updatedAfterReconnect
-            && tracker.updatedAfterReconnect
+            && tracker.updated
         );
     }
 

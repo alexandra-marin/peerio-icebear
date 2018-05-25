@@ -13,8 +13,8 @@ const testConfig = require('./test-config');
  *
  * GOTCHAS:
  * 1. Do not require any modules from test files, except cucumber and actual test code.
- * 2. Do not cache any of the things that App exposes, always use fully qualified path (this.ice.socket.connected)
- *    if you will put, let's say `this.ice.socket` to some local variable it might fail to collect next cycle.
+ * 2. Do not cache any of the things that App exposes, always use fully qualified path (ice.socket.connected)
+ *    if you will put, let's say `ice.socket` to some local variable it might fail to collect next cycle.
  * 3. Do not use arrow functions in step definitions `Then('step',()=>{})`.
  *    Arrow function will get bound to a wrong object and you won't be able to access the world.
  * 4. One scenario can have multiple App instances. But one App instance can only belong to one scenario (world).
@@ -55,10 +55,11 @@ class App {
         cfg.os = os.type();
         cfg.FileStream = FileStream;
         cfg.StorageEngine = StorageEngine;
-        cfg.StorageEngine.storageFolder = path.join(os.homedir(), '.peerio-icebear-tests');
+        cfg.StorageEngine.storageFolder = path.join(os.homedir(),
+            process.env.CUCUMBOT ? '.peerio-icebear-tests-cucumbot' : '.peerio-icebear-tests');
         cfg.socketServerUrl = testConfig.socketServerUrl;
         if (testConfig.logSocketMessages) {
-            cfg.debug = { trafficReportInterval: 5000, socketLogEnabled: true };
+            cfg.debug = { trafficReportInterval: 15000, socketLogEnabled: true };
         }
     }
 
@@ -88,8 +89,8 @@ class App {
                 (args[0] && args[0].name === 'DisconnectedError')
                 || (args[1] && args[1].name === 'DisconnectedError')
             ) return;
-
-            let line = `${type}${new Date().toISOString()}: `;
+            const d = new Date();
+            let line = `${type}${d.getMinutes()}:${d.getSeconds()}.${d.getMilliseconds()}: `;
             for (let i = 0; i < args.length; i++) {
                 if (typeof args[i] === 'object') {
                     line += `${safeJsonStringify(args[i])} `;
@@ -127,7 +128,7 @@ class App {
         console.log('===== STARTING TEST APP =====');
         App.lastInstanceDisposed = false;
         this._setupChai();
-        this.world.ice = require('~/');
+        global.ice = this.world.ice = require('~/');
         this._configure();
         this._addLibraries();
         this.world.ice.socket.start();
@@ -148,6 +149,7 @@ class App {
 
         // deleting module references
         delete this.world.ice;
+        delete global.ice;
         delete this.world.libs;
     }
 
@@ -157,14 +159,18 @@ class App {
         console.log('===== STOPPING TEST APP =====');
         const { when } = require('mobx');
         // closing connections
+        console.log('closing connection');
         this.world.ice.socket.close();
+        this.world.ice.socket.dispose();
         return new Promise((resolve) => {
             when(() => !this.world.ice.socket.connected, async () => {
+                console.log('clearing tinydb');
                 // delete TinyDbs
                 if (this.world.ice.TinyDb.user) await this.world.ice.TinyDb.user.clear();
                 await this.world.ice.TinyDb.system.clear();
-
+                console.log('clearing modules');
                 this._clearModuleCache();
+                console.log('invoking GC');
                 // hell, yeah
                 if (global.gc) global.gc();
                 this.started = false;

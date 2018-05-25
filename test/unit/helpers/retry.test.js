@@ -1,12 +1,12 @@
 const { retryUntilSuccess } = require('~/helpers/retry');
-const socket = require('~/network/socket');
+const tracker = require('~/models/update-tracker');
 const { performance } = require('perf_hooks');
 
 describe('Retry helper should', function() {
     this.timeout(50000);
 
     before(() => {
-        socket.authenticated = true;
+        tracker.updated = true;
     });
 
     it('resolve immediately', async () => {

@@ -1,4 +1,3 @@
-const socket = require('../../network/socket');
 const tracker = require('../update-tracker');
 const { retryUntilSuccess } = require('../../helpers/retry');
 const TaskQueue = require('../../helpers/task-queue');
@@ -18,11 +17,17 @@ const warnings = require('../warnings');
 class SyncedKeg extends Keg {
     constructor(kegName, db, plaintext = false, forceSign = false, allowEmpty = true, storeSignerData = false) {
         super(kegName, kegName, db, plaintext, forceSign, allowEmpty, storeSignerData);
-        // this will make sure we'll update every time server sends a new digest
-        // it will also happen after reconnect, because digest is always refreshed on reconnect
-        tracker.onKegTypeUpdated(db.id, kegName, this._enqueueLoad);
+
         // this will load initial data
-        socket.onceAuthenticated(this._enqueueLoad);
+        tracker.onceUpdated(() => {
+            // this is hacky, but there's no better way unless we refactor login seriously
+            // the problem is with failed login leaving synced keg instances behind without cleaning up subscription
+            if (!this.db.boot || !this.db.boot.keys) return;
+            // this will make sure we'll update every time server sends a new digest
+            // it will also happen after reconnect, because digest is always refreshed on reconnect
+            tracker.subscribeToKegUpdates(db.id, kegName, this._enqueueLoad);
+            this._enqueueLoad();
+        });
     }
 
     _syncQueue = new TaskQueue(1, 0);
@@ -34,29 +39,12 @@ class SyncedKeg extends Keg {
     _loadKeg = () => retryUntilSuccess(() => {
         // do we even need to update?
         const digest = tracker.getDigest(this.db.id, this.type);
-        if (this.collectionVersion !== null) {
-            const amISpamming = this.amISpammingServerDueToIndexErrors(this.collectionVersion, digest.maxUpdateId);
-            if (this.collectionVersion >= digest.maxUpdateId || amISpamming) {
-                this.loaded = true;
-                return Promise.resolve();
-            }
+        if (this.collectionVersion !== null && this.collectionVersion >= digest.maxUpdateId) {
+            this.loaded = true;
+            return Promise.resolve();
         }
-        return this.lastRequest && this.lastRequest.requestCount > 0
-            ? Promise.delay(this.lastRequest.requestCount * 500).then(this.reload)
-            : this.reload();
+        return this.reload();
     });
-
-    lastRequest = null;
-    amISpammingServerDueToIndexErrors(collVersion, maxUpdateId) {
-        if (!this.lastRequest
-            || this.lastRequest.collVersion !== collVersion
-            || this.lastRequest.maxUpdateId !== maxUpdateId) {
-            this.lastRequest = { collVersion, maxUpdateId, requestCount: 0 };
-            return false;
-        }
-        if (this.lastRequest.requestCount++ > 10) return true;
-        return false;
-    }
 
     /**
      * Forces updating keg data from server
@@ -110,6 +98,7 @@ class SyncedKeg extends Keg {
 
                 return this.saveToServer()
                     .then(() => {
+                        tracker.seenThis(this.db.id, this.type, this.collectionVersion);
                         this.onSaved();
                     })
                     .tapCatch(() => {

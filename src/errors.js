@@ -121,9 +121,9 @@ const serverErrorCodes = {
     usernameIsTaken: 431,
     forbiddenUsername: 432,
     forbiddenName: 433,
-    accountMigrationRequired: 434,
     captchaPending: 435,
     incorrectTimestamp: 442,
+    fileKegAlreadyExists: 480,
     accountClosed: 488,
     responseValidationError: 501
 };
@@ -148,6 +148,7 @@ function ServerError(code, msg) {
     const error = Error.call(this, this.message);
     this.name = `ServerError: ${code}: ${type}`;
     this.code = code;
+    this.error = code; // I always forget which one is it, code or error, so let it be both
     this.stack = error.stack;
 }
 

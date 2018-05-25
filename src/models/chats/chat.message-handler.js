@@ -8,8 +8,7 @@ const config = require('../../config');
 const { retryUntilSuccess } = require('../../helpers/retry');
 const { reaction, action } = require('mobx');
 const clientApp = require('../client-app');
-const _ = require('lodash');
-const { ServerError } = require('../../errors');
+const errorCodes = require('../../errors').ServerError.codes;
 const { getChatStore } = require('../../helpers/di-chat-store');
 
 /**
@@ -20,7 +19,8 @@ const { getChatStore } = require('../../helpers/di-chat-store');
 class ChatMessageHandler {
     constructor(chat) {
         this.chat = chat;
-        tracker.onKegTypeUpdated(chat.id, 'message', this.onMessageDigestUpdate);
+        // asynchronously. to avoid changing unreadCount in reaction to unreadCount change
+        tracker.subscribeToKegUpdates(chat.id, 'message', () => setTimeout(this.onMessageDigestUpdate));
         this.onMessageDigestUpdate();
         this._reactionsToDispose.push(reaction(
             () => this.chat.active && clientApp.isInChatsView && clientApp.isReadingNewestMessages,
@@ -34,15 +34,15 @@ class ChatMessageHandler {
                 }
             }
         ));
-        this._reactionsToDispose.push(reaction(() => tracker.updatedAfterReconnect, (authenticated) => {
-            if (authenticated) {
+        this._reactionsToDispose.push(reaction(() => tracker.updated, (updated) => {
+            if (updated) {
                 this.onMessageDigestUpdate();
             } else {
                 this.chat.updatedAfterReconnect = false;
             }
         }));
         this._reactionsToDispose.push(reaction(
-            () => tracker.updatedAfterReconnect
+            () => tracker.updated
                 && this.chat.active
                 && clientApp.isFocused
                 && clientApp.isInChatsView
@@ -84,16 +84,15 @@ class ChatMessageHandler {
         }, 15000);
     }
 
-    // one of the reasons to throttle is to avoid changing unreadCount observable inside a reaction to it's change
-    onMessageDigestUpdate = _.throttle(() => {
+    onMessageDigestUpdate = () => {
         const msgDigest = tracker.getDigest(this.chat.id, 'message');
         this.chat.unreadCount = msgDigest.newKegsCount;
         this.maxUpdateId = msgDigest.maxUpdateId;
         this.loadUpdates();
-    }, 250);
+    }
 
     loadUpdates() {
-        if (!(this.chat.mostRecentMessageLoaded || this.chat.initialPageLoaded)) return;
+        if (!(this.chat.mostRecentMessageLoaded || this.chat.initialPageLoaded) || !socket.authenticated) return;
         if (this.chat.canGoDown || this.downloadedUpdateId >= this.maxUpdateId) {
             this.chat.updatedAfterReconnect = true;
             return;
@@ -114,7 +113,7 @@ class ChatMessageHandler {
                 reverse: false
             },
             filter
-        })
+        }, false)
             .tapCatch(() => { this._loadingUpdates = false; })
             .then(action(resp => {
                 this._loadingUpdates = false;
@@ -132,7 +131,7 @@ class ChatMessageHandler {
                 this.chat.updatedAfterReconnect = true;
             }))
             .catch((err) => {
-                if (err && err.code === ServerError.codes.accessForbidden) {
+                if (err && err.code === errorCodes.accessForbidden) {
                     getChatStore().unloadChat(this.chat);
                 } else {
                     this.onMessageDigestUpdate();
@@ -149,7 +148,7 @@ class ChatMessageHandler {
         this._markAsSeenTimer = setTimeout(() => {
             this._markAsSeenTimer = null;
             if (!clientApp.isFocused || !clientApp.isInChatsView || !this.chat.active) return;
-            tracker.seenThis(this.chat.id, 'message', this.downloadedUpdateId);
+            tracker.seenThis(this.chat.id, 'message', this.downloadedUpdateId, false);
         }, this._getTimeoutValue(this.chat.unreadCount));
     }
 
@@ -176,7 +175,7 @@ class ChatMessageHandler {
                 offset: 0,
                 count: 1
             }
-        }))
+        }, false))
             .then(action(resp => {
                 this.setDownloadedUpdateId(resp.kegs);
                 this.chat.mostRecentMessageLoaded = true;
@@ -198,7 +197,7 @@ class ChatMessageHandler {
                 offset: 0,
                 count: config.chat.initialPageSize
             }
-        }))
+        }, false))
             .then(action(resp => {
                 this.chat.canGoUp = resp.hasMore;
                 this.chat.initialPageLoaded = true;
@@ -211,7 +210,7 @@ class ChatMessageHandler {
                 return this.chat.addMessages(resp.kegs);
             }))
             .catch((err) => {
-                if (err && err.code === ServerError.codes.accessForbidden) {
+                if (err && err.code === errorCodes.accessForbidden) {
                     getChatStore().unloadChat(this.chat);
                 } else {
                     throw err;
@@ -248,9 +247,9 @@ class ChatMessageHandler {
                 fromKegId: startingKegId || this.chat.messages[pagingUp ? 0 : this.chat.messages.length - 1].id,
                 count: config.chat.pageSize
             }
-        }))
+        }, false))
             .catch((err) => {
-                if (err && err.code === ServerError.codes.accessForbidden) {
+                if (err && err.code === errorCodes.accessForbidden) {
                     getChatStore().unloadChat(this.chat);
                 } else {
                     throw err;

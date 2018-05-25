@@ -65,10 +65,8 @@ Feature: Room management
         Then  Cucumbot is not in the room anymore
         And   The Cucumbot is not a member of the room
 
-    # TODO: enable after serve bug fix
     # online: invite -> reject -> invite -> accept
     @BOT_room_invite_reject_invite_accept
-    @off
     Scenario: Reinvite and accept after one Invite and reject
         When  Cucumbot receives the invite
         And   Cucumbot rejects the invite

@@ -6,9 +6,9 @@ module.exports = {
     // all new test accounts will be created with this passphrase by default
     defaultPassphrase: 'passphrase',
     // which server to test against
-    socketServerUrl: 'wss://treetrunks.peerio.com',
+    socketServerUrl: 'wss://hocuspocus.peerio.com',
     // what is the subject of confirmation email user receives when creating account
-    primaryEmailConfirmSubject: 'Welcome to Peerio (Staging)! Confirm your account.',
+    primaryEmailConfirmSubject: 'Welcome to Peerio! Confirm your account.',
     // what is the subject of confirmation email user receives when adding another email to profile
     newEmailConfirmSubject: 'Please confirm your new address',
     // how to find confirmation link inside confirm email body

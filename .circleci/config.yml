@@ -33,9 +33,9 @@ jobs:
       - run:
           name: eslint
           command: npm run code:verify
-      - run:
-          name: test
-          command: npm test
+#      - run:
+#          name: test
+#          command: npm test
       - store_artifacts:
           path: test-results
           prefix: test-results

@@ -4,7 +4,7 @@ const { waitForEmail } = require('../helpers/maildrop');
 const testConfig = require('../test-config');
 
 async function findContact(query) {
-    const contact = this.ice.contactStore.getContact(query);
+    const contact = ice.contactStore.getContact(query);
     await this.waitFor(() => contact.loading === false, 5000);
     contact.notFound.should.be.false;
     return contact;
@@ -12,7 +12,7 @@ async function findContact(query) {
 
 Then('I can not find unregistered account by random username', function() {
     const username = getRandomUsername();
-    const contact = this.ice.contactStore.getContact(username);
+    const contact = ice.contactStore.getContact(username);
     return this.waitFor(() => contact.notFound === true, 5000);
 });
 
@@ -27,31 +27,32 @@ Then('I can find the test account by username', async function() {
 });
 
 Then('test account is not added to my contacts', function() {
-    expect(this.ice.contactStore
+    expect(ice.contactStore
         .contacts.find(c => c.username === this.testAccount.username))
         .to.be.undefined;
 });
 
 When('I favorite the test account', function() {
-    return this.ice.contactStore.addContact(this.testAccount.username);
+    return ice.contactStore.addContact(this.testAccount.username);
 });
 
 When('I unfavorite the test account', function() {
-    return this.ice.contactStore.removeContact(this.testAccount.username);
+    return ice.contactStore.removeContact(this.testAccount.username);
 });
 
 When('the test account is my favorite contact', function() {
-    const c = this.ice.contactStore.getContact(this.testAccount.username);
+    const c = ice.contactStore.getContact(this.testAccount.username);
     c.isAdded.should.be.true;
 });
 
 When('the test account is not my favorite contact', function() {
-    const c = this.ice.contactStore.getContact(this.testAccount.username);
+    const c = ice.contactStore.getContact(this.testAccount.username);
     c.isAdded.should.be.false;
 });
 
 When('I invite random email', function() {
-    return this.inviteRandomEmail();
+    this.invitedEmail = this.inviteRandomEmail();
+    return ice.contactStore.invite(this.invitedEmail);
 });
 
 When('I create a test account with invited email', function() {
@@ -66,7 +67,7 @@ Then('the invite is converted to pending dm', async function() {
 });
 
 When('I delete invited random email', function() {
-    return this.ice.contactStore.removeInvite(this.invitedEmail);
+    return ice.contactStore.removeInvite(this.invitedEmail);
 });
 
 Then('I don\'t have pending dm', async function() {

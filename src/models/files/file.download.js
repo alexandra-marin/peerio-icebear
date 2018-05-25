@@ -44,7 +44,7 @@ const tempExt = '.peeriodownload';
  * @memberof File
  * @public
  */
-function download(filePath, resume, isTmpCacheDownload) {
+function download(filePath, resume, isTmpCacheDownload, suppressSnackbar) {
     // we need this check because resume process will pass temp file name
     if (!filePath.endsWith(tempExt)) {
         filePath = `${filePath}${tempExt}`; // eslint-disable-line no-param-reassign
@@ -59,7 +59,7 @@ function download(filePath, resume, isTmpCacheDownload) {
         if (!isTmpCacheDownload) {
             this._saveDownloadStartFact(filePath);
         }
-        const nonceGen = new FileNonceGenerator(0, this.chunksCount - 1, cryptoUtil.b64ToBytes(this.nonce));
+        const nonceGen = new FileNonceGenerator(0, this.chunksCount - 1, cryptoUtil.b64ToBytes(this.blobNonce));
         let stream, mode = 'write';
         let p = Promise.resolve(true);
         if (resume) {
@@ -90,7 +90,7 @@ function download(filePath, resume, isTmpCacheDownload) {
             .then(action(() => {
                 if (!isTmpCacheDownload) {
                     this.cached = true; // currently for mobile only
-                    warnings.add('snackbar_downloadComplete');
+                    if (!suppressSnackbar) warnings.add('snackbar_downloadComplete');
                 } else {
                     this.tmpCached = true;
                 }

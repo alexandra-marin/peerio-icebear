@@ -40,11 +40,13 @@ const SOCKET_EVENTS = {
 
 // application events sent by app server
 const APP_EVENTS = {
-    kegsUpdateTwo: 'kegsUpdateTwo',
+    digestUpdate: 'digestUpdate',
     serverWarning: 'serverWarning',
     // clearWarning: 'clearWarning',
     channelInvitesUpdate: 'channelInvitesUpdate',
-    channelDeleted: 'channelDeleted'
+    channelDeleted: 'channelDeleted',
+    volumeDeleted: 'volumeDeleted',
+    fileMigrationUnlocked: 'fileMigrationUnlocked'
 };
 
 /**
@@ -67,7 +69,7 @@ class SocketClient {
      * @private
      */
     socket = null;
-    taskPacer = new TaskPacer(40);// todo: maybe move to config
+    taskPacer = new TaskPacer(20);// todo: maybe move to config
     /**
      * Was socket started or not
      * @public
@@ -207,18 +209,18 @@ class SocketClient {
         this.authenticated = false;
         // <DEBUG>
         if (config.debug && config.debug.trafficReportInterval > 0) {
-            const s = WebSocket.prototype.send;
+            const s = this._originalWSSend = WebSocket.prototype.send;
             WebSocket.prototype.send = function(msg) {
                 self.bytesSent += msg.length || msg.byteLength || 0;
                 if (config.debug.socketLogEnabled && typeof msg === 'string') {
-                    console.log('OUTGOING SOCKET MSG:', msg);
+                    console.log('⬆️ OUT MSG:', msg);
                 }
                 return s.call(this, msg);
             };
             setInterval(() => {
-                console.log(
-                    'SENT:', util.formatBytes(self.bytesSent),
-                    'RECEIVED:', util.formatBytes(self.bytesReceived)
+                console.log('socket stat',
+                    'sent:', util.formatBytes(self.bytesSent),
+                    'received:', util.formatBytes(self.bytesReceived)
                 );
             }, config.debug.trafficReportInterval);
         }
@@ -294,7 +296,7 @@ class SocketClient {
             this.socket.io.engine.addEventListener('message', (msg) => {
                 this.bytesReceived += msg.length || msg.byteLength || 0;
                 if (config.debug.socketLogEnabled && typeof msg === 'string') {
-                    console.log('INCOMING SOCKET MSG:', msg);
+                    console.log('⬇️ IN MSG:', msg);
                 }
             });
         }
@@ -378,10 +380,11 @@ class SocketClient {
      * Send a message to server
      * @param {string} name - api method name
      * @param {any=} data - data to send
+     * @param {?bool} hasBinaryData - if you know for sure, set this to true/false to increase performance
      * @returns {Promise<Object>} - server response, always returns `{}` if response is empty
      * @public
      */
-    send(name, data) {
+    send(name, data, hasBinaryData = null) {
         const id = this.requestId++;
         return new Promise((resolve, reject) => {
             this.awaitingRequests[id] = { name, data, reject };
@@ -401,7 +404,7 @@ class SocketClient {
                     return;
                 }
                 const handler = (resp) => {
-                    this.throttled = (resp.error === 425);
+                    this.throttled = (resp.error === ServerError.codes.accountThrottled);
                     if (resp && resp.error) {
                         if (resp.error === ServerError.codes.accountClosed) {
                             getUser().deleted = true;
@@ -411,13 +414,18 @@ class SocketClient {
                             getUser().blacklisted = true;
                             this.close();
                         }
+                        console.error(name, data, resp);
                         reject(new ServerError(resp.error, resp.message));
                         return;
                     }
                     resolve(resp);
                 };
                 // console.debug(id, name, data);
-                this.socket.emit(name, data, handler);
+                if (hasBinaryData === null) {
+                    this.socket.emit(name, data, handler);
+                } else {
+                    this.socket.binary(hasBinaryData).emit(name, data, handler);
+                }
             });
         })
             .timeout(60000)
@@ -556,6 +564,10 @@ class SocketClient {
             clearInterval(interval);
         }, 1000);
     };
+
+    dispose() {
+        if (this._originalWSSend) WebSocket.prototype.send = this._originalWSSend;
+    }
 }
 
 module.exports = SocketClient;

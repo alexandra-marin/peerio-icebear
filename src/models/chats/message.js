@@ -1,5 +1,3 @@
-// @ts-check
-
 const { observable, computed, when } = require('mobx');
 const contactStore = require('./../contacts/contact-store');
 const User = require('./../user/user');
@@ -34,6 +32,7 @@ class Message extends Keg {
         // format 1 adds richText property to payload.
         // this property will be be overwritten when keg is dehydrated from older format data,
         this.format = 1;
+        this.latestFormat = this.format;
     }
 
     static unfurlQueue = new TaskQueue(5);
@@ -153,9 +152,14 @@ class Message extends Keg {
         this.version = 0;
         this.sender = contactStore.currentUser;
         this.timestamp = new Date();
-
-        // @ts-ignore we can't use jsdoc annotations to make bluebird promises assignable to global promises!
-        return (this.systemData ? retryUntilSuccess(() => this.saveToServer()) : this.saveToServer())
+        let promise;
+        // we want to auto-retry system messages and messages containing file attachments
+        if (this.systemData || (this.files && this.files.length)) {
+            promise = retryUntilSuccess(() => this.saveToServer());
+        } else {
+            promise = this.saveToServer();
+        }
+        return promise
             .catch(err => {
                 this.sendError = true;
                 console.error('Error sending message', err);
@@ -275,6 +279,17 @@ class Message extends Keg {
     }
 
     /**
+     * TODO: replace with the real thing
+     */
+    sendSharedFolder(folder) {
+        this.systemData = {
+            action: 'folder',
+            folderName: folder.name,
+            folderId: folder.folderId
+        };
+    }
+
+    /**
      * Parses message to find urls or file attachments.
      * Verifies external url type and size and fills this.inlineImages.
      * @memberof Message
@@ -354,6 +369,7 @@ class Message extends Keg {
     }
 
     serializeKegPayload() {
+        this.format = this.latestFormat;
         this.userMentions = this.text
             ? _.uniq(this.db.participants.filter((u) => this.text.match(u.mentionRegex)).map((u) => u.username))
             : [];

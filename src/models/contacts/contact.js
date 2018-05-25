@@ -284,13 +284,7 @@ class Contact {
      * @public
      */
     @observable notFound = false;
-    /**
-     * Legacy contacts can't be used so they should treated as 'notFound' but clients can inform user about legacy
-     * contact pending migration if this flag is `true` after loading is done.
-     * @member {boolean}
-     * @public
-     */
-    isLegacy = false;
+
     // to avoid parallel queries
     _waitingForResponse = false;
 
@@ -316,7 +310,7 @@ class Contact {
         }
         const usernames = Contact.smartRequestQueue.splice(0, 50); // 50 - max allowed batch size on server
         console.log(`Batch requesting ${usernames.length} lookups`);
-        socket.send('/auth/user/lookup', { string: usernames.map(u => u.username) })
+        socket.send('/auth/user/lookup', { string: usernames.map(u => u.username) }, false)
             .then(res => {
                 for (let i = 0; i < usernames.length; i++) {
                     usernames[i].resolve([res[i]]);
@@ -354,9 +348,8 @@ class Contact {
         )
             .then(action(resp => {
                 const profile = resp && resp[0] && resp[0][0] && resp[0][0].profile || null;
-                if (!profile || profile.legacy) {
+                if (!profile) {
                     this.notFound = true;
-                    this.isLegacy = !!(profile ? profile.legacy : false);
                     this._waitingForResponse = false;
                     this.loading = false;
                     return;

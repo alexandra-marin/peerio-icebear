@@ -13,7 +13,7 @@ const cryptoUtil = require('../../crypto/util');
 class FileProcessor {
     constructor(file, stream, nonceGenerator, processType) {
         this.file = file;
-        this.fileKey = cryptoUtil.b64ToBytes(file.key);
+        this.fileKey = cryptoUtil.b64ToBytes(file.blobKey);
         this.stream = stream;
         this.nonceGenerator = nonceGenerator;
         this.processType = processType;

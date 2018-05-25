@@ -147,7 +147,13 @@ class User {
      * @public
      */
     @observable secureWithTouchID = false;
-
+    /**
+     * @member {string} props
+     * @memberof User
+     * @instance
+     * @public
+     */
+    props = {};
     /**
      * Indicates 2fa state on current user.
      * @member {boolean} twoFAEnabled

@@ -61,7 +61,7 @@ class PeerioAppWorld {
         await getUrl(url);
     }
 
-    createAccount = async (username, email, isTestAccount = false) => {
+    createAccount = async (username, email, isTestAccount = false, extraProps = null) => {
         await this.libs.prombservable.asPromise(ice.socket, 'connected', true);
 
         const u = new ice.User();
@@ -71,6 +71,7 @@ class PeerioAppWorld {
         u.lastName = 'Lastname';
         u.locale = 'en';
         u.passphrase = testConfig.defaultPassphrase;
+        u.props = extraProps;
         ice.User.current = u;
         if (!isTestAccount) {
             this.username = u.username;
@@ -92,6 +93,10 @@ class PeerioAppWorld {
 
     createTestAccount = async (username = null, email = null) => {
         return this.createAccount(username, email, true);
+    }
+
+    createMedcryptorAccount = async (medcryptorData) => {
+        return this.createAccount(null, null, false, medcryptorData);
     }
 
     inviteRandomEmail = async () => {

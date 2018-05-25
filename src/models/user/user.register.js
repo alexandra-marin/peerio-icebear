@@ -30,7 +30,9 @@ module.exports = function mixUserRegisterModule() {
                     localeCode: this.locale.trim(),
                     platform: config.platform,
                     clientVersion: config.appVersion,
-                    sdkVersion: config.sdkVersion
+                    sdkVersion: config.sdkVersion,
+                    appLabel: config.appLabel,
+                    props: this.props || {}
                 };
                 if (config.appLabel) {
                     request.appLabel = config.appLabel;

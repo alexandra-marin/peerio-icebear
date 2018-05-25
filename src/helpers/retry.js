@@ -54,7 +54,7 @@ function retryUntilSuccess(fn, id = Math.random(), maxRetries = maxRetryCount, t
 // todo: don't retry if throttled
 function scheduleRetry(fn, id) {
     const callInfo = callsInProgress[id];
-    if (callInfo.retryCount++ > callInfo.maxRetries || callInfo.fatalErrorCount > 2) {
+    if (++callInfo.retryCount > callInfo.maxRetries || callInfo.fatalErrorCount > 2) {
         console.error(`Maximum retry count reached for action id ${id}. Giving up, rejecting promise.`);
         console.debug(fn);
         callInfo.reject(errors.normalize(callInfo.lastError));

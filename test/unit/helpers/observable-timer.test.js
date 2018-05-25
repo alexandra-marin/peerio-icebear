@@ -25,7 +25,7 @@ describe('Timer should', () => {
         const started = performance.now();
         timer.countUp(3);
 
-        return when(() => timer.counter === 10, () => {
+        return when(() => timer.counter === 3, () => {
             timer.stop();
             timer = null;
 

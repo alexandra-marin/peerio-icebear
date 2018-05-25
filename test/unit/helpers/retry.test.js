@@ -17,13 +17,12 @@ describe('Retry helper should', function() {
         await retryUntilSuccess(task).should.eventually.be.fulfilled;
     });
 
-    it('reject 10 times and then resolve', async () => {
+    it('reject 3 times and then resolve', async () => {
         let attemptNumber = 0;
         const task = () => new Promise((resolve, reject) => {
             attemptNumber++;
-            console.log('Attempt no', attemptNumber);
 
-            if (attemptNumber < 10) {
+            if (attemptNumber < 3) {
                 reject();
             } else {
                 resolve();
@@ -31,17 +30,19 @@ describe('Retry helper should', function() {
         });
 
         await retryUntilSuccess(task).should.be.fulfilled;
+        attemptNumber.should.equal(3);
     });
 
-    it('fail to resolve after 5 tries', async () => {
+    it('fail to resolve after 3 tries', async () => {
         let attemptNumber = 0;
         const task = () => new Promise((resolve, reject) => {
             attemptNumber++;
-            console.log('Attempt no', attemptNumber);
+            console.log('attemptNumber', attemptNumber);
             reject();
         });
 
-        await retryUntilSuccess(task, 'task 1', 5).should.be.rejected;
+        await retryUntilSuccess(task, 'task 1', 3).should.be.rejected;
+        attemptNumber.should.equal(4); // 4 because it's attempt number, first one doesn't count as retry
     });
 
     it('should add ~250ms for every failed try', async () => {
@@ -51,7 +52,6 @@ describe('Retry helper should', function() {
         const task = () => new Promise((resolve, reject) => {
             ended = performance.now();
             attemptNumber++;
-            console.log('Attempt no', attemptNumber);
 
             if (attemptNumber < 2) {
                 reject();
@@ -63,7 +63,6 @@ describe('Retry helper should', function() {
 
         await retryUntilSuccess(task).should.be.fulfilled;
         const timeout = ended - started;
-        console.log(`Timeout took ${timeout} milliseconds.`);
         timeout.should.be.above(1200).and.below(1300);
     });
 });

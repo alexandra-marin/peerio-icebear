@@ -821,8 +821,7 @@
   "title_yourRole": "Your role",
   "title_specialty": "Specialty",
   "title_countryOfPractice": "Country of practice",
- "title_selectYourSpecialty": "Select your specialty.",
+  "title_selectYourSpecialty": "Select your specialty.",
   "title_enterValidAhpra": "Please enter a valid AHPRA number.",
-  "title_selectYourRole": "Select your role.",
-  "mcr_title_zero_screen": "Find your fellow doctors and administrators"
+  "title_selectYourRole": "Select your role."
 }

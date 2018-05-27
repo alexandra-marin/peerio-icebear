@@ -242,7 +242,7 @@ class ChatStore {
 
         // aggregate all spaces by name
         const spacesMap = new Map(channelsFromASpace.map(x => [x.space.spaceName, x]));
-        
+
         // return all unique spaces
         const spaces = [...spacesMap.values()];
 

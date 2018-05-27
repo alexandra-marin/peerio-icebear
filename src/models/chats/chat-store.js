@@ -231,6 +231,24 @@ class ChatStore {
         return allRooms;
     }
 
+    @computed
+    get spaces() {
+        if (config.appLabel !== 'medcryptor') {
+            return [];
+        }
+
+        // get all channels that belong to a space
+        const channelsFromASpace = this.channels.filter(x => x.isInSpace);
+
+        // aggregate all spaces by name
+        const spacesMap = new Map(channelsFromASpace.map(x => [x.space.spaceName, x]));
+        
+        // return all unique spaces
+        const spaces = [...spacesMap.values()];
+
+        return spaces;
+    }
+
     /**
      * Does smart and efficient 'in-place' sorting of observable array.
      * Note that ObservableArray#sort creates copy of the array. This function sorts in place.

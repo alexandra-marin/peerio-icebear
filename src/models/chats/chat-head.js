@@ -54,12 +54,12 @@ class ChatHead extends SyncedKeg {
     @observable spaceDescription = null;
 
     /**
-     * @member {enum: internal / patient} spaceType
+     * @member {enum: internal / patient} spaceRoomType
      * @memberof ChatHead
      * @instance
      * @public
      */
-    @observable spaceType = null;
+    @observable spaceRoomType = null;
 
 
     serializeKegPayload() {
@@ -69,7 +69,7 @@ class ChatHead extends SyncedKeg {
             spaceId: this.spaceId,
             spaceName: this.spaceName,
             spaceDescription: this.spaceDescription,
-            spaceType: this.spaceType
+            spaceRoomType: this.spaceRoomType
         };
     }
 
@@ -79,7 +79,7 @@ class ChatHead extends SyncedKeg {
         this.spaceId = payload.spaceId || null;
         this.spaceName = payload.spaceName || null;
         this.spaceDescription = payload.spaceDescription || null;
-        this.spaceType = payload.spaceType || null;
+        this.spaceRoomType = payload.spaceRoomType || null;
     }
 }
 

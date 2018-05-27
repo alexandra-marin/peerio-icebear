@@ -46,20 +46,20 @@ const SyncedKeg = require('../kegs/synced-keg');
  * }
  * ```
  *
- *  1. Adding someone to the chat with full history access
+ *  1. Adding someone to the shared db with full history access
  *      - Create new 'username:encryptedKey' record in the most ALL key object
  *      - for this generate new ephemeral key pair, and re-encrypt all the stuff
  *      - Send a system message 'username was invited'
  *     At this point, invited user has full normal access to this keg db, BUT doesn't receive any notifications
  *     push or keg notifications. As user now has full access to the keg db she will infer invitation status
  *     from the special keg described below.
- * 2. Revoking invite or removing user from the channel
+ * 2. Revoking invite or removing user from the shared db
  *      - Delete the record for this user from ALL keys
  *      - Server deletes invite_status-username keg
  * 3. Accepting an invitation
  *      - invited user creates/undeletes invite_status-username keg with accepted:true property in it
  *      Server enables notifications when joined:true.
- * 4. Leaving a channel
+ * 4. Leaving a shared db
  *      - participant sets joined:false
  *      - admin removes user from boot keg
  *
@@ -74,13 +74,15 @@ const SyncedKeg = require('../kegs/synced-keg');
  * @param {User} user - currently authenticated user
  * @public
  */
-class ChatBootKeg extends SyncedKeg {
+class SharedDbBootKeg extends SyncedKeg {
     constructor(db, user) {
         // named kegs are pre-created, so we know the id already and only going to update boot keg
         super('boot', db, true, true, true, true);
         this.ignoreAntiTamperProtection = true;
         this.user = user;
         this.version = 1; // pre-created named keg
+        this.format = 1;
+        this.latestFormat = this.format;
     }
 
     /**
@@ -102,10 +104,10 @@ class ChatBootKeg extends SyncedKeg {
     keys = {};
 
     /**
-     * List of usernames who have access to the chat currently.
+     * List of usernames who have access to the shared DB currently.
      * This includes users pending join confirmation.
      * @member {Array<Contact>} participants
-     * @memberof ChatBootKeg
+     * @memberof SharedDbBootKeg
      * @instance
      * @public
      */
@@ -114,7 +116,7 @@ class ChatBootKeg extends SyncedKeg {
     /**
      * Subset of `this.participants`.
      * @member {Array<Contact>} admins
-     * @memberof ChatBootKeg
+     * @memberof SharedDbBootKeg
      * @instance
      * @public
      */
@@ -122,7 +124,7 @@ class ChatBootKeg extends SyncedKeg {
 
 
     /**
-     * Gives access to chat keys to a contact.
+     * Gives access to shared DB keys to a contact.
      * @param {Contact} contact
      * @public
      */
@@ -132,7 +134,7 @@ class ChatBootKeg extends SyncedKeg {
     }
 
     /**
-     * Gives access to chat keys to a contact.
+     * Gives access to shared DB keys to a contact.
      * @param {Contact} contact
      * @public
      */
@@ -142,10 +144,10 @@ class ChatBootKeg extends SyncedKeg {
 
     /**
      * Adds a new key, deprecating current key, or initializes empty boot keg with the first key.
-     * @memberof ChatBootKeg
+     * @memberof SharedDbBootKeg
      */
     addKey() {
-        if (this.dirty) throw new Error('Can not add key to chat boot keg because unsaved key exists.');
+        if (this.dirty) throw new Error('Can not add key to shared db boot keg because unsaved key exists.');
         // NOTE: if this is not the first key, we intentionally do not update `this.kegKey` and `this.kegKeyId`,
         // because it's dangerous to encrypt with the key that has not been saved yet.
         // Fields will get updated after boot keg is saved and reloaded.
@@ -187,10 +189,10 @@ class ChatBootKeg extends SyncedKeg {
     }
 
     /**
-     * Assigns a role to chat participant
+     * Assigns a role to shared db participant
      * @param {Contact} contact - contact to assign a role to
      * @param {string} role - currently can be only 'admin'
-     * @memberof ChatBootKeg
+     * @memberof SharedDbBootKeg
      */
     assignRole(contact, role) {
         if (role !== 'admin') throw new Error('Only admin role is currently supported');
@@ -206,7 +208,7 @@ class ChatBootKeg extends SyncedKeg {
      * Removes role from a participant
      * @param {Contact} contact
      * @param {string} role
-     * @memberof ChatBootKeg
+     * @memberof SharedDbBootKeg
      */
     unassignRole(contact, role) {
         if (role !== 'admin') throw new Error('Only admin role is currently supported.');
@@ -234,7 +236,7 @@ class ChatBootKeg extends SyncedKeg {
         kegKey = cryptoUtil.b64ToBytes(kegKey);
         kegKey = publicCrypto.decrypt(kegKey, this.publicKey, this.user.encryptionKeys.secretKey);
         if (kegKey === false) {
-            console.error('Failed to decrypt chat key for myself.');
+            console.error('Failed to decrypt shared db key for myself.');
             // todo: mark as invalid to prevent message loading attempts?
             return;
         }
@@ -280,7 +282,7 @@ class ChatBootKeg extends SyncedKeg {
     }
 
     serializeKegPayload() {
-        this.format = 1;
+        this.format = this.latestFormat || this.format;
         const ephemeralKeyPair = keys.generateEncryptionKeyPair();
         const ret = {};
         ret.publicKey = cryptoUtil.bytesToB64(ephemeralKeyPair.publicKey);
@@ -306,4 +308,4 @@ class ChatBootKeg extends SyncedKeg {
     }
 }
 
-module.exports = ChatBootKeg;
+module.exports = SharedDbBootKeg;

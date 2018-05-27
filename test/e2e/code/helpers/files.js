@@ -12,8 +12,8 @@ const deleteFile = filename => {
     try {
         fs.unlinkSync(filename);
     } catch (err) {
-        console.error(`Failed to delete ${filename}`);
-        console.error(err);
+        console.log(`Failed to delete ${filename}`);
+        // console.error(err);
     }
 };
 

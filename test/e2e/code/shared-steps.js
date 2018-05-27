@@ -20,12 +20,16 @@ When('I login', { timeout: 60000 }, function() {
     return this.login();
 });
 
+When('Cucumbot logs in', { timeout: 60000 }, function() {
+    return this.login();
+});
+
 Then('I am authenticated', function() {
-    expect(this.ice.socket.authenticated).to.be.true;
+    expect(ice.socket.authenticated).to.be.true;
 });
 
 Then('I am not authenticated', function() {
-    expect(this.ice.socket.authenticated).to.be.false;
+    expect(ice.socket.authenticated).to.be.false;
 });
 
 async function restart() {
@@ -40,3 +44,23 @@ When('I restart without login', function() {
     return this.app.restart();
 });
 
+When('I send my credentials to Cucumbot', async function() {
+    this.cucumbotClient.sendCredentials(this.username, this.passphrase);
+});
+
+When('I wait {int} seconds', function(int) {
+    return Promise.delay(int * 1000);
+});
+
+Given('I create a MedCryptor account', { timeout: 60000 }, async function() {
+    this.ice.config.appLabel = 'medcryptor';
+    await this.createAccount();
+});
+
+When('I go offline', function() {
+    ice.socket.close();
+});
+
+When('I go online', function() {
+    ice.socket.open();
+});

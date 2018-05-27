@@ -1,7 +1,7 @@
 const { setWorldConstructor } = require('cucumber');
 const { getUrl } = require('./helpers/https');
 const { waitForEmail } = require('./helpers/maildrop');
-const { getRandomUsername } = require('./helpers/random-data');
+const { getRandomUsername, getRandomEmail } = require('./helpers/random-data');
 const testConfig = require('./test-config');
 
 /**
@@ -30,11 +30,11 @@ class PeerioAppWorld {
     };
 
     login = async (username, passphrase) => {
-        await this.libs.prombservable.asPromise(this.ice.socket, 'connected', true);
-        const u = new this.ice.User();
+        await this.libs.prombservable.asPromise(ice.socket, 'connected', true);
+        const u = new ice.User();
         u.username = username || this.username;
         u.passphrase = passphrase || this.passphrase;
-        this.ice.User.current = u;
+        ice.User.current = u;
         await u.login();
         return this.waitForAccountDataInit();
     }
@@ -42,17 +42,17 @@ class PeerioAppWorld {
     waitForAccountDataInit = async () => {
         const { asPromise, asPromiseNegative } = this.libs.prombservable;
         console.log('Account init: waiting for profile to load');
-        await asPromise(this.ice.User.current, 'profileLoaded', true);
+        await asPromise(ice.User.current, 'profileLoaded', true);
         console.log('Account init: waiting for quota to load');
-        await asPromiseNegative(this.ice.User.current, 'quota', null);
+        await asPromiseNegative(ice.User.current, 'quota', null);
         console.log('Account init: waiting for settings to load');
-        await asPromise(this.ice.User.current.settings, 'loaded', true);
+        await asPromise(ice.User.current.settings, 'loaded', true);
         console.log('Account init: waiting for tofuStore to load');
-        await asPromise(this.ice.tofuStore, 'loaded', true);
+        await asPromise(ice.tofuStore, 'loaded', true);
         console.log('Account init: waiting for contactStore to load');
-        await asPromise(this.ice.contactStore.myContacts.loaded, true);
+        await asPromise(ice.contactStore.myContacts.loaded, true);
         console.log('Account init: waiting self contact info to load');
-        await this.ice.contactStore.currentUser.ensureLoaded();
+        await ice.contactStore.currentUser.ensureLoaded();
     }
 
     confirmPrimaryEmail = async (emailAddress) => {
@@ -61,17 +61,18 @@ class PeerioAppWorld {
         await getUrl(url);
     }
 
-    createAccount = async (username, email, isTestAccount = false) => {
-        await this.libs.prombservable.asPromise(this.ice.socket, 'connected', true);
+    createAccount = async (username, email, isTestAccount = false, extraProps = null) => {
+        await this.libs.prombservable.asPromise(ice.socket, 'connected', true);
 
-        const u = new this.ice.User();
+        const u = new ice.User();
         u.username = username || getRandomUsername();
         u.email = email || `${u.username}@${testConfig.emailDomain}`;
         u.firstName = 'Firstname';
         u.lastName = 'Lastname';
         u.locale = 'en';
         u.passphrase = testConfig.defaultPassphrase;
-        this.ice.User.current = u;
+        u.props = extraProps;
+        ice.User.current = u;
         if (!isTestAccount) {
             this.username = u.username;
             this.passphrase = u.passphrase;
@@ -92,6 +93,20 @@ class PeerioAppWorld {
 
     createTestAccount = async (username = null, email = null) => {
         return this.createAccount(username, email, true);
+    }
+
+    createMedcryptorAccount = async (medcryptorData) => {
+        return this.createAccount(null, null, false, medcryptorData);
+    }
+
+    inviteRandomEmail = async () => {
+        this.invitedEmail = getRandomEmail();
+        await this.ice.contactStore.invite(this.invitedEmail);
+    }
+
+    inviteRandomEmailWithTemplate = async (template) => {
+        this.invitedEmail = getRandomEmail();
+        await this.ice.contactStore.invite(this.invitedEmail, template);
     }
 }
 

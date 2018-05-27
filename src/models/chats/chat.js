@@ -977,7 +977,7 @@ class Chat {
         }
         validated.spaceName = space.spaceName.trim().substr(0, config.chat.maxChatNameLength);
         validated.spaceDescription = space.spaceDescription.trim().substr(0, config.chat.maxChatPurposeLength);
-        
+
         return this.chatHead.save(() => {
             this.chatHead.spaceId = validated.spaceId;
             this.chatHead.spaceName = validated.spaceName;

@@ -519,7 +519,7 @@ class ChatStore {
      * @instance
      * @public
      */
-    @action async startChat(participants = [], isChannel = false, name, purpose, noActivate) {
+    @action async startChat(participants = [], isChannel = false, name, purpose, noActivate, space = null) {
         const cached = isChannel ? null : this.findCachedChatWithParticipants(participants);
         if (cached) {
             if (!noActivate) this.activate(cached.id);
@@ -544,6 +544,7 @@ class ChatStore {
             await chat.loadMetadata();
             if (!noActivate) this.activate(chat.id);
             if (name) await chat.rename(name);
+            if (space) await chat.setSpace(space);
             if (purpose) await chat.changePurpose(purpose);
             if (isChannel) {
                 chat.addParticipants(this.getSelflessParticipants(participants));

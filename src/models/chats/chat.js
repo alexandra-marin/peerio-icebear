@@ -410,6 +410,29 @@ class Chat {
     }
 
     /**
+     * @member {bool} isInSpace
+     * @memberof Chat
+     * @instance
+     * @public
+     */
+    @computed get isInSpace() {
+        return this.chatHead && this.chatHead.space && this.chatHead.space.spaceId;
+    }
+
+    /**
+     * @member {object} space
+     * @memberof Chat
+     * @instance
+     * @public
+     */
+    @computed get space() {
+        if (this.chatHead && this.chatHead.space && this.chatHead.space.spaceId) {
+            return this.chatHead.space;
+        }
+        return null;
+    }
+
+    /**
      * @member {string} headLoaded
      * @memberof Chat
      * @instance

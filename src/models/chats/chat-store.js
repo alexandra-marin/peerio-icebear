@@ -181,7 +181,7 @@ class ChatStore {
      * @public
      */
     @computed get channels() {
-        return this.chats.filter(chat => chat.isChannel && chat.headLoaded);
+        return this.chats.filter(chat => chat.isChannel && chat.headLoaded && !chat.isInSpace);
     }
 
     /**
@@ -231,6 +231,15 @@ class ChatStore {
         return allRooms;
     }
 
+    /**
+     * Subset of ChatStore#chats, contains all spaces
+     * @member {Array<Chat>} spaces
+     * @type {Array<Chat>} spaces
+     * @memberof ChatStore
+     * @readonly
+     * @instance
+     * @public
+     */
     @computed
     get spaces() {
         if (config.appLabel !== 'medcryptor') {
@@ -238,10 +247,10 @@ class ChatStore {
         }
 
         // get all channels that belong to a space
-        const channelsFromASpace = this.channels.filter(x => x.isInSpace);
+        const channelsFromASpace = this.chats.filter(chat => chat.isChannel && chat.isInSpace);
 
         // aggregate all spaces by name
-        const spacesMap = new Map(channelsFromASpace.map(x => [x.space.spaceName, x]));
+        const spacesMap = new Map(channelsFromASpace.map(chat => [chat.space.spaceName, chat]));
 
         // return all unique spaces
         const spaces = [...spacesMap.values()];

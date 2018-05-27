@@ -827,5 +827,13 @@
   "title_countryOfPractice": "Country of practice",
   "title_selectYourSpecialty": "Select your specialty.",
   "title_enterValidAhpra": "Please enter a valid AHPRA number.",
-  "title_selectYourRole": "Select your role."
+  "title_selectYourRole": "Select your role.",
+  "mcr_title_thankYou":"Thank you for signing up!",
+  "mcr_title_upgrade":"Upgrade to a Practitioner account on MedCryptor desktop. You will have an access to more features such as:",
+  "mcr_title_patientInvites":"Patient invites",
+  "mcr_title_consultationRooms":"Consultation Rooms for doctors",
+  "mcr_title_discussionRooms":"Discussion Rooms for practitioners",
+  "mcr_title_getAccount":"Get practitioner account",
+  "mcr_title_needHelp":"Need help? Contact {username} for questions.",
+  "mcr_title_skip":"Skip for now"
 }

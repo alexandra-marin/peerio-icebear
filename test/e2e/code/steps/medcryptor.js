@@ -40,47 +40,75 @@ Then('I can edit specialization, medical ID, country and role', async function()
     this.ice.User.current.props.should.deep.equal(medcryptorData);
 });
 
-
-Then('I can assign space properties to rooms', { timeout: 60000 }, async function() {
-    const space = {
+Then('I create a patient space', async function() {
+    this.space = {
         spaceId: null,
         spaceName: 'Patient Space 1',
         spaceDescription: 'Discuss the case with docs and patient'
     };
+});
 
-    space.spaceRoomType = 'internal';
-    const internalRoom1 = await ice.chatStore.startChat([], true, 'test-internal1', 'test', null, space);
-    await this.waitFor(() => internalRoom1.metaLoaded && ice.chatStore.activeChat);
+Then('I create two internal rooms', async function() {
+    this.space.spaceRoomType = 'internal';
+    this.internalRoom1 = await ice.chatStore.startChat([], true, 'test-internal1', 'test', null, this.space);
+    await this.waitFor(() => this.internalRoom1.metaLoaded && ice.chatStore.activeChat);
 
-    space.spaceRoomType = 'internal';
-    const internalRoom2 = await ice.chatStore.startChat([], true, 'test-internal2', 'test', null, space);
-    await this.waitFor(() => internalRoom2.metaLoaded && ice.chatStore.activeChat);
+    this.space.spaceRoomType = 'internal';
+    this.internalRoom2 = await ice.chatStore.startChat([], true, 'test-internal2', 'test', null, this.space);
+    await this.waitFor(() => this.internalRoom2.metaLoaded && ice.chatStore.activeChat);
+});
 
-    space.spaceRoomType = 'patient';
-    const patientRoom = await ice.chatStore.startChat([], true, 'test-patient', 'test', null, space);
-    await this.waitFor(() => patientRoom.metaLoaded && ice.chatStore.activeChat);
+Then('I create a patient room', async function() {
+    this.space.spaceRoomType = 'patient';
+    this.patientRoom = await ice.chatStore.startChat([], true, 'test-patient', 'test', null, this.space);
+    await this.waitFor(() => this.patientRoom.metaLoaded && ice.chatStore.activeChat);
+});
 
+Then('I can view the patient space', async function() {
     ice.chatStore.spaces.length.should.equal(1);
 
     const returnedSpace = ice.chatStore.spaces[0];
 
-    returnedSpace.spaceName.should.equal(space.spaceName);
-    returnedSpace.spaceDescription.should.equal(space.spaceDescription);
+    returnedSpace.spaceName.should.equal(this.space.spaceName);
+    returnedSpace.spaceDescription.should.equal(this.space.spaceDescription);
     returnedSpace.isNew.should.equal(false);
     returnedSpace.unreadCount.should.equal(0);
 
     returnedSpace.internalRooms.length.should.equal(2);
-    returnedSpace.internalRooms.should.deep.equal([internalRoom1, internalRoom2]);
+    returnedSpace.internalRooms.should.deep.equal([this.internalRoom1, this.internalRoom2]);
 
     returnedSpace.patientRooms.length.should.equal(1);
-    returnedSpace.patientRooms.should.deep.equal([patientRoom]);
+    returnedSpace.patientRooms.should.deep.equal([this.patientRoom]);
+});
 
-    internalRoom1.unreadCount = 2;
-    patientRoom.unreadCount = 40;
+Then('I get notified of unread messages', async function() {
+    this.internalRoom1.unreadCount = 2;
+    this.patientRoom.unreadCount = 40;
+  
+    const returnedSpace = ice.chatStore.spaces[0];
     returnedSpace.unreadCount.should.equal(42);
 });
 
-Then('I can invite Cucumbot to a room with a space', async function() {
+Then('I create another patient space', async function() {
+    this.anotherSpace = {
+        spaceId: null,
+        spaceName: 'Patient Space 2',
+        spaceDescription: 'Discuss case #2 with docs and patient',
+        spaceRoomType: 'patient'
+    };
+    const room = await ice.chatStore.startChat([], true, 'test-space-2', 'test', null, this.anotherSpace);
+    await this.waitFor(() => room.metaLoaded && ice.chatStore.activeChat);
+
+    ice.chatStore.spaces.length.should.equal(2);
+    ice.chatStore.spaces[0].spaceName.should.equal(this.space.spaceName);
+    ice.chatStore.spaces[1].spaceName.should.equal(this.anotherSpace.spaceName);
+});
+
+Then('I invite Cucumbot to the patient room', async function() {
+    //
+});
+
+Then('Cucumbot joins the room', async function() {
     //
 });
 

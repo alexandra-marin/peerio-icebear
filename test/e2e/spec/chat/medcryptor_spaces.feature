@@ -1,4 +1,4 @@
-Feature: MedCryptor users
+Feature: MedCryptor patient spaces
 
     Scenario: MedCryptor users can create spaces
         Given I create a MedCryptor account

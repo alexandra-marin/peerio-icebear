@@ -32,3 +32,17 @@ Then('I can edit specialization, medical ID, country and role', async function()
 
     this.ice.User.current.props.should.deep.equal(medcryptorData);
 });
+
+
+Then('I can assign space properties to rooms', async function() {
+
+});
+
+Then('I can invite Cucumbot to a room with a space', async function() {
+
+});
+
+Then('I can list patient spaces', async function() {
+
+});
+

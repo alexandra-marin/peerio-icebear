@@ -250,7 +250,8 @@ class ChatStore {
         const channelsFromASpace = this.chats.filter(chat => chat.isChannel && chat.isInSpace);
 
         // aggregate all spaces by name
-        const spacesMap = new Map(channelsFromASpace.map(chat => [chat.chatHead.spaceName, this.getSpaceFromChat(chat)]));
+        const spacesMap = new Map(channelsFromASpace.map(chat => [
+            chat.chatHead.spaceName, this.getSpaceFromChat(chat)]));
 
         // return all unique spaces
         const spaces = [...spacesMap.values()];

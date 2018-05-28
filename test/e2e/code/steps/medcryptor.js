@@ -63,7 +63,7 @@ Then('I can assign space properties to rooms', async function() {
     ice.chatStore.spaces.length.should.equal(1);
 
     const returnedSpace = ice.chatStore.spaces[0];
-   
+
     returnedSpace.spaceName.should.equal(space.spaceName);
     returnedSpace.spaceDescription.should.equal(space.spaceDescription);
 

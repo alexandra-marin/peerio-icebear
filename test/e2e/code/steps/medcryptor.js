@@ -45,15 +45,27 @@ Then('I can assign space properties to rooms', async function() {
     const space = {
         spaceId: null,
         spaceName: 'Patient Space 1',
-        spaceDescription: 'Discuss the case with docs and patient',
-        spaceRoomType: 'internal'
+        spaceDescription: 'Discuss the case with docs and patient'
     };
-    const room = await ice.chatStore.startChat([], true, 'test', 'test', null, space);
-    await this.waitFor(() => room.metaLoaded && ice.chatStore.activeChat);
+
+    space.spaceRoomType = 'internal';
+    const internalRoom = await ice.chatStore.startChat([], true, 'test-internal', 'test', null, space);
+    await this.waitFor(() => internalRoom.metaLoaded && ice.chatStore.activeChat);
+
+    space.spaceRoomType = 'patient';
+    const patientRoom = await ice.chatStore.startChat([], true, 'test-patient', 'test', space);
+    await this.waitFor(() => patientRoom.metaLoaded && ice.chatStore.activeChat);
+
+    ice.chatStore.spaces.length.should.equal(1);
 
     const returnedSpace = ice.chatStore.spaces[0];
     returnedSpace.spaceName.should.equal(space.spaceName);
     returnedSpace.spaceDescription.should.equal(space.spaceDescription);
+
+    returnedSpace.internalRooms.length.should.equal(1);
+    returnedSpace.patientRooms.length.should.equal(1);
+    returnedSpace.internalRooms[0].should.deep.equal(internalRoom);
+    returnedSpace.patientRooms[0].should.deep.equal(patientRoom);
 });
 
 Then('I can invite Cucumbot to a room with a space', async function() {

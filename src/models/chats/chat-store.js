@@ -1,6 +1,7 @@
 const { observable, action, computed, reaction, autorunAsync, isObservableArray, when } = require('mobx');
 const Chat = require('./chat');
 const ChatStorePending = require('./chat-store.pending.js');
+const ChatStoreSpaces = require('./chat-store.spaces.js');
 const socket = require('../../network/socket');
 const tracker = require('../update-tracker');
 const { EventEmitter } = require('eventemitter3');
@@ -29,6 +30,7 @@ const Contact = require('../contacts/contact');
 class ChatStore {
     constructor() {
         this.pending = new ChatStorePending(this);
+        this.spacesHelper = new ChatStoreSpaces(this);
 
         reaction(() => this.activeChat, chat => {
             if (chat) chat.loadMessages();
@@ -242,39 +244,7 @@ class ChatStore {
      */
     @computed
     get spaces() {
-        if (config.appLabel !== 'medcryptor') {
-            return [];
-        }
-
-        // get all channels that belong to a space
-        const channelsFromASpace = this.chats.filter(chat => chat.isChannel && chat.isInSpace);
-
-        // aggregate all spaces by name
-        const spacesMap = new Map(channelsFromASpace.map(chat => [
-            chat.chatHead.spaceName, this.getSpaceFromChat(chat)]));
-
-        // return all unique spaces
-        const spaces = [...spacesMap.values()];
-
-        return spaces;
-    }
-
-    getSpaceFromChat(chat) {
-        const space = {
-            spaceId: chat.chatHead.spaceId,
-            spaceName: chat.chatHead.spaceName,
-            spaceDescription: chat.chatHead.spaceDescription
-        };
-
-        const allSpaceRooms = this.chats
-            .filter(c => c.isChannel)
-            .filter(c => c.isInSpace)
-            .filter(c => c.chatHead.spaceId === chat.chatHead.spaceId);
-
-        space.internalRooms = allSpaceRooms.filter(c => c.chatHead.spaceRoomType === 'internal');
-        space.patientRooms = allSpaceRooms.filter(c => c.chatHead.spaceRoomType === 'patient');
-
-        return space;
+        return this.spacesHelper.spaces;
     }
 
     /**

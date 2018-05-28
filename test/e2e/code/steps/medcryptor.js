@@ -66,13 +66,14 @@ Then('I can assign space properties to rooms', async function() {
 
     returnedSpace.spaceName.should.equal(space.spaceName);
     returnedSpace.spaceDescription.should.equal(space.spaceDescription);
+    returnedSpace.isNew.should.equal(false);
+    returnedSpace.unreadCount.should.equal(0);
 
     returnedSpace.internalRooms.length.should.equal(2);
-    returnedSpace.internalRooms[0].should.deep.equal(internalRoom1);
-    returnedSpace.internalRooms[1].should.deep.equal(internalRoom2);
+    returnedSpace.internalRooms.should.deep.equal([internalRoom1, internalRoom2]);
 
     returnedSpace.patientRooms.length.should.equal(1);
-    returnedSpace.patientRooms[0].should.deep.equal(patientRoom);
+    returnedSpace.patientRooms.should.deep.equal([patientRoom]);
 });
 
 Then('I can invite Cucumbot to a room with a space', async function() {

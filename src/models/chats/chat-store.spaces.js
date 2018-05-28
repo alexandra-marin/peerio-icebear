@@ -1,6 +1,8 @@
 const { computed } = require('mobx');
 const config = require('../../config');
 
+const countUnread = (count, room) => count + room.unreadCount;
+
 class Space {
     spaceId = '';
     spaceName = '';
@@ -9,7 +11,10 @@ class Space {
     internalRooms = [];
     patientRooms = [];
     @computed get unreadCount() {
-        return 0; // TODO
+        const internalRoomsUnread = this.internalRooms.reduce(countUnread, 0);
+        const patientRoomsUnread = this.patientRooms.reduce(countUnread, 0);
+
+        return internalRoomsUnread + patientRoomsUnread;
     }
 }
 

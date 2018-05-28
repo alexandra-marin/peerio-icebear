@@ -4,7 +4,7 @@ Feature: Digest
     Digest is normally tested during any other Cucumbot scenarios,
     but this set of scenarios is supposed to test edge cases.
 
-    @wip
+    # @wip
     @BOT_NO_ACCOUNT_test_multi_client_digest_with_relogin
     Scenario: Digest sync with multiple clients of same user
         Given I create my account
@@ -24,7 +24,7 @@ Feature: Digest
         And   I receive own message "Hello, stranger."
         And   I receive own message "I see you are offline."
 
-    @wip
+    # @wip
     @BOT_NO_ACCOUNT_test_multi_client_digest_with_offline
     Scenario: Digest sync with multiple clients of same user
         Given I create my account
@@ -44,7 +44,7 @@ Feature: Digest
         And   I receive own message "Hello, stranger."
         And   I receive own message "I see you are offline."
 
-    @wip
+    # @wip
     @BOT_NO_ACCOUNT_test_multi_client_digest_with_offline2
     Scenario: Digest sync with multiple clients of same user
         Given I create my account

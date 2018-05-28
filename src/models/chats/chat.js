@@ -416,7 +416,7 @@ class Chat {
      * @public
      */
     @computed get isInSpace() {
-        return this.chatHead && this.chatHead.space && this.chatHead.space.spaceId;
+        return this.chatHead && this.chatHead.spaceId;
     }
 
     /**
@@ -426,7 +426,7 @@ class Chat {
      * @public
      */
     @computed get space() {
-        if (this.chatHead && this.chatHead.space && this.chatHead.space.spaceId) {
+        if (this.chatHead && this.chatHead.spaceId) {
             return this.chatHead.space;
         }
         return null;

@@ -49,8 +49,12 @@ Then('I can assign space properties to rooms', async function() {
     };
 
     space.spaceRoomType = 'internal';
-    const internalRoom = await ice.chatStore.startChat([], true, 'test-internal', 'test', null, space);
-    await this.waitFor(() => internalRoom.metaLoaded && ice.chatStore.activeChat);
+    const internalRoom1 = await ice.chatStore.startChat([], true, 'test-internal1', 'test', null, space);
+    await this.waitFor(() => internalRoom1.metaLoaded && ice.chatStore.activeChat);
+
+    space.spaceRoomType = 'internal';
+    const internalRoom2 = await ice.chatStore.startChat([], true, 'test-internal2', 'test', null, space);
+    await this.waitFor(() => internalRoom2.metaLoaded && ice.chatStore.activeChat);
 
     space.spaceRoomType = 'patient';
     const patientRoom = await ice.chatStore.startChat([], true, 'test-patient', 'test', null, space);
@@ -59,22 +63,23 @@ Then('I can assign space properties to rooms', async function() {
     ice.chatStore.spaces.length.should.equal(1);
 
     const returnedSpace = ice.chatStore.spaces[0];
-    
+   
     returnedSpace.spaceName.should.equal(space.spaceName);
     returnedSpace.spaceDescription.should.equal(space.spaceDescription);
 
-    returnedSpace.internalRooms.length.should.equal(1);
-    returnedSpace.internalRooms[0].should.deep.equal(internalRoom);
+    returnedSpace.internalRooms.length.should.equal(2);
+    returnedSpace.internalRooms[0].should.deep.equal(internalRoom1);
+    returnedSpace.internalRooms[1].should.deep.equal(internalRoom2);
 
     returnedSpace.patientRooms.length.should.equal(1);
     returnedSpace.patientRooms[0].should.deep.equal(patientRoom);
 });
 
 Then('I can invite Cucumbot to a room with a space', async function() {
-
+    //
 });
 
 Then('I can list patient spaces', async function() {
-
+    //
 });
 

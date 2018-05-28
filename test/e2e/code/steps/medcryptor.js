@@ -105,15 +105,4 @@ Then('I create another patient space', async function() {
     ice.chatStore.spaces[1].spaceName.should.equal(this.anotherSpace.spaceName);
 });
 
-Then('I invite Cucumbot to the patient room', async function() {
-    //
-});
-
-Then('Cucumbot joins the room', async function() {
-    //
-});
-
-Then('I can list patient spaces', async function() {
-    //
-});
 

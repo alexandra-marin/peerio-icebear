@@ -42,7 +42,18 @@ Then('I can edit specialization, medical ID, country and role', async function()
 
 
 Then('I can assign space properties to rooms', async function() {
+    const space = {
+        spaceId: null,
+        spaceName: 'Patient Space 1',
+        spaceDescription: 'Discuss the case with docs and patient',
+        spaceRoomType: 'internal'
+    };
+    const room = await ice.chatStore.startChat([], true, 'test', 'test', null, space);
+    await this.waitFor(() => room.metaLoaded && ice.chatStore.activeChat);
 
+    const returnedSpace = ice.chatStore.spaces[0];
+    returnedSpace.spaceName.should.equal(space.spaceName);
+    returnedSpace.spaceDescription.should.equal(space.spaceDescription);
 });
 
 Then('I can invite Cucumbot to a room with a space', async function() {

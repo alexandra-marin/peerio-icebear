@@ -8,7 +8,7 @@ class Space {
     isNew = false;
     internalRooms = [];
     patientRooms = [];
-    
+
     countUnread = (count, room) => count + room.unreadCount;
     @computed get unreadCount() {
         const internalRoomsUnread = this.internalRooms.reduce(this.countUnread, 0);
@@ -34,7 +34,8 @@ class ChatStoreSpaces {
 
         // aggregate all spaces by name
         const spacesMap = new Map(channelsFromASpace.map(chat => [
-            chat.chatHead.spaceName, this.getSpaceFrom(chat)
+            chat.chatHead.spaceName, // key: the space's name
+            this.getSpaceFrom(chat) // value: the space object
         ]));
 
         // return all unique spaces

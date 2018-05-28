@@ -41,7 +41,7 @@ Then('I can edit specialization, medical ID, country and role', async function()
 });
 
 
-Then('I can assign space properties to rooms', async function() {
+Then('I can assign space properties to rooms', { timeout: 60000 }, async function() {
     const space = {
         spaceId: null,
         spaceName: 'Patient Space 1',

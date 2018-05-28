@@ -53,18 +53,20 @@ Then('I can assign space properties to rooms', async function() {
     await this.waitFor(() => internalRoom.metaLoaded && ice.chatStore.activeChat);
 
     space.spaceRoomType = 'patient';
-    const patientRoom = await ice.chatStore.startChat([], true, 'test-patient', 'test', space);
+    const patientRoom = await ice.chatStore.startChat([], true, 'test-patient', 'test', null, space);
     await this.waitFor(() => patientRoom.metaLoaded && ice.chatStore.activeChat);
 
     ice.chatStore.spaces.length.should.equal(1);
 
     const returnedSpace = ice.chatStore.spaces[0];
+    
     returnedSpace.spaceName.should.equal(space.spaceName);
     returnedSpace.spaceDescription.should.equal(space.spaceDescription);
 
     returnedSpace.internalRooms.length.should.equal(1);
-    returnedSpace.patientRooms.length.should.equal(1);
     returnedSpace.internalRooms[0].should.deep.equal(internalRoom);
+
+    returnedSpace.patientRooms.length.should.equal(1);
     returnedSpace.patientRooms[0].should.deep.equal(patientRoom);
 });
 

@@ -259,11 +259,21 @@ class ChatStore {
     }
 
     getSpaceFromChat(chat) {
-        return {
+        const space = {
             spaceId: chat.chatHead.spaceId,
             spaceName: chat.chatHead.spaceName,
             spaceDescription: chat.chatHead.spaceDescription
         };
+
+        const allSpaceRooms = this.chats
+            .filter(c => c.isChannel)
+            .filter(c => c.isInSpace)
+            .filter(c => c.chatHead.spaceId === chat.chatHead.spaceId);
+
+        space.internalRooms = allSpaceRooms.filter(c => c.chatHead.spaceRoomType === 'internal');
+        space.patientRooms = allSpaceRooms.filter(c => c.chatHead.spaceRoomType === 'patient');
+
+        return space;
     }
 
     /**

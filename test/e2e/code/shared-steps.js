@@ -52,11 +52,6 @@ When('I wait {int} seconds', function(int) {
     return Promise.delay(int * 1000);
 });
 
-Given('I create a MedCryptor account', { timeout: 60000 }, async function() {
-    this.ice.config.appLabel = 'medcryptor';
-    await this.createAccount();
-});
-
 When('I go offline', function() {
     ice.socket.close();
 });

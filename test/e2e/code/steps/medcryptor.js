@@ -104,5 +104,3 @@ Then('I create another patient space', async function() {
     ice.chatStore.spaces[0].spaceName.should.equal(this.space.spaceName);
     ice.chatStore.spaces[1].spaceName.should.equal(this.anotherSpace.spaceName);
 });
-
-

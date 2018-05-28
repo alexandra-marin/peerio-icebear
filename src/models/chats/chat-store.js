@@ -250,12 +250,20 @@ class ChatStore {
         const channelsFromASpace = this.chats.filter(chat => chat.isChannel && chat.isInSpace);
 
         // aggregate all spaces by name
-        const spacesMap = new Map(channelsFromASpace.map(chat => [chat.space.spaceName, chat]));
+        const spacesMap = new Map(channelsFromASpace.map(chat => [chat.chatHead.spaceName, this.getSpaceFromChat(chat)]));
 
         // return all unique spaces
         const spaces = [...spacesMap.values()];
 
         return spaces;
+    }
+
+    getSpaceFromChat(chat) {
+        return {
+            spaceId: chat.chatHead.spaceId,
+            spaceName: chat.chatHead.spaceName,
+            spaceDescription: chat.chatHead.spaceDescription
+        };
     }
 
     /**
@@ -541,6 +549,7 @@ class ChatStore {
      * @param {boolean=} isChannel
      * @param {string=} name
      * @param {string=} purpose - only for channels, not relevant for DMs
+     * @param {object=} space - only to create a space
      * @returns {?Chat} - can return null in case of paywall
      * @memberof ChatStore
      * @instance

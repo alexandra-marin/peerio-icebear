@@ -772,10 +772,11 @@ class Chat {
      * @returns {Promise}
      * @memberof Chat
      */
-    @action sendMessage(text, files) {
+    @action sendMessage(text, files, folders) {
         const m = new Message(this.db);
-        m.files = files;
         m.text = text;
+        m.files = files;
+        m.folders = folders;
         return this._sendMessage(m);
     }
 
@@ -859,25 +860,10 @@ class Chat {
         return this._fileHandler.unshare(file);
     }
 
-    // we don't share folders with chats yet // Anri
-    // shareFolders(folders) {
-    //     folders.forEach(folder => this.uploadQueue.push(folder));
-    //     let promise = Promise.resolve();
-    //     folders.forEach(folder => {
-    //         promise = promise.then(async () => {
-    //             // retry and error handling
-    //             // is done in store implementations
-    //             try {
-    //                 await volumeStore.convertFolder(folder);
-    //                 await this.sendSharedFolder(folder);
-    //             } catch (e) {
-    //                 console.error(e);
-    //             }
-    //             this.uploadQueue.remove(folder);
-    //         });
-    //     });
-    //     return promise;
-    // }
+    shareVolume(volume) {
+        this.sendMessage('', null, [volume.id]);
+    }
+
 
     async shareFilesAndFolders(filesAndFolders) {
         const files = filesAndFolders.filter(f => !f.isFolder);
@@ -886,8 +872,7 @@ class Chat {
             await this.shareFiles(files);
         }
         if (folders.length) {
-            // we don't share folders with chats yet // Anri
-            // await this.shareFolders(folders);
+            folders.forEach(f => f.isShared && f.addParticipants([this.dmPartnerUsername]));
         }
     }
 
@@ -1283,12 +1268,9 @@ class Chat {
         this._sendMessage(m);
     }
 
-    /**
-    * TODO: replace with the real thing
-    */
     sendSharedFolder(folder) {
         const m = new Message(this.db);
-        m.sendSharedFolder(folder);
+        m.folders = [folder];
         return this._sendMessage(m);
     }
 

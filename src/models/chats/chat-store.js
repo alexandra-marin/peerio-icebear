@@ -607,6 +607,13 @@ class ChatStore {
         });
     }
 
+    @action async startChatAndShareVolume(participant, volume) {
+        const chat = await this.startChat([participant]);
+        if (!chat) return Promise.reject(new Error('Failed to create chat'));
+        await chat.loadMetadata();
+        return chat.shareVolume(volume);
+    }
+
     /**
      * Removes chat from working set.
      * @function unloadChat

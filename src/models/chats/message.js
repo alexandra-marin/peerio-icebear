@@ -154,7 +154,7 @@ class Message extends Keg {
         this.timestamp = new Date();
         let promise;
         // we want to auto-retry system messages and messages containing file attachments
-        if (this.systemData || (this.files && this.files.length)) {
+        if (this.systemData || (this.files && this.files.length) || (this.folders && this.folders.length)) {
             promise = retryUntilSuccess(() => this.saveToServer());
         } else {
             promise = this.saveToServer();
@@ -279,17 +279,6 @@ class Message extends Keg {
     }
 
     /**
-     * TODO: replace with the real thing
-     */
-    sendSharedFolder(folder) {
-        this.systemData = {
-            action: 'folder',
-            folderName: folder.name,
-            folderId: folder.folderId
-        };
-    }
-
-    /**
      * Parses message to find urls or file attachments.
      * Verifies external url type and size and fills this.inlineImages.
      * @memberof Message
@@ -378,7 +367,8 @@ class Message extends Keg {
             timestamp: this.timestamp.valueOf(),
             userMentions: this.userMentions
         };
-        this._serializeFileAttachments(ret);
+        if (this.files) ret.files = JSON.stringify(this.files);
+        if (this.folders) ret.folders = JSON.stringify(this.folders);
         if (this.systemData) {
             ret.systemData = this.systemData;
         }
@@ -423,6 +413,7 @@ class Message extends Keg {
          * @public
          */
         this.files = payload.files ? JSON.parse(payload.files) : null;
+        this.folders = payload.folders ? JSON.parse(payload.folders) : null;
         /**
          * Does this message mention current user.
          * @member {boolean} isMention
@@ -433,13 +424,9 @@ class Message extends Keg {
 
     serializeProps() {
         const ret = {};
-        this._serializeFileAttachments(ret);
+        // for future server notifications
         if (this.systemData) ret.systemAction = this.systemData.action;
         return ret;
-    }
-
-    _serializeFileAttachments(obj) {
-        if (this.files) obj.files = JSON.stringify(this.files);
     }
 
     deserializeProps() {

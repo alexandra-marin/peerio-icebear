@@ -7,14 +7,13 @@ const { retryUntilSuccess } = require('../../helpers/retry');
 const createMap = require('../../helpers/dynamic-array-map');
 const FileStoreFolders = require('./file-store.folders');
 const { getUser } = require('../../helpers/di-current-user');
-const { getRandomShortIdHex } = require('../../crypto/util.random');
 const { getFileStore } = require('../../helpers/di-file-store');
 
 class FileStoreBase {
     static instances = observable.map();
 
     constructor(kegDb, root = null, id) {
-        this.id = id || getRandomShortIdHex(); // something to identify this instance in runtime
+        this.id = id; // something to identify this instance in runtime
         this._kegDb = kegDb;
         const m = createMap(this.files, 'fileId');
         this.fileMap = m.map;

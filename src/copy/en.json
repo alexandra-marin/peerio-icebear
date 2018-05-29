@@ -836,5 +836,12 @@
   "mcr_title_discussionRooms":"Discussion Rooms for practitioners",
   "mcr_title_getAccount":"Get practitioner account",
   "mcr_title_needHelp":"Need help? Contact {username} for questions.",
-  "mcr_title_skip":"Skip for now"
+  "mcr_title_skip":"Skip for now",
+  "mcr_title_roomsDescription1": "Group messages for your practice",
+  "mcr_title_roomsDescription2": "Organize Room by topic to chat among your peers",
+  "mcr_button_addPatient": "Add a Patient",
+  "mcr_title_addPatientDescription1": "For consultation and internal discussions",
+  "mcr_title_addPatientDescription2": "Keep a history of your patient with grouped Rooms",
+  "mcr_title_dmDescription1": "Private 1-on-1 conversations",
+  "mcr_title_dmDescription2": "Chat and share files directly with your colleagues"
 }

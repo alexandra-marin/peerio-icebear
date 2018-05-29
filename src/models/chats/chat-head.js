@@ -76,10 +76,10 @@ class ChatHead extends SyncedKeg {
     deserializeKegPayload(payload) {
         this.chatName = payload.chatName || '';
         this.purpose = payload.purpose || '';
-        this.spaceId = payload.spaceId || null;
-        this.spaceName = payload.spaceName || null;
-        this.spaceDescription = payload.spaceDescription || null;
-        this.spaceRoomType = payload.spaceRoomType || null;
+        this.spaceId = payload.spaceId;
+        this.spaceName = payload.spaceName;
+        this.spaceDescription = payload.spaceDescription;
+        this.spaceRoomType = payload.spaceRoomType;
     }
 }
 

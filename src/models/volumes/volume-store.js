@@ -94,8 +94,8 @@ class VolumeStore {
             // in case instance has changed. otherwise it will immediately resolve
             await volume.loadMetadata();
             await volume.rename(name);
-            volume.store.loadAllFiles();
-            volume.addParticipants(participants.filter(p => !p.isMe));
+            await volume.store.loadAllFiles();
+            await volume.addParticipants(participants.filter(p => !p.isMe));
             return volume;
         } catch (err) {
             console.error(err);

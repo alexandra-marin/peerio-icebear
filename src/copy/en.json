@@ -853,6 +853,7 @@
   "mcr_title_patientRoomsDescription2": "Invite your patient and doctors for a consultation",
   "mcr_title_patientRoomsDescription3": "Remove your doctors once consultation is done!",
   "mcr_title_primaryPhysician": "Primary Physician",
+  "mcr_title_patientFiles": "Patient Files",
   "mcr_title_newPatient": "New Patient",
   "title_noParticipants": "No participants",
   "mcr_title_chatHeaderPatientRoom": "This is the beginning of Patient Room for {patientName}.",

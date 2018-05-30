@@ -129,8 +129,8 @@ class VolumeStore {
 
     @action.bound async shareFolder(folder, participants) {
         if (folder.store.id !== 'main') return Promise.reject(new Error('Can only share local folders'));
-        folder.convertingToVolume = true;
         const newFolder = await this.createVolume(participants, folder.name);
+        folder.convertingToVolume = true;
         newFolder.convertingFromFolder = true;
         await newFolder.attach(folder, false, true);
         folder.progress = newFolder.progress = folder.progressMax = newFolder.progressMax = 0;

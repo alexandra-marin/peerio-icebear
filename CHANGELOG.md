@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.1.0"></a>
+# [5.1.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.0.2...v5.1.0) (2018-05-29)
+
+
+### Features
+
+* use prefixed mcr_title_seeWhoYouAlreadyKnow ([0440724](https://github.com/PeerioTechnologies/peerio-icebear/commit/0440724))
+
+
+
+<a name="5.0.2"></a>
+## [5.0.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.0.1...v5.0.2) (2018-05-25)
+
+
+### Bug Fixes
+
+* profile reload ([0e37f60](https://github.com/PeerioTechnologies/peerio-icebear/commit/0e37f60))
+* tests ([c12e0b2](https://github.com/PeerioTechnologies/peerio-icebear/commit/c12e0b2))
+* tests ([3df6fa4](https://github.com/PeerioTechnologies/peerio-icebear/commit/3df6fa4))
+
+
+
 <a name="5.0.1"></a>
 ## [5.0.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.0.0...v5.0.1) (2018-05-25)
 

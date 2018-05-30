@@ -12,13 +12,13 @@ const FileStoreBase = require('../files/file-store-base');
 const { asPromise } = require('../../helpers/prombservable');
 const { getFileStore } = require('../../helpers/di-file-store');
 const { getUser } = require('../../helpers/di-current-user');
+const { getChatStore } = require('../../helpers/di-chat-store');
 
 class Volume extends FileFolder {
     constructor(id) {
         super(null, '/', true);
         this.id = id;
         this.db = new VolumeKegDb(id);
-        // if (id) this.store = new FileStoreBase(this.db, this);
     }
 
     @observable loadingMeta = false;
@@ -73,7 +73,7 @@ class Volume extends FileFolder {
         this.id = this.db.id;
         this.chatHead = new ChatHead(this.db);
         await asPromise(this.chatHead, 'loaded', true);
-        if (!this.store) this.store = new FileStoreBase(this.db, this);
+        if (!this.store) this.store = new FileStoreBase(this.db, this, this.id);
         this.loadingMeta = false;
         this.metaLoaded = true;
         this.mount();
@@ -85,7 +85,7 @@ class Volume extends FileFolder {
         await Contact.ensureAllLoaded(contacts);
 
         const { boot } = this.db;
-        return boot.save(
+        await boot.save(
             () => {
                 contacts.forEach(c => boot.addParticipant(c));
                 return true;
@@ -95,6 +95,7 @@ class Volume extends FileFolder {
             },
             'error_addParticipant'
         );
+        return contacts.forEach(c => getChatStore().startChatAndShareVolume(c, this));
     }
 
     removeParticipant(participant) {

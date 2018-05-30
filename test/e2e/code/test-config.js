@@ -8,7 +8,7 @@ module.exports = {
     // which server to test against
     socketServerUrl: 'wss://hocuspocus.peerio.com',
     // what is the subject of confirmation email user receives when creating account
-    primaryEmailConfirmSubject: 'Welcome to Peerio! Confirm your account.',
+    primaryEmailConfirmSubject: 'Welcome to Peerio (Staging)! Confirm your account.',
     // what is the subject of confirmation email user receives when adding another email to profile
     newEmailConfirmSubject: 'Please confirm your new address',
     // how to find confirmation link inside confirm email body

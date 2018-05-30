@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.1.3"></a>
+## [5.1.3](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.1.2...v5.1.3) (2018-05-30)
+
+
+### Bug Fixes
+
+* folder conversion ux ([3b2830c](https://github.com/PeerioTechnologies/peerio-icebear/commit/3b2830c))
+* force reload synced keg on concurrency error ([e922045](https://github.com/PeerioTechnologies/peerio-icebear/commit/e922045))
+* no more dancing ([6bed81b](https://github.com/PeerioTechnologies/peerio-icebear/commit/6bed81b))
+
+
+
 <a name="5.1.2"></a>
 ## [5.1.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.1.1...v5.1.2) (2018-05-30)
 

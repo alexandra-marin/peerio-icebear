@@ -551,6 +551,13 @@ class File extends Keg {
                     file.fileId = this.fileId;
                     file.folderId = folderId;
                     return file.saveToServer()
+                        .then(() => {
+                            // a little hack adding the file object to store before it manages to update
+                            // to reduce lag before file appears
+                            if (!store.getById(this.fileId)) {
+                                store.files.unshift(file);
+                            }
+                        })
                         .catch(err => {
                             if (err && err.code === ServerError.codes.fileKegAlreadyExists) {
                                 // need to delete empty keg

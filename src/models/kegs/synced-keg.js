@@ -3,6 +3,7 @@ const { retryUntilSuccess } = require('../../helpers/retry');
 const TaskQueue = require('../../helpers/task-queue');
 const Keg = require('./keg.js');
 const warnings = require('../warnings');
+const { ServerError } = require('../../errors');
 
 /**
  * This class allows named kegs to share sync/save logic.
@@ -101,11 +102,16 @@ class SyncedKeg extends Keg {
                         tracker.seenThis(this.db.id, this.type, this.collectionVersion);
                         this.onSaved();
                     })
-                    .tapCatch(() => {
+                    .catch((err) => {
                         this.onSaveError(errorLocaleKey);
                         // we don't restore unless there was no changes after ours
-                        if (ver !== this.version) return;
-                        dataRestoreFn();
+                        if (ver === this.version) {
+                            dataRestoreFn();
+                        }
+                        if (err && err.code === ServerError.codes.malformedRequest) {
+                            return this.reload().then(() => Promise.reject(err));
+                        }
+                        return Promise.reject(err);
                     });
             }, this, null, resolve, reject);
         });

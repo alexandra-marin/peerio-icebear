@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.1.1"></a>
+## [5.1.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.1.0...v5.1.1) (2018-05-30)
+
+
+### Bug Fixes
+
+* folder.canShare ([c5335f1](https://github.com/PeerioTechnologies/peerio-icebear/commit/c5335f1))
+* sharing volume in dm ([79e948f](https://github.com/PeerioTechnologies/peerio-icebear/commit/79e948f))
+
+
+
 <a name="5.1.0"></a>
 # [5.1.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.0.2...v5.1.0) (2018-05-29)
 

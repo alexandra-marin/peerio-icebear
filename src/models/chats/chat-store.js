@@ -306,10 +306,13 @@ class ChatStore {
             } else if (!bmsg) {
                 return -1;
             }
-            return amsg.timestamp > bmsg.timestamp ? -1 : 1;
+            if (amsg.timestamp > bmsg.timestamp) return -1;
+            if (amsg.timestamp < bmsg.timestamp) return 1;
+            return 0;
         }
         // a is not fav, b is fav
-        return 1;
+        if (b.isFavorite) return 1;
+        return 0;
     }
 
     processChannelDeletedEvent = data => {

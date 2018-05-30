@@ -3,9 +3,11 @@ Feature: MedCryptor patient spaces
     # Any user can be invited all rooms in a space
     # If this changes, update Cucumbot to be either Peerio/MC user
 
-    Scenario: MedCryptor users can create spaces
+    Background:
         Given I create a MedCryptor account
-        Then  I create a patient space
+        And  I create a patient space
+
+    Scenario: MedCryptor users can create spaces
         And   I create two internal rooms
         And   I create a patient room
         Then  I can view the patient space
@@ -14,8 +16,6 @@ Feature: MedCryptor patient spaces
 
     @BOT_room_invite_patient
     Scenario: MedCryptor users can invite Peerio users to patient rooms
-        Given I create a MedCryptor account
-        And   I create a patient space
         And   I create a patient room
         When  I invite Cucumbot to the room
         Then  Cucumbot accepts the invite
@@ -24,8 +24,6 @@ Feature: MedCryptor patient spaces
 
     @BOT_room_invite_doctor
     Scenario: MedCryptor users can invite other Medcryptor users to all rooms in a spaces
-        Given I create a MedCryptor account
-        And   I create a patient space
         # patient rooms
         When  I create a patient room
         And   I invite Cucumbot to the room

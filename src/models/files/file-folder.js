@@ -100,7 +100,7 @@ class FileFolder {
     }
 
     get canShare() {
-        return !this.isShared && !this.root.isShared;
+        return !(this.isShared || this.root.isShared);
     }
 
     // Variables for bulk actions and share-related actions

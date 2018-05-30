@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.1.2"></a>
+## [5.1.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.1.1...v5.1.2) (2018-05-30)
+
+
+### Bug Fixes
+
+* lag on file keg copy operations ([6ec8760](https://github.com/PeerioTechnologies/peerio-icebear/commit/6ec8760))
+
+
+
 <a name="5.1.1"></a>
 ## [5.1.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.1.0...v5.1.1) (2018-05-30)
 

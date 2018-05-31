@@ -24,6 +24,10 @@ const filters = {
     medcryptor: medcryptorContactFilter
 };
 
+function getContactFilter() {
+    return filters[config.whiteLabel.name || 'peerio'];
+}
+
 class ContactStoreWhitelabel {
     // ref to contactStore
     store = null;
@@ -43,7 +47,7 @@ class ContactStoreWhitelabel {
         const c = this.store.getContact(usernameOrEmail);
         // when our request is complete, check and apply filter
         when(() => !c.loading, action(() => {
-            const filter = filters[config.whiteLabel.name || 'peerio'];
+            const filter = getContactFilter();
             if (filter(c, context)) {
                 Object.assign(result, c);
             } else {
@@ -52,6 +56,11 @@ class ContactStoreWhitelabel {
             result.loading = false;
         }));
         return result;
+    }
+
+    filter(token, context) {
+        const filter = getContactFilter();
+        return this.store.filter(token).filter(c => filter(c, context));
     }
 }
 

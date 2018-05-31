@@ -14,6 +14,7 @@ const { getChatStore } = require('../../helpers/di-chat-store');
 const tofuStore = require('./tofu-store');
 const { asPromise } = require('../../helpers/prombservable');
 const { retryUntilSuccess } = require('../../helpers/retry');
+const ContactStoreWhitelabel = require('./contact-store.whitelabel');
 
 /**
  * Contact store handles all Peerio users you(your app) are in some contact with,
@@ -185,6 +186,7 @@ class ContactStore {
         intercept(this, 'uiViewSortBy', this._checkSortValue);
         intercept(this, 'uiViewFilter', this._checkFilterValue);
         this._contactMap = createMap(this.contacts, 'username').map;
+        this.whitelabel = new ContactStoreWhitelabel(this);
         socket.onceAuthenticated(() => {
             this.myContacts = new MyContacts();
             this.myContacts.onUpdated = this.applyMyContactsData;

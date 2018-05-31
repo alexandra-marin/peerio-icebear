@@ -25,7 +25,7 @@ class ChatStoreSpaces {
 
     @computed
     get spaces() {
-        if (config.appLabel !== 'medcryptor') {
+        if (config.whiteLabel.name !== 'medcryptor') {
             return [];
         }
 

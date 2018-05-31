@@ -11,10 +11,10 @@ Given('I create a MedCryptor account with metadata', { timeout: 60000 }, async f
     this.ice.config.appLabel = 'medcryptor';
     this.ice.config.platform = 'ios';
     const medcryptorData = {
-        specialization: 'cardiology',
-        medicalID: '001',
-        country: 'Canada',
-        role: 'doctor'
+        mcrCountry: 'AU',
+        mcrSpecialty: 'specialty',
+        mcrRoles: ['doctor'],
+        mcrAHPRA: '001'
     };
 
     await this.createMedcryptorAccount(medcryptorData);

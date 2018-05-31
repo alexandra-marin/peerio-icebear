@@ -28,16 +28,58 @@ class ChatHead extends SyncedKeg {
     @observable purpose = '';
 
 
+    /** SPACE PROPERTIES */
+    /**
+     * @member {string} spaceId
+     * @memberof ChatHead
+     * @instance
+     * @public
+     */
+    @observable spaceId = null;
+
+    /**
+     * @member {string} spaceName
+     * @memberof ChatHead
+     * @instance
+     * @public
+     */
+    @observable spaceName = null;
+
+    /**
+     * @member {string} spaceDescription
+     * @memberof ChatHead
+     * @instance
+     * @public
+     */
+    @observable spaceDescription = null;
+
+    /**
+     * @member {enum: internal / patient} spaceRoomType
+     * @memberof ChatHead
+     * @instance
+     * @public
+     */
+    @observable spaceRoomType = null;
+
+
     serializeKegPayload() {
         return {
             chatName: this.chatName,
-            purpose: this.purpose
+            purpose: this.purpose,
+            spaceId: this.spaceId,
+            spaceName: this.spaceName,
+            spaceDescription: this.spaceDescription,
+            spaceRoomType: this.spaceRoomType
         };
     }
 
     deserializeKegPayload(payload) {
         this.chatName = payload.chatName || '';
         this.purpose = payload.purpose || '';
+        this.spaceId = payload.spaceId;
+        this.spaceName = payload.spaceName;
+        this.spaceDescription = payload.spaceDescription;
+        this.spaceRoomType = payload.spaceRoomType;
     }
 }
 

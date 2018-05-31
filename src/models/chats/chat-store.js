@@ -1,6 +1,7 @@
 const { observable, action, computed, reaction, autorunAsync, isObservableArray, when } = require('mobx');
 const Chat = require('./chat');
 const ChatStorePending = require('./chat-store.pending.js');
+const ChatStoreSpaces = require('./chat-store.spaces.js');
 const socket = require('../../network/socket');
 const tracker = require('../update-tracker');
 const { EventEmitter } = require('eventemitter3');
@@ -29,6 +30,7 @@ const Contact = require('../contacts/contact');
 class ChatStore {
     constructor() {
         this.pending = new ChatStorePending(this);
+        this.spacesHelper = new ChatStoreSpaces(this);
 
         reaction(() => this.activeChat, chat => {
             if (chat) chat.loadMessages();
@@ -181,7 +183,7 @@ class ChatStore {
      * @public
      */
     @computed get channels() {
-        return this.chats.filter(chat => chat.isChannel && chat.headLoaded);
+        return this.chats.filter(chat => chat.isChannel && chat.headLoaded && !chat.isInSpace);
     }
 
     /**
@@ -229,6 +231,20 @@ class ChatStore {
             return first.localeCompare(second);
         });
         return allRooms;
+    }
+
+    /**
+     * Subset of ChatStore#chats, contains all spaces
+     * @member {Array<Chat>} spaces
+     * @type {Array<Chat>} spaces
+     * @memberof ChatStore
+     * @readonly
+     * @instance
+     * @public
+     */
+    @computed
+    get spaces() {
+        return this.spacesHelper.spaces;
     }
 
     /**
@@ -514,12 +530,13 @@ class ChatStore {
      * @param {boolean=} isChannel
      * @param {string=} name
      * @param {string=} purpose - only for channels, not relevant for DMs
+     * @param {object=} space - only to create a space
      * @returns {?Chat} - can return null in case of paywall
      * @memberof ChatStore
      * @instance
      * @public
      */
-    @action async startChat(participants = [], isChannel = false, name, purpose, noActivate) {
+    @action async startChat(participants = [], isChannel = false, name, purpose, noActivate, space = null) {
         const cached = isChannel ? null : this.findCachedChatWithParticipants(participants);
         if (cached) {
             if (!noActivate) this.activate(cached.id);
@@ -544,6 +561,7 @@ class ChatStore {
             await chat.loadMetadata();
             if (!noActivate) this.activate(chat.id);
             if (name) await chat.rename(name);
+            if (space) await chat.setSpace(space);
             if (purpose) await chat.changePurpose(purpose);
             if (isChannel) {
                 chat.addParticipants(this.getSelflessParticipants(participants));

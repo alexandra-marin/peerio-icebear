@@ -15,6 +15,7 @@ const warnings = require('../warnings');
 const Contact = require('../contacts/contact');
 const chatInviteStore = require('../chats/chat-invite-store');
 const { asPromise } = require('../../helpers/prombservable');
+const { cryptoUtil } = require('../../crypto');
 // const volumeStore = require('../volumes/volume-store');
 
 // to assign when sending a message and don't have an id yet
@@ -406,6 +407,29 @@ class Chat {
      */
     @computed get purpose() {
         return this.chatHead && this.chatHead.purpose || '';
+    }
+
+    /**
+     * @member {bool} isInSpace
+     * @memberof Chat
+     * @instance
+     * @public
+     */
+    @computed get isInSpace() {
+        return this.chatHead && this.chatHead.spaceId;
+    }
+
+    /**
+     * @member {object} space
+     * @memberof Chat
+     * @instance
+     * @public
+     */
+    @computed get space() {
+        if (this.chatHead && this.chatHead.spaceId) {
+            return this.chatHead.space;
+        }
+        return null;
     }
 
     /**
@@ -948,6 +972,26 @@ class Chat {
                 m.setPurposeChangeFact(validated);
                 return this._sendMessage(m);
             });
+    }
+
+    /**
+     * @param {object} space - contains id, name, description, type
+     * @public
+     */
+    setSpace(space) {
+        const validated = space;
+        if (!space.spaceId) {
+            validated.spaceId = cryptoUtil.getRandomGlobalShortIdHex();
+        }
+        validated.spaceName = space.spaceName.trim().substr(0, config.chat.maxChatNameLength);
+        validated.spaceDescription = space.spaceDescription.trim().substr(0, config.chat.maxChatPurposeLength);
+
+        return this.chatHead.save(() => {
+            this.chatHead.spaceId = validated.spaceId;
+            this.chatHead.spaceName = validated.spaceName;
+            this.chatHead.spaceDescription = validated.spaceDescription;
+            this.chatHead.spaceRoomType = validated.spaceRoomType;
+        }, null, 'title_error');
     }
 
     /**

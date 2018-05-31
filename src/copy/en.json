@@ -856,6 +856,7 @@
   "mcr_title_patientRoomsDescription3": "Remove your doctors once consultation is done!",
   "mcr_title_primaryPhysician": "Primary Physician",
   "mcr_title_patientFiles": "Patient Files",
+  "mcr_title_general": "general",
   "mcr_title_newPatient": "New Patient",
   "mcr_title_newPatientDescription": "Adding a Patient automatically creates an Internal Discussion Room and a Consultation Room for the patient. Want to open a general Room for your practice? <toCreateRoom>Create a Room instead</>.",
   "mcr_title_newPatientRecord": "Name of the Patient Record",

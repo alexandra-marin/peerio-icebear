@@ -124,11 +124,11 @@ class FileStore extends FileStoreBase {
                             console.error(`Failed to migrate file ${file.fileId}`);
                         })
                 );
-            } else if (keg.descriptor) {
+            } else if (keg.props.descriptor) {
                 // file owner migrated it, we can migrate our keg
                 file.format = file.latestFormat;
                 file.descriptorKey = file.blobKey;
-                this.migrationQueue.addTask(() => retryUntilSuccess(() => file.saveToServer()));
+                this.migrationQueue.addTask(() => retryUntilSuccess(() => file.saveToServer(), null, 2));
             }
         }
     }

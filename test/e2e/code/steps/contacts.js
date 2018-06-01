@@ -10,6 +10,16 @@ async function findContact(query) {
     return contact;
 }
 
+async function inviteRandomEmail() {
+    this.invitedEmail = getRandomEmail();
+    await this.ice.contactStore.invite(this.invitedEmail);
+}
+
+async function inviteRandomEmailWithTemplate() {
+    this.invitedEmail = getRandomEmail();
+    await this.ice.contactStore.invite(this.invitedEmail, template);
+}
+
 Then('I can not find unregistered account by random username', function() {
     const username = getRandomUsername();
     const contact = ice.contactStore.getContact(username);
@@ -51,7 +61,7 @@ When('the test account is not my favorite contact', function() {
 });
 
 When('I invite random email', function() {
-    this.invitedEmail = this.inviteRandomEmail();
+    this.invitedEmail = inviteRandomEmail();
     return ice.contactStore.invite(this.invitedEmail);
 });
 
@@ -78,15 +88,15 @@ Then('I don\'t have pending dm', async function() {
 });
 
 When('I invite someone to Peerio', async function() {
-    return this.inviteRandomEmailWithTemplate('peerio');
+    return inviteRandomEmailWithTemplate('peerio');
 });
 
 When('I invite a MedCryptor doctor', async function() {
-    return this.inviteRandomEmailWithTemplate('medcryptor-doctor');
+    return inviteRandomEmailWithTemplate('medcryptor-doctor');
 });
 
 When('I invite a MedCryptor patient', function() {
-    return this.inviteRandomEmailWithTemplate('medcryptor-patient');
+    return inviteRandomEmailWithTemplate('medcryptor-patient');
 });
 
 Then('they receive Peerio templated email', { timeout: 120000 }, async function() {
@@ -102,11 +112,11 @@ Then('they receive MedCryptor patient templated email', { timeout: 120000 }, asy
 });
 
 Then('Peerio invites default to Peerio templated email', { timeout: 120000 }, async function() {
-    await this.inviteRandomEmail();
+    await inviteRandomEmail();
     await waitForEmail(this.invitedEmail, testConfig.inviteEmailSubject);
 });
 
 Then('MedCryptor invites default to doctor templated email', { timeout: 120000 }, async function() {
-    await this.inviteRandomEmail();
+    await inviteRandomEmail();
     await waitForEmail(this.invitedEmail, testConfig.inviteEmailSubjectMCDoctor);
 });

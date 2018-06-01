@@ -98,16 +98,6 @@ class PeerioAppWorld {
     createMedcryptorAccount = async (medcryptorData) => {
         return this.createAccount(null, null, false, medcryptorData);
     }
-
-    inviteRandomEmail = async () => {
-        this.invitedEmail = getRandomEmail();
-        await this.ice.contactStore.invite(this.invitedEmail);
-    }
-
-    inviteRandomEmailWithTemplate = async (template) => {
-        this.invitedEmail = getRandomEmail();
-        await this.ice.contactStore.invite(this.invitedEmail, template);
-    }
 }
 
 

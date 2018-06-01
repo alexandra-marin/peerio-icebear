@@ -54,7 +54,6 @@ Then('I create two internal rooms', async function() {
     this.internalRoom1 = await ice.chatStore.startChat([], true, 'test-internal1', 'test', null, this.space);
     await this.waitFor(() => this.internalRoom1.metaLoaded && ice.chatStore.activeChat);
 
-    this.space.spaceRoomType = 'internal';
     this.internalRoom2 = await ice.chatStore.startChat([], true, 'test-internal2', 'test', null, this.space);
     await this.waitFor(() => this.internalRoom2.metaLoaded && ice.chatStore.activeChat);
 });

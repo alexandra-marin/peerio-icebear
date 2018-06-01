@@ -1,5 +1,5 @@
 const { Then, When } = require('cucumber');
-const { getRandomUsername } = require('../helpers/random-data');
+const { getRandomUsername, getRandomEmail } = require('../helpers/random-data');
 const { waitForEmail } = require('../helpers/maildrop');
 const testConfig = require('../test-config');
 
@@ -15,7 +15,7 @@ async function inviteRandomEmail() {
     await this.ice.contactStore.invite(this.invitedEmail);
 }
 
-async function inviteRandomEmailWithTemplate() {
+async function inviteRandomEmailWithTemplate(template) {
     this.invitedEmail = getRandomEmail();
     await this.ice.contactStore.invite(this.invitedEmail, template);
 }

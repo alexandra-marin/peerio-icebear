@@ -1,7 +1,7 @@
 const { setWorldConstructor } = require('cucumber');
 const { getUrl } = require('./helpers/https');
+const { getRandomUsername } = require('../helpers/random-data');
 const { waitForEmail } = require('./helpers/maildrop');
-const { getRandomUsername, getRandomEmail } = require('./helpers/random-data');
 const testConfig = require('./test-config');
 
 /**

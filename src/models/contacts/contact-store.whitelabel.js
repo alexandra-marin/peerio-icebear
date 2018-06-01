@@ -12,7 +12,9 @@ function peerioContactFilter(contact /* , context */) {
 // Filter contacts in medcryptor workspace
 // Should return only medcryptor contacts in default context (null)
 // and Peerio and MedCryptor contacts in "newchat" context
+// For mobile always returns all users
 function medcryptorContactFilter(contact, context) {
+    if (config.isMobile) return true;
     switch (context) {
         case 'newchat': return true;
         default: return contact.appLabel === 'medcryptor';

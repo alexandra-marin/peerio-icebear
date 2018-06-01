@@ -183,7 +183,7 @@ class ChatStore {
      * @public
      */
     @computed get channels() {
-        return this.chats.filter(chat => chat.isChannel && chat.headLoaded && !chat.isInSpace);
+        return this.chats.filter(chat => chat.isChannel && chat.headLoaded);
     }
 
     /**
@@ -231,6 +231,20 @@ class ChatStore {
             return first.localeCompare(second);
         });
         return allRooms;
+    }
+
+    /**
+     * List of user's channels and invites that are *not* part of a space.
+     * 
+     * @member {Array} allNonSpaceRooms
+     * @type {Array} allNonSpaceRooms
+     * @memberof ChatStore
+     * @readonly
+     * @instance
+     * @public
+     */
+    @computed get allNonSpaceRooms() {
+        return this.allRooms.filter(c => !c.isInSpace)
     }
 
     /**

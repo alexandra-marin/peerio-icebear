@@ -37,6 +37,7 @@ class FileStoreMigration {
 
     async waitForStores() {
         await asPromise(this.fileStore, 'loaded', true);
+        await asPromise(this.fileStore.migrationQueue, 'length', 0);
         await asPromise(getChatStore(), 'loaded', true);
     }
 
@@ -78,7 +79,6 @@ class FileStoreMigration {
     async migrateToAccountVersion1() {
         if (this.migrationKeg.accountVersion === 1) return;
         this.performedByAnotherClient = false;
-        this.fileStore.pause();
 
         // trying to acquire lock
         if (!await this.canStartMigration()) {
@@ -86,6 +86,7 @@ class FileStoreMigration {
             this.performedByAnotherClient = true;
             this.pending = true;
             this.started = false;
+
             // Handle the case when another client disconnects during migration.
             const unsubscribe = socket.subscribe(socket.APP_EVENTS.fileMigrationUnlocked, async () => {
                 unsubscribe();
@@ -109,7 +110,6 @@ class FileStoreMigration {
             when(() => this.migrationKeg.accountVersion === 1, () => {
                 unsubscribe();
                 this.finishMigration();
-                this.fileStore.resume();
             });
             return;
         }

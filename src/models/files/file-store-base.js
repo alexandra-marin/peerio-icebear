@@ -23,6 +23,7 @@ class FileStoreBase {
 
         tracker.subscribeToKegUpdates(kegDb ? kegDb.id : 'SELF', 'file', () => {
             console.log('Files update event received');
+            if (this.paused) return;
             this.onFileDigestUpdate();
         });
     }
@@ -185,8 +186,6 @@ class FileStoreBase {
     }
 
     onFileDigestUpdate = _.debounce(() => {
-        if (this.paused) return;
-
         const digest = tracker.getDigest(this.kegDb.id, 'file');
         // this.unreadFiles = digest.newKegsCount;
         if (this.loaded && digest.maxUpdateId === this.maxUpdateId) {

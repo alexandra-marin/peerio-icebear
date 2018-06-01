@@ -242,7 +242,6 @@ class ChatStore {
      * @instance
      * @public
      */
-    @computed
     get spaces() {
         return this.spacesHelper.spaces;
     }

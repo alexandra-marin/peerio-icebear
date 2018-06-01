@@ -163,13 +163,13 @@ const config = new class {
 
     /**
      * Branding label for signup and login
-     * Default is null
+     * Contains name, default is empty string
      * See other allowed values in your branding guide
-     * @member {string}
+     * @member {object}
      * @memberof config
      * @public
      */
-    appLabel = null;
+    whiteLabel = { name: '' };
 
     /**
      * Unique device identifying string (optional).

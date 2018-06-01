@@ -1,14 +1,14 @@
 const { Given, Then } = require('cucumber');
 
 Given('I create a MedCryptor account', { timeout: 60000 }, async function() {
-    this.ice.config.appLabel = 'medcryptor';
+    this.ice.config.whiteLabel.name = 'medcryptor';
     this.ice.config.platform = 'ios';
     await this.createAccount();
     if (this.cucumbotClient) this.cucumbotClient.sendReady();
 });
 
 Given('I create a MedCryptor account with metadata', { timeout: 60000 }, async function() {
-    this.ice.config.appLabel = 'medcryptor';
+    this.ice.config.whiteLabel.name = 'medcryptor';
     this.ice.config.platform = 'ios';
     const medcryptorData = {
         specialization: 'cardiology',

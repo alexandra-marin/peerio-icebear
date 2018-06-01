@@ -81,8 +81,8 @@ module.exports = function mixUserAuthModule() {
                 // a new, cool client which is gonna use sessions
                 sessionId: this.sessionId || 'initialize'
             };
-            if (config.appLabel) {
-                req.appLabel = config.appLabel;
+            if (config.whiteLabel && config.whiteLabel.name) {
+                req.appLabel = config.whiteLabel.name;
             }
             if (deviceId) {
                 req.deviceId = deviceId;

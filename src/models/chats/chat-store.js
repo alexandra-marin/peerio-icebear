@@ -230,6 +230,9 @@ class ChatStore {
             const second = b.name || b.channelName;
             return first.localeCompare(second);
         });
+        if (config.whiteLabel.name === 'medcryptor') {
+            return allRooms.filter(c => !c.isInSpace);
+        }
         return allRooms;
     }
 
@@ -539,6 +542,7 @@ class ChatStore {
      * @public
      */
     @action async startChat(participants = [], isChannel = false, name, purpose, noActivate, space = null) {
+        console.log('STARTING CHAT');
         const cached = isChannel ? null : this.findCachedChatWithParticipants(participants);
         if (cached) {
             if (!noActivate) this.activate(cached.id);

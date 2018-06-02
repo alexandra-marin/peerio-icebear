@@ -250,6 +250,16 @@ class ChatStore {
     }
 
     /**
+     * currently selected/focused space.
+     * @member {string} activeSpace
+     * @type {string} activeSpace
+     * @memberof ChatStore
+     * @instance
+     * @public
+     */
+    @observable activeSpace = null;
+
+    /**
      * Does smart and efficient 'in-place' sorting of observable array.
      * Note that ObservableArray#sort creates copy of the array. This function sorts in place.
      * @protected
@@ -519,9 +529,18 @@ class ChatStore {
      */
     @action.bound
     switchToFirstChat() {
+        if (config.whiteLabel.name === 'medcryptor' && this.activeSpace) {
+            const active = this.spaces.find(x => x.spaceId === this.activeSpace);
+            const chats = active.internalRooms.concat(active.patientRooms);
+            const chatId = chats.length ? chats[0].id : null;
+            if (chatId) {
+                this.activate(chatId);
+                return;
+            }
+        }
         for (let i = 0; i < this.chats.length; i++) {
             const chat = this.chats[i];
-            if (chat.leaving) continue;
+            if (chat.leaving || chat.isInSpace) continue;
             this.activate(chat.id);
             return;
         }

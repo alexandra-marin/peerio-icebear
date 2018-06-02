@@ -1,13 +1,14 @@
-const { computed } = require('mobx');
+const { computed, observable } = require('mobx');
 const config = require('../../config');
 
 class Space {
     spaceId = '';
     spaceName = '';
     spaceDescription = '';
-    isNew = false;
     internalRooms = [];
     patientRooms = [];
+    
+    @observable isNew = false;
 
     countUnread = (count, room) => count + room.unreadCount;
     @computed get unreadCount() {

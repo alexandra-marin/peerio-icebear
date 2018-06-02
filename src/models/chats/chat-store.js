@@ -234,20 +234,6 @@ class ChatStore {
     }
 
     /**
-     * List of user's channels and invites that are *not* part of a space.
-     * 
-     * @member {Array} allNonSpaceRooms
-     * @type {Array} allNonSpaceRooms
-     * @memberof ChatStore
-     * @readonly
-     * @instance
-     * @public
-     */
-    @computed get allNonSpaceRooms() {
-        return this.allRooms.filter(c => !c.isInSpace)
-    }
-
-    /**
      * Subset of ChatStore#chats, contains all spaces
      * @member {Array<Chat>} spaces
      * @type {Array<Chat>} spaces

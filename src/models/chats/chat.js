@@ -420,19 +420,6 @@ class Chat {
     }
 
     /**
-     * @member {object} space
-     * @memberof Chat
-     * @instance
-     * @public
-     */
-    @computed get space() {
-        if (this.chatHead && this.chatHead.spaceId) {
-            return this.chatHead.space;
-        }
-        return null;
-    }
-
-    /**
      * @member {string} headLoaded
      * @memberof Chat
      * @instance

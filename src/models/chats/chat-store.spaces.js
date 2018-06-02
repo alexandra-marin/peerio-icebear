@@ -7,7 +7,7 @@ class Space {
     spaceDescription = '';
     internalRooms = [];
     patientRooms = [];
-    
+
     @observable isNew = false;
 
     countUnread = (count, room) => count + room.unreadCount;

@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.1.6"></a>
+## [5.1.6](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.1.5...v5.1.6) (2018-06-03)
+
+
+### Bug Fixes
+
+* reshared files in chats update properly ([0dcb1d3](https://github.com/PeerioTechnologies/peerio-icebear/commit/0dcb1d3))
+
+
+### Performance Improvements
+
+* more debounce ([7a5ce0d](https://github.com/PeerioTechnologies/peerio-icebear/commit/7a5ce0d))
+
+
+
 <a name="5.1.5"></a>
 ## [5.1.5](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.1.4...v5.1.5) (2018-06-03)
 

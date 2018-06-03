@@ -1,12 +1,11 @@
 const SyncedKeg = require('../kegs/synced-keg');
-const { observable } = require('mobx');
 
 class FileFoldersKeg extends SyncedKeg {
     constructor(db) {
         super('file_folders', db);
     }
 
-    @observable.shallow folders = [];
+    folders = [];
 
     serializeKegPayload() {
         return {

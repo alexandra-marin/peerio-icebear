@@ -1,11 +1,11 @@
-// @ts-check
-
 const { when } = require('mobx');
 const fileStore = require('../files/file-store');
 const config = require('../../config');
-const TaskQueue = require('../../helpers/task-queue');
 const { retryUntilSuccess } = require('../../helpers/retry');
 const socket = require('../../network/socket');
+const tracker = require('../update-tracker');
+const { getUser } = require('../../helpers/di-current-user');
+const File = require('../files/file');
 
 /**
  * File handling module for Chat. Extracted for readability.
@@ -13,19 +13,72 @@ const socket = require('../../network/socket');
  * @public
  */
 class ChatFileHandler {
+    knownUpdateId = '';
+    maxUpdateId = '';
     constructor(chat) {
         /**
          * @type {Chat} chat
          */
         this.chat = chat;
+        tracker.subscribeToKegUpdates(chat.id, 'file', this.onFileDigestUpdate);
+        tracker.onUpdated(this.onFileDigestUpdate, true);
     }
 
-    /**
-     * TaskQueue of files to share for paced process.
-     * @member {TaskQueue} shareQueue
-     * @protected
-     */
-    shareQueue = new TaskQueue(1, 2000);
+    onFileDigestUpdate = () => {
+        const msgDigest = tracker.getDigest(this.chat.id, 'file');
+        this.maxUpdateId = msgDigest.maxUpdateId;
+        if (this.knownUpdateId < msgDigest.knownUpdateId) this.knownUpdateId = msgDigest.knownUpdateId;
+        this.copyFileKegs();
+    }
+
+    copyFileKegs() {
+        if (!this.maxUpdateId || this.maxUpdateId === this.knownUpdateId || this.copyingFiles) return;
+        this.copyingFiles = true;
+        socket.send('/auth/kegs/db/query', {
+            kegDbId: this.chat.db.id,
+            type: 'file',
+            filter: {
+                collectionVersion: { $gt: this.knownUpdateId }
+            }
+        }, false)
+            .then(resp => {
+                if (!resp.kegs || !resp.kegs.length) return;
+
+                resp.kegs.forEach(keg => {
+                    if (this.knownUpdateId < keg.collectionVersion) {
+                        this.knownUpdateId = keg.collectionVersion;
+                    }
+                    if (keg.deleted) {
+                        fileStore.removeCachedChatKeg(this.chat.id, keg.kegId);
+                        return;
+                    }
+                    const file = new File(this.chat.db, fileStore);
+                    try {
+                        if (file.loadFromKeg(keg) && !file.deleted) {
+                            fileStore.updateCachedChatKeg(this.chat.id, file);
+                            if (this.chat.isChannel) {
+                                return;
+                            }
+                            // Not waiting for this to resolve. Internally it will do retries,
+                            // but on larger scale it's too complicated to handle recovery
+                            // from non-connection related errors
+                            file.copyTo(getUser().kegDb, fileStore);
+                        }
+                    } catch (err) {
+                        console.error(err);
+                    }
+                });
+            })
+            .then(() => {
+                this.copyingFiles = false;
+                tracker.seenThis(this.chat.db.id, 'file', this.knownUpdateId);
+                setTimeout(this.onFileDigestUpdate);
+            })
+            .catch(err => {
+                console.error('Error copying fileKegs to SELF', err);
+                this.copyingFiles = false;
+            });
+    }
 
     /**
      * Initiates file upload and shares it to the chat afterwards.
@@ -40,7 +93,7 @@ class ChatFileHandler {
      * @returns {File}
      * @public
      */
-    uploadAndShare(path, name, deleteAfterUpload = false, beforeShareCallback = null, message) {
+    uploadAndShare(path, name, deleteAfterUpload = false, message) {
         const file = fileStore.upload(path, name);
         file.uploadQueue = this.chat.uploadQueue; // todo: change, this is dirty
         this.chat.uploadQueue.push(file);
@@ -48,9 +101,6 @@ class ChatFileHandler {
         const deletedDisposer = when(() => file.deleted, removeFileFromQueue);
         when(() => file.readyForDownload, async () => {
             try {
-                if (beforeShareCallback) {
-                    await beforeShareCallback();
-                }
                 await this.share([file], message);
                 if (deleteAfterUpload) {
                     config.FileStream.delete(path);
@@ -71,42 +121,38 @@ class ChatFileHandler {
      * @param {string} [message = ''] message to attach to file
      * @returns {Promise}
      */
-    share(files, message = '') {
-        // @ts-ignore no bluebird-promise assignability with jsdoc
-        return Promise.map(files, (f) => {
-            return this.shareQueue.addTask(() => {
-                const ids = this.shareFileKegs([f]);
-                return this.chat.sendMessage(message, ids);
-            });
-        });
+    async share(files, message = '') {
+        if (!files || !files.length) return Promise.reject();
+        await Promise.map(files, f => f.share(this.chat));
+        const ids = files.map(f => f.fileId);
+        return this.chat.sendMessage(message, ids);
     }
-
 
     /**
-     * Shares existing Peerio files with a chat.
-     * This function performs only logical sharing, provides permissions/access for recipients.
-     * It doesn't inform recipients in the chat about the fact of sharing.
-     * @param {Array<File>} files
-     * @return {Array<string>} - fileId list
-     * @private
+     *
+     * @param {string|File} file - file id or instance
      */
-    shareFileKegs(files) {
-        if (!files || !files.length) return null;
-        const ids = [];
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i];
-            // todo: handle failure
-            file.share(this.chat.otherParticipants);
-            ids.push(file.fileId);
+    async unshare(file) {
+        if (typeof file === 'string') {
+            file = fileStore.getByIdInChat(file, this.chat.id); // eslint-disable-line no-param-reassign
+            await file.ensureLoaded();
+            if (file.deleted) return Promise.resolve();
         }
-        return ids;
+        if (file.db.id !== this.chat.id) {
+            return Promise.reject(
+                new Error('Attempt to unshare file from kegdb it does not belong to.')
+            );
+        }
+        return file.remove();
     }
+
 
     getRecentFiles() {
         return retryUntilSuccess(() => {
             return socket.send(
                 '/auth/kegs/db/files/latest',
-                { kegDbId: this.chat.id, count: config.chat.recentFilesDisplayLimit }
+                { kegDbId: this.chat.id, count: config.chat.recentFilesDisplayLimit },
+                false
             )
                 .then(res => {
                     const ids = [];

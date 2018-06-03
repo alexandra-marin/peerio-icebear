@@ -97,22 +97,22 @@ class UploadConfig {
 const config = new class {
     sdkVersion = _sdkVersion;
 
-    // debug = {
-    //     /**
-    //      * Traffic stat summary will be logged with this interval (ms.)
-    //      * @member {number} debug.trafficReportInterval
-    //      * @memberof config
-    //      * @public
-    //      */
-    //     trafficReportInterval: 5 * 60 * 1000,
-    //     /**
-    //      * All socket messages will be logged if set to `true` before socket is started.
-    //      * @member {boolean} debug.socketLogEnabled
-    //      * @memberof config
-    //      * @public
-    //      */
-    //     socketLogEnabled: false
-    // };
+    debug = {
+        /**
+         * Traffic stat summary will be logged with this interval (ms.)
+         * @member {number} debug.trafficReportInterval
+         * @memberof config
+         * @public
+         */
+        trafficReportInterval: 60 * 60 * 1000,
+        /**
+         * All socket messages will be logged if set to `true` before socket is started.
+         * @member {boolean} debug.socketLogEnabled
+         * @memberof config
+         * @public
+         */
+        socketLogEnabled: false
+    };
 
     /**
      * App server connection url. (wss://)
@@ -289,12 +289,14 @@ const config = new class {
 
     chat = {
         /**
-         * Maximum amount of chats to load initially. Favorite chats will ignore this and load in full number.
+         * Maximum amount of DM chats to load initially.
+         * Favorite chats do count toward this limit but will always load in full number, even if there's more
+         * favorite chats then limit allows.
          * @member {number} chat.maxInitialChats
          * @memberof config
          * @public
          */
-        maxInitialChats: 15,
+        maxInitialChats: 10,
         /**
          * Amount of messages to load to a chat initially.
          * @member {number} chat.initialPageSize
@@ -377,6 +379,9 @@ const config = new class {
         }
     };
 
+    /**
+     * How long to wait for external server to respond when unfurling urls posted in messages.
+     */
     unfurlTimeout = 30000;
 
     /**

@@ -182,7 +182,7 @@ class FileDownloader extends FileProcessor {
     };
 
     _getChunkUrl(from, to) {
-        return socket.send('/auth/file/url', this.getUrlParams)
+        return socket.send('/auth/file/url', this.getUrlParams, false)
             .then(f => `${f.url}?rangeStart=${from}&rangeEnd=${to}`);
     }
 

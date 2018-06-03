@@ -5,6 +5,7 @@ const { observable, action } = require('mobx');
 const { getContactStore } = require('../../helpers/di-contact-store');
 const { getUser } = require('../../helpers/di-current-user');
 const { asPromise, asPromiseMultiValue } = require('../../helpers/prombservable');
+const { DecryptionError } = require('../../errors');
 
 let temporaryKegId = 0;
 function getTemporaryKegId() {
@@ -51,12 +52,6 @@ class Keg {
          */
         this.overrideKey = null;
         /**
-         * Keg format version, client tracks kegs structure changes with this property
-         * @member {number}
-         * @public
-         */
-        this.format = 0;
-        /**
          * Keg collection (all kegs with this.type) version, snowflake string id.
          * null means we don't know the version yet, need to fetch keg at least once.
          * @member {?string}
@@ -86,6 +81,12 @@ class Keg {
         this.storeSignerData = storeSignerData;
     }
 
+    /**
+     * Keg format version, client tracks kegs structure changes with this property
+     * @member {number}
+     * @public
+     */
+    @observable format = 0;
     /**
      * null when signature has not been verified yet (it's async) or it will never be because this keg is not supposed
      * to be signed.
@@ -224,7 +225,7 @@ class Keg {
         return socket.send('/auth/kegs/create', {
             kegDbId: this.db.id,
             type: this.type
-        }).then(resp => {
+        }, false).then(resp => {
             this.id = resp.kegId;
             this.version = resp.version;
             this.collectionVersion = resp.collectionVersion;
@@ -298,7 +299,7 @@ class Keg {
                 version: lastVersion + 1,
                 format: this.format
             }
-        })).then(resp => {
+        }, true)).then(resp => {
             this.pendingReEncryption = false;
             this.dirty = false;
             this.collectionVersion = resp.collectionVersion;
@@ -334,9 +335,9 @@ class Keg {
         return socket.send('/auth/kegs/get', {
             kegDbId: this.db.id,
             kegId: this.id
-        })
+        }, false)
             .catch((err) => {
-                if (this.allowEmpty && err instanceof ServerError && err.code === ServerError.codes.notFound) {
+                if (this.allowEmpty && err && err.code === ServerError.codes.notFound) {
                     // expected error for empty named kegs
                     const keg = {
                         kegId: this.id,
@@ -369,7 +370,7 @@ class Keg {
         return socket.send('/auth/kegs/delete', {
             kegDbId: this.db.id,
             kegId: this.id
-        });
+        }, false);
     }
 
     /**
@@ -393,7 +394,7 @@ class Keg {
             // empty kegs (esp. named) have a potential to overwrite values so we do it carefully
             this.id = keg.kegId;
             this.version = keg.version;
-            this.format = keg.format || this.format || 0; // this is a new field so older kegs might not have it
+            this.format = keg.format || 0; // this is a new field so older kegs might not have it
             this.type = keg.type || this.type; // so anti-tamper can detect it
             this.owner = keg.owner;
             this.deleted = keg.deleted;
@@ -452,11 +453,16 @@ class Keg {
                 this.detectTampering(payload);
             }
             this.deserializeKegPayload(payload);
+            if (keg.props && keg.props.descriptor) this.deserializeDescriptor(keg.props.descriptor);
             if (this.afterLoad) this.afterLoad();
             this.loaded = true;
             return this;
         } catch (err) {
             console.error(err, this.id);
+            // TODO: refactor this fucntion to return error code instead
+            if (err instanceof DecryptionError) {
+                this.decryptionError = true;
+            }
             this.lastLoadHadError = true;
             return false;
         }

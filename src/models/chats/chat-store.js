@@ -1,13 +1,10 @@
-// @ts-check
-
-const { observable, action, computed, reaction, autorunAsync, isObservableArray, when, runInAction } = require('mobx');
+const { observable, action, computed, reaction, autorunAsync, isObservableArray, when } = require('mobx');
 const Chat = require('./chat');
 const ChatStorePending = require('./chat-store.pending.js');
 const socket = require('../../network/socket');
 const tracker = require('../update-tracker');
 const { EventEmitter } = require('eventemitter3');
 const _ = require('lodash');
-const { retryUntilSuccess } = require('../../helpers/retry');
 const MyChats = require('../chats/my-chats');
 const TinyDb = require('../../db/tiny-db');
 const config = require('../../config');
@@ -18,6 +15,7 @@ const { setChatStore } = require('../../helpers/di-chat-store');
 const { getFileStore } = require('../../helpers/di-file-store');
 const { cryptoUtil } = require('../../crypto');
 const chatInviteStore = require('./chat-invite-store');
+const dbListProvider = require('../../helpers/keg-db-list-provider');
 
 // Used for typechecking
 // eslint-disable-next-line no-unused-vars
@@ -308,10 +306,13 @@ class ChatStore {
             } else if (!bmsg) {
                 return -1;
             }
-            return amsg.timestamp > bmsg.timestamp ? -1 : 1;
+            if (amsg.timestamp > bmsg.timestamp) return -1;
+            if (amsg.timestamp < bmsg.timestamp) return 1;
+            return 0;
         }
         // a is not fav, b is fav
-        return 1;
+        if (b.isFavorite) return 1;
+        return 0;
     }
 
     processChannelDeletedEvent = data => {
@@ -343,17 +344,20 @@ class ChatStore {
      * @param {string | Chat} chat - chat id or Chat instance
      * @public
      */
-    addChat = (chat) => {
+    @action.bound addChat(chat, noActivate) {
         if (!chat) throw new Error(`Invalid chat id. ${chat}`);
         let c;
         if (typeof chat === 'string') {
-            if (chat === 'SELF' || this.chatMap[chat]) return;
+            if (chat === 'SELF' || this.chatMap[chat]
+                || !(chat.startsWith('channel:') || chat.startsWith('chat:'))) {
+                return this.chatMap[chat];
+            }
             c = new Chat(chat, undefined, this, chat.startsWith('channel:'));
         } else {
             c = chat;
             if (this.chatMap[c.id]) {
                 console.error('Trying to add a copy of an instance of a chat that already exists.', c.id);
-                return;
+                return this.chatMap[c.id];
             }
         }
 
@@ -365,8 +369,9 @@ class ChatStore {
         if (this.myChats.hidden.includes(c.id)) c.unhide();
         c.loadMetadata().then(() => c.loadMostRecentMessage())
             .then(() => this.pending.onChatAdded(c));
-        if (this.loaded && !this.activeChat) this.activate(c.id);
-    };
+        if (this.loaded && !this.activeChat && !noActivate) this.activate(c.id);
+        return c;
+    }
 
     // takes current fav/hidden lists and makes sure store.chats reflect it
     // at first login this class and chat list loader will call this function once each making sure data is applied
@@ -411,42 +416,35 @@ class ChatStore {
     @action async loadAllChats() {
         if (this.loaded || this.loading) return;
         this.loading = true;
-        await asPromise(tracker, 'updatedAfterReconnect', true);
-        // 1. Loading my_chats keg
+
+        await tracker.waitUntilUpdated();
+
+        // subscribe to future chats that will be created
+        tracker.subscribeToKegDbAdded(this.addChat);
+
+        // Loading my_chats keg
         this.myChats = new MyChats();
         this.myChats.onUpdated = this.applyMyChatsData;
-        // 2. loading favorite chats
-        // gonna happen in applyMyChatsData when fav list is loaded
         await asPromise(this.myChats, 'loaded', true);
-        // 3. checking how many more chats we can load
-        const rest = config.chat.maxInitialChats - this.myChats.favorites.length;
-        if (rest > 0) {
-            // 4. loading the rest unhidden chats
-            await retryUntilSuccess(() =>
-                socket.send('/auth/kegs/user/dbs')
-                    .then(action(list => {
-                        let k = 0;
-                        for (const id of list) {
-                            if (id.startsWith('channel:')) {
-                                this.addChat(id);
-                                continue;
-                            }
-                            if (id === 'SELF' || this.myChats.hidden.includes(id)
-                                || this.myChats.favorites.includes(id)) continue;
-                            if (k++ >= rest) continue;
-                            this.addChat(id);
-                        }
-                    })));
+
+        // loading favorite chats
+        // ..... gonna happen in applyMyChatsData when fav list is loaded
+
+        // loading all the channels
+        const channels = await dbListProvider.getChannels();
+        channels.forEach(this.addChat);
+
+        // checking how many more chats we can load
+        let chatsLeft = config.chat.maxInitialChats - this.myChats.favorites.length;
+        // loading the rest unhidden chats
+        const dms = await dbListProvider.getDMs();
+        for (const id of dms) {
+            const d = tracker.getDigest(id, 'message');
+            if (chatsLeft <= 0 && d.maxUpdateId === d.knownUpdateId) continue;
+            if (this.myChats.favorites.includes(id)) continue;
+            this.addChat(id);
+            chatsLeft--;
         }
-        // 5. check if chats were created while we were loading chat list
-        // unlikely, but possible
-        runInAction(() => {
-            Object.keys(tracker.digest).forEach(this.addChat);
-        });
-        // 6. subscribe to future chats that will be created
-        // this should always happen right after adding chats from digest, synchronously,
-        // so that there's no new chats that can slip away
-        tracker.onKegDbAdded(this.addChat);
 
         // 7. waiting for most chats to load but up to a reasonable time
         await Promise.map(this.chats, chat => asPromise(chat, 'headLoaded', true))
@@ -524,30 +522,40 @@ class ChatStore {
      * @instance
      * @public
      */
-    @action startChat(participants = [], isChannel = false, name, purpose) {
+    @action async startChat(participants = [], isChannel = false, name, purpose, noActivate) {
         const cached = isChannel ? null : this.findCachedChatWithParticipants(participants);
         if (cached) {
-            this.activate(cached.id);
+            if (!noActivate) this.activate(cached.id);
             return cached;
         }
         if (isChannel && getUser().channelsLeft === 0) {
             warnings.add('error_channelLimitReached');
             return null;
         }
-        // we can't add participants before setting channel name because
-        // server will trigger invites and send empty chat name to user
-        const chat = new Chat(null, isChannel ? [] : this.getSelflessParticipants(participants), this, isChannel);
-        runInAction(async () => {
+        try {
+            // we can't add participants before setting channel name because
+            // server will trigger invites and send empty chat name to user
+            let chat = new Chat(null, isChannel ? [] : this.getSelflessParticipants(participants), this, isChannel);
             await chat.loadMetadata();
-            this.addChat(chat);
-            this.activate(chat.id);
+            // There's a concurrency situation, because 'addChat' can be called before this
+            // by the event from server (db added).
+            // Event can arrive before this call not only as a result of our DM creation, but also
+            // if we get lucky and our contact creates same DM right before we do.
+            // That is why addChat returns the correct instance and we overwrite our chat variable.
+            chat = this.addChat(chat);
+            // in case instance has changed, otherwise resolves immediately
+            await chat.loadMetadata();
+            if (!noActivate) this.activate(chat.id);
             if (name) await chat.rename(name);
             if (purpose) await chat.changePurpose(purpose);
             if (isChannel) {
                 chat.addParticipants(this.getSelflessParticipants(participants));
             }
-        });
-        return chat;
+            return chat;
+        } catch (err) {
+            console.error(err);
+            return null;
+        }
     }
 
     /**
@@ -592,14 +600,21 @@ class ChatStore {
      * @instance
      * @public
      */
-    @action startChatAndShareFiles(participants, fileOrFiles) {
+    @action async startChatAndShareFiles(participants, fileOrFiles) {
         const files = (Array.isArray(fileOrFiles) || isObservableArray(fileOrFiles)) ? fileOrFiles : [fileOrFiles];
-        const chat = this.startChat(participants);
+        const chat = await this.startChat(participants);
         if (!chat) return Promise.reject(new Error('Failed to create chat'));
         return chat.loadMetadata().then(() => {
-            chat.shareFiles(files);
+            chat.shareFilesAndFolders(files);
             this.activate(chat.id);
         });
+    }
+
+    @action async startChatAndShareVolume(participant, volume) {
+        const chat = await this.startChat([participant]);
+        if (!chat) return Promise.reject(new Error('Failed to create chat'));
+        await chat.loadMetadata();
+        return chat.shareVolume(volume);
     }
 
     /**

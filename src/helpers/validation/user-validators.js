@@ -59,7 +59,7 @@ function _callServer(context, name, value) {
     }
     return new Promise(resolve => {
         const timeout = setTimeout(() => {
-            socket.send('/noauth/validate', { context, name, value })
+            socket.send('/noauth/validate', { context, name, value }, false)
                 .then(resp => {
                     resolve(!!resp && resp.valid);
                 })

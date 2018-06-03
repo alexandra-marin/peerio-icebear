@@ -16,7 +16,8 @@ module.exports = {
     // email subject when receiving a Peerio email invitation to join from another user
     inviteEmailSubject: 'Firstname Lastname has invited you to Peerio (Staging)!',
     // will output every websocket message, incoming and outgoing to console
-    logSocketMessages: false,
+    logSocketMessages: true,
     // will output application logs to console
-    showAppLogs: !!process.env.SHOW_APP_LOGS
+    showAppLogs: !!process.env.SHOW_APP_LOGS,
+    muteCucumbot: false
 };

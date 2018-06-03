@@ -1,5 +1,3 @@
-// @ts-check
-
 const { observable, computed, when } = require('mobx');
 const contactStore = require('./../contacts/contact-store');
 const User = require('./../user/user');
@@ -34,6 +32,7 @@ class Message extends Keg {
         // format 1 adds richText property to payload.
         // this property will be be overwritten when keg is dehydrated from older format data,
         this.format = 1;
+        this.latestFormat = this.format;
     }
 
     static unfurlQueue = new TaskQueue(5);
@@ -153,9 +152,14 @@ class Message extends Keg {
         this.version = 0;
         this.sender = contactStore.currentUser;
         this.timestamp = new Date();
-
-        // @ts-ignore we can't use jsdoc annotations to make bluebird promises assignable to global promises!
-        return (this.systemData ? retryUntilSuccess(() => this.saveToServer()) : this.saveToServer())
+        let promise;
+        // we want to auto-retry system messages and messages containing file attachments
+        if (this.systemData || (this.files && this.files.length) || (this.folders && this.folders.length)) {
+            promise = retryUntilSuccess(() => this.saveToServer());
+        } else {
+            promise = this.saveToServer();
+        }
+        return promise
             .catch(err => {
                 this.sendError = true;
                 console.error('Error sending message', err);
@@ -354,6 +358,7 @@ class Message extends Keg {
     }
 
     serializeKegPayload() {
+        this.format = this.latestFormat;
         this.userMentions = this.text
             ? _.uniq(this.db.participants.filter((u) => this.text.match(u.mentionRegex)).map((u) => u.username))
             : [];
@@ -362,7 +367,8 @@ class Message extends Keg {
             timestamp: this.timestamp.valueOf(),
             userMentions: this.userMentions
         };
-        this._serializeFileAttachments(ret);
+        if (this.files) ret.files = JSON.stringify(this.files);
+        if (this.folders) ret.folders = JSON.stringify(this.folders);
         if (this.systemData) {
             ret.systemData = this.systemData;
         }
@@ -407,6 +413,7 @@ class Message extends Keg {
          * @public
          */
         this.files = payload.files ? JSON.parse(payload.files) : null;
+        this.folders = payload.folders ? JSON.parse(payload.folders) : null;
         /**
          * Does this message mention current user.
          * @member {boolean} isMention
@@ -417,13 +424,9 @@ class Message extends Keg {
 
     serializeProps() {
         const ret = {};
-        this._serializeFileAttachments(ret);
+        // for future server notifications
         if (this.systemData) ret.systemAction = this.systemData.action;
         return ret;
-    }
-
-    _serializeFileAttachments(obj) {
-        if (this.files) obj.files = JSON.stringify(this.files);
     }
 
     deserializeProps() {

@@ -334,7 +334,7 @@ class ContactStore {
 
     _getBatchPage(emails, pos) {
         if (pos >= emails.length) return Promise.resolve([]);
-        return socket.send('/auth/user/lookup', { string: emails.slice(pos, pos + 15) });
+        return socket.send('/auth/user/lookup', { string: emails.slice(pos, pos + 15) }, false);
     }
 
     /**
@@ -448,7 +448,7 @@ class ContactStore {
     invite(email) {
         return socket.send('/auth/contacts/invite', { email })
             .then(() => {
-                warnings.add('snackbar_emailInviteSent');
+                warnings.add('snackbar_contactInvited');
             })
             .catch(() => {
                 warnings.add('error_emailInviteSend');
@@ -469,14 +469,6 @@ class ContactStore {
         usernames.forEach(u => this.getContactAndSave(u));
     }
 
-    loadLegacyContacts() {
-        return socket.send('/auth/legacy/contacts/get')
-            .then(list => {
-                console.log(`contact-store.js: load legacy contacts`);
-                // console.log(list);
-                list && list.length && this._merge(list);
-            });
-    }
     /**
      * Populates contact store with contact list from tofu kegs.
      * Any contact that your app ever encountered has a tofu keg.

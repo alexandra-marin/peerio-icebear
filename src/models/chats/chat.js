@@ -1,5 +1,3 @@
-// @ts-check
-
 const { observable, computed, action, when, reaction } = require('mobx');
 const Message = require('./message');
 const ChatKegDb = require('../kegs/chat-keg-db');
@@ -16,6 +14,8 @@ const socket = require('../../network/socket');
 const warnings = require('../warnings');
 const Contact = require('../contacts/contact');
 const chatInviteStore = require('../chats/chat-invite-store');
+const { asPromise } = require('../../helpers/prombservable');
+// const volumeStore = require('../volumes/volume-store');
 
 // to assign when sending a message and don't have an id yet
 let temporaryChatId = 0;
@@ -772,10 +772,11 @@ class Chat {
      * @returns {Promise}
      * @memberof Chat
      */
-    @action sendMessage(text, files) {
+    @action sendMessage(text, files, folders) {
         const m = new Message(this.db);
-        m.files = files;
         m.text = text;
+        m.files = files;
+        m.folders = folders;
         return this._sendMessage(m);
     }
 
@@ -843,8 +844,8 @@ class Chat {
      * @returns {Promise}
      * @public
      */
-    uploadAndShareFile(path, name, deleteAfterUpload = false, beforeShareCallback = null, message = null) {
-        return this._fileHandler.uploadAndShare(path, name, deleteAfterUpload, beforeShareCallback, message);
+    uploadAndShareFile(path, name, deleteAfterUpload = false, message = null) {
+        return this._fileHandler.uploadAndShare(path, name, deleteAfterUpload, message);
     }
 
     /**
@@ -854,6 +855,25 @@ class Chat {
      */
     shareFiles(files) {
         return this._fileHandler.share(files);
+    }
+    unshareFile(file) {
+        return this._fileHandler.unshare(file);
+    }
+
+    shareVolume(volume) {
+        this.sendMessage('', null, [volume.id]);
+    }
+
+
+    async shareFilesAndFolders(filesAndFolders) {
+        const files = filesAndFolders.filter(f => !f.isFolder);
+        const folders = filesAndFolders.filter(f => f.isFolder);
+        if (files.length) {
+            await this.shareFiles(files);
+        }
+        if (folders.length) {
+            folders.forEach(f => f.isShared && f.addParticipants([this.dmPartnerUsername]));
+        }
     }
 
     /**
@@ -1248,6 +1268,13 @@ class Chat {
         this._sendMessage(m);
     }
 
+    sendSharedFolder(folder) {
+        const m = new Message(this.db);
+        m.folders = [folder];
+        return this._sendMessage(m);
+    }
+
+
     /**
      * Checks if there are any file attachments in new message batch and adds them to _recentFiles if needed.
      * @private
@@ -1279,6 +1306,10 @@ class Chat {
             this.messages[i].parseExternalContent();
         }
         this.resetScheduled = false;
+    }
+
+    ensureMetaLoaded() {
+        return asPromise(this, 'metaLoaded', true);
     }
 
     dispose() {

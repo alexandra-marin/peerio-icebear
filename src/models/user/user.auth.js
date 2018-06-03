@@ -22,7 +22,6 @@ module.exports = function mixUserAuthModule() {
                 switch (e.code) {
                     case errors.ServerError.codes.sdkVersionDeprecated:
                     case errors.ServerError.codes.clientVersionDeprecated:
-                        warnings.addSevere('warning_deprecated');
                         clientApp.clientVersionDeprecated = true;
                         break;
                     case errors.ServerError.codes.twoFAAuthRequired:
@@ -59,7 +58,7 @@ module.exports = function mixUserAuthModule() {
     this._loadAuthSalt = () => {
         console.log('Loading auth salt');
         if (this.authSalt) return Promise.resolve();
-        return socket.send('/noauth/auth-salt/get', { username: this.username })
+        return socket.send('/noauth/auth-salt/get', { username: this.username }, false)
             .then((response) => {
                 this.authSalt = new Uint8Array(response.authSalt);
             });
@@ -78,11 +77,13 @@ module.exports = function mixUserAuthModule() {
                 arch: config.arch,
                 clientVersion: config.appVersion,
                 sdkVersion: config.sdkVersion,
-                appLabel: config.appLabel,
                 // sending whatever string in the beginning to let server know we are
                 // a new, cool client which is gonna use sessions
                 sessionId: this.sessionId || 'initialize'
             };
+            if (config.appLabel) {
+                req.appLabel = config.appLabel;
+            }
             if (deviceId) {
                 req.deviceId = deviceId;
             }
@@ -90,7 +91,7 @@ module.exports = function mixUserAuthModule() {
                 this.trustedDevice = cookieData.trusted;
                 req.twoFACookie = cookieData.cookie;
             }
-            return socket.send('/noauth/auth-token/get', req);
+            return socket.send('/noauth/auth-token/get', req, true);
         })
             .then(resp => util.convertBuffers(resp));
     };
@@ -105,7 +106,7 @@ module.exports = function mixUserAuthModule() {
         if (decrypted[0] !== 65 || decrypted[1] !== 84 || decrypted.length !== 32) {
             return Promise.reject(new Error('Auth token plaintext is of invalid format.'));
         }
-        return socket.send('/noauth/authenticate', { decryptedAuthToken: decrypted.buffer })
+        return socket.send('/noauth/authenticate', { decryptedAuthToken: decrypted.buffer }, true)
             .then(resp => {
                 if (this.sessionId && resp.sessionId !== this.sessionId) {
                     console.log('Digest session has expired.');

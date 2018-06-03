@@ -465,7 +465,7 @@ class ChatStore {
         channels.forEach(this.addChat);
 
         // checking how many more chats we can load
-        let chatsLeft = config.chat.maxInitialChats - this.myChats.favorites.length - channels.length;
+        let chatsLeft = config.chat.maxInitialChats - this.myChats.favorites.length;
         // loading the rest unhidden chats
         const dms = await dbListProvider.getDMs();
         for (const id of dms) {

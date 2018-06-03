@@ -289,12 +289,14 @@ const config = new class {
 
     chat = {
         /**
-         * Maximum amount of chats to load initially. Favorite chats will ignore this and load in full number.
+         * Maximum amount of DM chats to load initially.
+         * Favorite chats do count toward this limit but will always load in full number, even if there's more
+         * favorite chats then limit allows.
          * @member {number} chat.maxInitialChats
          * @memberof config
          * @public
          */
-        maxInitialChats: 15,
+        maxInitialChats: 10,
         /**
          * Amount of messages to load to a chat initially.
          * @member {number} chat.initialPageSize

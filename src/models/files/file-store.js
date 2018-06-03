@@ -16,6 +16,7 @@ const FileStoreBase = require('./file-store-base');
 const FileStoreBulk = require('./file-store.bulk');
 const util = require('../../util');
 const { asPromise } = require('../../helpers/prombservable');
+const _ = require('lodash');
 
 class FileStore extends FileStoreBase {
     isMainStore = true;
@@ -23,6 +24,8 @@ class FileStore extends FileStoreBase {
         super(null, null, 'main');
         this.bulk = new FileStoreBulk(this);
         this.migration = new FileStoreMigration(this);
+        // currently gets updated by each chat.file-handler inside 'copyKegs()'
+        // not very intuitive, but until we make a special file store for chats it works
         this.chatFileMap = observable.map();
 
         tracker.subscribeToFileDescriptorUpdates(() => {
@@ -46,7 +49,7 @@ class FileStore extends FileStoreBase {
         return !this.files.length && !this.folderStore.root.folders.length;
     }
 
-    updateDescriptors() {
+    updateDescriptors = _.debounce(() => {
         if (this.paused) return;
 
         const taskId = 'updating descriptors';
@@ -94,7 +97,7 @@ class FileStore extends FileStoreBase {
             tracker.seenThis(tracker.DESCRIPTOR_PATH, null, this.knownDescriptorVersion);
             if (this.knownDescriptorVersion < tracker.fileDescriptorDigest.maxUpdateId) this.updateDescriptors();
         });
-    }
+    }, 2000, { leading: true, maxWait: 4000 });
 
     @action.bound onInitialFileAdded(keg, file) {
         if (!file.format) {
@@ -239,6 +242,7 @@ class FileStore extends FileStoreBase {
         }
     }
 
+    // TODO: i think this will do parallel loading with chat.file-handler of newly shared files
     loadChatFile(fileId, kegDbId) {
         const chat = getChatStore().chatMap[kegDbId];
         if (!chat) {
@@ -297,6 +301,11 @@ class FileStore extends FileStoreBase {
                 return;
             }
         }
+    }
+    updateCachedChatKeg(chatId, keg) {
+        const map = this.chatFileMap.get(chatId);
+        if (!map) return;
+        map.set(keg.fileId, keg);
     }
 
     /**

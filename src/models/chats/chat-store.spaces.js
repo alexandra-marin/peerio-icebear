@@ -11,6 +11,7 @@ class Space {
     @observable isNew = false;
 
     countUnread = (count, room) => count + room.unreadCount;
+
     @computed get unreadCount() {
         const internalRoomsUnread = this.internalRooms.reduce(this.countUnread, 0);
         const patientRoomsUnread = this.patientRooms.reduce(this.countUnread, 0);

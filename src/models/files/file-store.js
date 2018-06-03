@@ -16,6 +16,7 @@ const FileStoreBase = require('./file-store-base');
 const FileStoreBulk = require('./file-store.bulk');
 const util = require('../../util');
 const { asPromise } = require('../../helpers/prombservable');
+const _ = require('lodash');
 
 class FileStore extends FileStoreBase {
     isMainStore = true;
@@ -46,7 +47,7 @@ class FileStore extends FileStoreBase {
         return !this.files.length && !this.folderStore.root.folders.length;
     }
 
-    updateDescriptors() {
+    updateDescriptors = _.debounce(() => {
         if (this.paused) return;
 
         const taskId = 'updating descriptors';
@@ -94,7 +95,7 @@ class FileStore extends FileStoreBase {
             tracker.seenThis(tracker.DESCRIPTOR_PATH, null, this.knownDescriptorVersion);
             if (this.knownDescriptorVersion < tracker.fileDescriptorDigest.maxUpdateId) this.updateDescriptors();
         });
-    }
+    }, 2000, { leading: true, maxWait: 4000 });
 
     @action.bound onInitialFileAdded(keg, file) {
         if (!file.format) {

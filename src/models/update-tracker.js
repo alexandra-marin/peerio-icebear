@@ -16,20 +16,17 @@ const { asPromise } = require('../helpers/prombservable');
  *    (because we might have missed it while disconnected).
  *
  * @namespace UpdateTracker
- * @protected
  */
 class UpdateTracker {
     DESCRIPTOR_PATH = 'global:fileDescriptor:updated'
     /**
      * listeners to new keg db added event
      * @member {Array<function>}
-     * @private
      */
     dbAddedHandlers = [];
     /**
      * Listeners to changes in existing keg databases.
      * @member {{kegDbId: {kegType: function}}}
-     * @private
      */
     updateHandlers = {};
 
@@ -104,7 +101,6 @@ class UpdateTracker {
      * so we want to avoid null reference. This function will return zeroes in case of null.
      * @param {string} id - keg db id
      * @param {string} type - keg type
-     * @protected
      */
     getDigest(id, type) {
         if (!this.digest[id]) return this.zeroDigest;
@@ -116,7 +112,6 @@ class UpdateTracker {
     /**
      * Subscribes handler to an event of new keg db created for this user
      * @param {function} handler
-     * @protected
      */
     subscribeToKegDbAdded(handler) {
         if (this.dbAddedHandlers.includes(handler)) {
@@ -131,7 +126,6 @@ class UpdateTracker {
      * @param {string} kegDbId - id of the db to watch
      * @param {string} kegType - keg type to watch
      * @param {function} handler
-     * @protected
      */
     subscribeToKegUpdates(kegDbId, kegType, handler) {
         if (!this.updateHandlers[kegDbId]) {
@@ -155,7 +149,6 @@ class UpdateTracker {
     /**
      * Unsubscribes handler from all events (subscribeToKegUpdates, subscribeToKegDbAdded)
      * @param {function} handler
-     * @protected
      */
     unsubscribe(handler) {
         let ind = this.dbAddedHandlers.indexOf(handler);
@@ -215,7 +208,6 @@ class UpdateTracker {
 
     /**
      * Emits event informing about new database getting loaded into runtime
-     * @private
      */
     emitKegDbAddedEvent(id) {
         if (id === 'SELF' || !this.loadedOnce) return;
@@ -233,7 +225,6 @@ class UpdateTracker {
      * Emits one update event for a keg type in specific database.
      * @param {string} id
      * @param {string} type
-     * @private
      */
     emitKegTypeUpdatedEvent(id, type) {
         if (!this.loadedOnce) {
@@ -254,7 +245,6 @@ class UpdateTracker {
 
     /**
      * Handles server response to digest query.
-     * @private
      */
     processDigestResponse(digest) {
         console.log('Processing digest response');
@@ -275,7 +265,6 @@ class UpdateTracker {
 
     /**
      * Fills digest with full update info from server.
-     * @private
      */
     loadDigest = async () => {
         console.log('Requesting full digest');
@@ -320,7 +309,6 @@ class UpdateTracker {
      * @param {string} id - keg db id
      * @param {string} type - keg type
      * @param {string} updateId - max known update id
-     * @protected
      */
     seenThis(id, type, updateId, throttle = true) {
         if (!updateId) return;

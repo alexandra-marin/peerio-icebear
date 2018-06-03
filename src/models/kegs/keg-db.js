@@ -4,28 +4,23 @@ const tracker = require('../../models/update-tracker');
 /**
  * Keg database.
  * This class is for user's own database ('SELF')
- * @public
  */
 class KegDb {
     /**
      * Always equals 'SELF'
      * @member {string}
-     * @public
      */
     id;
 
     /**
      * Database key to use for keg encryption.
      * @member {Uint8Array}
-     * @public
      */
     key;
 
     /**
      * Current key id for the database
      * @member {?string}
-     * @readonly
-     * @public
      */
     get keyId() {
         return this.boot ? this.boot.kegKeyId : null;
@@ -33,7 +28,6 @@ class KegDb {
 
     /**
      * @member {BootKeg}
-     * @public
      */
     boot;
 
@@ -48,7 +42,6 @@ class KegDb {
      * @param {KeyPair} signKeys
      * @param {KeyPair} encryptionKeys
      * @param {Uint8Array} kegKey
-     * @protected
      */
     createBootKeg(bootKey, signKeys, encryptionKeys, kegKey) {
         console.log('Creating boot keg of "SELF".');
@@ -67,7 +60,6 @@ class KegDb {
     /**
      * Retrieves boot keg for the db and initializes this KegDb instance with required data.
      * @param {Uint8Array} bootKey
-     * @protected
      */
     loadBootKeg(bootKey) {
         console.log('Loading boot keg of "SELF".');

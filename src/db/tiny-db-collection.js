@@ -18,7 +18,6 @@ class TinyDbCollection {
     /**
      * @param {string} valueString
      * @returns {string} ciphertext
-     * @private
      */
     encrypt = (valueString) => {
         if (!this.encryptionKey) return valueString;
@@ -29,7 +28,6 @@ class TinyDbCollection {
     /**
      * @param {string} ciphertext
      * @returns {string}
-     * @private
      */
     decrypt = (ciphertext) => {
         if (ciphertext == null) return null;
@@ -42,7 +40,6 @@ class TinyDbCollection {
      * Gets a value from TinyDbCollection.
      * @param {string} key
      * @returns {Promise<any>} - JSON.parse() result of retrieved value
-     * @public
      */
     getValue(key) {
         if (!key) return Promise.reject(new Error('Invalid TinyDb key'));
@@ -60,7 +57,6 @@ class TinyDbCollection {
      * @param {string} key
      * @param {any} value - will be serialized with JSON.stringify() before storing.
      * @returns {Promise}
-     * @public
      */
     setValue(key, value) {
         if (!key) return Promise.reject(new Error('Invalid tinydb key'));
@@ -73,7 +69,6 @@ class TinyDbCollection {
      * Removes value from TinyDbCollection.
      * @param {string} key
      * @returns {Promise}
-     * @public
      */
     removeValue(key) {
         if (!key) return Promise.reject(new Error('Invalid tinydb key'));
@@ -83,7 +78,6 @@ class TinyDbCollection {
     /**
      * Returns a list of all keys in TinyDbCollection.
      * @returns {Promise<string[]>}
-     * @public
      */
     getAllKeys() {
         return this.engine.getAllKeys();
@@ -91,7 +85,6 @@ class TinyDbCollection {
 
     /**
      * Clears all TinyDbCollection values.
-     * @public
      */
     clear() {
         return this.engine.clear();

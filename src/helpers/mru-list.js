@@ -6,7 +6,6 @@ const { observable, action } = require('mobx');
  * Gotcha: Don't create 2+ instances for the same list name. Due to caching it will lead to conflicts.
  * @param {string} name - unique name for the list
  * @param {number} [limit] - maximum number of elements in the list (will remove least recent)
- * @public
  */
 class MRUList {
     constructor(name, limit = 10) {
@@ -16,11 +15,7 @@ class MRUList {
 
     /**
      * Observable list of current MRU list. Readonly.
-     * @readonly
      * @member {ObservableArray<string>} list
-     * @instance
-     * @memberof MRUList
-     * @public
      */
     @observable.shallow list = [];
     _name;
@@ -30,7 +25,6 @@ class MRUList {
      * Loads cached list from current user's TinyDb.
      * Normally you call this once, after user has been authenticated.
      * In case an instance is created before that, loadCache() is not called automatically.
-     * @public
      */
     async loadCache() {
         const list = await TinyDb.user.getValue(this._name);
@@ -38,7 +32,6 @@ class MRUList {
     }
 
     /**
-     * @private
      */
     _saveCache = _.throttle(() => {
         return TinyDb.user.setValue(this._name, this.list.peek());
@@ -49,9 +42,6 @@ class MRUList {
      * Adds item usage fact to the list. Saves it to TinyDb in a throttled manner.
      * @function addItem
      * @param {string} item
-     * @instance
-     * @memberof MRUList
-     * @public
      */
     @action addItem(item) {
         this.list.remove(item);

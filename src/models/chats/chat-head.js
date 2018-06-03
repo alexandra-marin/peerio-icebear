@@ -5,7 +5,6 @@ const { observable } = require('mobx');
  * Chat head keg is open for any chat participant to update.
  * @param {ChatKegDb} db
  * @extends SyncedKeg
- * @public
  */
 class ChatHead extends SyncedKeg {
     constructor(db) {
@@ -14,16 +13,10 @@ class ChatHead extends SyncedKeg {
 
     /**
      * @member {string} chatName
-     * @memberof ChatHead
-     * @instance
-     * @public
      */
     @observable chatName = '';
     /**
      * @member {string} purpose
-     * @memberof ChatHead
-     * @instance
-     * @public
      */
     @observable purpose = '';
 

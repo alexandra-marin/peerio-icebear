@@ -52,7 +52,6 @@
 
 //     /**
 //      * Removes fully used chunks and adjusts position in the first chunk based on size of data read from stream
-//      * @private
 //      */
 //     adjustPos(size) {
 //         // do we even need to remove any chunks?

@@ -8,23 +8,16 @@ const { observable } = require('mobx');
  * @param {string} [title] - localization string key
  * @param {Object} [data] - variables to pass to peerio-translator when resolving content
  * @param {string} [level='medium'] - severity level, options (medium, severe)
- * @protected
  */
 class SystemWarning {
     /**
      * Warning life cycle states.
-     * @static
-     * @memberof SystemWarning
-     * @protected
      */
     static STATES = { QUEUED: 0, /* WILL_SHOW: 1, */ SHOWING: 2, WILL_DISMISS: 3, DISMISSED: 4 };
 
     /**
      * Observable current life cycle state.
      * @member {number} state
-     * @memberof SystemWarning
-     * @instance
-     * @protected
      */
     @observable state = SystemWarning.STATES.QUEUED
 
@@ -38,7 +31,6 @@ class SystemWarning {
 
     /**
      * Advances life cycle state to SHOWING
-     * @protected
      */
     show() {
         if (this.state !== SystemWarning.STATES.QUEUED) return;
@@ -50,7 +42,6 @@ class SystemWarning {
     /**
      * Advances life cycle state to final status.
      * Does it gradually to allow UI animations to execute.
-     * @protected
      */
     dismiss() {
         if (this.state > SystemWarning.STATES.SHOWING) return;
@@ -64,7 +55,6 @@ class SystemWarning {
 
     /**
      * Starts a timer that will dismiss the warning automatically.
-     * @protected
      */
     autoDismiss() {
         if (this.state > SystemWarning.STATES.SHOWING) return;
@@ -76,7 +66,6 @@ class SystemWarning {
     }
     /**
      * Removes auto-dismiss timer
-     * @protected
      */
     cancelAutoDismiss() {
         if (this.timer) {

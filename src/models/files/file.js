@@ -17,7 +17,6 @@ const { asPromise } = require('../../helpers/prombservable');
  * File keg and model.
  * @param {KegDb} db
  * @extends {Keg}
- * @public
  */
 class File extends Keg {
     constructor(db, store) {
@@ -33,54 +32,35 @@ class File extends Keg {
     /**
      * System-wide unique client-generated id
      * @member {string} fileId
-     * @memberof File
-     * @instance
-     * @public
      */
     @observable fileId = null;
     /**
      * Folder id
      * @member {string} folderId
-     * @memberof File
-     * @instance
-     * @public
      */
     @observable folderId = null;
     /**
      * @member {string} name
-     * @memberof File
-     * @instance
-     * @public
      */
     @observable name = '';
     /**
      * Bytes
      * @member {number} size
-     * @memberof File
-     * @instance
-     * @public
      */
     @observable size = 0;
     /**
      * @member {number} uploadedAt
-     * @memberof File
-     * @instance
-     * @public
      */
     @observable uploadedAt = null;
 
     /**
      * Username uploaded this file.
      * @member {string} fileOwner
-     * @memberof File
-     * @instance
-     * @public
      */
     @observable fileOwner;
 
     /**
      * Indicates if last caching attempt failed
-     * @memberof File
      */
     @observable cachingFailed = false;
 
@@ -90,57 +70,36 @@ class File extends Keg {
      * When this is 'true' file is ready to be downloaded. Upload finishes before that,
      * then server needs some time to process file.
      * @member {boolean} readyForDownload
-     * @memberof File
-     * @instance
-     * @public
      */
     @observable readyForDownload = false;
     /**
      * @member {boolean} uploading
-     * @memberof File
-     * @instance
-     * @public
      */
     @observable uploading = false;
     /**
      * @member {boolean} downloading
-     * @memberof File
-     * @instance
-     * @public
      */
     @observable downloading = false;
     /**
      * Upload or download progress value in bytes. Note that when uploading it doesn't count overhead.
      * @member {number} progress
-     * @memberof File
-     * @instance
-     * @public
      */
     @observable progress = 0;
     /**
      * File size with overhead for downloads and without overhead for uploads.
      * @member {number} progressMax
-     * @memberof File
-     * @instance
-     * @public
      */
     @observable progressMax = 0;
 
     /**
      * currently mobile only: flag means file was downloaded and is available locally
      * @member {boolean} cached
-     * @memberof File
-     * @instance
-     * @public
      */
     @observable cached = false;
 
     /**
      * file was downloaded for inline image display
      * @member {boolean} tmpCached
-     * @memberof File
-     * @instance
-     * @public
      */
     @observable tmpCached = false;
 
@@ -149,9 +108,6 @@ class File extends Keg {
      * and we saved it's original upload path. Useful for preview
      * launch
      * @member {String} originalUploadPath
-     * @memberof File
-     * @instance
-     * @public
      */
     @observable originalUploadPath;
 
@@ -161,9 +117,6 @@ class File extends Keg {
      * or downloaded manually by user
      * TODO: REVIEW THIS AFTER NEWFS MERGE
      * @member {String} originalUploadPath
-     * @memberof File
-     * @instance
-     * @public
      */
     get hasFileAvailableForPreview() {
         return this.originalUploadPath || this.cached || this.tmpCached;
@@ -174,35 +127,23 @@ class File extends Keg {
      * It's a bit weird mix of UI state and logic, but it works fine at the moment,
      * we'll rethink it when we implement folders.
      * @member {boolean} selected
-     * @memberof File
-     * @instance
-     * @public
      */
     @observable selected = false;
     /**
      * Is this file visible or filtered by search. Also weird, needs refactor.
      * @member {boolean} show
-     * @memberof File
-     * @instance
-     * @public
      */
     @observable show = true;
 
     /**
      * Is this file currently shared with anyone.
      * @member {boolean} shared
-     * @memberof File
-     * @instance
-     * @public
      */
     @observable shared = false;
 
     /**
      * Amount of visual components which display this file currently
      * @member {number} visibleCounter
-     * @memberof File
-     * @instance
-     * @public
      */
     @observable visibleCounter = 0;
 
@@ -210,9 +151,6 @@ class File extends Keg {
     /**
      * file extension
      * @member {string} ext
-     * @memberof File
-     * @instance
-     * @public
      */
     @computed get ext() {
         return fileHelper.getFileExtension(this.name);
@@ -221,9 +159,6 @@ class File extends Keg {
     /**
      * file icon type
      * @member {string} ext
-     * @memberof File
-     * @instance
-     * @public
      */
     @computed get iconType() {
         return fileHelper.getFileIconType(this.ext);
@@ -234,9 +169,6 @@ class File extends Keg {
      * default: undefined (folders have not been loaded)
      * null: file is in the root folder
      * @member {FileFolder} folder
-     * @memberof File
-     * @instance
-     * @public
      */
     @computed get folder() {
         const folder = this.store.folderStore.getById(this.folderId);
@@ -252,9 +184,6 @@ class File extends Keg {
 
     /**
      * @member {string} nameWithoutExt
-     * @memberof File
-     * @instance
-     * @public
      */
     @computed get nameWithoutExtension() {
         return fileHelper.getFileNameWithoutExtension(this.name);
@@ -273,9 +202,6 @@ class File extends Keg {
     /**
      * currently mobile only: Full path to locally stored file
      * @member {string} cachePath
-     * @memberof File
-     * @instance
-     * @public
      */
     @computed get cachePath() {
         if (!config.isMobile) return null;
@@ -286,9 +212,6 @@ class File extends Keg {
     /**
      * Human readable file size
      * @member {string} sizeFormatted
-     * @memberof File
-     * @instance
-     * @public
      */
     @computed get sizeFormatted() {
         return util.formatBytes(this.size);
@@ -296,9 +219,6 @@ class File extends Keg {
 
     /**
      * @member {number} chunksCount
-     * @memberof File
-     * @instance
-     * @public
      */
     @computed get chunksCount() {
         return Math.ceil(this.size / this.chunkSize);
@@ -306,9 +226,6 @@ class File extends Keg {
 
     /**
      * @member {boolean} canShare
-     * @memberof File
-     * @instance
-     * @public
      */
     @computed get canShare() {
         return this.format === 1;
@@ -316,7 +233,6 @@ class File extends Keg {
     /**
      * Bytes
      * @member {number}
-     * @public
      */
     get sizeWithOverhead() {
         return this.size + this.chunksCount * config.CHUNK_OVERHEAD;
@@ -445,7 +361,6 @@ class File extends Keg {
      * Shares file with a chat (creates a copy of the keg)
      * @param {Chat} any chat instance
      * @returns {Promise}
-     * @public
      */
     share(chat) {
         return this.copyTo(chat.db, getFileStore());
@@ -454,7 +369,6 @@ class File extends Keg {
     /**
      * Open file with system's default file type handler app.
      * @param {string} [path] - tries cachePath, tmpCachePath and originalUploadPath if path is not passed
-     * @public
      */
     launchViewer(path) {
         let filePath = null;
@@ -469,7 +383,6 @@ class File extends Keg {
 
     /**
      * Remove locally stored file copy. Currently only mobile uses this.
-     * @public
      */
     deleteCache() {
         config.FileSystem.delete(this.cachePath);
@@ -478,7 +391,6 @@ class File extends Keg {
     /**
      * Remove file from cloud and unshare with everyone.
      * @returns {Promise}
-     * @public
      */
     remove() {
         this._resetUploadState();
@@ -496,7 +408,6 @@ class File extends Keg {
      * Retries a few times in case of error.
      * @param {string} newName
      * @returns {Promise}
-     * @public
      */
     rename(newName) {
         return retryUntilSuccess(() => {

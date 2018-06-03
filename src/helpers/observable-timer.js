@@ -2,22 +2,17 @@ const { observable } = require('mobx');
 
 /**
  * Observable timer counter up/down.
- * @public
  */
 class Timer {
     /**
      * Observable counter you want to watch.
      * @member {number} counter
-     * @instance
-     * @memberof Timer
-     * @public
      */
     @observable counter = 0;
 
     /**
      * Starts counting from 0 to passed seconds amount, updates every second.
      * @param {any} seconds - number of seconds to count to
-     * @public
      */
     countUp(seconds) {
         this.counter = 0;
@@ -28,7 +23,6 @@ class Timer {
     /**
      * Starts counting from passed seconds amount to 0, updates every second.
      * @param {any} seconds - number of seconds to count from
-     * @public
      */
     countDown(seconds) {
         this.counter = Math.round(seconds);
@@ -38,7 +32,6 @@ class Timer {
 
     /**
      * Stops counting and resets counter to 0
-     * @public
      */
     stop() {
         if (this._interval) clearInterval(this._interval);

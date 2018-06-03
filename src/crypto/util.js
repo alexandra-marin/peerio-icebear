@@ -1,8 +1,6 @@
 /**
  * Peerio crypto utilities module.
  * Exported from icebear index as `crypto.cryptoUtil`
- * @module crypto/util
- * @public
  */
 const conversion = require('./util.conversion');
 const random = require('./util.random');
@@ -14,8 +12,6 @@ const padding = require('./util.padding');
  * @param {Uint8Array} arr1
  * @param {Uint8Array} arr2
  * @returns {Uint8Array} new concatenated array.
- * @memberof crypto/util
- * @public
  */
 function concatTypedArrays(arr1, arr2) {
     const joined = new Uint8Array(arr1.byteLength + arr2.byteLength);

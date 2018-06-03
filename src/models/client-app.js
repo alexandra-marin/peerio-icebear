@@ -9,7 +9,6 @@ const tracker = require('./update-tracker');
  * and client can provide such information.
  * Also works as container for high level properties we couldn't find better place for.
  * @namespace ClientApp
- * @public
  */
 class ClientApp {
     /**
@@ -17,48 +16,36 @@ class ClientApp {
      * One example of how this affects Icebear behavior:
      * messages will not be marked as 'read' unless isFocused == true
      * @member {boolean} isFocused
-     * @memberof ClientApp
-     * @public
      */
     @observable isFocused = true;
 
     /**
      * Use this to let Icebear know if your app is currently showing any of the chats.
      * @member {boolean} isInChatsView
-     * @memberof ClientApp
-     * @public
      */
     @observable isInChatsView = false;
 
     /**
      * Use this to let Icebear know if your app is currently showing main file view.
      * @member {boolean} isInFilesView
-     * @memberof ClientApp
-     * @public
      */
     @observable isInFilesView = false;
 
     /**
      * Icebear sets this flag.
      * @member {boolean} clientVersionDeprecated
-     * @memberof ClientApp
-     * @public
      */
     @observable clientVersionDeprecated = false;
 
     /**
      * Icebear sets this flag.
      * @member {boolean} clientSessionExpired
-     * @memberof ClientApp
-     * @public
      */
     @observable clientSessionExpired = false;
 
     /**
      * UI should listen to this and request entering of 2fa code from user and then pass ot back to icebear.
      * @member {TwoFARequest} active2FARequest
-     * @memberof ClientApp
-     * @public
      */
     @observable active2FARequest = null;
 
@@ -70,22 +57,18 @@ class ClientApp {
      *   externalContentEnabled: bool
      *   externalContentJustForFavs: bool,
      *   peerioContentEnabled: bool
-     * @memberof ClientApp
      */
     @observable uiUserPrefs = {};
 
     /**
      * UI should listen to this to determine whether or not to show "scroll to bottom" button
      * and SDK should listen to determine whether to mark messages as read
-     * @memberof ClientApp
      */
     @observable isReadingNewestMessages = true;
 
     /**
      * UI should listen to this and request entering of 2fa code from user and then pass ot back to icebear.
      * @member {TwoFARequest} updatingAfterReconnect
-     * @memberof ClientApp
-     * @public
      */
     @computed get updatingAfterReconnect() {
         return socket.connected && !(
@@ -100,7 +83,6 @@ class ClientApp {
      * @param {string} type - 'login', 'backupCodes', 'disable' one of the reasons for 2fa request
      * @param {Function<string, ?boolean>} submitCallback, accepts 2fa code and 'trust this device' flag(for login only)
      * @param {?Function} cancelCallback
-     * @protected
      */
     create2FARequest(type, submitCallback, cancelCallback) {
         if (!['login', 'backupCodes', 'disable'].includes(type)) {

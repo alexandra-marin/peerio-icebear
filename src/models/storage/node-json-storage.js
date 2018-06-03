@@ -10,7 +10,6 @@ const fileOptions = { encoding: 'utf8' };
  * This is a StorageEngine implementation that can be used in any nodejs-based apps (cli, electron).
  *
  * It uses os.homedir() or NodeJsonStorage.storageFolder to store JSON files.
- * @public
 */
 class NodeJsonStorage {
     constructor(name) {

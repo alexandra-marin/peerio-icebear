@@ -7,8 +7,6 @@
  * - replaces global Promise object with bluebird implementation. Note that native(not transpiled) async functions
  *  will still return native Promise.
  * - extends Uint8Array prototype. See {@link extensions/uint8array}.
- * @module index
- * @public
  */
 
 // replacing native Promise with bluebird implementation

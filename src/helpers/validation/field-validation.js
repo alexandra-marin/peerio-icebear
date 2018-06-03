@@ -1,8 +1,6 @@
 /**
  * @todo @seavan @flohdot
  * Validates fields in a form.
- * @module helpers/field-validation
- * @public
  */
 
 import { reaction, extendObservable, computed } from 'mobx';
@@ -21,8 +19,6 @@ const userValidators = require('./user-validators');
  * @param {string} fName - field name
  * @param {Array<Object>|Object} validatorOrArray
  * @param {number} [positionInForm]
- * @memberof helpers/field-validation
- * @public
  */
 function addValidation(store, fName, validatorOrArray, positionInForm) {
     const byName = store.byName || {};

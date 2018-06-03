@@ -173,9 +173,6 @@ module.exports = function mixUserAuthModule() {
      * with minimal time waste on key derivation.
      * You can use this to store auth data locally in keychain or protected with shorter password.
      * @returns {string}
-     * @memberof User
-     * @instance
-     * @public
      */
     this.serializeAuthData = () => {
         const paddedPassphrase = cryptoUtil.padPassphrase(this.passphrase);
@@ -196,9 +193,6 @@ module.exports = function mixUserAuthModule() {
      * Applies serialized auth data to user object. Just call `login()` after this and user will get authenticated
      * faster then when you just provide username and passphrase.
      * @param {string} data
-     * @memberof User
-     * @instance
-     * @public
      */
     this.deserializeAuthData = (data) => {
         // console.log(data);
@@ -225,9 +219,6 @@ module.exports = function mixUserAuthModule() {
     /**
      * Removes passcode for a user if it exists, and disables using passcodes.
      * @returns {Promise}
-     * @memberof User
-     * @instance
-     * @public
      */
     this.disablePasscode = () => {
         return TinyDb.system.setValue(`${this.username}:passcode:disabled`, true)
@@ -245,9 +236,6 @@ module.exports = function mixUserAuthModule() {
     /**
      * Checks if user disabled passcode.
      * @returns {Promise<boolean>}
-     * @memberof User
-     * @instance
-     * @public
      */
     this.passcodeIsDisabled = () => {
         return TinyDb.system.getValue(`${this.username}:passcode:disabled`)
@@ -260,9 +248,6 @@ module.exports = function mixUserAuthModule() {
      * it to the local db.
      * @param {string} passcode
      * @returns {Promise}
-     * @memberof User
-     * @instance
-     * @public
      */
     this.setPasscode = (passcode) => {
         if (!this.username) return Promise.reject(new Error('Username is required to derive keys'));
@@ -292,9 +277,6 @@ module.exports = function mixUserAuthModule() {
      * Validates passcode.
      * @param {string} passcode
      * @returns {Promise<boolean>}
-     * @memberof User
-     * @instance
-     * @public
      */
     this.validatePasscode = (passcode) => {
         // creating temporary user obj to do that without affecting current instance's state
@@ -312,9 +294,6 @@ module.exports = function mixUserAuthModule() {
     /**
      * Checks if user has a passcode saved.
      * @returns {Promise<boolean>}
-     * @memberof User
-     * @instance
-     * @public
      */
     this.hasPasscode = () => {
         return TinyDb.system.getValue(`${this.username}:passcode`).then(result => !!result);

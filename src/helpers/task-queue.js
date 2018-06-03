@@ -5,35 +5,24 @@ const { computed, observable, action } = require('mobx');
  * @param {number} [parallelism=1] - how many tasks can run(wait to be finished) at the same time
  * @param {number} [throttle=0] - how many milliseconds delay to make before running every task
  * @class TaskQueue
- * @public
  */
 class TaskQueue {
     /**
-     * @readonly
      */
     paused = false;
     /**
      * List of tasks in queue. Running tasks are not here.
      * @member {ObservableArray<function>} tasks
-     * @memberof TaskQueue
-     * @instance
-     * @public
      */
     @observable.shallow waitingTasks = [];
     /**
      * Amount of currently running tasks
      * @member {Observable<number>} runningTasks
-     * @memberof TaskQueue
-     * @instance
-     * @public
      */
     @observable runningTasks = 0;
     /**
      * Amount of currently running tasks + tasks in queue
      * @member {Computed<number>} length
-     * @memberof TaskQueue
-     * @instance
-     * @public
      */
     @computed get length() {
         return this.waitingTasks.length + this.runningTasks;
@@ -55,9 +44,6 @@ class TaskQueue {
      * @param {callback} [onSuccess] - callback will be executed as soon as task is finished without error
      * @param {callback<Error>} [onError] - callback will be executed if task throws or rejects promise
      * @returns {Promise}
-     * @memberof TaskQueue
-     * @instance
-     * @public
      */
     @action addTask(task, context, args, onSuccess, onError) {
         return new Promise((resolve, reject) => {
@@ -81,9 +67,6 @@ class TaskQueue {
     /**
      * Runs the next task in queue if it is possible
      * @function runTask
-     * @memberof TaskQueue
-     * @instance
-     * @private
      */
     @action.bound runTask() {
         if (this.paused) return;
@@ -115,9 +98,6 @@ class TaskQueue {
     /**
      * Performs necessary actions when a task is finished
      * @function onTaskComplete
-     * @memberof TaskQueue
-     * @instance
-     * @private
      */
     @action.bound onTaskComplete() {
         this.runningTasks--;

@@ -6,7 +6,6 @@ const { AntiTamperError } = require('../../errors');
  * Tofu keg.
  * @param {KegDb} db
  * @extends {Keg}
- * @public
  */
 class Tofu extends Keg {
     constructor(db) {
@@ -15,27 +14,22 @@ class Tofu extends Keg {
 
     /**
      * @member {string}
-     * @public
      */
     username;
     /**
      * @member {string}
-     * @public
      */
     firstName;
     /**
      * @member {string}
-     * @public
      */
     lastName;
     /**
      * @member {Uint8Array}
-     * @public
      */
     encryptionPublicKey;
     /**
      * @member {Uint8Array}
-     * @public
      */
     signingPublicKey;
 

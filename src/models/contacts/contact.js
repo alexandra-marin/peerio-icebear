@@ -23,7 +23,6 @@ const nullFingerprint = '00000-00000-00000-00000-00000-00000';
  * @param {string} username - this can also be an email which will be replaced with username if user found
  * @param {Object} [prefetchedData] - if, for some reason you have the contact data from server, feed it here
  * @param {bool} [noAutoLoad] - don't automatically call this.load() in constructor (needed for tests only)
- * @public
  */
 class Contact {
     constructor(username, prefetchedData, noAutoLoad) {
@@ -42,107 +41,68 @@ class Contact {
      * This flag means that we are making attempts to load contact
      * once it's 'false' it means that we are done trying with ether positive (notFound=false) result
      * or negative result. It's set to true by default, right after it exits constructor.
-     * @memberof Contact
      * @member {boolean} loading
-     * @instance
-     * @public
      */
     @observable loading = true; // default state, because that's what we do from the moment contact is created
     /**
      * @member {string}
-     * @public
      */
     username;
     /**
      * '@username'
      * @member {string}
-     * @public
      */
     usernameTag;
     /**
      * @member {array<string>} addresses
-     * @public
      */
     addresses = [];
     /**
-     * @memberof Contact
      * @member {string} firstName
-     * @instance
-     * @public
      */
     @observable firstName = '';
     /**
-     * @memberof Contact
      * @member {string} lastName
-     * @instance
-     * @public
      */
     @observable lastName = '';
     /**
-     * @memberof Contact
      * @member {Uint8Array} encryptionPublicKey
-     * @instance
-     * @public
      */
     @observable encryptionPublicKey = null;
     /**
-     * @memberof Contact
      * @member {Uint8Array} signingPublicKey
-     * @instance
-     * @public
      */
     @observable signingPublicKey = null;
     /**
-     * @memberof Contact
      * @member {boolean} tofuError
-     * @instance
-     * @public
      */
     @observable tofuError = false;
     /**
      * Wether or not user added this contact to his address book
-     * @memberof Contact
      * @member {boolean} isAdded
-     * @instance
-     * @public
      */
     @observable isAdded = false;
     /**
      * Some server-generated random chars to prevent enumeration of user-specific urls
-     * @memberof Contact
      * @member {string} urlSalt
-     * @instance
-     * @public
      */
     @observable urlSalt = null;
     /**
-     * @memberof Contact
      * @member {number} profileVersion
-     * @instance
-     * @public
      */
     @observable profileVersion = 0;
     /**
-     * @memberof Contact
      * @member {boolean} hasAvatar
-     * @instance
-     * @public
      */
     @observable hasAvatar = false;
     /**
-     * @memberof Contact
      * @member {boolean} isDeleted
-     * @instance
-     * @public
      */
     @observable isDeleted = false;
 
     /**
      * RGB string built based on hashed signing public key, not cryptographically strong, just for better UX
-     * @memberof Contact
      * @member {string} color
-     * @instance
-     * @public
      */
     @computed get color() {
         if (!this.signingPublicKey) return '#9e9e9e';
@@ -151,20 +111,14 @@ class Contact {
 
     /**
      * First letter of first name or username.
-     * @memberof Contact
      * @member {string} letter
-     * @instance
-     * @public
      */
     @computed get letter() {
         return getFirstLetterUpperCase(this.firstName || this.username);
     }
 
     /**
-     * @memberof Contact
      * @member {string} fullName
-     * @instance
-     * @public
      */
     @computed get fullName() {
         let ret = '';
@@ -177,10 +131,7 @@ class Contact {
     }
 
     /**
-     * @memberof Contact
      * @member {string} fullNameAndUsername
-     * @instance
-     * @public
      */
     @computed get fullNameAndUsername() {
         let ret = '';
@@ -196,10 +147,7 @@ class Contact {
 
     /**
      * Lower cased full name for search/filter optimization
-     * @memberof Contact
      * @member {string} fullNameLower
-     * @instance
-     * @public
      */
     @computed get fullNameLower() {
         return this.fullName.toLocaleLowerCase();
@@ -214,10 +162,7 @@ class Contact {
     /**
      * Cryptographically strong User fingerprint based on signing public key.
      * Looks like '12345-12345-12345-12345-12345', empty value is '00000-00000-00000-00000-00000-00000'
-     * @memberof Contact
      * @member {string} fingerprint
-     * @instance
-     * @public
      */
     @computed get fingerprint() {
         if (!this.signingPublicKey) return nullFingerprint;
@@ -235,20 +180,14 @@ class Contact {
         return `${serverSettings.avatarServer}/v2/avatar/${this.urlSalt}`;
     }
     /**
-     * @memberof Contact
      * @member {string} largeAvatarUrl
-     * @instance
-     * @public
      */
     @computed get largeAvatarUrl() {
         if (!this.hasAvatar) return null;
         return `${this._avatarUrl}/large/?${this.profileVersion}`;
     }
     /**
-     * @memberof Contact
      * @member {string} mediumAvatarUrl
-     * @instance
-     * @public
      */
     @computed get mediumAvatarUrl() {
         if (!this.hasAvatar) return null;
@@ -258,10 +197,7 @@ class Contact {
 
     /**
      * Same as {@link fingerprint}, but formatted as: '1234 5123 4512\n3451 2345 1234 5123 45'
-     * @memberof Contact
      * @member {string} fingerprintSkylarFormatted
-     * @instance
-     * @public
      */
     @computed get fingerprintSkylarFormatted() {
         let i = 0;
@@ -275,7 +211,6 @@ class Contact {
     /**
      * Server said it couldn't find this user.
      * @member {boolean}
-     * @public
      */
     @observable notFound = false;
 
@@ -327,7 +262,6 @@ class Contact {
     /**
      * Loads user data from server (or applies prefetched data)
      * @param {Object} [prefetchedData]
-     * @public
      */
     load(prefetchedData) {
         if (!this.loading || this._waitingForResponse) return;
@@ -380,7 +314,6 @@ class Contact {
     /**
      * Loads or creates Tofu keg and verifies Tofu data, check `tofuError` observable.
      * @returns {Promise}
-     * @protected
      */
     loadTofu() {
         // console.log('Loading tofu:', this.username);
@@ -417,7 +350,6 @@ class Contact {
      * Helper function to execute callback when contact is loaded.
      * Executes immediately if already loaded.
      * @param {function} callback
-     * @public
      */
     whenLoaded(callback) {
         // it is important for this to be async
@@ -426,7 +358,6 @@ class Contact {
     /**
      * Helper function to get a promise that resolves when contact is loaded.
      * @returns {Promise}
-     * @public
      */
     ensureLoaded() {
         return new Promise(resolve => {
@@ -435,11 +366,8 @@ class Contact {
     }
     /**
      * Helper function to get a promise that resolves when all contacts in passed collection are loaded.
-     * @static
      * @param {Array<Contact>} contacts
      * @returns {Promise}
-     * @memberof Contact
-     * @public
      */
     static ensureAllLoaded(contacts) {
         return Promise.map(contacts, contact => contact.ensureLoaded());

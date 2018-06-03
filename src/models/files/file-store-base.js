@@ -281,7 +281,6 @@ class FileStoreBase {
 
     /**
      * Call at least once from UI.
-     * @public
      */
     loadAllFiles = async () => {
         if (this.loading || this.loaded) return;
@@ -361,7 +360,6 @@ class FileStoreBase {
 
     /**
      * Pause file store updates.
-     * @public
      */
     pause() {
         this.paused = true;
@@ -369,7 +367,6 @@ class FileStoreBase {
 
     /**
      * Resume file store updates.
-     * @public
      */
     resume() {
         if (!this.paused) return;

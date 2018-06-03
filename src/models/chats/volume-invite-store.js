@@ -66,7 +66,6 @@ class VolumeInviteStore {
         this.activeInvite = null;
     }
 
-    /** @private */
     updateInvitees = () => {
         return socket.send('/auth/kegs/volume/invitees')
             .then(action(res => {
@@ -97,7 +96,6 @@ class VolumeInviteStore {
             }));
     };
 
-    /** @private */
     updateInvites = () => {
         return socket.send('/auth/kegs/volume/invites')
             .then(action(res => {
@@ -114,7 +112,6 @@ class VolumeInviteStore {
             }));
     };
 
-    /** @private */
     updateLeftUsers = () => {
         return socket.send('/auth/kegs/volume/users-left')
             .then(action(res => {

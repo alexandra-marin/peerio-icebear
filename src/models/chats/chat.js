@@ -971,11 +971,13 @@ class Chat {
             validated.spaceId = cryptoUtil.getRandomGlobalShortIdHex();
         }
         validated.spaceName = space.spaceName.trim().substr(0, config.chat.maxChatNameLength);
+        validated.nameInSpace = space.nameInSpace.trim().substr(0, config.chat.maxChatNameLength);
         validated.spaceDescription = space.spaceDescription.trim().substr(0, config.chat.maxChatPurposeLength);
 
         return this.chatHead.save(() => {
             this.chatHead.spaceId = validated.spaceId;
             this.chatHead.spaceName = validated.spaceName;
+            this.chatHead.nameInSpace = validated.nameInSpace;
             this.chatHead.spaceDescription = validated.spaceDescription;
             this.chatHead.spaceRoomType = validated.spaceRoomType;
         }, null, 'title_error');

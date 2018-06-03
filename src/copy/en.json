@@ -872,7 +872,7 @@
   "mcr_title_newPatientRecord": "Name of the Patient Record",
   "mcr_title_newPatientRecordHint": "Name appears alphabetically in your chatlist. Example: Doe, John",
   "mcr_title_patientUsernameOrEmail": "Patient username or email address",
-  "title_noParticipants": "No participants",
+  "mcr_title_noParticipants": "No participants",
   "mcr_title_chatHeaderPatientRoom": "This is the beginning of Patient Room for {patientName}.",
   "mcr_title_patientRoomNotice": "Both patient and doctor must be present for a consultation. <toAddMembers>Add members</> to start the conversation.",
   "mcr_title_chatHeaderInternalRoom": "This is the beginning of Patient Room for {patientName}.",

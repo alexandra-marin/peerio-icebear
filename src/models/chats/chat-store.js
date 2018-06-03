@@ -230,7 +230,9 @@ class ChatStore {
             const second = b.name || b.channelName;
             return first.localeCompare(second);
         });
-        if (config.whiteLabel.name === 'medcryptor') {
+        // until we implement MedCryptor mobile patient management, we need to show patient
+        // rooms in the main room list on mobile
+        if (config.whiteLabel.name === 'medcryptor' && !config.isMobile) {
             return allRooms.filter(c => !c.isInSpace);
         }
         return allRooms;

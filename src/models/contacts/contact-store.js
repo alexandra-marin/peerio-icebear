@@ -207,11 +207,18 @@ class ContactStore {
     applyInvitesData = action(() => {
         this.invitedContacts = this.invites.issued;
         when(
-            () => this.invites.loaded,
+            () => this.invites.loaded && tofuStore.loaded && getChatStore().loaded,
             () => {
                 try {
                     this.invitedContacts.forEach(c => {
                         if (c.username) {
+                            // If c.username exists, then invited user has indeed joined Peerio & confirmed email.
+                            // But, if same username isn't in tofuStore, current user doesn't yet know this,
+                            // so emit `onInviteAccepted` event (on desktop this shows a notification).
+                            if (!tofuStore.cache[c.username]) {
+                                setTimeout(() => this.onInviteAccepted({ contact: c }));
+                            }
+
                             this.getContactAndSave(c.username);
                             getChatStore().pending.add(c.username, c.email);
                         }
@@ -258,7 +265,6 @@ class ContactStore {
                         // because own keg writes don't trigger digest update
                         c.isAdded = true;
                         this.applyMyContactsData();
-                        warnings.add('snackbar_contactFavourited');
                         resolve(true);
                     }).catch(reject);
                 }
@@ -352,7 +358,6 @@ class ContactStore {
                 ).then(() => {
                     // because own keg writes don't trigger digest update
                     this.applyMyContactsData();
-                    warnings.add('snackbar_contactRemovedFavourite');
                 });
             });
     }

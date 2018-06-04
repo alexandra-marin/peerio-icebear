@@ -60,7 +60,7 @@ function _callServer(context, name, value) {
                     resolve(!!resp && resp.valid);
                 })
                 .catch((e) => {
-                    if (e.name === 'DisconnectedError') resolve(undefined);
+                    if (e && e.name === 'DisconnectedError') resolve(undefined);
                     else resolve(false);
                 });
         }, VALIDATION_THROTTLING_PERIOD_MS);

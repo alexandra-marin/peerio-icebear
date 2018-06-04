@@ -59,8 +59,9 @@ function _callServer(context, name, value) {
                 .then(resp => {
                     resolve(!!resp && resp.valid);
                 })
-                .catch(() => {
-                    resolve(false);
+                .catch((e) => {
+                    if (e.name === 'DisconnectedError') resolve(undefined);
+                    else resolve(false);
                 });
         }, VALIDATION_THROTTLING_PERIOD_MS);
         serverValidationStore.request[key] = { timeout, resolve };

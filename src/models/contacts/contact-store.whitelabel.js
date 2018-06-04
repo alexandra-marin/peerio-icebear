@@ -33,6 +33,10 @@ const filters = {
     medcryptor: medcryptorContactFilter
 };
 
+function getContactFilter() {
+    return filters[config.whiteLabel.name || 'peerio'];
+}
+
 class ContactStoreWhitelabel {
     // ref to contactStore
     store = null;
@@ -41,21 +45,18 @@ class ContactStoreWhitelabel {
         this.store = store;
     }
 
-    getContactFilter() {
-        return filters[config.whiteLabel.name || 'peerio'];
-    }
-
     // Filter contacts in whitelabel namespace
     // Context corresponds to part of UI where filtering is applied
     // Supported contexts = default (null or undefined), and newchat
     // For Peerio, all contexts including newchat currently return only Peerio contacts
-    // For Medcryptor, there are various rules for returning Peerio, MC, or both
+    // For Medcryptor, newchat context returns all namespace contacts, default context
+    // returns only medcryptor
     getContact(usernameOrEmail, context) {
         const result = new Contact(usernameOrEmail, null, true);
         const c = this.store.getContact(usernameOrEmail);
         // when our request is complete, check and apply filter
         when(() => !c.loading, action(() => {
-            const filter = this.getContactFilter();
+            const filter = getContactFilter();
             if (filter(c, context)) {
                 Object.assign(result, c);
             } else {
@@ -67,7 +68,7 @@ class ContactStoreWhitelabel {
     }
 
     filter(token, context) {
-        const filter = this.getContactFilter();
+        const filter = getContactFilter();
         return this.store.filter(token).filter(c => filter(c, context));
     }
 }

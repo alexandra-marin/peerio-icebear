@@ -942,6 +942,20 @@ class Chat {
     }
 
     /**
+     * @param {string} name - name to appear for MC admin users
+     */
+    renameInSpace(name = '') {
+        const validated = name.trim().substr(0, config.chat.maxChatNameLength);
+
+        if (this.chatHead.nameInSpace === validated || (!this.chatHead.nameInSpace && !validated)) {
+            return Promise.resolve(); // nothing to rename
+        }
+        return this.chatHead.save(() => {
+            this.chatHead.nameInSpace = validated;
+        }, null, 'error_chatRename');
+    }
+
+    /**
      * @param {string} purpose - pass empty string to remove chat purpose
      * @public
      */

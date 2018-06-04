@@ -10,23 +10,19 @@ function peerioContactFilter(contact /* , context */) {
 }
 
 // Filter contacts in medcryptor workspace
-// Should return only medcryptor contacts in default context (null)
-// and Peerio and MedCryptor contacts in "newchat" context
+// For desktop, various rules (MC only, Peerio only, or both) based on context
 // For mobile always returns all users
 function medcryptorContactFilter(contact, context) {
     if (config.isMobile) return true;
     switch (context) {
-        case 'newpatientspace':
-            return contact.appLabel === 'peerio';
-
         case 'newchat':
         case 'newpatientroom':
         case 'addcontact':
-            return true;
+            return contact.appLabel === 'peerio' || contact.appLabel === 'medcryptor';
 
-        case 'sharedfolders':
-        case 'newinternalroom':
-        case 'newroom':
+        case 'newpatientspace':
+            return contact.appLabel === 'peerio';
+
         default:
             return contact.appLabel === 'medcryptor';
     }

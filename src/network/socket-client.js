@@ -389,7 +389,7 @@ class SocketClient {
                 } else {
                     this.socket.binary(hasBinaryData).emit(name, data, handler);
                 }
-            });
+            }, name);
         })
             .timeout(60000)
             .finally(() => {

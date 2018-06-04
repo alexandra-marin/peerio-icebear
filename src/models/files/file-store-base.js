@@ -308,7 +308,7 @@ class FileStoreBase {
                         this.knownUpdateId = keg.collectionVersion;
                     }
                     if (!keg.props.fileId && !keg.deleted) {
-                        console.error('File keg missing fileId', keg.kegId);
+                        if (keg.version > 1) console.error('File keg missing fileId', keg.kegId);
                         continue;
                     }
                     const existing = this.getById(keg.props.fileId) || this.getByKegId(keg.kegId);

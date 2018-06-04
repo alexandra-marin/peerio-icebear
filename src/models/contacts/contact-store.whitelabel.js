@@ -16,9 +16,19 @@ function peerioContactFilter(contact /* , context */) {
 function medcryptorContactFilter(contact, context) {
     if (config.isMobile) return true;
     switch (context) {
-        case 'newpatientspace': return contact.appLabel === 'peerio';
-        case 'newchat': return true;
-        default: return contact.appLabel === 'medcryptor';
+        case 'newpatientspace':
+            return contact.appLabel === 'peerio';
+
+        case 'newchat':
+        case 'newpatientroom':
+        case 'addcontact':
+            return true;
+
+        case 'sharedfolders':
+        case 'newinternalroom':
+        case 'newroom':
+        default:
+            return contact.appLabel === 'medcryptor';
     }
 }
 

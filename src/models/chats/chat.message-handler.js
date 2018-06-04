@@ -14,7 +14,6 @@ const { getChatStore } = require('../../helpers/di-chat-store');
 /**
  *
  * @param {Chat} chat - chat creates instance and passes itself to the constructor.
- * @protected
  */
 class ChatMessageHandler {
     constructor(chat) {

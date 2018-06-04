@@ -8,7 +8,6 @@
  * @typedef {Object} KeyPair
  * @property {Uint8Array} publicKey - 32 bytes
  * @property {Uint8Array} secretKey - 32 bytes or 64 bytes in case of signing key pair
- * @public
  */
 
 /**
@@ -19,7 +18,6 @@
  * @property {boolean} confirmed
  * @property {boolean} primary
  * @property {string} type - currently always == 'email'
- * @public
  */
 
 /**
@@ -30,7 +28,6 @@
  * @property {string} email
  * @property {number} added
  * @property {string} [username]
- * @public
  */
 
 /**
@@ -40,5 +37,4 @@
   * @property {strong} type - 'login' 'backupCodes' 'disable'
   * @property {Function<string, ?bool>} submit - function accepts TOTP code and 'trust this device' flag
   * @property {Function} cancel
-  * @public
   */

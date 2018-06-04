@@ -28,8 +28,6 @@
  *  if the function does not return a message, the default message provided by the
  *  validator will be used.
  *
- * @module helpers/user-validators
- * @public
  */
 const socket = require('../../network/socket');
 
@@ -47,8 +45,6 @@ const serverValidationStore = { request: {} };
  * @param {string} name -- field name
  * @param {*} value
  * @returns {Promise<boolean>}
- * @memberof helpers/user-validators
- * @private
  */
 function _callServer(context, name, value) {
     const key = `${context}::${name}`;

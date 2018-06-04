@@ -10,23 +10,19 @@ const { AbstractCallError } = require('../../errors');
  * 3. set config.FileStream = YourFileStreamImplementation.
  * @param {string} filePath - will be used by 'open' function
  * @param {string} mode - 'read' or 'write' or 'append'
- * @public
  */
 class FileStreamAbstract {
     /**
      * @member {string}
-     * @public
      */
     filePath;
     /**
      * @member {string}
-     * @public
      */
     mode;
     /**
      * File stream pointer
      * @member {number}
-     * @public
      */
     pos;
 
@@ -44,7 +40,6 @@ class FileStreamAbstract {
      * @function read
      * @param {number} size - amount of bytes to read (if possible)
      * @return {Promise<Uint8Array>} - resolves with a number of bytes written to buffer
-     * @public
      */
     read = (size) => {
         if (this.mode !== 'read') {
@@ -63,7 +58,6 @@ class FileStreamAbstract {
      * @param {number} size - bytes
      * @returns {Promise<Uint8Array>}
      * @abstract
-     * @protected
      */
     readInternal(size) {
         throw new AbstractCallError();
@@ -74,7 +68,6 @@ class FileStreamAbstract {
      * @function write
      * @param {Uint8Array} buffer
      * @returns {Promise} - resolves when chunk is written out
-     * @public
      */
     write = (buffer) => {
         if (this.mode !== 'write' && this.mode !== 'append') {
@@ -90,7 +83,6 @@ class FileStreamAbstract {
      * @param {Uint8Array} buffer
      * @returns {Promise<Uint8Array>} buffer, same one as was passed
      * @abstract
-     * @protected
      */
     writeInternal(buffer) {
         throw new AbstractCallError();
@@ -101,7 +93,6 @@ class FileStreamAbstract {
      * @function seek
      * @param {number} pos
      * @returns {number} new position
-     * @public
      */
     seek = (pos) => {
         if (this.mode !== 'read') throw new Error('Seek only on read streams');
@@ -112,7 +103,6 @@ class FileStreamAbstract {
      * Override this in your implementation. Move file position pointer.
      * @param {number} pos
      * @returns {number} new position
-     * @protected
      */
     seekInternal(pos) {
         throw new AbstractCallError();
@@ -123,7 +113,6 @@ class FileStreamAbstract {
      * Override. This function has to set 'size' property.
      * @returns {Promise<FileStreamAbstract>} - this
      * @abstract
-     * @public
      */
     open() {
         throw new AbstractCallError();
@@ -132,7 +121,6 @@ class FileStreamAbstract {
     /**
      * Override. Called when done working with file, should flush all buffers and dispose resources.
      * @abstract
-     * @public
      */
     close() {
         throw new AbstractCallError();
@@ -145,7 +133,6 @@ class FileStreamAbstract {
      * @param {string} name - human-readable file name
      * @returns {string} - actual device path for file
      * @abstract
-     * @public
      */
     static getFullPath(uid, name) {
         throw new AbstractCallError();
@@ -156,7 +143,6 @@ class FileStreamAbstract {
      * @param {string} path
      * @returns {Promise<boolean>} - true if path exists on device
      * @abstract
-     * @public
      */
     static exists(path) {
         throw new AbstractCallError();
@@ -166,7 +152,6 @@ class FileStreamAbstract {
      * Override. Launch external viewer.
      * @param {string} path - file path to open in a viewer.
      * @abstract
-     * @public
      */
     static launchViewer(path) {
         throw new AbstractCallError();
@@ -174,12 +159,9 @@ class FileStreamAbstract {
 
     /**
      * Override. Get file stat object.
-     * @static
      * @param {string} path
      * @returns {{size:number}}
-     * @memberof FileStreamAbstract
      * @abstract
-     * @public
      */
     static getStat(path) {
         throw new AbstractCallError();
@@ -188,10 +170,7 @@ class FileStreamAbstract {
     /**
      * Override. Currently mobile only.
      * @returns Promise<string[]> - array of absolute paths to cached items.
-     * @static
-     * @memberof FileStreamAbstract
      * @abstract
-     * @public
      */
     static getCacheList() {
         throw new AbstractCallError();
@@ -199,12 +178,9 @@ class FileStreamAbstract {
 
     /**
      * Override. Removes file by path.
-     * @static
      * @param {string} path
      * @returns {Promise}
-     * @memberof FileStreamAbstract
      * @abstract
-     * @public
      */
     static delete(path) {
         throw new AbstractCallError();
@@ -212,13 +188,10 @@ class FileStreamAbstract {
 
     /**
      * Override. Renames old path to new path.
-     * @static
      * @param {string} oldPath
      * @param {string} newPath
      * @returns {Promise}
-     * @memberof FileStreamAbstract
      * @abstract
-     * @public
      */
     static rename(oldPath, newPath) {
         throw new AbstractCallError();
@@ -226,8 +199,6 @@ class FileStreamAbstract {
 
     /**
      * Override. Returns a path for storing temporarily downloaded(cached) files.
-     * @static
-     * @memberof FileStreamAbstract
      */
     static getTempCachePath(name) {
         throw new AbstractCallError();
@@ -235,8 +206,6 @@ class FileStreamAbstract {
 
     /**
      * Override. Creates a directory at "path".
-     * @static
-     * @memberof FileStreamAbstract
      */
     static createDir(path) {
         throw new AbstractCallError();
@@ -244,8 +213,6 @@ class FileStreamAbstract {
 
     /**
      * Override. Empties and them removes a directory at "path".
-     * @static
-     * @memberof FileStreamAbstract
      */
     static removeDir(path) {
         throw new AbstractCallError();

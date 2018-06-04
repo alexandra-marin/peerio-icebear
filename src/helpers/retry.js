@@ -1,7 +1,5 @@
 /**
  * Retry operation tools.
- * @module helpers/retry
- * @protected
  */
 
 const errors = require('../errors');
@@ -22,8 +20,6 @@ const callsInProgress = {};
  * @param {number} [maxRetries=120] - override if needed
  * @param {bool} [thisIsRetry] - for internal use only
  * @returns {Promise} - resolves when action is finally executed, rejects after all attempts exhausted
- * @memberof helpers/retry
- * @protected
  */
 function retryUntilSuccess(fn, id = Math.random(), maxRetries = maxRetryCount, thisIsRetry) {
     let callInfo = callsInProgress[id];

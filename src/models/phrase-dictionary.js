@@ -5,7 +5,6 @@ const util = require('../crypto/util');
  * Passphrase dictionary module.
  * @param {string} locale - locale code for dict
  * @param {string} dictString - '\n' separated word list
- * @public
  */
 class PhraseDictionary {
     locale;
@@ -19,7 +18,6 @@ class PhraseDictionary {
     /**
      * Returns a random passphrase of chosen word length
      * @param {number} length - passphrase word count
-     * @public
      */
     getPassphrase(length) {
         if (!this.dict) throw new Error('no dictionary available');
@@ -33,7 +31,6 @@ class PhraseDictionary {
 
     /**
      * Free RAM by removing cached dictionary
-     * @public
      */
     dispose() {
         this.dict = null;
@@ -55,8 +52,6 @@ class PhraseDictionary {
     /**
      * Last chosen dictionary.
      * @member {PhraseDictionary}
-     * @memberof PhraseDictionary
-     * @public
      */
     static current;
 
@@ -65,8 +60,6 @@ class PhraseDictionary {
      * whenever you need without re-creating the dictionary every time.
      * @param {string} localeCode
      * @param {string} rawData
-     * @memberof PhraseDictionary
-     * @public
      */
     static setDictionary(localeCode, rawData) {
         if (PhraseDictionary.current) PhraseDictionary.current.dispose();

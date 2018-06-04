@@ -1,8 +1,6 @@
 /* eslint-disable no-case-declarations */
 /**
 * All kinds of unfurl helpers
-* @module helpers/unfurl
-* @protected
 */
 
 const urlRegex = require('url-regex')();

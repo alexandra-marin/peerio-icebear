@@ -1,7 +1,5 @@
 /**
  * Public key encryption module
- * @module crypto/public
- * @public
  */
 
 const nacl = require('tweetnacl');
@@ -17,8 +15,6 @@ const { DecryptionError } = require('../errors');
  * @param {Uint8Array} theirPublicKey - message sender's public key
  * @param {Uint8Array} mySecretKey - decrypting user's secret key
  * @returns {Uint8Array}  decrypted bytes
- * @memberof crypto/public
- * @public
  */
 function decryptCompat(cipher, nonce, theirPublicKey, mySecretKey) {
     const decrypted = nacl.box.open(cipher, nonce, theirPublicKey, mySecretKey);
@@ -35,8 +31,6 @@ function decryptCompat(cipher, nonce, theirPublicKey, mySecretKey) {
  * @param {Uint8Array} theirPublicKey - message recipient's public key
  * @param {Uint8Array} mySecretKey - encrypting user's secret key
  * @returns {Uint8Array} encrypted bytes
- * @memberof crypto/public
- * @public
  */
 function encrypt(msgBytes, theirPublicKey, mySecretKey) {
     const sharedKey = nacl.box.before(theirPublicKey, mySecretKey);
@@ -51,8 +45,6 @@ function encrypt(msgBytes, theirPublicKey, mySecretKey) {
  * @param {Uint8Array} theirPublicKey - message sender's public key
  * @param {Uint8Array} mySecretKey - decrypting user's secret key
  * @returns {Uint8Array} decrypted bytes
- * @memberof crypto/public
- * @public
  */
 function decrypt(cipher, theirPublicKey, mySecretKey) {
     const sharedKey = nacl.box.before(theirPublicKey, mySecretKey);
@@ -65,8 +57,6 @@ function decrypt(cipher, theirPublicKey, mySecretKey) {
  * @param {Uint8Array} mySecretKey - current user's secret key
  * @returns {Uint8Array} 32 bytes shared key
  * @function computeSharedKey
- * @memberof crypto/public
- * @public
  */
 const computeSharedKey = nacl.box.before;
 

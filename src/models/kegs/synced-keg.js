@@ -13,7 +13,6 @@ const { ServerError } = require('../../errors');
  * @param {boolean} [plaintext=false] - encrypted or not
  * @param {boolean} [forceSign=false] - force signature of plaintext kegs or not
  * @extends {Keg}
- * @public
  */
 class SyncedKeg extends Keg {
     constructor(kegName, db, plaintext = false, forceSign = false, allowEmpty = true, storeSignerData = false) {
@@ -50,7 +49,6 @@ class SyncedKeg extends Keg {
     /**
      * Forces updating keg data from server
      * @returns {Promise}
-     * @public
      */
     reload = () => {
         return this.load()
@@ -74,7 +72,6 @@ class SyncedKeg extends Keg {
      * freshly received data from server.
      * @param {string} [errorLocaleKey] - optional error to show in snackbar
      * @returns {Promise}
-     * @public
      */
     save(dataChangeFn, dataRestoreFn, errorLocaleKey) {
         return new Promise((resolve, reject) => {
@@ -119,7 +116,6 @@ class SyncedKeg extends Keg {
 
     /**
      * Override to perform actions after keg data has been updated from server.
-     * @protected
      * @abstract
      */
     onUpdated() {
@@ -128,7 +124,6 @@ class SyncedKeg extends Keg {
 
     /**
      * Override to perform actions after keg data has been saved.
-     * @protected
      * @abstract
      */
     onSaved() {
@@ -138,7 +133,6 @@ class SyncedKeg extends Keg {
     /**
      * Override if required. Default implementation generates medium warning if locale key is provided.
      * @param {string} [localeKey]
-     * @protected
      * @abstract
      */
     onSaveError(localeKey) {

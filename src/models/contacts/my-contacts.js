@@ -4,7 +4,6 @@ const { getUser } = require('../../helpers/di-current-user');
 /**
  * User's favorite contacts. Named plaintext synced keg.
  * @extends {SyncedKeg}
- * @protected
  */
 class MyContacts extends SyncedKeg {
     contacts = {};
@@ -24,7 +23,6 @@ class MyContacts extends SyncedKeg {
     /**
      * @param {Contact} contact
      * @returns {boolean} - true if contact was added, false if contact was already in the list.
-     * @protected
      */
     addContact(contact) {
         if (this.contacts[contact.username]) return false;
@@ -35,7 +33,6 @@ class MyContacts extends SyncedKeg {
     /**
      * @param {Contact} contact
      * @returns {boolean} - true if contact was removed, false if contact was not in the list.
-     * @protected
      */
     removeContact(contact) {
         if (!this.contacts[contact.username]) return false;

@@ -11,7 +11,6 @@ const FileProcessor = require('./file-processor');
  * @param {FileNonceGenerator} nonceGenerator
  * @param {number} startFromChunk - in case of resume, start uploading from the chunk after this one
  * @extends {FileProcessor}
- * @protected
  */
 class FileUploader extends FileProcessor {
     constructor(file, stream, nonceGenerator, startFromChunk) {
@@ -33,36 +32,30 @@ class FileUploader extends FileProcessor {
     /**
      * read chunks go here
      * @member {Array<Uint8Array>}
-     * @protected
      */
     encryptQueue = [];
     /**
      * encrypted chunks go here
      * @member {Array<Uint8Array>}
-     * @protected
      */
     uploadQueue = [];
     /**
      * end of file reached while reading file
      * @member {boolean}
-     * @protected
      */
     eofReached = false;
     /**
      * avoid parallel reads
      * @member {boolean}
-     * @protected
      */
     readingChunk = false;
     /**
      * @member {number}
-     * @protected
      */
     lastReadChunkId = -1;
     /**
      * amount of chunks that currently wait for response from server
      * @member {number}
-     * @protected
      */
     chunksWaitingForResponse = 0;
 

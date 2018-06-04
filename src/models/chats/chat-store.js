@@ -25,7 +25,6 @@ const Contact = require('../contacts/contact');
 /**
  * Chat store.
  * @namespace
- * @public
  */
 class ChatStore {
     constructor() {
@@ -60,25 +59,18 @@ class ChatStore {
      * Events emitter.
      * @member {EventEmitter}
      * @type {EventEmitter}
-     * @public
      */
     events = new EventEmitter();
 
     /**
      * Working set of chats. Server might have more, but we display only these at any time.
      * @member {ObservableArray<Chat>} chats
-     * @memberof ChatStore
-     * @instance
-     * @public
      */
     @observable.shallow chats = [];
 
     /**
      * @member {boolean} unreadChatsAlwaysOnTop
      * @type {boolean} unreadChatsAlwaysOnTop
-     * @memberof ChatStore
-     * @instance
-     * @public
      */
     @observable unreadChatsAlwaysOnTop = false;
 
@@ -86,7 +78,6 @@ class ChatStore {
      * MyChats Keg
      * @member {MyChats} myChats
      * @type {MyChats} myChats
-     * @protected
      */
     myChats;
 
@@ -94,16 +85,12 @@ class ChatStore {
      * To prevent duplicates
      * @member {{chatId:Chat}}
      * @type {{[chatId : string]: Chat}}
-     * @private
      */
     chatMap = {};
     /**
      * True when chat list loading is in progress.
      * @member {boolean} loading
      * @type {boolean} loading
-     * @memberof ChatStore
-     * @instance
-     * @public
      */
     @observable loading = false;
 
@@ -111,9 +98,6 @@ class ChatStore {
      * True when all chats has been updated after reconnect
      * @member {boolean} updatedAfterReconnect
      * @type {boolean} updatedAfterReconnect
-     * @memberof ChatStore
-     * @instance
-     * @public
      */
     @computed get updatedAfterReconnect() {
         return this.chats.every(c => c.updatedAfterReconnect);
@@ -123,27 +107,18 @@ class ChatStore {
      * currently selected/focused chat.
      * @member {Chat} activeChat
      * @type {Chat} activeChat
-     * @memberof ChatStore
-     * @instance
-     * @public
      */
     @observable activeChat = null;
     /**
      * Chats set this flag and UI should use it to prevent user from spam-clicking the 'hide' button
      * @member {boolean} hidingChat
      * @type {boolean} hidingChat
-     * @memberof ChatStore
-     * @instance
-     * @public
      */
     @observable hidingChat = false;
     /**
      * True when loadAllChats() was called and finished once already.
      * @member {boolean} loaded
      * @type {boolean} loaded
-     * @memberof ChatStore
-     * @instance
-     * @public
      */
     @observable loaded = false;
 
@@ -151,10 +126,6 @@ class ChatStore {
      * Total unread messages in all chats.
      * @member {number} unreadMessages
      * @type {number} unreadMessages
-     * @memberof ChatStore
-     * @readonly
-     * @instance
-     * @public
      */
     @computed get unreadMessages() {
         return this.chats.reduce((acc, curr) => acc + curr.unreadCount, 0);
@@ -164,10 +135,6 @@ class ChatStore {
      * Subset of ChatStore#chats, contains direct message chats and pending DMs
      * @member {Array<Chat>} directMessages
      * @type {Array<Chat>} directMessages
-     * @memberof ChatStore
-     * @readonly
-     * @instance
-     * @public
      */
     @computed get directMessages() {
         return this.chats.filter(chat => !chat.isChannel && chat.headLoaded);
@@ -177,10 +144,6 @@ class ChatStore {
      * Subset of ChatStore#chats, contains only channel chats
      * @member {Array<Chat>} channels
      * @type {Array<Chat>} channels
-     * @memberof ChatStore
-     * @readonly
-     * @instance
-     * @public
      */
     @computed get channels() {
         return this.chats.filter(chat => chat.isChannel && chat.headLoaded);
@@ -190,10 +153,6 @@ class ChatStore {
      * Does chat store has any channels or not.
      * @member {boolean} hasChannels
      * @type {boolean} hasChannels
-     * @memberof ChatStore
-     * @readonly
-     * @instance
-     * @public
      */
     @computed get hasChannels() {
         return !!this.channels.length;
@@ -203,10 +162,6 @@ class ChatStore {
      * Number of unread messages and invitations
      * @member {number} badgeCount
      * @type {number} badgeCount
-     * @memberof ChatStore
-     * @readonly
-     * @instance
-     * @public
      */
     @computed
     get badgeCount() {
@@ -217,10 +172,6 @@ class ChatStore {
      * List of user's channels and invites
      * @member {Array} allRooms
      * @type {Array} allRooms
-     * @memberof ChatStore
-     * @readonly
-     * @instance
-     * @public
      */
     @computed
     get allRooms() {
@@ -264,7 +215,6 @@ class ChatStore {
     /**
      * Does smart and efficient 'in-place' sorting of observable array.
      * Note that ObservableArray#sort creates copy of the array. This function sorts in place.
-     * @protected
      */
     sortChats() {
         if (this.loading) return;
@@ -285,12 +235,10 @@ class ChatStore {
 
     /**
      * Chat comparison function. Takes into account favorite status of the chat, timestamp and user preferences.
-     * @static
      * @param {Chat} a
      * @param {Chat} b
      * @param {boolean} unreadOnTop
      * @returns {number} -1, 0 or 1
-     * @protected
      */
     static compareChats(a, b, unreadOnTop) {
         if (a.isChannel && !b.isChannel) {
@@ -372,7 +320,6 @@ class ChatStore {
      * Adds chat to the list.
      * @function addChat
      * @param {string | Chat} chat - chat id or Chat instance
-     * @public
      */
     @action.bound addChat(chat, noActivate) {
         if (!chat) throw new Error(`Invalid chat id. ${chat}`);
@@ -439,9 +386,6 @@ class ChatStore {
      * ORDER OF THE STEPS IS IMPORTANT ON MANY LEVELS
      * @function loadAllChats
      * @returns {Promise}
-     * @memberof ChatStore
-     * @instance
-     * @public
      */
     @action async loadAllChats() {
         if (this.loaded || this.loading) return;
@@ -503,7 +447,6 @@ class ChatStore {
      * the chatId.
      * @param {Array<Contact>} participants
      * @returns {?Chat} if found
-     * @private
      */
     findCachedChatWithParticipants(participants) {
         // validating participants
@@ -527,7 +470,6 @@ class ChatStore {
 
     /**
      * Sets activeChat to first chat in list
-     * @public
      */
     @action.bound
     switchToFirstChat() {
@@ -558,9 +500,6 @@ class ChatStore {
      * @param {string=} purpose - only for channels, not relevant for DMs
      * @param {object=} space - only to create a space
      * @returns {?Chat} - can return null in case of paywall
-     * @memberof ChatStore
-     * @instance
-     * @public
      */
     @action async startChat(participants = [], isChannel = false, name, purpose, noActivate, space = null) {
         console.log('STARTING CHAT');
@@ -604,9 +543,6 @@ class ChatStore {
      * Activates the chat.
      * @function activate
      * @param {string} id - chat id
-     * @memberof ChatStore
-     * @instance
-     * @public
      */
     @action activate(id) {
         const chat = this.chatMap[id];
@@ -622,9 +558,6 @@ class ChatStore {
     /**
      * Deactivates currently active chat.
      * @function deactivateCurrentChat
-     * @memberof ChatStore
-     * @instance
-     * @public
      */
     @action deactivateCurrentChat() {
         if (!this.activeChat) return;
@@ -638,9 +571,6 @@ class ChatStore {
      * @param {Array<Contact>} participants
      * @param {File|Array<File>} fileOrFiles
      * @returns {Promise}
-     * @memberof ChatStore
-     * @instance
-     * @public
      */
     @action async startChatAndShareFiles(participants, fileOrFiles) {
         const files = (Array.isArray(fileOrFiles) || isObservableArray(fileOrFiles)) ? fileOrFiles : [fileOrFiles];
@@ -663,9 +593,6 @@ class ChatStore {
      * Removes chat from working set.
      * @function unloadChat
      * @param {Chat} chat
-     * @memberof ChatStore
-     * @instance
-     * @public
      */
     @action unloadChat(chat) {
         if (chat.active) {
@@ -680,7 +607,6 @@ class ChatStore {
      * Returns a promise that resolves with chat instance once that chat is added to chat store and loaded.
      * @param {string} id - chat id
      * @returns {Promise<Chat>}
-     * @protected
      */
     getChatWhenReady(id) {
         return new Promise((resolve) => {

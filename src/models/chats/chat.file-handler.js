@@ -10,7 +10,6 @@ const File = require('../files/file');
 /**
  * File handling module for Chat. Extracted for readability.
  * @param {Chat} chat - chat creates an instance and passes itself to it.
- * @public
  */
 class ChatFileHandler {
     knownUpdateId = '';
@@ -91,7 +90,6 @@ class ChatFileHandler {
      *                                                before file is shared. We need this to finish keg preparations.
      * @param {string} [message=null] - message to attach to file
      * @returns {File}
-     * @public
      */
     uploadAndShare(path, name, deleteAfterUpload = false, message) {
         const file = fileStore.upload(path, name);

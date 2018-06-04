@@ -16,8 +16,6 @@
  * ```
  * REFACTOR WARNING: before renaming any errors (not sure why you would do that though),
  *                   make sure they haven't been used by name anywhere.
- * @module errors
- * @public
  */
 
 // jsdoc freaks out and merges next jsdoc with previous if this var is not defined here
@@ -36,8 +34,6 @@ let a; // eslint-disable-line
  * @param {string} [failoverMessage] - if error will not be of Error instance, this message wrapped in new Error object
  * will be returned
  * @returns {Error}
- * @memberof errors
- * @public
  */
 module.exports.normalize = function(error, failoverMessage) {
     if (error instanceof Error) return error;
@@ -58,8 +54,6 @@ module.exports.normalize = function(error, failoverMessage) {
  * @param {string} name - custom error name, should match the class name you will use for the error
  * @param {string} msg - default message for the error
  * @returns {function} class, inherited from Error
- * @memberof errors
- * @public
  */
 function getGenericCustomError(name, msg) {
     const err = function(message, data) {
@@ -98,8 +92,6 @@ module.exports.getGenericCustomError = getGenericCustomError;
 /**
  * Check sources for the list of codes.
  * You can look up this enum both by integer code and by string error name.
- * @memberof errors
- * @public
  */
 const serverErrorCodes = {
     genericServerError: 400,
@@ -139,8 +131,6 @@ Object.keys(serverErrorCodes).forEach((key) => {
  * @param {number} code - server error code
  * @param {string} [msg] - message, if any
  * @returns {ServerError}
- * @memberof errors
- * @public
  */
 function ServerError(code, msg) {
     const type = serverErrorMap[code] || 'Unknown server error';

@@ -34,7 +34,6 @@ const ACK_MSG = '👍';
  * @param {Array<Contact>} participants - chat participants, will be used to create chat or find it by participant list
  * @param {?bool} isChannel
  * @param {ChatStore} store
- * @public
  */
 class Chat {
     constructor(id, participants = [], store, isChannel = false) {
@@ -65,26 +64,17 @@ class Chat {
     /**
      * Chat id
      * @member {?string} id
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @observable id = null;
 
     /**
      * Render these messages.
      * @member {ObservableArray<Message>} messages
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @observable.shallow messages = [];
     /**
      * Render these messages at the bottom of the chat, they don't have Id yet, you can use tempId.
      * @member {ObservableArray<Message>} limboMessages
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @observable.shallow limboMessages = [];
 
@@ -101,10 +91,6 @@ class Chat {
      * All participants, including awaiting for invite accept or removal after leave.
      * Including current user.
      * @member {ObservableArray<Contact>} allParticipants
-     * @memberof Chat
-     * @instance
-     * @public
-     * @readonly
      */
     @computed get allParticipants() {
         if (!this.db.boot || !this.db.boot.participants) return [];
@@ -115,10 +101,6 @@ class Chat {
      * Participants, including awaiting for invite accept or removal after leave.
      * Excluding current user.
      * @member {ObservableArray<Contact>} otherParticipants
-     * @memberof Chat
-     * @instance
-     * @public
-     * @readonly
      */
     @computed get otherParticipants() {
         return this.allParticipants.filter(p => p.username !== User.current.username);
@@ -127,10 +109,6 @@ class Chat {
     /**
      * The username of the person you're having a DM with
      * @member {string} dmPartnerUsername
-     * @memberof Chat
-     * @instance
-     * @public
-     * @readonly
      */
     @computed get dmPartnerUsername() {
         if (this.isChannel) {
@@ -147,10 +125,6 @@ class Chat {
      * Includes only currently joined room participants and current user.
      * Excludes users awaiting to accept invite or get removed after leave.
      * @member {Array<Contact>} allJoinedParticipants
-     * @memberof Chat
-     * @instance
-     * @public
-     * @readonly
      */
     @computed get allJoinedParticipants() {
         const filtered = this.allParticipants.slice();
@@ -168,16 +142,10 @@ class Chat {
     /**
      * If true - chat is not ready for anything yet.
      * @member {boolean} loadingMeta
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @observable loadingMeta = false;
     /**
      * @member {boolean} metaLoaded
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @observable metaLoaded = false;
 
@@ -185,39 +153,24 @@ class Chat {
     /**
      * This can happen when chat was just added or after reset()
      * @member {boolean} loadingInitialPage
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @observable loadingInitialPage = false;
     /**
      * Ready to render messages.
      * @member {boolean} initialPageLoaded
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @observable initialPageLoaded = false;
     /**
      * Ready to render most recent message contents in chat list.
      * @member {boolean} mostRecentMessageLoaded
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @observable mostRecentMessageLoaded = false;
     /**
      * @member {boolean} loadingTopPage
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @observable loadingTopPage = false;
     /**
      * @member {boolean} loadingBottomPage
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @observable loadingBottomPage = false;
 
@@ -225,113 +178,74 @@ class Chat {
     /**
      * can we go back in history from where we are? (load older messages)
      * @member {boolean} canGoUp
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @observable canGoUp = false;
     /**
      * can we go forward in history or we have the most recent data loaded
      * @member {boolean} canGoDown
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @observable canGoDown = false;
 
     /**
      * currently selected/focused in UI
      * @member {boolean} active
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @observable active = false;
 
     /**
      * Is this chat instance added to chat list already or not
      * @member {boolean} active
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @observable added = false;
 
     /**
      * @member {boolean} isFavorite
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @observable isFavorite = false;
 
     /**
      * Prevent spamming 'Favorite' button in GUI.
      * @member {boolean} changingFavState
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @observable changingFavState = false;
 
     /**
      * Will be set to `true` after leave() is called on the channel so UI can react until channel is actually removed.
      * @member {boolean} leaving
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @observable leaving = false;
 
     /**
      * Will be set to `true` after update logic is done on reconnect.
      * @member {boolean} updatedAfterReconnect
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @observable updatedAfterReconnect = true;
 
     /**
      * list of files being uploaded to this chat.
      * @member {ObservableArray<File>} uploadQueue
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @observable.shallow uploadQueue = [];
     /**
      * Unread message count in this chat.
      * @member {number} unreadCount
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @observable unreadCount = 0;
     /**
      * when user is not looking but chat is active and receiving updates,
      * chat briefly sets this value to the id of last seen message so client can render separator marker.
      * @member {string} newMessagesMarkerPos
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @observable newMessagesMarkerPos = '';
     /**
      * Indicates ongoing loading recent files list for this chat
      * @member {bool} loadingRecentFiles
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @observable loadingRecentFiles = false;
     @observable _recentFiles = null;
     /**
      * List of recent file ids for this chat.
      * @member {Array<string>} recentFiles
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @computed get recentFiles() {
         if (this._recentFiles === null && !this.loadingRecentFiles) {
@@ -350,9 +264,6 @@ class Chat {
      * Chat head keg.
      * Observable, because `this.name` relies on it
      * @member {?ChatHead} chatHead
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @observable.ref chatHead;
     _messageHandler = null;
@@ -365,9 +276,6 @@ class Chat {
     _reactionsToDispose = [];
     /**
      * @member {boolean} isReadOnly
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @computed get isReadOnly() {
         if (this.isChannel) return false;
@@ -378,9 +286,6 @@ class Chat {
     /**
      * Includes current user.
      * @member {Array<string>} participantUsernames
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @computed get participantUsernames() {
         return this.allParticipants.map(p => p.username);
@@ -388,9 +293,6 @@ class Chat {
 
     /**
      * @member {string} name
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @computed get name() {
         if (this.isChannel && this.chatHead && this.chatHead.chatName) return this.chatHead.chatName;
@@ -401,9 +303,6 @@ class Chat {
 
     /**
      * @member {string} purpose
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @computed get purpose() {
         return this.chatHead && this.chatHead.purpose || '';
@@ -421,9 +320,6 @@ class Chat {
 
     /**
      * @member {string} headLoaded
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @computed get headLoaded() {
         return !!(this.chatHead && this.chatHead.loaded);
@@ -432,9 +328,6 @@ class Chat {
     /**
      * User should not be able to send multiple ack messages in a row. We don't limit it on SDK level, but GUIs should.
      * @member {boolean} canSendAck
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @computed get canSendAck() {
         if (this.limboMessages.length) {
@@ -454,9 +347,6 @@ class Chat {
     /**
      * User should not be able to send multiple video call messages in a row. Similar setup to ack throttling.
      * @member {boolean} canSendJitsi
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @computed get canSendJitsi() {
         if (this.limboMessages.length) {
@@ -479,9 +369,6 @@ class Chat {
     /**
      * Don't render message marker if this is false.
      * @member {boolean} showNewMessagesMarker
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @computed get showNewMessagesMarker() {
         if (!this.newMessagesMarkerPos) return false;
@@ -494,9 +381,6 @@ class Chat {
     /**
      * True if current user is an admin of this chat.
      * @member {boolean} canIAdmin
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @computed get canIAdmin() {
         if (!this.isChannel) return true;
@@ -509,9 +393,6 @@ class Chat {
     /**
      * True if current user can leave the channel. (Last admin usually can't)
      * @member {boolean} canILeave
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @computed get canILeave() {
         if (!this.isChannel) return false;
@@ -522,9 +403,6 @@ class Chat {
 
     /**
      * @member {?Message} mostRecentMessage
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @observable mostRecentMessage;
 
@@ -532,9 +410,6 @@ class Chat {
      * UI flag for chats created from chat-pending-dms
      * Will be set to true if it was for user who just signed up
      * @member {boolean} isChatCreatedFromPendingDM
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @observable isChatCreatedFromPendingDM;
 
@@ -542,16 +417,12 @@ class Chat {
      * UI flag for chats where user is a new user who accepted an invite to join
      * Will be set to true in a DM with the user who invited this user
      * @member {boolean} isNewUserFromInvite
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @observable isNewUserFromInvite;
 
     _metaPromise = null;
     /**
      * @returns {Promise}
-     * @private
      */
     loadMetadata() {
         if (this.metaLoaded || this.loadingMeta) return this._metaPromise;
@@ -586,9 +457,6 @@ class Chat {
      * @param {Array<Object|Message>} kegs - list of messages to add
      * @param {boolean} [prepend=false] - add message to top of bottom
      * @function addMessages
-     * @memberof Chat
-     * @instance
-     * @protected
      */
     @action addMessages(kegs, prepend = false) {
         if (!kegs || !kegs.length) return Promise.resolve();
@@ -619,7 +487,6 @@ class Chat {
      * @param {number} freshBatchMentionCount -- # of new/freshly loaded messages
      * @param {number} freshBatchMessageCount -- # of new/freshly loaded mentions
      * @param {number} lastMentionId -- id of last mention message, if exists
-     * @private
      */
     onNewMessageLoad(freshBatchMentionCount, freshBatchMessageCount, lastMentionId) {
         // fresh batch could mean app/page load rather than unreads,
@@ -726,7 +593,6 @@ class Chat {
     /**
      * Sorts messages in-place as opposed to ObservableArray#sort that returns a copy of array.
      * We use insertion sorting because it's optimal for our mostly always sorted small array.
-     * @protected
      */
     sortMessages() {
         const array = this.messages;
@@ -752,8 +618,6 @@ class Chat {
      * @function _sendMessage
      * @param {Message} m
      * @returns {Promise}
-     * @private
-     * @memberof Chat
      */
     _sendMessage(m) {
         if (this.canGoDown) this.reset();
@@ -781,7 +645,6 @@ class Chat {
      * @param {string} text
      * @param {Array<string>} [files] an array of file ids.
      * @returns {Promise}
-     * @memberof Chat
      */
     @action sendMessage(text, files, folders) {
         const m = new Message(this.db);
@@ -799,7 +662,6 @@ class Chat {
      * @param {string} legacyText The rendered HTML of the rich text, for back-compat with older clients
      * @param {Array<string>} [files] An array of file ids
      * @returns {Promise}
-     * @memberof Chat
      */
     @action sendRichTextMessage(richText, legacyText, files) {
         const m = new Message(this.db);
@@ -814,9 +676,6 @@ class Chat {
      * When we have message delete - it should be unified process.
      * @function removeMessage
      * @param {Message} message
-     * @memberof Chat
-     * @instance
-     * @public
      */
     @action removeMessage(message) {
         this.limboMessages.remove(message);
@@ -825,7 +684,6 @@ class Chat {
     }
     /**
      * @returns {Promise}
-     * @public
      */
     sendAck() {
         return this.sendMessage(ACK_MSG);
@@ -835,7 +693,6 @@ class Chat {
      * Checks if this chat's participants are the same with ones that are passed
      * @param participants
      * @returns boolean
-     * @protected
      */
     hasSameParticipants(participants) {
         if (this.otherParticipants.length !== participants.length) return false;
@@ -853,7 +710,6 @@ class Chat {
      * @param {boolean} [deleteAfterUpload=false]
      * @param {string} [message=null]
      * @returns {Promise}
-     * @public
      */
     uploadAndShareFile(path, name, deleteAfterUpload = false, message = null) {
         return this._fileHandler.uploadAndShare(path, name, deleteAfterUpload, message);
@@ -862,7 +718,6 @@ class Chat {
     /**
      * @param {Array<File>} files
      * @returns {Promise}
-     * @public
      */
     shareFiles(files) {
         return this._fileHandler.share(files);
@@ -889,7 +744,6 @@ class Chat {
 
     /**
      * @returns {Promise}
-     * @protected
      */
     loadMostRecentMessage() {
         return this._messageHandler.loadMostRecentMessage();
@@ -897,7 +751,6 @@ class Chat {
 
     /**
      * @returns {Promise}
-     * @protected
      */
     async loadMessages() {
         if (!this.metaLoaded) await this.loadMetadata();
@@ -906,7 +759,6 @@ class Chat {
     }
 
     /**
-     * @public
      */
     loadPreviousPage() {
         if (!this.canGoUp) return;
@@ -914,7 +766,6 @@ class Chat {
     }
 
     /**
-     * @public
      */
     loadNextPage() {
         if (!this.canGoDown) return;
@@ -923,7 +774,6 @@ class Chat {
 
     /**
      * @param {string} name - pass empty string to remove chat name
-     * @public
      */
     rename(name) {
         let validated = name || '';
@@ -957,7 +807,6 @@ class Chat {
 
     /**
      * @param {string} purpose - pass empty string to remove chat purpose
-     * @public
      */
     changePurpose(purpose) {
         let validated = purpose || '';
@@ -999,7 +848,6 @@ class Chat {
 
     /**
      * @function toggleFavoriteState
-     * @public
      */
     toggleFavoriteState = () => {
         this.changingFavState = true;
@@ -1018,7 +866,6 @@ class Chat {
 
     /**
      * @function hide
-     * @public
      */
     hide = () => {
         this.store.unloadChat(this);
@@ -1030,7 +877,6 @@ class Chat {
 
     /**
      * @function unhide
-     * @public
      */
     unhide = () => {
         return this.store.myChats.save(() => {
@@ -1040,7 +886,6 @@ class Chat {
 
     /**
      * Reloads most recent page of the chat like it was just added.
-     * @public
      */
     reset() {
         this.loadingInitialPage = false;
@@ -1060,7 +905,6 @@ class Chat {
 
     /**
      * Detects and sets firstOfTheDay flag for all loaded messages
-     * @private
      */
     _detectFirstOfTheDayFlag() {
         if (!this.messages.length) return;
@@ -1114,7 +958,6 @@ class Chat {
     /**
      * Deletes the channel.
      * @returns {Promise}
-     * @public
      */
     delete() {
         if (!this.isChannel) return Promise.reject(new Error('Can not delete DM chat.'));
@@ -1141,7 +984,6 @@ class Chat {
      *                                               before proceeding. So if there are some invalid
      *                                               contacts - entire batch will fail.
      * @returns {Promise}
-     * @public
      */
     addParticipants(participants) {
         if (!participants || !participants.length) return Promise.resolve();
@@ -1173,7 +1015,6 @@ class Chat {
      * Assigns admin role to a contact.
      * @param {Contact} contact
      * @returns {Promise}
-     * @public
      */
     promoteToAdmin(contact) {
         if (!this.otherParticipants.includes(contact)) {
@@ -1203,7 +1044,6 @@ class Chat {
      * Unassigns admin role from a contact.
      * @param {Contact} contact
      * @returns {Promise}
-     * @public
      */
     demoteAdmin(contact) {
         if (!this.otherParticipants.includes(contact)) {
@@ -1234,7 +1074,6 @@ class Chat {
      * Checks if a contact has admin rights to this chat.
      * @param {Contact} contact
      * @returns {boolean}
-     * @public
      */
     isAdmin(contact) {
         return this.db.admins.includes(contact);
@@ -1246,7 +1085,6 @@ class Chat {
      * @param {boolean} isUserKick - this function is called in case admin kicks the user and in case user left and
      *                                admin needs to remove their keys. Method wants to know which case is it.
      * @returns {Promise}
-     * @public
      */
     removeParticipant(participant, isUserKick = true) {
         let contact = participant;
@@ -1282,7 +1120,6 @@ class Chat {
 
     /**
      * Remove myself from this channel.
-     * @public
      */
     leave() {
         this.leaving = true;
@@ -1298,7 +1135,6 @@ class Chat {
     }
     /**
      * Sends '{Current user} joined chat' system message to the chat.
-     * @protected
      */
     sendJoinMessage() {
         const m = new Message(this.db);
@@ -1324,7 +1160,6 @@ class Chat {
 
     /**
      * Checks if there are any file attachments in new message batch and adds them to _recentFiles if needed.
-     * @private
      */
     @action detectFileAttachments(messages) {
         if (!this._recentFiles) {

@@ -24,7 +24,6 @@ const socket = require('../../network/socket');
  * Message keg and model
  * @param {ChatStore} db - chat db
  * @extends {Keg}
- * @public
  */
 class Message extends Keg {
     constructor(db) {
@@ -39,35 +38,23 @@ class Message extends Keg {
     /**
      * @member {boolean} sending
      * @type {boolean} sending
-     * @memberof Message
-     * @instance
-     * @public
      */
     @observable sending = false;
     /**
      * @member {boolean} sendError
      * @type {boolean} sendError
-     * @memberof Message
-     * @instance
-     * @public
      */
     @observable sendError = false;
     /**
      * array of usernames to render receipts for
      * @member {Array<string>} receipts
      * @type {Array<string>} receipts
-     * @memberof Message
-     * @instance
-     * @public
      */
     @observable receipts;
     /**
      * Which usernames are mentioned in this message.
      * @member {Array<string>} userMentions
      * @type {Array<string>} userMentions
-     * @memberof Message
-     * @instance
-     * @public
      */
     @observable.shallow userMentions = [];
     // ----- calculated in chat store, used in ui
@@ -75,18 +62,12 @@ class Message extends Keg {
      * Is this message first in the day it was sent (and loaded message page)
      * @member {boolean} firstOfTheDay
      * @type {boolean} firstOfTheDay
-     * @memberof Message
-     * @instance
-     * @public
      */
     @observable firstOfTheDay;
     /**
      * whether or not to group this message with previous one in message list.
      * @member {boolean} groupWithPrevious
      * @type {boolean} groupWithPrevious
-     * @memberof Message
-     * @instance
-     * @public
      */
     @observable groupWithPrevious;
 
@@ -94,17 +75,12 @@ class Message extends Keg {
      * External image urls mentioned in this chat and safe to render in agreement with all settings.
      * @member {Array<ExternalImage>} externalImages
      * @type {Array<ExternalImage>} externalImages
-     * @memberof Message
-     * @instance
-     * @public
      */
     @observable externalImages = [];
 
     /**
      * Indicates if current message contains at least one url.
      * @type {boolean}
-     * @memberof Message
-     * @public
      */
     @observable hasUrls = false;
 
@@ -112,9 +88,6 @@ class Message extends Keg {
     /**
      * used to compare calendar days
      * @member {string} dayFingerprint
-     * @memberof Message
-     * @instance
-     * @public
      */
     @computed get dayFingerprint() {
         if (!this.timestamp) return null;
@@ -128,9 +101,6 @@ class Message extends Keg {
      * TODO: new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' });
      * TODO: resolve/unify this in favor of most performant method
      * @member {string} messageTimestampText
-     * @memberof Message
-     * @instance
-     * @public
      */
     @computed get messageTimestampText() {
         const { timestamp } = this;
@@ -142,7 +112,6 @@ class Message extends Keg {
      * But because failure might have happened after we got a get id - we need to clear the keg id and version,
      * so the message doesn't confusingly appear out of order (messages are sorted by id)
      * @returns {Promise}
-     * @protected
      */
     send() {
         this.sending = true;
@@ -173,7 +142,6 @@ class Message extends Keg {
     /**
      * Creates system metadata indicating chat rename.
      * @param {string} newName
-     * @protected
      */
     setRenameFact(newName) {
         this.systemData = {
@@ -185,7 +153,6 @@ class Message extends Keg {
     /**
      * Creates system metadata indicating chat purpose change.
      * @param {string} newPurpose
-     * @protected
      */
     setPurposeChangeFact(newPurpose) {
         this.systemData = {
@@ -196,7 +163,6 @@ class Message extends Keg {
 
     /**
      * Creates system metadata indicating chat creation.
-     * @protected
      */
     setChatCreationFact() {
         this.systemData = { action: 'create' };
@@ -204,7 +170,6 @@ class Message extends Keg {
     /**
      * Creates system metadata indicating admin sending user invitation to channel.
      * @param {Array<string>} usernames - array of invited usernames.
-     * @protected
      */
     setChannelInviteFact(usernames) {
         this.systemData = {
@@ -214,14 +179,12 @@ class Message extends Keg {
     }
     /**
      * Creates system metadata indicating user accepting invite and joining channel.
-     * @protected
      */
     setChannelJoinFact() {
         this.systemData = { action: 'join' };
     }
     /**
      * Creates system metadata indicating user leaving channel.
-     * @protected
      */
     setChannelLeaveFact() {
         this.systemData = { action: 'leave' };
@@ -229,7 +192,6 @@ class Message extends Keg {
     /**
      * Creates system metadata indicating admin removing user from a channel.
      * @param {string} username - username kicked from chat.
-     * @protected
      */
     setUserKickFact(username) {
         this.systemData = {
@@ -242,7 +204,6 @@ class Message extends Keg {
      * Crates system metadata indicating admin assigning a role to user.
      * @param {string} username
      * @param {string} role - currently only 'admin'
-     * @memberof Message
      */
     setRoleAssignFact(username, role) {
         this.systemData = {
@@ -256,7 +217,6 @@ class Message extends Keg {
      * Crates system metadata indicating admin removing a role from user.
      * @param {string} username
      * @param {string} role - currently only 'admin'
-     * @memberof Message
      */
     setRoleUnassignFact(username, role) {
         this.systemData = {
@@ -269,7 +229,6 @@ class Message extends Keg {
     /**
      * Sends a message containing jitsi link to the channel
      * @param {string} link
-     * @memberof Message
      */
     sendVideoLink(link) {
         this.systemData = {
@@ -281,7 +240,6 @@ class Message extends Keg {
     /**
      * Parses message to find urls or file attachments.
      * Verifies external url type and size and fills this.inlineImages.
-     * @memberof Message
      */
     async parseExternalContent() {
         this.externalImages.clear();
@@ -381,43 +339,36 @@ class Message extends Keg {
     deserializeKegPayload(payload) {
         /**
          * @member {Contact} sender
-         * @public
          */
         this.sender = contactStore.getContact(this.owner);
         /**
          * @member {string} text
-         * @public
          */
         this.text = payload.text;
 
         /**
          * @member {Object=} richText
-         * @public
          */
         this.richText = payload.richText;
 
         /**
          * For system messages like chat rename fact.
          * @member {Object} systemData
-         * @public
          */
         this.systemData = payload.systemData;
         /**
          * @member {Date} timestamp
-         * @public
          */
         this.timestamp = new Date(payload.timestamp);
         this.userMentions = payload.userMentions;
         /**
          * @member {Array<string>} files
-         * @public
          */
         this.files = payload.files ? JSON.parse(payload.files) : null;
         this.folders = payload.folders ? JSON.parse(payload.folders) : null;
         /**
          * Does this message mention current user.
          * @member {boolean} isMention
-         * @public
          */
         this.isMention = this.userMentions ? this.userMentions.includes(User.current.username) : false;
     }

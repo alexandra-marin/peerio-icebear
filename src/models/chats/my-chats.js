@@ -4,19 +4,16 @@ const { getUser } = require('../../helpers/di-current-user');
 /**
  * MyChats keg holds chat groups for user.
  * @extends {SyncedKeg}
- * @public
  */
 class MyChats extends SyncedKeg {
     /**
      * Favorite chat ids
      * @member {Array<string>}
-     * @public
      */
     favorites = [];
     /**
      * Hidden chat ids
      * @member {Array<string>}
-     * @public
      */
     hidden = [];
 
@@ -55,7 +52,6 @@ class MyChats extends SyncedKeg {
      * Adds favorite chat and removes it from hidden list if it was there.
      * @param {string} chatId
      * @returns {boolean} - true if added, false if already had been in the list
-     * @public
      */
     addFavorite(chatId) {
         const ret = this._add(this.favorites, chatId);
@@ -69,7 +65,6 @@ class MyChats extends SyncedKeg {
      * Removes favorite chat,
      * @param {string} chatId
      * @returns {boolean} - true if removed, false if couldn't find it in the favorites list
-     * @public
      */
     removeFavorite(chatId) {
         return this._remove(this.favorites, chatId);
@@ -79,7 +74,6 @@ class MyChats extends SyncedKeg {
      * Adds hidden chat and removes it from favorites list if it was there.
      * @param {string} chatId
      * @returns {boolean} - true if added, false if already had been in the list
-     * @public
      */
     addHidden(chatId) {
         const ret = this._add(this.hidden, chatId);
@@ -93,7 +87,6 @@ class MyChats extends SyncedKeg {
      * Removes hidden chat.
      * @param {string} chatId
      * @returns {boolean} - true if removed, false if couldn't find it in the hidden list
-     * @public
      */
     removeHidden(chatId) {
         return this._remove(this.hidden, chatId);

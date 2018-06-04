@@ -30,7 +30,6 @@ class GhostStore {
      *
      * @param minCollectionVersion
      * @returns {Socket|*}
-     * @private
      */
     _getGhosts(minCollectionVersion = '') {
         const filter = { minCollectionVersion };

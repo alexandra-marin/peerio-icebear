@@ -45,9 +45,6 @@ function _getUlResumeParams(path) {
  * @param {string} [fileName] - if you'd like to override this.name or filePath
  * @param {bool} [resume] - system sets this param to true when it detects unfinished upload
  * @returns {Promise}
- * @instance
- * @memberof File
- * @public
  */
 function upload(filePath, fileName, resume) {
     if (this.downloading || this.uploading) {
@@ -134,9 +131,6 @@ function upload(filePath, fileName, resume) {
 /**
  * Cancels ongoing upload. This will also remove file keg.
  * @returns {Promise}
- * @instance
- * @memberof File
- * @public
  */
 function cancelUpload() {
     if (this.readyForDownload) {

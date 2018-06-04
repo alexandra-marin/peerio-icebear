@@ -13,8 +13,6 @@
  * Cipherbytes structure:
  * `[ 32 zero bytes ][ actual cipher bytes ][ 24-byte nonce]`
  *
- * @module crypto/secret
- * @public
  */
 
 const nacl = require('tweetnacl');
@@ -23,8 +21,6 @@ const { DecryptionError } = require('../errors');
 
 /**
  * 24 - The size of the nonce is used for encryption
- * @memberof crypto/secret
- * @public
  */
 const NONCE_SIZE = 24;
 
@@ -37,8 +33,6 @@ const NONCE_SIZE = 24;
  * @param {boolean} [appendNonce=true] - appends nonce to the end of encrypted bytes
  * @param {boolean} [prependLength=false] - adds 4 bytes containing message length after encryption to the beginning
  * @returns {Uint8Array} encrypted bytes
- * @memberof crypto/secret
- * @public
  */
 function encrypt(msgBytes, key, nonce = util.getRandomNonce(), appendNonce = true, prependLength = false) {
     const fullMsgLength = 32 + msgBytes.length; /* ZEROBYTES */
@@ -76,8 +70,6 @@ function encrypt(msgBytes, key, nonce = util.getRandomNonce(), appendNonce = tru
  * @param {string} msg - message to encrypt
  * @param {Uint8Array} key - 32 bytes symmetric key
  * @returns {Uint8Array} encrypted bytes
- * @memberof crypto/secret
- * @public
  */
 function encryptString(msg, key) {
     const msgBytes = util.strToBytes(msg);
@@ -92,8 +84,6 @@ function encryptString(msg, key) {
  * @param {Uint8Array} [nonce='will be extracted from message'] - pass nonce when it's not appended to cipher bytes
  * @param {boolean} [containsLength=false] - whether or not to ignore first 4 bytes
  * @returns {Uint8Array} decrypted message
- * @memberof crypto/secret
- * @public
  */
 function decrypt(cipher, key, nonce, containsLength) {
     let start = 0, end;
@@ -121,8 +111,6 @@ function decrypt(cipher, key, nonce, containsLength) {
  * @param {Uint8Array} cipher - encrypted message
  * @param {Uint8Array} key - 32 bytes symmetric key
  * @returns {string} decrypted message
- * @memberof crypto/secret
- * @public
  */
 function decryptString(cipher, key) {
     return util.bytesToStr(decrypt(cipher, key));

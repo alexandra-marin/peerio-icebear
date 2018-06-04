@@ -62,9 +62,6 @@ class VolumeStore {
      * ORDER OF THE STEPS IS IMPORTANT ON MANY LEVELS
      * @function loadAllVolumes
      * @returns {Promise}
-     * @memberof VolumeStore
-     * @instance
-     * @public
      */
     @action.bound async loadAllVolumes() {
         if (this.loaded || this.loading) return;

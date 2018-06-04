@@ -13,7 +13,6 @@ const { CHUNK_OVERHEAD } = config;
  * @param {FileNonceGenerator} nonceGenerator
  * @param {{partialChunkSize:number, wholeChunks:number}} resumeParams
  * @extends {FileProcessor}
- * @protected
  */
 class FileDownloader extends FileProcessor {
     constructor(file, stream, nonceGenerator, resumeParams) {
@@ -37,13 +36,11 @@ class FileDownloader extends FileProcessor {
     /**
      * Chunks as they were uploaded
      * @member {Array<Uint8Array>}
-     * @protected
      */
     decryptQueue = [];
     /**
      * Number of active downloads.
      * @member {number}
-     * @protected
      */
     activeDownloads = 0;
     /**
@@ -54,31 +51,26 @@ class FileDownloader extends FileProcessor {
     /**
      * Flag to indicate that chunk is currently waiting for write promise resolve to avoid parallel writes.
      * @member {boolean}
-     * @protected
      */
     writing = false;
     /**
      *  position of the blob as it is stored in the cloud
      * @member {number}
-     * @protected
      */
     downloadPos = 0;
     /**
      * Indicates that there are no more chunks to download.
      * @member {boolean}
-     * @protected
      */
     noMoreChunks = false;
     /**
      * blob was fully read
      * @member {boolean}
-     * @protected
      */
     downloadEof = false;
     /**
      * Array of active XMLHttpRequests.
      * @member {Array<XMLHttpRequest>}
-     * @private
      */
     currentXhrs = [];
 

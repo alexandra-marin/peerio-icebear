@@ -3,7 +3,6 @@ const TinyDbCollection = require('./tiny-db-collection');
 /**
  * TinyDbManager manages system and user collections, and allows opening
  * other collections.
- * @public
  */
 class TinyDbManager {
     /**
@@ -19,8 +18,6 @@ class TinyDbManager {
     /**
      * Instance of unencrypted system collection.
      * @member {TinyDbCollection}
-     * @static
-     * @public
      */
     get system() {
         if (!this.systemCollection) this.openSystem();
@@ -31,8 +28,6 @@ class TinyDbManager {
      * Instance of encrypted user collection.
      * Only values are encrypted.
      * @const {TinyDb}
-     * @static
-     * @public
      */
     get user() {
         return this.userCollection;
@@ -52,7 +47,6 @@ class TinyDbManager {
     /**
     * Creates system collection instance and assigns it to {@link system} property
     * @returns {TinyDbCollection} system collection
-    * @private
     */
     openSystem() {
         this.systemCollection = this.open('$system$');
@@ -64,7 +58,6 @@ class TinyDbManager {
      * @param {string} username
      * @param {Uint8Array} encryptionKey - database key
      * @returns {TinyDbCollection} user collection
-     * @protected
      */
     openUser(username, encryptionKey) {
         this.userCollection = this.open(username, encryptionKey);

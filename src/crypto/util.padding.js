@@ -5,8 +5,6 @@
 /**
  * @const
  * @returns {number} 1024
- * @memberof crypto/util
- * @public
  */
 const MAX_PASSPHRASE_LENGTH = 1024;
 
@@ -15,8 +13,6 @@ const MAX_PASSPHRASE_LENGTH = 1024;
  * @param {Uint8Array} arr
  * @param {number} length
  * @returns {Uint8Array} new zero-padded array
- * @memberof crypto/util
- * @public
  */
 function padBytes(arr, length) {
     const newBytes = new Uint8Array(length).fill(0);
@@ -30,8 +26,6 @@ function padBytes(arr, length) {
  * @param {string} passphrase
  * @returns {string} passhprase padded with dots `.`
  * @throws if passphrase is too long
- * @memberof crypto/util
- * @public
  */
 function padPassphrase(passphrase) {
     if (passphrase.length > MAX_PASSPHRASE_LENGTH) {
@@ -51,8 +45,6 @@ function padPassphrase(passphrase) {
  * @param {string} paddedPassphrase
  * @returns {string} unpadded passphrase
  * @throws if padded passphrase is too short
- * @memberof crypto/util
- * @public
  */
 function unpadPassphrase(paddedPassphrase) {
     if (paddedPassphrase.length < 8) {

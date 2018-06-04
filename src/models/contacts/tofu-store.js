@@ -49,11 +49,8 @@ class TofuStore {
 
     /**
      * Finds Tofu keg by username property.
-     * @static
      * @param {string} username
      * @returns {Promise<?Tofu>} tofu keg, if any
-     * @memberof Tofu
-     * @public
      */
     @action.bound getByUsername(username) {
         if (!this.loaded) {

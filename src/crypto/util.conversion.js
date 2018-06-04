@@ -12,8 +12,6 @@ const textDecoder = HAS_TEXT_ENCODER ? new TextDecoder('utf-8') : null;
  * Uses native TextEncoder or Buffer.
  * @param {string} str - string to convert to byte array
  * @returns {Uint8Array} - utf8 decoded bytes
- * @memberof crypto/util
- * @public
  */
 function strToBytes(str) {
     if (HAS_TEXT_ENCODER) {
@@ -28,8 +26,6 @@ function strToBytes(str) {
  * Uses native TextEncoder or Buffer.
  * @param {Uint8Array} bytes - utf8 bytes
  * @returns {string} encoded string
- * @memberof crypto/util
- * @public
  */
 function bytesToStr(bytes) {
     if (HAS_TEXT_ENCODER) {
@@ -42,8 +38,6 @@ function bytesToStr(bytes) {
  * Converts Base64 string to byte array.
  * @param {string} str - B64 string to decode
  * @returns {Uint8Array}
- * @memberof crypto/util
- * @public
  */
 function b64ToBytes(str) {
     return new Uint8Array(Buffer.from(str, 'base64').buffer);
@@ -53,8 +47,6 @@ function b64ToBytes(str) {
  * Converts Uint8Array or ArrayBuffer to Base64 string.
  * @param {Uint8Array|ArrayBuffer} bytes
  * @returns {string} B64 string encoded bytes
- * @memberof crypto/util
- * @public
  */
 function bytesToB64(bytes) {
     return Buffer.from(bytes.buffer || bytes, bytes.byteOffset || 0, bytes.byteLength).toString('base64');
@@ -64,8 +56,6 @@ function bytesToB64(bytes) {
  * Converts Uint8Array or ArrayBuffer to hex encoded string.
  * @param {Uint8Array|ArrayBuffer} bytes
  * @returns {string} B64 string encoded bytes (no 0x or other prefix, just data)
- * @memberof crypto/util
- * @public
  */
 function bytesToHex(bytes) {
     return Buffer.from(bytes.buffer || bytes, bytes.byteOffset || 0, bytes.byteLength).toString('hex');
@@ -75,8 +65,6 @@ function bytesToHex(bytes) {
  * Converts hex string to byte array.
  * @param {string} str - hex string to decode, no prefixes, just data
  * @returns {Uint8Array}
- * @memberof crypto/util
- * @public
  */
 function hexToBytes(str) {
     return new Uint8Array(Buffer.from(str, 'hex').buffer);
@@ -88,8 +76,6 @@ const converterDataView = new DataView(new ArrayBuffer(4));
  * Converts 32-bit unsigned integer to byte array.
  * @param {number} num - 32-bit unsigned integer
  * @returns {Uint8Array}
- * @memberof crypto/util
- * @public
  */
 function numberToByteArray(num) {
     converterDataView.setUint32(0, num);
@@ -100,8 +86,6 @@ function numberToByteArray(num) {
  * Converts bytes to 32-bit unsigned integer.
  * @param {UInt8Array|ArrayBuffer} arr - 4 bytes representing unsigned integer
  * @returns {number} 32-bit unsigned integer
- * @memberof crypto/util
- * @public
  */
 function byteArrayToNumber(arr, offset, length) {
     // safari doesn't like undefined params

@@ -148,7 +148,6 @@ class FileStoreMigration {
     /**
      * Asks server if we can start migration.
      * @returns {Promise<boolean>}
-     * @private
      */
     canStartMigration() {
         return retryUntilSuccess(() => socket.send('/auth/file/migration/start'))

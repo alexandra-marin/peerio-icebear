@@ -1,7 +1,5 @@
 /**
  * Observable/Promise bridges and tools
- * @module helpers/prombservable
- * @protected
  */
 const { when } = require('mobx');
 
@@ -11,8 +9,6 @@ const { when } = require('mobx');
  * @param {string} observableProperty - observable property name inside object
  * @param {any} expectedValue - resolve promise when observable property has this value (strict equality ===)
  * @returns {Promise}
- * @memberof helpers/prombservable
- * @protected
  */
 function asPromise(object, observableProperty, expectedValue) {
     return new Promise(resolve => {
@@ -26,8 +22,6 @@ function asPromise(object, observableProperty, expectedValue) {
  * @param {string} observableProperty - observable property name inside object
  * @param {any} unwantedValue - resolve promise when observable property doesn't have this value (strict equality !==)
  * @returns {Promise}
- * @memberof helpers/prombservable
- * @protected
  */
 function asPromiseNegative(object, observableProperty, unwantedValue) {
     return new Promise(resolve => {
@@ -42,8 +36,6 @@ function asPromiseNegative(object, observableProperty, unwantedValue) {
  * @param {string} observableProperty - observable property name inside object
  * @param {Array<any>} expectedValue - resolve promise when observable property has one of this values ( strict === )
  * @returns {Promise}
- * @memberof helpers/prombservable
- * @protected
  */
 function asPromiseMultiValue(object, observableProperty, expectedValues) {
     return new Promise(resolve => {

@@ -29,7 +29,6 @@ class ReceivedInvite {
 /**
  * Chat invites store. Contains lists of incoming and outgoing invites and operations on them.
  * @namespace
- * @public
  */
 class ChatInviteStore {
     constructor() {
@@ -41,18 +40,12 @@ class ChatInviteStore {
     /**
      * List of channel ids current user has been invited to.
      * @member {ObservableArray<{kegDbId: string, username: string, timestamp: number}>} received
-     * @memberof ChatInviteStore
-     * @instance
-     * @public
      */
     @observable.shallow received = [];
 
     /**
      * List of channel invites admins of current channel have sent.
      * @member {Map<kegDbId: string, [{username: string, timestamp: number}]>} sent
-     * @memberof ChatInviteStore
-     * @instance
-     * @public
      */
     @observable sent = observable.shallowMap();
 
@@ -62,18 +55,12 @@ class ChatInviteStore {
      * if current user is an admin of specific channel. Then icebear will remove an item from this list.
      * todo: the whole system smells a bit, maybe think of something better
      * @member {Map<{kegDbId: string, username: string}>} left
-     * @memberof ChatInviteStore
-     * @instance
-     * @protected
      */
     @observable left = observable.shallowMap();
 
     /**
      * List of users who rejected invites and are pending to be removed from boot keg.
      * @member {Map<{kegDbId: string, username: string}>} rejected
-     * @memberof ChatInviteStore
-     * @instance
-     * @protected
      */
     @observable rejected = observable.shallowMap();
 
@@ -107,7 +94,6 @@ class ChatInviteStore {
         this.activeInvite = null;
     }
 
-    /** @private */
     updateInvitees = () => {
         return socket.send('/auth/kegs/channel/invitees')
             .then(action(res => {
@@ -138,7 +124,6 @@ class ChatInviteStore {
             }));
     };
 
-    /** @private */
     updateInvites = () => {
         return socket.send('/auth/kegs/channel/invites')
             .then(action(res => {
@@ -169,7 +154,6 @@ class ChatInviteStore {
             }));
     };
 
-    /** @private */
     updateLeftUsers = () => {
         return socket.send('/auth/kegs/channel/users-left')
             .then(action(res => {
@@ -203,7 +187,6 @@ class ChatInviteStore {
     /**
      * @param {Object} data - invite objects
      * @returns {string}
-     * @private
      */
     decryptChannelName(data) {
         try {
@@ -228,8 +211,6 @@ class ChatInviteStore {
     /**
      * Updates local data from server.
      * @function
-     * @memberof ChatInviteStore
-     * @private
      */
     update = () => {
         if (this.updating) {
@@ -252,7 +233,6 @@ class ChatInviteStore {
     };
 
     /**
-     * @private
      */
     afterUpdate() {
         this.initialInvitesProcessed = true;
@@ -263,7 +243,6 @@ class ChatInviteStore {
 
     /**
      * @param {string} kegDbId
-     * @public
      */
     acceptInvite(kegDbId) {
         if (getUser().channelsLeft === 0) {
@@ -292,7 +271,6 @@ class ChatInviteStore {
 
     /**
      * @param {string} kegDbId
-     * @public
      */
     rejectInvite(kegDbId) {
         const invite = this.received.find(i => i.kegDbId === kegDbId);
@@ -313,7 +291,6 @@ class ChatInviteStore {
     /**
      * @param {string} kegDbId
      * @param {string} username
-     * @public
      */
     revokeInvite(kegDbId, username, noWarning = false) {
         return getChatStore().getChatWhenReady(kegDbId).then(chat => {

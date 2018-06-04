@@ -11,8 +11,6 @@ const hashing = require('./util.hashing');
  * @param {number} num - byte count to return
  * @returns {Uint8Array} - random bytes array of `num` size
  * @function getRandomBytes
- * @memberof crypto/util
- * @public
  */
 let getRandomBytes;
 
@@ -51,8 +49,6 @@ if (!getRandomBytes) throw new Error('No PRNG implementation found. Application 
  * @param {number} [max=2147483648] - maximum random value (exclusive)
  * @returns {number} random number
  * @throws {InvalidArgumentError}
- * @memberof crypto/util
- * @public
  */
 function getRandomNumber(min = 0, max = 2147483648) {
     const range = max - min;
@@ -89,8 +85,6 @@ function getRandomNumber(min = 0, max = 2147483648) {
  * so if you are generating 1 nonce every millisecond, it's guaranteed to have no collisions within 50 days
  * even without random bytes part.
  * @returns {Uint8Array} - 24 bytes, [4: from timestamp][20: random]
- * @memberof crypto/util
- * @public
  */
 function getRandomNonce() {
     const nonce = new Uint8Array(24);
@@ -106,8 +100,6 @@ function getRandomNonce() {
  * Partially consists of hashed username and timestamp.
  * @param {string} username
  * @returns {Uint8Array} 42 bytes, [16: username+timestamp hash][26: random bytes]
- * @memberof crypto/util
- * @public
  */
 function getRandomUserSpecificIdBytes(username) {
     const id = new Uint8Array(42);
@@ -121,8 +113,6 @@ function getRandomUserSpecificIdBytes(username) {
  * Same as {@link crypto/util:getRandomUserSpecificIdBytes} but returns B64 string
  * @param {string} username
  * @returns {string} id in base64 encoding
- * @memberof crypto/util
- * @public
  */
 function getRandomUserSpecificIdB64(username) {
     return convert.bytesToB64(getRandomUserSpecificIdBytes(username));
@@ -132,8 +122,6 @@ function getRandomUserSpecificIdB64(username) {
  * @see crypto/util:getRandomUserSpecificIdBytes
  * @param {string} username
  * @returns {string} id in hex encoding
- * @memberof crypto/util
- * @public
  */
 function getRandomUserSpecificIdHex(username) {
     return convert.bytesToHex(getRandomUserSpecificIdBytes(username));
@@ -154,8 +142,6 @@ function getRandomGlobalUrlSafeShortIdB64() {
 /**
  * Generates hex string of 10-byte unique random id suitable for personal use (one keg db).
  * @returns {string} 10 bytes id in hex encoding
- * @memberof crypto/util
- * @public
  */
 function getRandomShortIdHex() {
     const id = new Uint8Array(10);

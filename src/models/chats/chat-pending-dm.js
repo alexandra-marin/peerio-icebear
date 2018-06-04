@@ -8,7 +8,6 @@ const { getContactStore } = require('../../helpers/di-contact-store');
  * Mocks properties of Chat object to be displayed correctly by UI in chat lists
  * @param {string} username - user name of a registered user
  * @param {Date} timestamp - used to sort DMs with pending
- * @public
  */
 class ChatPendingDM extends Chat {
     constructor(username, email, isReceived) {

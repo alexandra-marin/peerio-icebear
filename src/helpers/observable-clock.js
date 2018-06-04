@@ -8,7 +8,6 @@ const config = require('../config');
  * Create your own clock or use default one.
  * @class Clock
  * @param {number} interval - clock update interval in seconds
- * @public
  */
 class Clock {
     _atom;
@@ -17,8 +16,6 @@ class Clock {
     /**
      * Default clock instance with `config.observableClockEventFrequency` interval
      * @member {Clock}
-     * @static
-     * @public
      */
     static default;
 
@@ -30,7 +27,6 @@ class Clock {
     /**
      * Current timestamp. Observable. Updates every `this.interval` seconds
      * @member {number}
-     * @public
      */
     get now() {
         if (this._atom.reportObserved()) {
@@ -41,7 +37,6 @@ class Clock {
 
     /**
      * Stops the clock, it can't be restarted after this.
-     * @public
      */
     dispose() {
         this._stopTicking();

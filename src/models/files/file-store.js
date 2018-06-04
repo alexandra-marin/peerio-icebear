@@ -157,7 +157,6 @@ class FileStore extends FileStoreBase {
 
     /**
      * Call at least once from UI.
-     * @public
      */
     loadAllFiles = Promise.method(async () => {
         if (this.loading || this.loaded) return;
@@ -179,7 +178,6 @@ class FileStore extends FileStoreBase {
     /**
      * Finds all loaded file kegs by fileId
      *
-     * @memberof FileStore
      */
     getAllById(fileId) {
         const files = [];
@@ -205,7 +203,6 @@ class FileStore extends FileStoreBase {
      * Returns file shared in specific chat. Loads it if needed.
      * @param {string} fileId
      * @param {string} kegDbId
-     * @memberof FileStore
      */
     getByIdInChat(fileId, kegDbId) {
         const fileMap = this.chatFileMap.get(kegDbId);
@@ -340,7 +337,6 @@ class FileStore extends FileStoreBase {
      * @param {string} filePath - full path with name
      * @param {string} [fileName] - if u want to override name in filePath
      * @param {FileFolder} [folder] - where to put the file
-     * @public
      */
     upload = (filePath, fileName, folder) => {
         const keg = new File(User.current.kegDb, this);
@@ -382,7 +378,6 @@ class FileStore extends FileStoreBase {
 
     /**
      * Resumes interrupted downloads if any.
-     * @protected
      */
     resumeBrokenDownloads() {
         if (!this.loaded) return;
@@ -406,7 +401,6 @@ class FileStore extends FileStoreBase {
 
     /**
      * Resumes interrupted uploads if any.
-     * @protected
      */
     resumeBrokenUploads() {
         console.log('Checking for interrupted uploads.');

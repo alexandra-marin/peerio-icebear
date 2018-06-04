@@ -1,8 +1,6 @@
 /**
  * Various file helpers
- * @module helpers/file
  * @alias fileHelpers
- * @public
  */
 
 // jsdoc hack..
@@ -12,8 +10,6 @@ let a; //eslint-disable-line
  * Extracts file name+extension portion from any path.
  * @param {string} path
  * @returns {string} file name and extension without any parent folders.
- * @memberof helpers/file
- * @public
  */
 function getFileName(path) {
     return path.replace(/^.*[\\/]/, '');
@@ -23,8 +19,6 @@ function getFileName(path) {
  * Extracts file name without extension from any path
  * @param {string} path
  * @returns {string} file name without extension
- * @memberof helpers/file
- * @public
  */
 function getFileNameWithoutExtension(path) {
     return getFileName(path).replace(/\.\w+$/, '');
@@ -34,8 +28,6 @@ function getFileNameWithoutExtension(path) {
  * Extracts file extension from any path.
  * @param {string} path
  * @returns {string} file extension
- * @memberof helpers/file
- * @public
  */
 function getFileExtension(path) {
     let extension = path.toLocaleLowerCase().match(/\.\w+$/);
@@ -47,8 +39,6 @@ function getFileExtension(path) {
  * For use with FileSpriteIcon. Determines general file "type" based on extension.
  * @param {string} file extension
  * @returns {string} file type
- * @memberof helpers/file
- * @public
  */
 const fileIconType = {
     txt: 'txt',

@@ -8,7 +8,6 @@ const rimraf = require('rimraf');
 /**
  * FileStreamAbstract implementation for nodejs, see {@link FileStreamAbstract} for docs.
  * @extends {FileStreamAbstract}
- * @public
  */
 class NodeFileStream extends FileStreamAbstract {
     checkForError(err, rejectFn) {

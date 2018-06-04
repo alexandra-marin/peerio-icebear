@@ -1,7 +1,5 @@
 /**
  * Various utility functions that didn't fit anywhere else.
- * @module util
- * @public
  */
 
 // jsdoc (or documentationjs?) freaks out and pulls param from the next function
@@ -12,8 +10,6 @@ let a;// eslint-disable-line
  * Finds all ArrayBuffer type properties recursively and changes them to Uint8Array created with the same ArrayBuffer.
  * @param {Object} obj - object to check for ArrayBuffers.
  * @returns {Object} same object that was passed but with some property values changed.
- * @memberof util
- * @public
  */
 function convertBuffers(obj) {
     if (typeof (obj) !== 'object') return obj;
@@ -38,8 +34,6 @@ function convertBuffers(obj) {
  * @returns {string} formatted string.
  * @example
  * formatBytes(1024); // returns '1 KB'
- * @memberof util
- * @public
  */
 function formatBytes(bytes) {
     if (bytes < 1024) return `${bytes} B`;

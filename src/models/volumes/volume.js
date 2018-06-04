@@ -48,7 +48,6 @@ class Volume extends FileFolder {
     }
 
     /**
-     * @public
      */
     rename(name) {
         let validated = name || '';
@@ -127,7 +126,6 @@ class Volume extends FileFolder {
     /**
      * Deletes the volume.
      * @returns {Promise}
-     * @public
      */
     async remove() {
         if (this.owner !== getUser().username) {

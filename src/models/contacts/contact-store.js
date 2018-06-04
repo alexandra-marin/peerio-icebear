@@ -20,27 +20,21 @@ const ContactStoreWhitelabel = require('./contact-store.whitelabel');
  * Contact store handles all Peerio users you(your app) are in some contact with,
  * not just the ones you add to favorites explicitly.
  * @namespace
- * @public
  */
 class ContactStore {
     /**
      * All peerio users your app encounters end up here (except invited by email, they're non-peerio users).
-     * @memberof ContactStore
      * @member {ObservableArray<Contact>} contacts
-     * @instance
-     * @public
      */
     @observable.shallow contacts = [];
     /**
      * My contacts keg.
      * @member {MyContacts}
-     * @protected
      */
     @observable.ref myContacts;
     /**
      * Invites keg.
      * @member {MyContacts}
-     * @protected
      */
     invites;
     _requestMap = {};
@@ -48,10 +42,7 @@ class ContactStore {
 
     /**
      * Favorite Contacts.
-     * @memberof ContactStore
      * @member {ObservableArray<Contact>} addedContacts
-     * @instance
-     * @public
      */
     @computed get addedContacts() {
         return this.contacts.filter(c => c.isAdded);
@@ -59,36 +50,24 @@ class ContactStore {
 
     /**
      * Invited contacts.
-     * @memberof ContactStore
      * @member {ObservableArray<InvitedContacts>} invitedContacts
-     * @instance
-     * @public
      */
     @observable.shallow invitedContacts = [];
 
     /**
      * options: firstName, lastName, username
-     * @memberof ContactStore
      * @member {string} uiViewSortBy
-     * @instance
-     * @public
      */
     @observable uiViewSortBy = 'firstName';
     /**
      * options: added, all
-     * @memberof ContactStore
      * @member {string} uiViewFilter
-     * @instance
-     * @public
      */
     @observable uiViewFilter = 'added';
     /**
      * Any string to search in user's names.
      * Set to `''` to clear search.
-     * @memberof ContactStore
      * @member {string} uiViewSearchQuery
-     * @instance
-     * @public
      */
     @observable uiViewSearchQuery = '';
 
@@ -105,7 +84,6 @@ class ContactStore {
      * Events emitter.
      * @member {EventEmitter}
      * @type {EventEmitter}
-     * @public
      */
     events = new EventEmitter();
 
@@ -134,10 +112,7 @@ class ContactStore {
 
     /**
      * Helper data view to simplify sorting and filtering.
-     * @memberof ContactStore
      * @member {Array<{letter:string, items:Array<Contact>}>} uiView
-     * @instance
-     * @public
      */
     @computed get uiView() {
         let ret;
@@ -209,11 +184,18 @@ class ContactStore {
     applyInvitesData = action(() => {
         this.invitedContacts = this.invites.issued;
         when(
-            () => this.invites.loaded,
+            () => this.invites.loaded && tofuStore.loaded && getChatStore().loaded,
             () => {
                 try {
                     this.invitedContacts.forEach(c => {
                         if (c.username) {
+                            // If c.username exists, then invited user has indeed joined Peerio & confirmed email.
+                            // But, if same username isn't in tofuStore, current user doesn't yet know this,
+                            // so emit `onInviteAccepted` event (on desktop this shows a notification).
+                            if (!tofuStore.cache[c.username]) {
+                                setTimeout(() => this.onInviteAccepted({ contact: c }));
+                            }
+
                             this.getContactAndSave(c.username);
                             getChatStore().pending.add(c.username, c.email);
                         }
@@ -238,7 +220,6 @@ class ContactStore {
      * Tries to add contact to favorites.
      * @param {string|Contact} val - username, email or Contact
      * @returns {Promise<bool>} - true: added, false: not found
-     * @public
      */
     addContact(val) {
         const c = typeof val === 'string' ? this.getContactAndSave(val) : val;
@@ -260,7 +241,6 @@ class ContactStore {
                         // because own keg writes don't trigger digest update
                         c.isAdded = true;
                         this.applyMyContactsData();
-                        warnings.add('snackbar_contactFavourited');
                         resolve(true);
                     }).catch(reject);
                 }
@@ -273,7 +253,6 @@ class ContactStore {
      * WARNING: doesn't not wait for passed contacts to load.
      * @param {Array<Contact>} contacts
      * @returns {Promise}
-     * @public
      */
     addContactBatch(contacts) {
         return this.myContacts.save(
@@ -289,7 +268,6 @@ class ContactStore {
      * Looks up by email and adds contacts to favorites list.
      * @param {Array<string>} emails
      * @returns {{imported:Array<string>, notFound: Array<string>}}
-     * @public
      */
     importContacts(emails) {
         if (!Array.isArray(emails) && !isObservableArray(emails)) {
@@ -336,7 +314,6 @@ class ContactStore {
     /**
      * Removes contact from favorites.
      * @param {string|Contact} usernameOrContact
-     * @public
      */
     removeContact(usernameOrContact) {
         const c = typeof usernameOrContact === 'string' ? this.getContact(usernameOrContact) : usernameOrContact;
@@ -354,7 +331,6 @@ class ContactStore {
                 ).then(() => {
                     // because own keg writes don't trigger digest update
                     this.applyMyContactsData();
-                    warnings.add('snackbar_contactRemovedFavourite');
                 });
             });
     }
@@ -363,7 +339,6 @@ class ContactStore {
      * Removes invitation.
      * @param {string} email
      * @returns {Promise}
-     * @public
      */
     removeInvite(email) {
         return retryUntilSuccess(
@@ -377,7 +352,6 @@ class ContactStore {
      * to favorites and then removes received invites.
      * @param {string} username
      * @returns {Promise}
-     * @public
      */
     removeReceivedInvite(username) {
         return retryUntilSuccess(
@@ -393,7 +367,6 @@ class ContactStore {
      * @param {string} usernameOrEmail
      * @param {Object} [prefetchedData]
      * @returns {Contact}
-     * @public
      */
     getContact(usernameOrEmail, prefetchedData) {
         const existing = this._contactMap[usernameOrEmail]
@@ -440,7 +413,6 @@ class ContactStore {
      * Sends an invite
      * @param {string} email
      * @returns {Promise}
-     * @public
      */
     invite(email, context) {
         return this.inviteNoWarning(email, context)
@@ -456,7 +428,6 @@ class ContactStore {
      * Sends an invite
      * @param {string} email
      * @returns {Promise}
-     * @public
      */
     inviteNoWarning(email, context) {
         return socket.send('/auth/contacts/invite', { email, context });
@@ -469,7 +440,6 @@ class ContactStore {
     /**
      * Populates contact store with contact list from tofu kegs.
      * Any contact that your app ever encountered has a tofu keg.
-     * @protected
      */
     loadContactsFromTOFUKegs() {
         when(() => tofuStore.loaded, () => {
@@ -482,7 +452,6 @@ class ContactStore {
      * @param {string} token - search query string
      * @param {Array<Contact>} list - optional list to search in, by default it will search in contact store
      * @returns {Array<Contact>}
-     * @public
      */
     filter(token, list, nosort = false) {
         token = token.toLocaleLowerCase(); // eslint-disable-line

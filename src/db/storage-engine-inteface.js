@@ -8,7 +8,6 @@
  * @param {string} namespace - unique namespace will be passed to storage engine when instantiating.
  * Values in current instance should be stored under that unique namespace.
  * @interface StorageEngineInterface
- * @public
  */
 class StorageEngineInterface {
     constructor(namespace) { }
@@ -18,7 +17,6 @@ class StorageEngineInterface {
      * @param {string} key
      * @returns {Promise<string>} - strictly `null` if key or value doesn't exist. TinyDb stores only strings,
      * so any other return type is an error.
-     * @public
      */
     getValue(key) { }
 
@@ -27,7 +25,6 @@ class StorageEngineInterface {
      * @param {string} key - if key already exists - overwrite.
      * @param {string} value - TinyDb will serialize any value to string before saving it.
      * @returns {Promise}
-     * @public
      */
     setValue(key, value) { }
 
@@ -35,20 +32,17 @@ class StorageEngineInterface {
      * Asynchronously removes key/value from store.
      * @param {string} key - if key doesn't exist, just resolve promise.
      * @returns {Promise}
-     * @public
      */
     removeValue(key) { }
 
     /**
      * Asynchronously retrieves a list of all keys in current namespace
      * @returns {Promise<string[]>}
-     * @public
      */
     getAllKeys() { }
 
     /**
      * Removes all data from current namespace.
-     * @public
      */
     clear() { }
 }

@@ -6,12 +6,10 @@ const _ = require('lodash');
  * Named readonly server-controlled keg. Contains data about contacts invited by email.
  * Invite data can be modified via separate api.
  * @extends {SyncedKeg}
- * @public
  */
 class Invites extends SyncedKeg {
     /**
      * @member {Array<InvitedContact>}
-     * @public
      */
     issued = [];
     /**

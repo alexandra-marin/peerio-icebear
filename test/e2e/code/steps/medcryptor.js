@@ -45,7 +45,8 @@ Then('I create a patient space', async function() {
     this.space = {
         spaceId: null,
         spaceName: 'Patient Space 1',
-        spaceDescription: 'Discuss the case with docs and patient'
+        spaceDescription: 'Discuss the case with docs and patient',
+        nameInSpace: 'general'
     };
 });
 
@@ -94,7 +95,8 @@ Then('I create another patient space', async function() {
         spaceId: null,
         spaceName: 'Patient Space 2',
         spaceDescription: 'Discuss case #2 with docs and patient',
-        spaceRoomType: 'patient'
+        spaceRoomType: 'patient',
+        nameInSpace: 'general'
     };
     const room = await ice.chatStore.startChat([], true, 'test-space-2', 'test', null, this.anotherSpace);
     await this.waitFor(() => room.metaLoaded && ice.chatStore.activeChat);

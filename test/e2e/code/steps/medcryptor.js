@@ -1,4 +1,5 @@
 const { Given, Then } = require('cucumber');
+const { getRandomUsername } = require('../helpers/random-data');
 
 Given('I create a MedCryptor account', { timeout: 60000 }, async function() {
     this.ice.config.whiteLabel.name = 'medcryptor';
@@ -8,37 +9,55 @@ Given('I create a MedCryptor account', { timeout: 60000 }, async function() {
 });
 
 Given('I create a MedCryptor account with metadata', { timeout: 60000 }, async function() {
+    this.medicalId = getRandomUsername();
     this.ice.config.whiteLabel.name = 'medcryptor';
     this.ice.config.platform = 'ios';
     const medcryptorData = {
-        specialization: 'cardiology',
-        medicalID: '001',
-        country: 'Canada',
-        role: 'doctor'
+        mcrCountry: 'Canada',
+        mcrSpecialty: 'cardiology',
+        mcrRoles: ['doctor'],
+        mcrAHPRA: this.medicalId
     };
 
     await this.createMedcryptorAccount(medcryptorData);
     await this.app.restart();
+    this.ice.config.platform = 'ios';
     await this.login();
 
-    this.ice.User.current.props.should.deep.equal(medcryptorData);
+    this.ice.User.current.props.should.deep.contain(medcryptorData);
 });
 
 Then('I can edit specialization, medical ID, country and role', async function() {
     const medcryptorData = {
-        specialization: 'admin',
-        medicalID: '002',
-        country: 'Australia',
-        role: 'admin'
+        mcrCountry: 'Australia',
+        mcrSpecialty: 'surgery',
+        mcrRoles: ['doctor'],
+        mcrAHPRA: getRandomUsername()
     };
 
     this.ice.User.current.props = medcryptorData;
     await this.ice.User.current.saveProfile();
 
     await this.app.restart();
+    this.ice.config.platform = 'ios';
     await this.login();
 
-    this.ice.User.current.props.should.deep.equal(medcryptorData);
+    this.ice.User.current.props.should.deep.contain(medcryptorData);
+});
+
+Then('I can not register another user with same AHPRA', async function() {
+    await this.app.restart();
+
+    this.ice.config.whiteLabel.name = 'medcryptor';
+    this.ice.config.platform = 'ios';
+    const medcryptorData = {
+        mcrCountry: 'Canada',
+        mcrSpecialty: 'cardiology',
+        mcrRoles: ['doctor'],
+        mcrAHPRA: this.medicalId
+    };
+
+    await this.createMedcryptorAccount(medcryptorData).should.be.rejected;
 });
 
 Then('I create a patient space', async function() {

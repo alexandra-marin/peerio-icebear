@@ -2,16 +2,31 @@ const { computed, observable } = require('mobx');
 const config = require('../../config');
 
 class Space {
+    constructor(store) {
+        this.store = store;
+    }
+
     spaceId = '';
     spaceName = '';
     spaceDescription = '';
-    internalRooms = [];
-    patientRooms = [];
+
+    @computed get allRooms() {
+        return this.store.channels
+            .filter(c => c.isInSpace)
+            .filter(c => c.chatHead.spaceId === this.spaceId);
+    }
+
+    @computed get internalRooms() {
+        return this.allRooms.filter(c => c.chatHead.spaceRoomType === 'internal');
+    }
+
+    @computed get patientRooms() {
+        return this.allRooms.filter(c => c.chatHead.spaceRoomType === 'patient');
+    }
 
     @observable isNew = false;
 
     countUnread = (count, room) => count + room.unreadCount;
-
     @computed get unreadCount() {
         const internalRoomsUnread = this.internalRooms.reduce(this.countUnread, 0);
         const patientRoomsUnread = this.patientRooms.reduce(this.countUnread, 0);
@@ -47,18 +62,10 @@ class ChatStoreSpaces {
     }
 
     getSpaceFrom = (chat) => {
-        const space = new Space(); // eslint-disable-line
+        const space = new Space(this.store); // eslint-disable-line
         space.spaceId = chat.chatHead.spaceId;
         space.spaceName = chat.chatHead.spaceName;
         space.spaceDescription = chat.chatHead.spaceDescription;
-
-        const allSpaceRooms = this.store.chats
-            .filter(c => c.isChannel)
-            .filter(c => c.isInSpace)
-            .filter(c => c.chatHead.spaceId === chat.chatHead.spaceId);
-
-        space.internalRooms = allSpaceRooms.filter(c => c.chatHead.spaceRoomType === 'internal');
-        space.patientRooms = allSpaceRooms.filter(c => c.chatHead.spaceRoomType === 'patient');
 
         return space;
     }

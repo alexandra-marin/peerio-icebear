@@ -83,11 +83,12 @@ Then('I can view the patient space', async function() {
 });
 
 Then('I get notified of unread messages', async function() {
-    this.internalRoom1.unreadCount = 2;
-    this.patientRoom.unreadCount = 40;
-
+    const allUnread = this.internalRoom1.unreadCount +
+        this.internalRoom2.unreadCount +
+        this.patientRoom.unreadCount;
+    
     const returnedSpace = ice.chatStore.spaces[0];
-    returnedSpace.unreadCount.should.equal(42);
+    returnedSpace.unreadCount.should.equal(allUnread);
 });
 
 Then('I create another patient space', async function() {

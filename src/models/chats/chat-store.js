@@ -166,12 +166,17 @@ class ChatStore {
             const second = b.name || b.channelName;
             return first.localeCompare(second);
         });
-        // until we implement MedCryptor mobile patient management, we need to show patient
-        // rooms in the main room list on mobile
-        if (config.whiteLabel.name === 'medcryptor' && !config.isMobile) {
-            return allRooms.filter(c => !c.isInSpace);
-        }
+
         return allRooms;
+    }
+
+    /**
+     * List of chats that don't belong to a space
+     * @type {Array}
+     */
+    @computed
+    get nonSpaceRooms() {
+        return this.allRooms.filter(c => !c.isInSpace);
     }
 
     /**

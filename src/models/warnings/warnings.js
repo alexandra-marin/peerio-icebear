@@ -8,21 +8,17 @@ const clientApp = require('../client-app');
 /**
  * Public API for Warnings system.
  * @namespace
- * @public
  */
 class Warnings {
     /**
      * Observable. Clients should watch this and render new snackbar/dialog on change.
      * @member {SystemWarning} current
-     * @memberof Warnings
-     * @public
      */
     @observable current;
 
     /**
      * Warnings waiting to get shown.
      * @member {Array<SystemWarning>}
-     * @private
      */
     queue = [];
 
@@ -30,7 +26,6 @@ class Warnings {
      * Some combination of conditions like several reconnects while AFK might create multiple duplicate warnings
      * because server sends them on every reconnect until dismissed.
      * To avoid that we store a cache of unconfirmed server warnings for the session.
-     * @private
      */
     sessionCache = {};
 
@@ -48,7 +43,6 @@ class Warnings {
     /**
      * Adds the warning to internal queue.
      * @param {SystemWarning} warning
-     * @private
      */
     queueItem(warning) {
         if (warning.level === 'severe') {
@@ -62,7 +56,6 @@ class Warnings {
     }
     /**
      * Pops next item from queue and makes it current.
-     * @private
      */
     assignNextItem = () => {
         this.current = this.queue.shift();
@@ -81,9 +74,6 @@ class Warnings {
      * @param {string} [level='medium'] - severity level.
      * @param {function} [callback] - executes when warning is dismissed
      * @function add
-     * @instance
-     * @memberof Warnings
-     * @public
      */
     @action add(content, title, data, level = 'medium', callback) {
         this.queueItem(new SystemWarning(content, title, data, level, callback));
@@ -97,9 +87,6 @@ class Warnings {
      * @param {Object} [data] - variables to pass to translator.
      * @param {function} [callback] - executes when warning is dismissed
      * @function addSevere
-     * @instance
-     * @memberof Warnings
-     * @public
      */
     @action addSevere(content, title, data, callback) {
         this.add(content, title, data, 'severe', callback);
@@ -109,9 +96,6 @@ class Warnings {
      * Adds server warning to the queue.
      * @param {Object} serverObj - as received from server
      * @function addServerWarning
-     * @instance
-     * @memberof Warnings
-     * @protected
      */
     @action.bound addServerWarning(serverObj) {
         if (serverObj.msg === 'serverWarning_promoConsentRequest') return;

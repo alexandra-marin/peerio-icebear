@@ -72,7 +72,6 @@ const SyncedKeg = require('../kegs/synced-keg');
  *
  * @param {KegDb} db - owner instance
  * @param {User} user - currently authenticated user
- * @public
  */
 class SharedDbBootKeg extends SyncedKeg {
     constructor(db, user) {
@@ -107,18 +106,12 @@ class SharedDbBootKeg extends SyncedKeg {
      * List of usernames who have access to the shared DB currently.
      * This includes users pending join confirmation.
      * @member {Array<Contact>} participants
-     * @memberof SharedDbBootKeg
-     * @instance
-     * @public
      */
     @observable.shallow participants = [];
 
     /**
      * Subset of `this.participants`.
      * @member {Array<Contact>} admins
-     * @memberof SharedDbBootKeg
-     * @instance
-     * @public
      */
     @observable.shallow admins = [];
 
@@ -126,7 +119,6 @@ class SharedDbBootKeg extends SyncedKeg {
     /**
      * Gives access to shared DB keys to a contact.
      * @param {Contact} contact
-     * @public
      */
     addParticipant(contact) {
         if (this.participants.includes(contact)) return;
@@ -136,7 +128,6 @@ class SharedDbBootKeg extends SyncedKeg {
     /**
      * Gives access to shared DB keys to a contact.
      * @param {Contact} contact
-     * @public
      */
     removeParticipant(contact) {
         this.participants.remove(contact);
@@ -144,7 +135,6 @@ class SharedDbBootKeg extends SyncedKeg {
 
     /**
      * Adds a new key, deprecating current key, or initializes empty boot keg with the first key.
-     * @memberof SharedDbBootKeg
      */
     addKey() {
         if (this.dirty) throw new Error('Can not add key to shared db boot keg because unsaved key exists.');
@@ -179,7 +169,6 @@ class SharedDbBootKeg extends SyncedKeg {
 
     /**
      * Overrides SyncedKeg#onSaved
-     * @private
      */
     onSaved() {
         const ids = Object.keys(this.keys).map(id => +id);
@@ -192,7 +181,6 @@ class SharedDbBootKeg extends SyncedKeg {
      * Assigns a role to shared db participant
      * @param {Contact} contact - contact to assign a role to
      * @param {string} role - currently can be only 'admin'
-     * @memberof SharedDbBootKeg
      */
     assignRole(contact, role) {
         if (role !== 'admin') throw new Error('Only admin role is currently supported');
@@ -208,7 +196,6 @@ class SharedDbBootKeg extends SyncedKeg {
      * Removes role from a participant
      * @param {Contact} contact
      * @param {string} role
-     * @memberof SharedDbBootKeg
      */
     unassignRole(contact, role) {
         if (role !== 'admin') throw new Error('Only admin role is currently supported.');

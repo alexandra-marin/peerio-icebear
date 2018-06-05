@@ -26,13 +26,11 @@ let currentUser;
  * specifically requires refactoring to improve readability and reduce state-mutating functions amount.
  *
  * Many private and protected members are not documented with jsdoc tags to avoid clutter.
- * @public
  */
 class User {
     _username = '';
     /**
      * @member {string} username
-     * @public
      */
     get username() {
         return this._username;
@@ -44,117 +42,71 @@ class User {
     // -- profile data
     /**
      * @member {string} firstName
-     * @memberof User
-     * @instance
-     * @public
      */
     @observable firstName = '';
     /**
      * @member {string} lastName
-     * @memberof User
-     * @instance
-     * @public
      */
     @observable lastName = '';
     /**
      * @member {string} email
-     * @memberof User
-     * @instance
-     * @public
      */
     @observable email = '';
     /**
      * @member {string} locale
-     * @memberof User
-     * @instance
-     * @public
      */
     @observable locale = 'en';
     /**
      * Currently unused, maybe we will bring passcodes back eventually
      * @member {boolean} passcodeIsSet
-     * @memberof User
-     * @instance
-     * @public
      */
     @observable passcodeIsSet = false;
     /**
      * Quota object as received from server, it has complex and weird format.
      * You don't need to use this directly, use computed properties that are based on this.
      * @member {Object} quota
-     * @memberof User
-     * @instance
-     * @protected
      */
     @observable quota = null;
     /**
      * Sets to `true` when profile is loaded for the first time and is not empty anymore.
      * @member {boolean} profileLoaded
-     * @memberof User
-     * @instance
-     * @public
      */
     @observable profileLoaded = false;
     /**
      * @member {Array<Address>} addresses
-     * @memberof User
-     * @instance
-     * @protected
      */
     @observable.ref addresses = [];
     /**
      * @member {boolean} primaryAddressConfirmed
-     * @memberof User
-     * @instance
-     * @public
      */
     @observable primaryAddressConfirmed = false;
     /**
      * @member {boolean} deleted
-     * @memberof User
-     * @instance
-     * @public
      */
     @observable deleted = false;
     /**
      * @member {boolean} blacklisted
-     * @memberof User
-     * @instance
-     * @public
      */
     @observable blacklisted = false;
     /**
      * Don't try to upload another avatar while this is `true`
      * @member {boolean} savingAvatar
-     * @memberof User
-     * @instance
-     * @public
      */
     @observable savingAvatar = false;
     /**
      * UI-controlled flag, Icebear doesn't use it
      * @member {boolean} autologinEnabled
-     * @memberof User
-     * @instance
-     * @public
      */
     @observable autologinEnabled = false;
     /**
      * UI-controlled flag, Icebear doesn't use it
      * @member {boolean} secureWithTouchID
-     * @memberof User
-     * @instance
-     * @public
      */
     @observable secureWithTouchID = false;
 
     /**
      * Indicates 2fa state on current user.
      * @member {boolean} twoFAEnabled
-     * @memberof User
-     * @instance
-     * @readonly
-     * @public
      */
     @observable twoFAEnabled = false;
 
@@ -163,19 +115,12 @@ class User {
      * Indicates device trust if 2fa is enabled.
      *
      * @member {boolean|undefined} trustedDevice
-     * @memberof User
-     * @instance
-     * @readonly
-     * @public
      */
     @observable trustedDevice = undefined;
 
     /**
      * Computed `firstName+' '+lastName`
      * @member {string} fullName
-     * @memberof User
-     * @instance
-     * @public
      */
     @computed get fullName() {
         let ret = '';
@@ -189,45 +134,37 @@ class User {
     /**
      * Account creation timestamp. Is null until `profileLoaded != true`.
      * @member {number}
-     * @public
      */
     createdAt = null;
     // -- key data
     /**
      * @member {string}
-     * @public
      */
     passphrase;
     /**
      * @member {Uint8Array}
-     * @public
      */
     authSalt;
     /**
      * Key for SELF database boot keg.
      * @member {Uint8Array}
-     * @protected
      */
     bootKey;
     /**
      * @member {KeyPair}
-     * @public
      */
     authKeys;
     /**
      * @member {KeyPair}
-     * @public
      */
     signKeys;
     /**
      * @member {KeyPair}
-     * @public
      */
     encryptionKeys;
     /**
      * Key for SELF keg database.
      * @member {Uint8Array}
-     * @protected
      */
     kegKey;
     /**
@@ -242,7 +179,6 @@ class User {
     /**
      * Most recently used emoji.
      * @member {MRUList}
-     * @public
      */
     emojiMRU = new MRUList('emojiPicker', 30);
 
@@ -259,9 +195,6 @@ class User {
     /**
      * All current active plan names
      * @member {Array<string>} activePlans
-     * @memberof User
-     * @instance
-     * @public
      */
     @computed get activePlans() {
         if (this.quota == null || this.quota.quotas === null) return [];
@@ -273,9 +206,6 @@ class User {
     /**
      * Total amounts of bytes user can upload.
      * @member {number} fileQuotaTotal
-     * @memberof User
-     * @instance
-     * @public
      */
     @computed get fileQuotaTotal() {
         if (this.quota == null || !this.quota.resultingQuotas
@@ -292,9 +222,6 @@ class User {
     /**
      * Formatted total amounts of bytes user can upload.
      * @member {string} fileQuotaTotalFmt
-     * @memberof User
-     * @instance
-     * @public
      */
     @computed get fileQuotaTotalFmt() {
         return formatBytes(this.fileQuotaTotal);
@@ -303,9 +230,6 @@ class User {
     /**
      * Free bytes left for uploads.
      * @member {number} fileQuotaLeft
-     * @memberof User
-     * @instance
-     * @public
      */
     @computed get fileQuotaLeft() {
         if (this.quota == null || !this.quota.quotasLeft
@@ -320,9 +244,6 @@ class User {
     /**
      * Formatted bytes left for uploads.
      * @member {string} fileQuotaLeftFmt
-     * @memberof User
-     * @instance
-     * @public
      */
     @computed get fileQuotaLeftFmt() {
         return formatBytes(this.fileQuotaLeft);
@@ -331,9 +252,6 @@ class User {
     /**
      * Maximum file size user can upload.
      * @member {number} fileSizeLimit
-     * @memberof User
-     * @instance
-     * @public
      */
     @computed get fileSizeLimit() {
         if (this.quota == null
@@ -351,9 +269,6 @@ class User {
     /**
      * Formatted maximum file size user can upload.
      * @member {number} fileSizeLimitFmt
-     * @memberof User
-     * @instance
-     * @public
      */
     @computed get fileSizeLimitFmt() {
         return formatBytes(this.fileSizeLimit);
@@ -362,9 +277,6 @@ class User {
     /**
      * Used bytes in storage.
      * @member {number} fileQuotaUsed
-     * @memberof User
-     * @instance
-     * @public
      */
     @computed get fileQuotaUsed() {
         return this.fileQuotaTotal - this.fileQuotaLeft;
@@ -373,9 +285,6 @@ class User {
     /**
      * Formatted used bytes in storage.
      * @member {number} fileQuotaUsedFmt
-     * @memberof User
-     * @instance
-     * @public
      */
     @computed get fileQuotaUsedFmt() {
         return formatBytes(this.fileQuotaUsed);
@@ -384,9 +293,6 @@ class User {
     /**
      * Amount of % used bytes in storage.
      * @member {number} fileQuotaUsedPercent
-     * @memberof User
-     * @instance
-     * @public
      */
     @computed get fileQuotaUsedPercent() {
         return this.fileQuotaTotal === 0 ? 0 : Math.round(this.fileQuotaUsed / (this.fileQuotaTotal / 100));
@@ -395,9 +301,6 @@ class User {
     /**
      * Maximum number of channels user can have
      * @member {number} channelLimit
-     * @memberof User
-     * @instance
-     * @public
      */
     @computed get channelLimit() {
         if (this.quota == null || !this.quota.resultingQuotas
@@ -414,9 +317,6 @@ class User {
     /**
      * Available channel slots left.
      * @member {number} channelsLeft
-     * @memberof User
-     * @instance
-     * @public
      */
     @computed get channelsLeft() {
         if (this.quota == null || !this.quota.quotasLeft
@@ -434,8 +334,6 @@ class User {
      * Adjust file size for overhead
      * @param {number} size - amount of bytes user wants to upload
      * @returns {number} file size including overhead
-     * @instance
-     * @protected
      */
     _adjustedOverheadFileSize(size) {
         const chunkSize = config.upload.getChunkSize(size);
@@ -446,9 +344,6 @@ class User {
     /**
      * Maximum amount of people invited which give you bonus
      * @member {number} maxInvitedPeopleBonus
-     * @memberof User
-     * @instance
-     * @public
      */
     @computed get maxInvitedPeopleBonus() {
         // TODO[backlog]: this should be stored in server
@@ -458,9 +353,6 @@ class User {
     /**
      * Maximum amount of people invited which give you bonus
      * @member {number} currentInvitedPeopleBonus
-     * @memberof User
-     * @instance
-     * @public
      */
     @computed get currentInvitedPeopleBonus() {
         // TODO[backlog]: this should be stored in server
@@ -472,9 +364,6 @@ class User {
     /**
      * Maximum bonus user can achieve if they complete all tasks
      * @member {number} maximumOnboardingBonus
-     * @memberof User
-     * @instance
-     * @public
      */
     @computed get maximumOnboardingBonus() {
         // TODO[backlog]: this should be stored in server
@@ -492,9 +381,6 @@ class User {
     /**
      * Maximum bonus user can achieve if they complete all tasks
      * @member {number} currentOnboardingBonus
-     * @memberof User
-     * @instance
-     * @public
      */
     @computed get currentOnboardingBonus() {
         if (!User.current.quota) return 0;
@@ -522,9 +408,6 @@ class User {
      * Checks if there's enough storage to upload a file.
      * @param {number} size - amount of bytes user wants to upload.
      * @returns {boolean} is there enough storage left to upload.
-     * @memberof User
-     * @instance
-     * @public
      */
     canUploadFileSize = (size) => {
         return this.fileQuotaLeft >= this._adjustedOverheadFileSize(size);
@@ -535,9 +418,6 @@ class User {
      * e.g. Basic - 500 Mb limit, Premium - 2 Gb. Pro - unlimited.
      * @param {number} size - amount of bytes user wants to upload.
      * @returns {boolean} is file size acceptable for current plan
-     * @memberof User
-     * @instance
-     * @public
      */
     canUploadMaxFileSize = (size) => {
         const realSize = this._adjustedOverheadFileSize(size);
@@ -588,7 +468,6 @@ class User {
      * Full registration process.
      * Initial login after registration differs a little.
      * @returns {Promise}
-     * @public
      */
     createAccountAndLogin = () => {
         console.log('Starting account registration sequence.');
@@ -617,7 +496,6 @@ class User {
     /**
      * Authenticates connection and makes necessary initial requests.
      * @returns {Promise}
-     * @public
      */
     login = () => {
         console.log('Starting login sequence');
@@ -668,10 +546,7 @@ class User {
 
     /**
      * Currently authenticated user.
-     * @static
      * @member {User}
-     * @memberof User
-     * @public
      */
     static get current() {
         return currentUser;
@@ -685,7 +560,6 @@ class User {
     /**
      * Gets the last authenticated user.
      * @returns {Promise<?{username:string,firstName:string,lastName:string}>}
-     * @public
      */
     static getLastAuthenticated() {
         return TinyDb.system.getValue(`last_user_authenticated`);
@@ -694,7 +568,6 @@ class User {
     /**
      * Saves the data of the last authenticated user.
      * @returns {Promise}
-     * @public
      */
     setAsLastAuthenticated() {
         return TinyDb.system.setValue(`last_user_authenticated`, {
@@ -707,7 +580,6 @@ class User {
     /**
      * Removes last authenticated user information.
      * @returns {Promise}
-     * @public
      */
     static removeLastAuthenticated() {
         return TinyDb.system.removeValue(`last_user_authenticated`);
@@ -722,7 +594,6 @@ class User {
      * Computes or gets from cache shared encryption key for a public key.
      * @param {Uint8Array} theirPublicKey
      * @return {Uint8Array}
-     * @protected
      */
     getSharedKey(theirPublicKey) {
         if (!(theirPublicKey instanceof Uint8Array)) throw new Error('Invalid argument type');

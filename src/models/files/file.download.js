@@ -40,9 +40,6 @@ const tempExt = '.peeriodownload';
  * @param {string} filePath - where to store file (including name)
  * @param {boolean} [resume] - for system use
  * @returns {Promise}
- * @instance
- * @memberof File
- * @public
  */
 function download(filePath, resume, isTmpCacheDownload, suppressSnackbar) {
     // we need this check because resume process will pass temp file name
@@ -122,9 +119,6 @@ function download(filePath, resume, isTmpCacheDownload, suppressSnackbar) {
 /**
  * Cancels download and removes impartially downloaded file.
  * @returns {Promise}
- * @instance
- * @memberof File
- * @public
  */
 function cancelDownload() {
     this._saveDownloadEndFact();
@@ -134,9 +128,6 @@ function cancelDownload() {
 /**
  * Removes download cache if it exists
  * @returns {Promise}
- * @instance
- * @memberof File
- * @public
  */
 function removeCache() {
     return Promise.resolve((async () => {

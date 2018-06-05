@@ -9,7 +9,6 @@ const TaskQueue = require('../../helpers/task-queue');
 /**
  *
  * @param {Chat} chat - chat creates instance and passes itself to the constructor.
- * @protected
  */
 
 class ChatReceiptHandler {
@@ -49,7 +48,6 @@ class ChatReceiptHandler {
     /**
      * Sends receipt for message id seen
      * @param {string} pos
-     * @protected
      */
     sendReceipt(pos) {
         // console.debug(`sendReceipt(${pos})`);

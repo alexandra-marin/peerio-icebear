@@ -10,7 +10,6 @@ const File = require('../files/file');
 /**
  * File handling module for Chat. Extracted for readability.
  * @param {Chat} chat - chat creates an instance and passes itself to it.
- * @public
  */
 class ChatFileHandler {
     knownUpdateId = '';
@@ -50,13 +49,15 @@ class ChatFileHandler {
                     }
                     if (keg.deleted) {
                         fileStore.removeCachedChatKeg(this.chat.id, keg.kegId);
-                    }
-                    if (this.chat.isChannel) {
                         return;
                     }
                     const file = new File(this.chat.db, fileStore);
                     try {
                         if (file.loadFromKeg(keg) && !file.deleted) {
+                            fileStore.updateCachedChatKeg(this.chat.id, file);
+                            if (this.chat.isChannel) {
+                                return;
+                            }
                             // Not waiting for this to resolve. Internally it will do retries,
                             // but on larger scale it's too complicated to handle recovery
                             // from non-connection related errors
@@ -89,7 +90,6 @@ class ChatFileHandler {
      *                                                before file is shared. We need this to finish keg preparations.
      * @param {string} [message=null] - message to attach to file
      * @returns {File}
-     * @public
      */
     uploadAndShare(path, name, deleteAfterUpload = false, message) {
         const file = fileStore.upload(path, name);

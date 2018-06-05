@@ -1,8 +1,6 @@
 /* eslint-disable no-param-reassign */
 /**
  * Uint8Array extensions and polyfills.
- * @module extensions/uint8array
- * @public
  */
 
 if (typeof (Uint8Array.prototype.slice) === 'undefined') {
@@ -15,8 +13,6 @@ if (typeof (Uint8Array.prototype.slice) === 'undefined') {
      * @returns {Uint8Array} new array containing a range of bytes from original array.
      * @function slice
      * @extends Uint8Array
-     * @memberof extensions/uint8array
-     * @public
      */
     Uint8Array.prototype.slice = function(begin, end) {
         begin = begin || 0;

@@ -19,8 +19,6 @@ const SERVER_PLAN_PRO_YEARLY = 'icebear_pro_yearly';
  * - FileStream
  * - StorageEngine
  *
- * @module config
- * @public
  */
 class UploadConfig {
     /**
@@ -28,8 +26,6 @@ class UploadConfig {
      * Is not supposed to be changed ever.
      * If you do change it for some reason - remember to restart paused uploads as file chunk size might change.
      * @member {Array<{maxFileSize: ?number, chunkSize: number}>} upload.chunkSizes
-     * @memberof config
-     * @public
      */
     get chunkSizes() {
         return [
@@ -51,8 +47,6 @@ class UploadConfig {
      * @function upload.getChunkSize
      * @param {number} fileSize - in bytes.
      * @returns {number} chunk size to use, in bytes.
-     * @memberof config
-     * @public
      */
     getChunkSize(fileSize) {
         const data = this.chunkSizes;
@@ -69,16 +63,12 @@ class UploadConfig {
      * Max amount of bytes to buffer from disk for encrypting.
      * This number can't be less than maximum chunk size.
      * @member {number} upload.encryptBufferSize
-     * @memberof config
-     * @public
      */
     encryptBufferSize = 1024 * 1024;
     /**
      * Max amount of chunks to pre-encrypt for sending
      * This number can't be less than maximum chunk size.
      * @member {number} upload.uploadBufferSize
-     * @memberof config
-     * @public
      */
     uploadBufferSize = 1024 * 1024;
 
@@ -88,8 +78,6 @@ class UploadConfig {
      * Bigger number = faster upload = more pressure on server.
      * 0-5 is a reasonable range to pick. Default is 2.
      * @member {number} upload.uploadBufferSize
-     * @memberof config
-     * @public
      */
     maxResponseQueue = 2;
 }
@@ -101,15 +89,11 @@ const config = new class {
         /**
          * Traffic stat summary will be logged with this interval (ms.)
          * @member {number} debug.trafficReportInterval
-         * @memberof config
-         * @public
          */
         trafficReportInterval: 60 * 60 * 1000,
         /**
          * All socket messages will be logged if set to `true` before socket is started.
          * @member {boolean} debug.socketLogEnabled
-         * @memberof config
-         * @public
          */
         socketLogEnabled: false
     };
@@ -119,8 +103,6 @@ const config = new class {
      *
      * **Client app is required to set this property before using Icebear SDK.**
      * @member {string}
-     * @memberof config
-     * @public
      */
     socketServerUrl = 'wss://';
 
@@ -129,8 +111,6 @@ const config = new class {
      *
      * **Client app is required to set this property before using Icebear SDK.**
      * @member {string}
-     * @memberof config
-     * @public
      */
     ghostFrontendUrl = 'https://';
 
@@ -145,8 +125,6 @@ const config = new class {
      *
      * **Client app is required to set this property before using Icebear SDK.**
      * @member {string}
-     * @memberof config
-     * @public
      */
     appVersion = '';
 
@@ -156,8 +134,6 @@ const config = new class {
      *
      * **Client app is required to set this property before using Icebear SDK.**
      * @member {string}
-     * @memberof config
-     * @public
      */
     platform = '';
 
@@ -166,8 +142,6 @@ const config = new class {
      * Default is null
      * See other allowed values in your branding guide
      * @member {string}
-     * @memberof config
-     * @public
      */
     appLabel = null;
 
@@ -180,8 +154,6 @@ const config = new class {
      * If not set, deviceId is generated from a random value.
      *
      * @member {string | undefined}
-     * @memberof config
-     * @public
      */
     deviceUID = null;
 
@@ -189,8 +161,6 @@ const config = new class {
      * For reference. Amount of bytes added to every file chunk in encrypted state.
      * DO NOT change this value unless you really know what you're doing.
      * @returns {number} 32
-     * @memberof config
-     * @public
      */
     get CHUNK_OVERHEAD() { return 32; }
 
@@ -203,8 +173,6 @@ const config = new class {
          * Note that maxDownloadChunkSize and maxDecryptBufferSize will be
          * multiplied by parallelism factor.
          * @member {number} download.parallelism
-         * @memberof config
-         * @public
          */
         parallelism: 1,
 
@@ -213,16 +181,12 @@ const config = new class {
          * File gets downloaded in 'downloadChunks' and then broken down to the chunk size it was uploaded with.
          * This number can't be less than maximum chunk size.
          * @member {number} download.maxDownloadChunkSize
-         * @memberof config
-         * @public
          */
         maxDownloadChunkSize: 1024 * 1024,
         /**
          * Max amount of bytes to download and queue for decryption.
          * This number can't be less than maximum chunk size.
          * @member {number} download.maxDecryptBufferSize
-         * @memberof config
-         * @public
          */
         maxDecryptBufferSize: 1024 * 1024 * 3
     };
@@ -232,8 +196,6 @@ const config = new class {
      *
      * **Client app is required to set this property before using Icebear SDK.**
      * @member {FileStreamAbstract}
-     * @memberof config
-     * @public
      */
     FileStream = null;
     /**
@@ -241,8 +203,6 @@ const config = new class {
      *
      * **Client app is required to set this property before using Icebear SDK.**
      * @member {StorageEngineInterface}
-     * @memberof config
-     * @public
      */
     StorageEngine = null;
     /**
@@ -250,16 +210,12 @@ const config = new class {
      * Default clock can be used for refreshing timestamps and other time counters.
      * Do not set this value too low, create custom clocks instead.
      * @member {number}
-     * @memberof config
-     * @public
      */
     observableClockEventFrequency = 30; // seconds
 
     /**
      * Server plans ids
      * @member {Array<string>}
-     * @memberof config
-     * @public
      */
     serverPlans = [
         SERVER_PLAN_PREMIUM_MONTHLY,
@@ -271,16 +227,12 @@ const config = new class {
     /**
      * Server premium plans ids
      * @member {Array<string>}
-     * @memberof config
-     * @public
      */
     serverPlansPremium = [SERVER_PLAN_PREMIUM_MONTHLY, SERVER_PLAN_PREMIUM_YEARLY];
 
     /**
      * Server pro plans ids
      * @member {Array<string>}
-     * @memberof config
-     * @public
      */
     serverPlansPro = [SERVER_PLAN_PRO_MONTHLY, SERVER_PLAN_PRO_YEARLY];
 
@@ -289,65 +241,49 @@ const config = new class {
 
     chat = {
         /**
-         * Maximum amount of chats to load initially. Favorite chats will ignore this and load in full number.
+         * Maximum amount of DM chats to load initially.
+         * Favorite chats do count toward this limit but will always load in full number, even if there's more
+         * favorite chats then limit allows.
          * @member {number} chat.maxInitialChats
-         * @memberof config
-         * @public
          */
-        maxInitialChats: 15,
+        maxInitialChats: 10,
         /**
          * Amount of messages to load to a chat initially.
          * @member {number} chat.initialPageSize
-         * @memberof config
-         * @public
          */
         initialPageSize: 40,
         /**
          * When navigating chat history, load this amount of messages per page.
          * @member {number} chat.pageSize
-         * @memberof config
-         * @public
          */
         pageSize: 30,
         /**
          * Icebear will unload messages over this limit, resulting is low memory consumption when navigating history
          * or chatting normally.
          * @member {number} chat.maxLoadedMessages
-         * @memberof config
-         * @public
          */
         maxLoadedMessages: 130,
         /**
          * Delay (ms) between decryption of individual messages when processing a batch.
          * Increase to get more responsiveness, but increase page load time.
          * @member {number} chat.decryptQueueThrottle
-         * @memberof config
-         * @public
          */
         decryptQueueThrottle: 0,
         /**
          * Maximum amount of recent files to maintain in chat object to be able to display the list on UI.
          * @member {number} chat.recentFilesDisplayLimit
-         * @memberof config
-         * @public
          */
         recentFilesDisplayLimit: 10,
         /**
          * Maximum number of characters chat name can have.
          * Do not override this in clients, it's supposed to be a system limit.
          * @member {number} chat.maxChatNameLength
-         * @memberof config
-         * @readonly
-         * @public
          */
         maxChatNameLength: 24,
         /**
          * Maximum number of characters chat purpose can have.
          * Do not override this in clients, it's supposed to be a system limit.
          * @member {number} chat.maxChatPurposeLength
-         * @memberof config
-         * @readonly
-         * @public
          */
         maxChatPurposeLength: 120,
         /**
@@ -355,17 +291,11 @@ const config = new class {
          * to allow auto-downloading and showing it inline with "show big files" enabled
          * or with manual "Display this image"
          * @member {number} chat.inlineImageSizeLimit
-         * @memberof config
-         * @readonly
-         * @public
          */
         inlineImageSizeLimit: 10 * 1024 * 1024,
         /**
          * Image bigger than this is not downloaded inline even with manual "Display this image"
          * @member {number} chat.inlineImageSizeLimitCutoff
-         * @memberof config
-         * @readonly
-         * @public
          */
         inlineImageSizeLimitCutoff: 30 * 1024 * 1024,
         allowedInlineContentTypes: {

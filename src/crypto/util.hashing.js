@@ -13,8 +13,6 @@ const padding = require('./util.padding');
  * @param {Uint8Array} value - value to hash
  * @param {string} [personalizationString]
  * @returns {BLAKE2s}
- * @memberof crypto/util
- * @private
  */
 function getHashObject(length, value, personalizationString) {
     const personalization = personalizationString
@@ -31,8 +29,6 @@ function getHashObject(length, value, personalizationString) {
  * @param {Uint8Array} value - value to hash
  * @param {string} [personalizationString]
  * @returns {string} - hex encoded hash
- * @memberof crypto/util
- * @public
  */
 function getHexHash(length, value, personalizationString) {
     return getHashObject(length, value, personalizationString).hexDigest();
@@ -44,8 +40,6 @@ function getHexHash(length, value, personalizationString) {
  * @param {Uint8Array} value - value to hash
  * @param {string} [personalizationString]
  * @returns {Uint8Array} - hash bytes
- * @memberof crypto/util
- * @public
  */
 function getByteHash(length, value, personalizationString) {
     return getHashObject(length, value, personalizationString).digest();
@@ -56,8 +50,6 @@ function getByteHash(length, value, personalizationString) {
  * @param {string} username
  * @param {Uint8Array} publicKey
  * @returns {Promise<string>} fingerprint. Example: `51823-23479-94038-76454-79776-13778`
- * @memberof crypto/util
- * @public
  */
 function getFingerprint(username, publicKey) {
     const scrypt = getScrypt();
@@ -70,8 +62,6 @@ function getFingerprint(username, publicKey) {
  * Converts fingerprint bytes to string representation.
  * @param {Uint8Array} bytes
  * @returns {string} fingerprint. Example: `51823-23479-94038-76454-79776-13778`
- * @memberof crypto/util
- * @private
  */
 function fingerprintToStr(bytes) {
     const v = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);

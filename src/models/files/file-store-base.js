@@ -23,6 +23,7 @@ class FileStoreBase {
 
         tracker.subscribeToKegUpdates(kegDb ? kegDb.id : 'SELF', 'file', () => {
             console.log('Files update event received');
+            if (this.paused) return;
             this.onFileDigestUpdate();
         });
     }
@@ -185,8 +186,6 @@ class FileStoreBase {
     }
 
     onFileDigestUpdate = _.debounce(() => {
-        if (this.paused) return;
-
         const digest = tracker.getDigest(this.kegDb.id, 'file');
         // this.unreadFiles = digest.newKegsCount;
         if (this.loaded && digest.maxUpdateId === this.maxUpdateId) {
@@ -282,7 +281,6 @@ class FileStoreBase {
 
     /**
      * Call at least once from UI.
-     * @public
      */
     loadAllFiles = async () => {
         if (this.loading || this.loaded) return;
@@ -310,7 +308,7 @@ class FileStoreBase {
                         this.knownUpdateId = keg.collectionVersion;
                     }
                     if (!keg.props.fileId && !keg.deleted) {
-                        console.error('File keg missing fileId', keg.kegId);
+                        if (keg.version > 1) console.error('File keg missing fileId', keg.kegId);
                         continue;
                     }
                     const existing = this.getById(keg.props.fileId) || this.getByKegId(keg.kegId);
@@ -362,7 +360,6 @@ class FileStoreBase {
 
     /**
      * Pause file store updates.
-     * @public
      */
     pause() {
         this.paused = true;
@@ -370,7 +367,6 @@ class FileStoreBase {
 
     /**
      * Resume file store updates.
-     * @public
      */
     resume() {
         if (!this.paused) return;

@@ -1,6 +1,5 @@
 /**
  * @namespace helpers/dynamic-array-map
- * @protected
  */
 
 const { observable } = require('mobx');
@@ -14,8 +13,6 @@ let a;//eslint-disable-line
  * @param {ObservableArray<Object>} array - array to create map for
  * @param {any} keyProp - property of the items in the array that will be used as key for the map
  * @returns {Object} - map object
- * @memberof helpers/dynamic-array-map
- * @protected
  */
 function createMap(array, keyProp) {
     const map = {};

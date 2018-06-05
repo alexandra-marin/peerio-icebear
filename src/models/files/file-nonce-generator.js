@@ -13,29 +13,24 @@ const util = require('../../crypto/util');
  * @param {number} startChunkId - chunk id to start with (next nonce will use this id)
  * @param {number} maxChunkId
  * @param {Uint8Array} nonce - leave empty to generate random one
- * @protected
  */
 class FileNonceGenerator {
     constructor(startChunkId, maxChunkId, nonce = util.getRandomNonce()) {
         /**
          * @member {Uint8Array}
-         * @protected
          */
         this.nonce = nonce;
         /**
          * @member {number}
-         * @protected
          */
         this.chunkId = startChunkId;
         /**
          * @member {number}
-         * @protected
          */
         this.maxChunkId = maxChunkId;
         this._resetControlBytes();
         /**
          * @member {boolean}
-         * @protected
          */
         this.eof = false;
     }
@@ -57,7 +52,6 @@ class FileNonceGenerator {
     /**
      * @returns {Uint8Array|null} - nonce for the next chunk
      * @throws if called after nonce for maxChunkId was generated
-     * @protected
      */
     getNextNonce() {
         if (this.eof) throw new Error('Attempt to generate nonce past maxChunkId.');

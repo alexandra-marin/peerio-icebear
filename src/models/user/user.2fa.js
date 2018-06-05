@@ -9,9 +9,6 @@ module.exports = function mixUser2faModule() {
     /**
      * Starts 2fa setup challenge.
      * @returns {Promise<string>} - TOTP secret
-     * @memberof User
-     * @instance
-     * @public
      */
     this.setup2fa = () => {
         console.log('Starting 2fa setup.');
@@ -27,9 +24,6 @@ module.exports = function mixUser2faModule() {
      * @param {string} code
      * @param {boolean} trust - wether or not to trust this device and minimize 2fa requests on login
      * @returns {Promise<Array<string>>} backup codes
-     * @memberof User
-     * @instance
-     * @public
      */
     this.confirm2faSetup = (code, trust = false) => {
         code = sanitizeCode(code); //eslint-disable-line
@@ -51,9 +45,6 @@ module.exports = function mixUser2faModule() {
     /**
      * Disables 2fa on current account.
      * @returns {Promise}
-     * @memberof User
-     * @instance
-     * @public
      */
     this.disable2fa = () => {
         return verifyProtectedAction('disable')
@@ -70,9 +61,6 @@ module.exports = function mixUser2faModule() {
     /**
      * Requests new set of 2fa backup codes invalidating previous ones..
      * @returns {Promise}
-     * @memberof User
-     * @instance
-     * @public
      */
     this.reissueBackupCodes = () => {
         return verifyProtectedAction('backupCodes')

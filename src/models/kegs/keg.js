@@ -21,7 +21,6 @@ function getTemporaryKegId() {
  * @param {boolean} [allowEmpty=false] - normally client doesn't expect empty keg when calling `.load()` and will throw
  * @param {boolean} [storeSignerData=false] - if the keg is signed, in addition to signature it will store
  *                                            and then verify over signedByUsername prop instead of `keg.owner`.
- * @public
  * todo: convert this monstrous constructor params to object
  */
 class Keg {
@@ -30,53 +29,44 @@ class Keg {
         /**
          * Keg type
          * @member {string}
-         * @public
          */
         this.type = type;
         /**
          * Owner KegDb instance
          * @member {KegDb}
-         * @public
          */
         this.db = db;
         /**
          * Is the payload of this keg encrypted or not
          * @member {boolean}
-         * @public
          */
         this.plaintext = plaintext;
         /**
          * Sometimes this specific key has to be en/decrypted with other then default for this KegDb key.
          * @member {?Uint8Array}
-         * @public
          */
         this.overrideKey = null;
         /**
          * Keg collection (all kegs with this.type) version, snowflake string id.
          * null means we don't know the version yet, need to fetch keg at least once.
          * @member {?string}
-         * @public
          */
         this.collectionVersion = null;
         /**
          * Default props object for default props serializers. More advanced logic usually ignores this property.
          * @member {Object}
-         * @public
          */
         this.props = {};
         /**
          * @member {boolean}
-         * @public
          */
         this.forceSign = forceSign;
         /**
          * @member {boolean}
-         * @public
          */
         this.allowEmpty = allowEmpty;
         /**
          * @member {boolean}
-         * @public
          */
         this.storeSignerData = storeSignerData;
     }
@@ -84,92 +74,60 @@ class Keg {
     /**
      * Keg format version, client tracks kegs structure changes with this property
      * @member {number}
-     * @public
      */
     @observable format = 0;
     /**
      * null when signature has not been verified yet (it's async) or it will never be because this keg is not supposed
      * to be signed.
      * @member {?boolean} signatureError
-     * @memberof Keg
-     * @instance
-     * @public
      */
     @observable signatureError = null;
     /**
      * Indicates failure to process received/shared keg.
      * @member {?boolean} sharedKegError
-     * @memberof Keg
-     * @instance
-     * @public
      */
     @observable sharedKegError = null;
     /**
      * @member {?string} id
-     * @memberof Keg
-     * @instance
-     * @public
      */
     @observable id;
     /**
      * If this keg wasn't created yet, but you need to use it in a list somewhere like chat, you can call
      * `assignTempId()` and use this field as identification.
      * @member {?string} tempId
-     * @memberof Keg
-     * @instance
-     * @public
      */
     @observable tempId;
     /**
      * Keg version, when first created and empty, keg has version === 1
      * @member {number}
-     * @public
      */
     @observable version = 0;
 
     /**
      * @member {boolean} deleted
-     * @memberof Keg
-     * @instance
-     * @public
      */
     @observable deleted = false;
     /**
      * @member {boolean} loading
-     * @memberof Keg
-     * @instance
-     * @public
      */
     @observable loading = false;
     /**
      * @member {boolean} saving
-     * @memberof Keg
-     * @instance
-     * @public
      */
     @observable saving = false;
     /**
      * Subclasses can set this to 'true' on data modification and subscribe to the flag resetting to 'false'
      * after keg is saved.
      * @member {boolean} dirty
-     * @memberof Keg
-     * @instance
-     * @public
      */
     @observable dirty = false;
     /**
      * Sets to true when keg is loaded for the first time.
      * @member {boolean} loaded
-     * @memberof Keg
-     * @instance
-     * @public
      */
     @observable loaded = false;
     /**
      * @member {boolean} lastLoadHadError
-     * @memberof Keg
-     * @instance
-     * @public
      */
     lastLoadHadError = false;
 
@@ -177,8 +135,6 @@ class Keg {
     /**
      * Some kegs don't need anti-tamper checks.
      * @member {boolean} ignoreAntiTamperProtection
-     * @memberof Keg
-     * @instance
      */
     ignoreAntiTamperProtection;
 
@@ -186,14 +142,12 @@ class Keg {
     /**
      * Kegs with version==1 were just created and don't have any data
      * @returns {boolean}
-     * @public
      */
     get isEmpty() {
         return !this.version || this.version <= 1;
     }
     /**
      * Creates unique (for session) temporary id and puts it into `tempId`
-     * @public
      */
     assignTemporaryId() {
         this.tempId = getTemporaryKegId();
@@ -209,7 +163,6 @@ class Keg {
     /**
      * Saves keg to server, creates keg (reserves id) first if needed
      * @returns {Promise}
-     * @public
      */
     saveToServer() {
         if (this.loading) {
@@ -238,7 +191,6 @@ class Keg {
      * Updates existing server keg with new data.
      * This function assumes keg id exists so always use `saveToServer()` to be safe.
      * @returns {Promise}
-     * @private
      */
     internalSave() {
         let payload, props, lastVersion, signingPromise = Promise.resolve(true);
@@ -312,7 +264,6 @@ class Keg {
      * Sign the encrypted payload of this keg
      * @param {Uint8Array} payload
      * @returns {string} base64
-     * @private
      */
     signKegPayload(payload) {
         const toSign = this.plaintext ? cryptoUtil.strToBytes(payload) : payload;
@@ -322,7 +273,6 @@ class Keg {
     /**
      * (Re)populates this keg instance with data from server
      * @returns {Promise<Keg>}
-     * @public
      */
     load() {
         if (this.saving) {
@@ -364,7 +314,6 @@ class Keg {
     /**
      * Deletes the keg.
      * @returns {Promise}
-     * @public
      */
     remove() {
         return socket.send('/auth/kegs/delete', {
@@ -381,7 +330,6 @@ class Keg {
      * @param {Object} keg data as received from server
      * @returns {Keg|boolean} - returns false if keg data could not have been loaded. This function doesn't throw,
      * you have to check error flags if you received false return value.
-     * @public
      */
     @action loadFromKeg(keg) {
         try {
@@ -472,7 +420,6 @@ class Keg {
      * Shared/received kegs are encrypted by sender and this function checks if keg is valid and secure
      * and re-encrypts it with own KegDb key removing sharing metadata props that's not needed anymore
      * @param {Object} kegProps
-     * @private
      */
     @action validateAndReEncryptSharedKeg(kegProps) {
         this.sharedKegError = null;
@@ -498,7 +445,6 @@ class Keg {
      * Asynchronously checks signature.
      * @param {Uint8Array|string} payload
      * @param {Object} props
-     * @private
      */
     verifyKegSignature(payload, props) {
         if (!payload || this.lastLoadHadError) return;
@@ -526,7 +472,6 @@ class Keg {
      * Generic version that provides empty keg payload.
      * Override in child classes to.
      * @returns {Object}
-     * @public
      * @abstract
      */
     serializeKegPayload() {
@@ -536,7 +481,6 @@ class Keg {
     /**
      * Generic version that does nothing.
      * Override in child classes to convert raw keg data into object properties.
-     * @public
      * @abstract
      */
     // eslint-disable-next-line
@@ -545,7 +489,6 @@ class Keg {
     /**
      * Generic version that uses this.props object as-is
      * @returns {Object}
-     * @public
      * @abstract
      */
     serializeProps() {
@@ -555,7 +498,6 @@ class Keg {
     /**
      * Generic version that puts props object as-is to this.prop
      * @param {Object} props
-     * @public
      * @abstract
      */
     deserializeProps(props) {
@@ -567,7 +509,6 @@ class Keg {
      * Compares keg metadata with encrypted payload to make sure server didn't change metadata.
      * @param payload {Object} - decrypted keg payload
      * @throws AntiTamperError
-     * @private
      */
     detectTampering(payload) {
         if (!payload._sys) {

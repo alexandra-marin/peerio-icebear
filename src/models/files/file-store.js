@@ -16,6 +16,7 @@ const FileStoreBase = require('./file-store-base');
 const FileStoreBulk = require('./file-store.bulk');
 const util = require('../../util');
 const { asPromise } = require('../../helpers/prombservable');
+const _ = require('lodash');
 
 class FileStore extends FileStoreBase {
     isMainStore = true;
@@ -23,6 +24,8 @@ class FileStore extends FileStoreBase {
         super(null, null, 'main');
         this.bulk = new FileStoreBulk(this);
         this.migration = new FileStoreMigration(this);
+        // currently gets updated by each chat.file-handler inside 'copyKegs()'
+        // not very intuitive, but until we make a special file store for chats it works
         this.chatFileMap = observable.map();
 
         tracker.subscribeToFileDescriptorUpdates(() => {
@@ -46,7 +49,7 @@ class FileStore extends FileStoreBase {
         return !this.files.length && !this.folderStore.root.folders.length;
     }
 
-    updateDescriptors() {
+    updateDescriptors = _.debounce(() => {
         if (this.paused) return;
 
         const taskId = 'updating descriptors';
@@ -94,7 +97,7 @@ class FileStore extends FileStoreBase {
             tracker.seenThis(tracker.DESCRIPTOR_PATH, null, this.knownDescriptorVersion);
             if (this.knownDescriptorVersion < tracker.fileDescriptorDigest.maxUpdateId) this.updateDescriptors();
         });
-    }
+    }, 2000, { leading: true, maxWait: 4000 });
 
     @action.bound onInitialFileAdded(keg, file) {
         if (!file.format) {
@@ -154,7 +157,6 @@ class FileStore extends FileStoreBase {
 
     /**
      * Call at least once from UI.
-     * @public
      */
     loadAllFiles = Promise.method(async () => {
         if (this.loading || this.loaded) return;
@@ -176,7 +178,6 @@ class FileStore extends FileStoreBase {
     /**
      * Finds all loaded file kegs by fileId
      *
-     * @memberof FileStore
      */
     getAllById(fileId) {
         const files = [];
@@ -202,7 +203,6 @@ class FileStore extends FileStoreBase {
      * Returns file shared in specific chat. Loads it if needed.
      * @param {string} fileId
      * @param {string} kegDbId
-     * @memberof FileStore
      */
     getByIdInChat(fileId, kegDbId) {
         const fileMap = this.chatFileMap.get(kegDbId);
@@ -239,6 +239,7 @@ class FileStore extends FileStoreBase {
         }
     }
 
+    // TODO: i think this will do parallel loading with chat.file-handler of newly shared files
     loadChatFile(fileId, kegDbId) {
         const chat = getChatStore().chatMap[kegDbId];
         if (!chat) {
@@ -298,6 +299,11 @@ class FileStore extends FileStoreBase {
             }
         }
     }
+    updateCachedChatKeg(chatId, keg) {
+        const map = this.chatFileMap.get(chatId);
+        if (!map) return;
+        map.set(keg.fileId, keg);
+    }
 
     /**
      * Uploads a folder reconstructing folder structure in Peerio
@@ -331,7 +337,6 @@ class FileStore extends FileStoreBase {
      * @param {string} filePath - full path with name
      * @param {string} [fileName] - if u want to override name in filePath
      * @param {FileFolder} [folder] - where to put the file
-     * @public
      */
     upload = (filePath, fileName, folder) => {
         const keg = new File(User.current.kegDb, this);
@@ -373,7 +378,6 @@ class FileStore extends FileStoreBase {
 
     /**
      * Resumes interrupted downloads if any.
-     * @protected
      */
     resumeBrokenDownloads() {
         if (!this.loaded) return;
@@ -397,7 +401,6 @@ class FileStore extends FileStoreBase {
 
     /**
      * Resumes interrupted uploads if any.
-     * @protected
      */
     resumeBrokenUploads() {
         console.log('Checking for interrupted uploads.');

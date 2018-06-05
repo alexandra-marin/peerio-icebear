@@ -13,7 +13,6 @@ const socket = require('../../network/socket');
  * @param {string} obj.level - 'medium' or 'severe'
  * @param {string} obj.token - unique id of this warning to send it back and dismiss this warning
  * @param {function} onClear - callback will be called when warning is successfully dismissed on server
- * @protected
  */
 class ServerWarning extends SystemWarning {
     constructor(obj, onClear) {

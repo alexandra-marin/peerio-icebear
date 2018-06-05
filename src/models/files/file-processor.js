@@ -8,7 +8,6 @@ const cryptoUtil = require('../../crypto/util');
  * @param {FileStreamAbstract} stream
  * @param {FileNonceGenerator} nonceGenerator
  * @param {string} processType - 'upload' or 'download'
- * @protected
  */
 class FileProcessor {
     constructor(file, stream, nonceGenerator, processType) {
@@ -22,21 +21,18 @@ class FileProcessor {
     /**
      * Next queue processing calls will stop if stopped == true
      * @member {boolean}
-     * @protected
      */
     stopped = false;
 
     /**
      * process stopped and promise resolved/rejected
      * @member {boolean}
-     * @protected
      */
     processFinished = false;
 
     /**
      * Starts the up/download process
      * @returns {Promise}
-     * @protected
      */
     start() {
         console.log(`starting ${this.processType} for file id: ${this.file.id}`);
@@ -49,7 +45,6 @@ class FileProcessor {
 
     /**
      * Cancels process.
-     * @protected
      */
     cancel() {
         this._finishProcess(new errors.UserCancelError(`${this.processType} cancelled`));
@@ -89,7 +84,6 @@ class FileProcessor {
     /**
      * Override in child classes if cleanup is needed on finish.
      * @abstract
-     * @protected
      */
     cleanup() {
     }

@@ -61,31 +61,24 @@ const APP_EVENTS = {
  * The rest you can find in sources:
  * - **SOCKET_EVENTS** - whatever is happening with socket.io instance
  * - **APP_EVENTS** - server emits them
- * @public
  */
 class SocketClient {
     /**
      * Socket.io client instance
-     * @private
      */
     socket = null;
     taskPacer = new TaskPacer(20);// todo: maybe move to config
     /**
      * Was socket started or not
-     * @public
      */
     started = false;
     /**
      * Connection url this socket uses. Readonly.
-     * @public
      */
     url = null;
     /**
      * Observable connection state.
      * @member {boolean} connected
-     * @instance
-     * @memberof SocketClient
-     * @public
      */
     @observable connected = false;
     /**
@@ -93,46 +86,32 @@ class SocketClient {
      * but client is still initializing, loading boot keg and other important data needed before starting any other
      * processes and setting socket.authenticated to true.
      * @member {boolean}
-     * @private
      */
     preauthenticated = false;
     /**
      * Observable. Normally you want to use socket when it's authenticated rather then just connected.
      * @member {boolean} authenticated
-     * @instance
-     * @memberof SocketClient
-     * @public
      */
     @observable authenticated = false;
     /**
      * Observable. Is the connection currently throttled by server.
      * @member {boolean} throttled
-     * @instance
-     * @memberof SocketClient
-     * @public
      */
     @observable throttled = false;
     /**
      * Observable. In case reconnection attempt failed, this property will reflect current attempt number.
      * @member {number} reconnectAttempt
-     * @instance
-     * @memberof SocketClient
-     * @public
      */
     @observable reconnectAttempt = 0;
     /**
      * Observable. Shows current server response time in milliseconds. This is not a network ping,
      * this is a time needed for a websocket message to do a round trip.
      * @member {number} latency
-     * @instance
-     * @memberof SocketClient
-     * @public
      */
     @observable latency = 0;
     /**
      * Countdown to the next reconnect attempt.
      * @member {Timer}
-     * @public
      */
     reconnectTimer = new Timer();
 
@@ -143,57 +122,47 @@ class SocketClient {
      * Total amount of bytes received since socket was created.
      * Note that this is not including file downloads, because downloads go through https.
      * @member {number}
-     * @public
      */
     bytesReceived = 0;
     /**
      * Total amount of bytes sent since socket was created.
      * @member {number}
-     * @public
      */
     bytesSent = 0;
     /**
      * Just an incrementing with every request number to be able to identify server responses.
-     * @private
      */
     requestId = 0;
     /**
      * Awaiting requests map.
-     * @private
      */
     awaitingRequests = {}; // {number: function}
 
     /**
      * List of 'authenticated' event handlers.
-     * @private
      */
     authenticatedEventListeners = [];
     /**
      * List of 'started' event handlers.
-     * @private
      */
     startedEventListeners = [];
     // following properties are not static for access convenience
     /**
      * Possible connection states
-     * @public
      */
     STATES = STATES;
     /**
      * Socket lifecycle events
-     * @public
      */
     SOCKET_EVENTS = SOCKET_EVENTS;
     /**
      * Application server events
-     * @public
      */
     APP_EVENTS = APP_EVENTS;
 
     /**
      * Initializes the SocketClient instance, creates wrapped socket.io instance and so on.
      * @param {string} url
-     * @public
      */
     start(url) {
         if (this.started) return;
@@ -305,7 +274,6 @@ class SocketClient {
     /**
      * Returns connection state, one of {@link STATES}
      * @member {string}
-     * @public
      */
     get state() {
         // unknown states translated to 'closed' for safety
@@ -314,7 +282,6 @@ class SocketClient {
 
     /**
      * Internal function to do what it says
-     * @private
      */
     setAuthenticatedState() {
         // timeout to make sure code that call this does what it needs to before mobx reaction triggers
@@ -329,7 +296,6 @@ class SocketClient {
 
     /**
      * Internal function to do what it says
-     * @private
      */
     validateSubscription(event, listener) {
         if (!SOCKET_EVENTS[event] && !APP_EVENTS[event]) {
@@ -344,7 +310,6 @@ class SocketClient {
      * @param {string} event - event name, one of SOCKET_EVENTS or APP_EVENTS
      * @param {function} listener - event handler
      * @returns {function} function you can call to unsubscribe
-     * @public
      */
     subscribe(event, listener) {
         this.validateSubscription(event, listener);
@@ -363,7 +328,6 @@ class SocketClient {
      * Unsubscribes socket or app events listener.
      * @param {string} event - event name, one of SOCKET_EVENTS or APP_EVENTS
      * @param {function} listener - event handler
-     * @public
      */
     unsubscribe(event, listener) {
         this.validateSubscription(event, listener);
@@ -382,7 +346,6 @@ class SocketClient {
      * @param {any=} data - data to send
      * @param {?bool} hasBinaryData - if you know for sure, set this to true/false to increase performance
      * @returns {Promise<Object>} - server response, always returns `{}` if response is empty
-     * @public
      */
     send(name, data, hasBinaryData = null) {
         const id = this.requestId++;
@@ -426,7 +389,7 @@ class SocketClient {
                 } else {
                     this.socket.binary(hasBinaryData).emit(name, data, handler);
                 }
-            });
+            }, name);
         })
             .timeout(60000)
             .finally(() => {
@@ -436,7 +399,6 @@ class SocketClient {
 
     /**
      * Rejects promises and clears all awaiting requests (in case of disconnect)
-     * @private
      */
     cancelAwaitingRequests() {
         const err = new DisconnectedError();
@@ -452,7 +414,6 @@ class SocketClient {
      * Executes a callback only once when socket will connect.
      * If socket is already connected, callback will be scheduled to run ASAP.
      * @param {function} callback
-     * @public
      */
     onceConnected(callback) {
         if (this.socket.connected) {
@@ -470,7 +431,6 @@ class SocketClient {
      * Executes a callback only once when socket will authenticate.
      * If socket is already authenticated, callback will be scheduled to run ASAP.
      * @param {function} callback
-     * @public
      */
     onceAuthenticated(callback) {
         if (this.authenticated) {
@@ -488,7 +448,6 @@ class SocketClient {
      * Executes a callback once socket is started.
      * If socket is already started, callback will be scheduled to run ASAP.
      * @param {function} callback
-     * @public
      */
     onceStarted(callback) {
         if (this.started) {
@@ -503,7 +462,6 @@ class SocketClient {
      * Does not call handler if socket is already authenticated, only subscribes to future events.
      * @param {function} handler
      * @returns {function} unsubscribe function
-     * @public
      */
     onAuthenticated(handler) {
         return this.subscribe(SOCKET_EVENTS.authenticated, handler);
@@ -514,7 +472,6 @@ class SocketClient {
      * Does not call handler if socket is already disconnected, only subscribes to future events.
      * @param {function} handler
      * @returns {function} unsubscribe function
-     * @public
      */
     onDisconnect(handler) {
         return this.subscribe(SOCKET_EVENTS.disconnect, handler);
@@ -522,7 +479,6 @@ class SocketClient {
 
     /**
      * Closes current connection and disables reconnects until open() is called.
-     * @public
      */
     close = () => {
         this.socket.close();
@@ -530,7 +486,6 @@ class SocketClient {
 
     /**
      * Opens a new connection. (Or does nothing if already open)
-     * @public
      */
     open = () => {
         this.socket.open();
@@ -538,7 +493,6 @@ class SocketClient {
 
     /**
      * Internal function to do what it says
-     * @private
      */
     resetReconnectTimer = () => {
         if (this.connected) return;
@@ -548,7 +502,6 @@ class SocketClient {
 
     /**
      * Closes connection and opens it again.
-     * @public
      */
     reset = () => {
         if (this.resetting) return;

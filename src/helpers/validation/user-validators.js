@@ -28,8 +28,6 @@
  *  if the function does not return a message, the default message provided by the
  *  validator will be used.
  *
- * @module helpers/user-validators
- * @public
  */
 const socket = require('../../network/socket');
 
@@ -47,8 +45,6 @@ const serverValidationStore = { request: {} };
  * @param {string} name -- field name
  * @param {*} value
  * @returns {Promise<boolean>}
- * @memberof helpers/user-validators
- * @private
  */
 function _callServer(context, name, value) {
     const key = `${context}::${name}`;
@@ -63,8 +59,9 @@ function _callServer(context, name, value) {
                 .then(resp => {
                     resolve(!!resp && resp.valid);
                 })
-                .catch(() => {
-                    resolve(false);
+                .catch((e) => {
+                    if (e && e.name === 'DisconnectedError') resolve(undefined);
+                    else resolve(false);
                 });
         }, VALIDATION_THROTTLING_PERIOD_MS);
         serverValidationStore.request[key] = { timeout, resolve };

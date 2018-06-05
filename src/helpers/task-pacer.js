@@ -25,7 +25,8 @@ class TaskPacer {
      * Executes a task immediately or as soon as chosen execution pace allows it
      * @param {function} task
      */
-    run(task) {
+    run(task, debugName) {
+        task.__debugName = debugName;
         this.queue.push(task);
         if (!this.taskRunnerIsUp) {
             this.taskRunnerIsUp = true;
@@ -47,7 +48,9 @@ class TaskPacer {
         const diff = Date.now() - this.lastRunTimestamp;
         if (diff < 1000) {
             if (++this.runCount > this.rate) {
-                console.log('Task pacer hit.', 'next run in', 1000 - diff, 'ms');
+                console.log('Task pacer hit. Next task: ',
+                    this.queue.length ? this.queue[0].__debugName : 'queue empty',
+                    '. Next run in', 1000 - diff, 'ms');
                 setTimeout(this.taskRunner, 1000 - diff); // deferring execution to the next second
                 return;
             }

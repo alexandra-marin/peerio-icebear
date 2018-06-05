@@ -4,7 +4,6 @@ const Keg = require('../kegs/keg');
  * Plaintext system named keg. Server verifies contract on update.
  * Some properties (addresses) can be changed only via separate api.
  * @extends {Keg}
- * @protected
  */
 class Profile extends Keg {
     constructor(user) {

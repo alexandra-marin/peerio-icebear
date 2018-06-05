@@ -40,18 +40,18 @@ class ChatStoreSpaces {
         this.store = store;
     }
 
-    @computed
-    get spaces() {
+    @computed get roomsWithinSpaces() {
+        return this.store.channels.filter(chat => chat.isInSpace);
+    }
+
+    @computed get spaces() {
         if (config.whiteLabel.name !== 'medcryptor') {
             return [];
         }
 
-        // get all channels that belong to a space
-        const channelsFromASpace = this.store.channels.filter(chat => chat.isInSpace);
-
         // aggregate all spaces by id
-        const spacesMap = new Map(channelsFromASpace.map(chat => [
-            chat.chatHead.spaceId, // key: the space's name
+        const spacesMap = new Map(this.roomsWithinSpaces.map(chat => [
+            chat.chatHead.spaceId, // key: the space's id
             this.getSpaceFrom(chat) // value: the space object
         ]));
 

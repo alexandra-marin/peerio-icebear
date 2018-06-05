@@ -460,7 +460,7 @@ class ChatStore {
         }
         for (let i = 0; i < this.chats.length; i++) {
             const chat = this.chats[i];
-            if (chat.leaving || chat.isInSpace) continue;
+            if (chat.leaving) continue;
             this.activate(chat.id);
             return;
         }

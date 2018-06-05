@@ -86,7 +86,7 @@ Then('I get notified of unread messages', async function() {
     const allUnread = this.internalRoom1.unreadCount +
         this.internalRoom2.unreadCount +
         this.patientRoom.unreadCount;
-    
+
     const returnedSpace = ice.chatStore.spaces[0];
     returnedSpace.unreadCount.should.equal(allUnread);
 });

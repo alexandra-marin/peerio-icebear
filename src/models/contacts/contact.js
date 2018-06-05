@@ -100,6 +100,10 @@ class Contact {
      */
     @observable isDeleted = false;
     /**
+     * @type {boolean}
+     */
+    @observable isHidden = false;
+    /**
      * @type {string}
      */
     appLabel;

@@ -312,7 +312,7 @@ class Chat {
      * @type {bool}
      */
     @computed get isInSpace() {
-        return this.chatHead && this.chatHead.spaceId;
+        return !!this.chatHead && !!this.chatHead.spaceId;
     }
 
     /**

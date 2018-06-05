@@ -166,12 +166,17 @@ class ChatStore {
             const second = b.name || b.channelName;
             return first.localeCompare(second);
         });
-        // until we implement MedCryptor mobile patient management, we need to show patient
-        // rooms in the main room list on mobile
-        if (config.whiteLabel.name === 'medcryptor' && !config.isMobile) {
-            return allRooms.filter(c => !c.isInSpace);
-        }
+
         return allRooms;
+    }
+
+    /**
+     * List of chats that don't belong to a space
+     * @type {Array}
+     */
+    @computed
+    get nonSpaceRooms() {
+        return this.allRooms.filter(c => !c.isInSpace);
     }
 
     /**
@@ -460,7 +465,8 @@ class ChatStore {
         }
         for (let i = 0; i < this.chats.length; i++) {
             const chat = this.chats[i];
-            if (chat.leaving || chat.isInSpace) continue;
+            if (chat.leaving) continue;
+            if (config.whiteLabel.name === 'medcryptor' && chat.isInSpace) continue;
             this.activate(chat.id);
             return;
         }
@@ -478,7 +484,6 @@ class ChatStore {
      * @returns {?Chat} - can return null in case of paywall
      */
     @action async startChat(participants = [], isChannel = false, name, purpose, noActivate, space = null) {
-        console.log('STARTING CHAT');
         const cached = isChannel ? null : this.findCachedChatWithParticipants(participants);
         if (cached) {
             if (!noActivate) this.activate(cached.id);

@@ -31,31 +31,31 @@ class FileUploader extends FileProcessor {
 
     /**
      * read chunks go here
-     * @member {Array<Uint8Array>}
+     * @type {Array<Uint8Array>}
      */
     encryptQueue = [];
     /**
      * encrypted chunks go here
-     * @member {Array<Uint8Array>}
+     * @type {Array<Uint8Array>}
      */
     uploadQueue = [];
     /**
      * end of file reached while reading file
-     * @member {boolean}
+     * @type {boolean}
      */
     eofReached = false;
     /**
      * avoid parallel reads
-     * @member {boolean}
+     * @type {boolean}
      */
     readingChunk = false;
     /**
-     * @member {number}
+     * @type {number}
      */
     lastReadChunkId = -1;
     /**
      * amount of chunks that currently wait for response from server
-     * @member {number}
+     * @type {number}
      */
     chunksWaitingForResponse = 0;
 

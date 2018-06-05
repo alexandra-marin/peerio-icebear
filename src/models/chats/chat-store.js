@@ -57,47 +57,41 @@ class ChatStore {
     };
     /**
      * Events emitter.
-     * @member {EventEmitter}
      * @type {EventEmitter}
      */
     events = new EventEmitter();
 
     /**
      * Working set of chats. Server might have more, but we display only these at any time.
-     * @member {ObservableArray<Chat>} chats
+     * @type {ObservableArray<Chat>}
      */
     @observable.shallow chats = [];
 
     /**
-     * @member {boolean} unreadChatsAlwaysOnTop
-     * @type {boolean} unreadChatsAlwaysOnTop
+     * @type {boolean}
      */
     @observable unreadChatsAlwaysOnTop = false;
 
     /**
      * MyChats Keg
-     * @member {MyChats} myChats
-     * @type {MyChats} myChats
+     * @type {MyChats}
      */
     myChats;
 
     /**
      * To prevent duplicates
-     * @member {{chatId:Chat}}
      * @type {{[chatId : string]: Chat}}
      */
     chatMap = {};
     /**
      * True when chat list loading is in progress.
-     * @member {boolean} loading
-     * @type {boolean} loading
+     * @type {boolean}
      */
     @observable loading = false;
 
     /**
      * True when all chats has been updated after reconnect
-     * @member {boolean} updatedAfterReconnect
-     * @type {boolean} updatedAfterReconnect
+     * @type {boolean}
      */
     @computed get updatedAfterReconnect() {
         return this.chats.every(c => c.updatedAfterReconnect);
@@ -105,27 +99,23 @@ class ChatStore {
 
     /**
      * currently selected/focused chat.
-     * @member {Chat} activeChat
-     * @type {Chat} activeChat
+     * @type {Chat}
      */
     @observable activeChat = null;
     /**
      * Chats set this flag and UI should use it to prevent user from spam-clicking the 'hide' button
-     * @member {boolean} hidingChat
-     * @type {boolean} hidingChat
+     * @type {boolean}
      */
     @observable hidingChat = false;
     /**
      * True when loadAllChats() was called and finished once already.
-     * @member {boolean} loaded
-     * @type {boolean} loaded
+     * @type {boolean}
      */
     @observable loaded = false;
 
     /**
      * Total unread messages in all chats.
-     * @member {number} unreadMessages
-     * @type {number} unreadMessages
+     * @type {number}
      */
     @computed get unreadMessages() {
         return this.chats.reduce((acc, curr) => acc + curr.unreadCount, 0);
@@ -133,8 +123,7 @@ class ChatStore {
 
     /**
      * Subset of ChatStore#chats, contains direct message chats and pending DMs
-     * @member {Array<Chat>} directMessages
-     * @type {Array<Chat>} directMessages
+     * @type {Array<Chat>}
      */
     @computed get directMessages() {
         return this.chats.filter(chat => !chat.isChannel && chat.headLoaded);
@@ -142,17 +131,15 @@ class ChatStore {
 
     /**
      * Subset of ChatStore#chats, contains only channel chats
-     * @member {Array<Chat>} channels
-     * @type {Array<Chat>} channels
+     * @type {Array<Chat>}
      */
     @computed get channels() {
         return this.chats.filter(chat => chat.isChannel && chat.headLoaded);
     }
 
     /**
-     * Does chat store has any channels or not.
-     * @member {boolean} hasChannels
-     * @type {boolean} hasChannels
+     * Does chat store have any channels or not.
+     * @type {boolean}
      */
     @computed get hasChannels() {
         return !!this.channels.length;
@@ -160,8 +147,7 @@ class ChatStore {
 
     /**
      * Number of unread messages and invitations
-     * @member {number} badgeCount
-     * @type {number} badgeCount
+     * @type {number}
      */
     @computed
     get badgeCount() {
@@ -170,8 +156,7 @@ class ChatStore {
 
     /**
      * List of user's channels and invites
-     * @member {Array} allRooms
-     * @type {Array} allRooms
+     * @type {Array}
      */
     @computed
     get allRooms() {
@@ -191,12 +176,7 @@ class ChatStore {
 
     /**
      * Subset of ChatStore#chats, contains all spaces
-     * @member {Array<Chat>} spaces
-     * @type {Array<Chat>} spaces
-     * @memberof ChatStore
-     * @readonly
-     * @instance
-     * @public
+     * @type {Array<Chat>}
      */
     get spaces() {
         return this.spacesHelper.spaces;
@@ -204,11 +184,7 @@ class ChatStore {
 
     /**
      * currently selected/focused space.
-     * @member {string} activeSpace
-     * @type {string} activeSpace
-     * @memberof ChatStore
-     * @instance
-     * @public
+     * @type {string}
      */
     @observable activeSpace = null;
 

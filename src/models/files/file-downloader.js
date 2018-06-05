@@ -35,42 +35,42 @@ class FileDownloader extends FileProcessor {
 
     /**
      * Chunks as they were uploaded
-     * @member {Array<Uint8Array>}
+     * @type {Array<Uint8Array>}
      */
     decryptQueue = [];
     /**
      * Number of active downloads.
-     * @member {number}
+     * @type {number}
      */
     activeDownloads = 0;
     /**
      * Download processing chain.
-     * @member {Promise}
+     * @type {Promise}
      */
     downloadChain = Promise.resolve();
     /**
      * Flag to indicate that chunk is currently waiting for write promise resolve to avoid parallel writes.
-     * @member {boolean}
+     * @type {boolean}
      */
     writing = false;
     /**
      *  position of the blob as it is stored in the cloud
-     * @member {number}
+     * @type {number}
      */
     downloadPos = 0;
     /**
      * Indicates that there are no more chunks to download.
-     * @member {boolean}
+     * @type {boolean}
      */
     noMoreChunks = false;
     /**
      * blob was fully read
-     * @member {boolean}
+     * @type {boolean}
      */
     downloadEof = false;
     /**
      * Array of active XMLHttpRequests.
-     * @member {Array<XMLHttpRequest>}
+     * @type {Array<XMLHttpRequest>}
      */
     currentXhrs = [];
 

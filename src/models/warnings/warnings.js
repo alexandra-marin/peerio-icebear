@@ -12,13 +12,13 @@ const clientApp = require('../client-app');
 class Warnings {
     /**
      * Observable. Clients should watch this and render new snackbar/dialog on change.
-     * @member {SystemWarning} current
+     * @type {SystemWarning}
      */
     @observable current;
 
     /**
      * Warnings waiting to get shown.
-     * @member {Array<SystemWarning>}
+     * @type {Array<SystemWarning>}
      */
     queue = [];
 

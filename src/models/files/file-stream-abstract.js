@@ -13,16 +13,16 @@ const { AbstractCallError } = require('../../errors');
  */
 class FileStreamAbstract {
     /**
-     * @member {string}
+     * @type {string}
      */
     filePath;
     /**
-     * @member {string}
+     * @type {string}
      */
     mode;
     /**
      * File stream pointer
-     * @member {number}
+     * @type {number}
      */
     pos;
 

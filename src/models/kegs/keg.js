@@ -28,113 +28,113 @@ class Keg {
         this.id = id;
         /**
          * Keg type
-         * @member {string}
+         * @type {string}
          */
         this.type = type;
         /**
          * Owner KegDb instance
-         * @member {KegDb}
+         * @type {KegDb}
          */
         this.db = db;
         /**
          * Is the payload of this keg encrypted or not
-         * @member {boolean}
+         * @type {boolean}
          */
         this.plaintext = plaintext;
         /**
          * Sometimes this specific key has to be en/decrypted with other then default for this KegDb key.
-         * @member {?Uint8Array}
+         * @type {?Uint8Array}
          */
         this.overrideKey = null;
         /**
          * Keg collection (all kegs with this.type) version, snowflake string id.
          * null means we don't know the version yet, need to fetch keg at least once.
-         * @member {?string}
+         * @type {?string}
          */
         this.collectionVersion = null;
         /**
          * Default props object for default props serializers. More advanced logic usually ignores this property.
-         * @member {Object}
+         * @type {Object}
          */
         this.props = {};
         /**
-         * @member {boolean}
+         * @type {boolean}
          */
         this.forceSign = forceSign;
         /**
-         * @member {boolean}
+         * @type {boolean}
          */
         this.allowEmpty = allowEmpty;
         /**
-         * @member {boolean}
+         * @type {boolean}
          */
         this.storeSignerData = storeSignerData;
     }
 
     /**
      * Keg format version, client tracks kegs structure changes with this property
-     * @member {number}
+     * @type {number}
      */
     @observable format = 0;
     /**
      * null when signature has not been verified yet (it's async) or it will never be because this keg is not supposed
      * to be signed.
-     * @member {?boolean} signatureError
+     * @type {?boolean}
      */
     @observable signatureError = null;
     /**
      * Indicates failure to process received/shared keg.
-     * @member {?boolean} sharedKegError
+     * @type {?boolean}
      */
     @observable sharedKegError = null;
     /**
-     * @member {?string} id
+     * @type {?string}
      */
     @observable id;
     /**
      * If this keg wasn't created yet, but you need to use it in a list somewhere like chat, you can call
      * `assignTempId()` and use this field as identification.
-     * @member {?string} tempId
+     * @type {?string}
      */
     @observable tempId;
     /**
      * Keg version, when first created and empty, keg has version === 1
-     * @member {number}
+     * @type {number}
      */
     @observable version = 0;
 
     /**
-     * @member {boolean} deleted
+     * @type {boolean}
      */
     @observable deleted = false;
     /**
-     * @member {boolean} loading
+     * @type {boolean}
      */
     @observable loading = false;
     /**
-     * @member {boolean} saving
+     * @type {boolean}
      */
     @observable saving = false;
     /**
      * Subclasses can set this to 'true' on data modification and subscribe to the flag resetting to 'false'
      * after keg is saved.
-     * @member {boolean} dirty
+     * @type {boolean}
      */
     @observable dirty = false;
     /**
      * Sets to true when keg is loaded for the first time.
-     * @member {boolean} loaded
+     * @type {boolean}
      */
     @observable loaded = false;
     /**
-     * @member {boolean} lastLoadHadError
+     * @type {boolean}
      */
     lastLoadHadError = false;
 
 
     /**
      * Some kegs don't need anti-tamper checks.
-     * @member {boolean} ignoreAntiTamperProtection
+     * @type {boolean}
      */
     ignoreAntiTamperProtection;
 

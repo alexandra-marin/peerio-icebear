@@ -6,7 +6,7 @@ const { observable } = require('mobx');
 class Timer {
     /**
      * Observable counter you want to watch.
-     * @member {number} counter
+     * @type {number}
      */
     @observable counter = 0;
 

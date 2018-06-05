@@ -12,53 +12,38 @@ class ChatHead extends SyncedKeg {
     }
 
     /**
-     * @member {string} chatName
+     * @type {string}
      */
     @observable chatName = '';
     /**
-     * @member {string} purpose
+     * @type {string}
      */
     @observable purpose = '';
 
 
     /** SPACE PROPERTIES */
     /**
-     * @member {string} spaceId
-     * @memberof ChatHead
-     * @instance
-     * @public
+     * @type {string}
      */
     @observable spaceId = null;
 
     /**
-     * @member {string} spaceName
-     * @memberof ChatHead
-     * @instance
-     * @public
+     * @type {string}
      */
     @observable spaceName = null;
 
     /**
-     * @member {string} nameInSpace
-     * @memberof ChatHead
-     * @instance
-     * @public
+     * @type {string}
      */
     @observable nameInSpace = null;
 
     /**
-     * @member {string} spaceDescription
-     * @memberof ChatHead
-     * @instance
-     * @public
+     * @type {string}
      */
     @observable spaceDescription = null;
 
     /**
-     * @member {enum: internal / patient} spaceRoomType
-     * @memberof ChatHead
-     * @instance
-     * @public
+     * @type {enum: internal / patient}
      */
     @observable spaceRoomType = null;
 

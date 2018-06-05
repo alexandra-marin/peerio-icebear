@@ -8,26 +8,26 @@ const tracker = require('../../models/update-tracker');
 class KegDb {
     /**
      * Always equals 'SELF'
-     * @member {string}
+     * @type {string}
      */
     id;
 
     /**
      * Database key to use for keg encryption.
-     * @member {Uint8Array}
+     * @type {Uint8Array}
      */
     key;
 
     /**
      * Current key id for the database
-     * @member {?string}
+     * @type {?string}
      */
     get keyId() {
         return this.boot ? this.boot.kegKeyId : null;
     }
 
     /**
-     * @member {BootKeg}
+     * @type {BootKeg}
      */
     boot;
 

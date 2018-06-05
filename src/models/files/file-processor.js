@@ -20,13 +20,13 @@ class FileProcessor {
 
     /**
      * Next queue processing calls will stop if stopped == true
-     * @member {boolean}
+     * @type {boolean}
      */
     stopped = false;
 
     /**
      * process stopped and promise resolved/rejected
-     * @member {boolean}
+     * @type {boolean}
      */
     processFinished = false;
 

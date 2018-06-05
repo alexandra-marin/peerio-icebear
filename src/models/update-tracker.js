@@ -21,12 +21,12 @@ class UpdateTracker {
     DESCRIPTOR_PATH = 'global:fileDescriptor:updated'
     /**
      * listeners to new keg db added event
-     * @member {Array<function>}
+     * @type {Array<function>}
      */
     dbAddedHandlers = [];
     /**
      * Listeners to changes in existing keg databases.
-     * @member {{kegDbId: {kegType: function}}}
+     * @type {{kegDbId: {kegType: function}}}
      */
     updateHandlers = {};
 
@@ -38,12 +38,12 @@ class UpdateTracker {
 
     /**
      * Keg digest
-     * @member {kegDbId:{ kegType: { maxUpdateId: string, knownUpdateId(session): string, newKegsCount: number }}
+     * @type {kegDbId:{ kegType: { maxUpdateId: string, knownUpdateId(session): string, newKegsCount: number }}
      */
     digest = {};
     /**
      * Global digest
-     * @member {path:{ maxUpdateId: string, knownUpdateId(session): string }}
+     * @type {path:{ maxUpdateId: string, knownUpdateId(session): string }}
      */
     globalDigest = {
         [this.DESCRIPTOR_PATH]: { maxUpdateId: '', knownUpdateId: '' }

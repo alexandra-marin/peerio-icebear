@@ -16,7 +16,7 @@ class ChatFileHandler {
     maxUpdateId = '';
     constructor(chat) {
         /**
-         * @type {Chat} chat
+         * @type {Chat}
          */
         this.chat = chat;
         tracker.subscribeToKegUpdates(chat.id, 'file', this.onFileDigestUpdate);

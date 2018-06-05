@@ -7,7 +7,6 @@
 //  * Currently supports only reading from stream.
 //  * Underlying array can receive new data by appending(pushing) chunks to it
 //  * @param {Array<Uint8Array>} array
-//  * @public
 //  */
 // class ArrayStream {
 //     constructor(array) {
@@ -18,7 +17,6 @@
 //      * Get a portion of data from the stream without consuming it (moving stream pointer)
 //      * @param {number} size
 //      * @returns {?Uint8Array}
-//      * @public
 //      */
 //     peek(size) {
 //         return this.read(size, false);
@@ -30,7 +28,6 @@
 //      * @param {bool} [adjust] - default: true. Will consume data read from stream (move pointer).
 //      * @returns {?Uint8Array} - array of requested size. If there's not enough
 //      * data to fill array of requested size - null will be returned.
-//      * @public
 //      */
 //     read(size, adjust = true) {
 //         // do we have enough data for chunk this size?
@@ -77,7 +74,6 @@
 //     /**
 //      * Current stream length (from current position to the end of stream)
 //      * @returns {number} - available byte length
-//      * @public
 //      */
 //     get length() {
 //         if (!this.arr.length) return 0;

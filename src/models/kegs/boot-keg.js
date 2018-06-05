@@ -20,19 +20,19 @@ class BootKeg extends Keg {
 
     deserializeKegPayload(data) {
         /**
-         * @member {KeyPair}
+         * @type {KeyPair}
          */
         this.signKeys = {};
         this.signKeys.publicKey = util.b64ToBytes(data.signKeys.publicKey);
         this.signKeys.secretKey = util.b64ToBytes(data.signKeys.secretKey);
         /**
-         * @member {KeyPair}
+         * @type {KeyPair}
          */
         this.encryptionKeys = {};
         this.encryptionKeys.publicKey = util.b64ToBytes(data.encryptionKeys.publicKey);
         this.encryptionKeys.secretKey = util.b64ToBytes(data.encryptionKeys.secretKey);
         /**
-         * @member {Uint8Array}
+         * @type {Uint8Array}
          */
         this.kegKey = util.b64ToBytes(data.kegKey);
         this.keys[this.kegKeyId] = { key: this.kegKey, createdAt: Date.now() };

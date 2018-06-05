@@ -32,15 +32,15 @@ class ChatStoreSpaces {
         }
 
         // get all channels that belong to a space
-        const channelsFromASpace = this.store.chats.filter(chat => chat.isChannel && chat.isInSpace);
+        const channelsFromASpace = this.store.channels.filter(chat => chat.isInSpace);
 
-        // aggregate all spaces by name
+        // aggregate all spaces by id
         const spacesMap = new Map(channelsFromASpace.map(chat => [
             chat.chatHead.spaceId, // key: the space's name
             this.getSpaceFrom(chat) // value: the space object
         ]));
 
-        // return all unique spaces
+        // return all unique spaces as array
         const spaces = [...spacesMap.values()];
 
         return spaces;

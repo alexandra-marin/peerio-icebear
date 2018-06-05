@@ -11,7 +11,6 @@ Feature: MedCryptor patient spaces
         And   I create two internal rooms
         And   I create a patient room
         Then  I can view the patient space
-        Then  I get notified of unread messages
         Then  I create another patient space
 
     @BOT_room_invite_patient
@@ -30,9 +29,13 @@ Feature: MedCryptor patient spaces
         Then  Cucumbot accepts the invite
         And   I can see Cucumbot joined the room
         And   Cucumbot has joined the room
+        When  Cucumbot sends a message "Hello"
         # doctor rooms
         When  I create two internal rooms
         And   I invite Cucumbot to the room
         Then  Cucumbot accepts the invite
         And   I can see Cucumbot joined the room
         And   Cucumbot has joined the room
+        When  Cucumbot sends a message "Hello"
+        Then  I get notified of unread messages
+        

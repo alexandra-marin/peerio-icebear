@@ -17,7 +17,7 @@ class TinyDbManager {
 
     /**
      * Instance of unencrypted system collection.
-     * @member {TinyDbCollection}
+     * @type {TinyDbCollection}
      */
     get system() {
         if (!this.systemCollection) this.openSystem();

@@ -9,27 +9,27 @@ const { observable } = require('mobx');
  */
 class Settings extends Keg {
     /**
-     * @member {boolean} contactNotifications
+     * @type {boolean}
      */
     @observable contactNotifications = false;
     /**
-     * @member {boolean} contactRequestNotifications
+     * @type {boolean}
      */
     @observable contactRequestNotifications = false;
     /**
-     * @member {boolean} messageNotifications
+     * @type {boolean}
      */
     @observable messageNotifications = false;
     /**
-     * @member {boolean} errorTracking
+     * @type {boolean}
      */
     @observable errorTracking = false;
     /**
-     * @member {boolean} dataCollection
+     * @type {boolean}
      */
     @observable dataCollection = false;
     /**
-     * @member {boolean} subscribeToPromoEmails
+     * @type {boolean}
      */
     @observable subscribeToPromoEmails = false;
 

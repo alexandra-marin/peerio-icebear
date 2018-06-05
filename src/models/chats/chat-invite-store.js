@@ -39,13 +39,13 @@ class ChatInviteStore {
     }
     /**
      * List of channel ids current user has been invited to.
-     * @member {ObservableArray<{kegDbId: string, username: string, timestamp: number}>} received
+     * @type {ObservableArray<{kegDbId: string, username: string, timestamp: number}>}
      */
     @observable.shallow received = [];
 
     /**
      * List of channel invites admins of current channel have sent.
-     * @member {Map<kegDbId: string, [{username: string, timestamp: number}]>} sent
+     * @type {Map<kegDbId: string, [{username: string, timestamp: number}]>}
      */
     @observable sent = observable.shallowMap();
 
@@ -54,13 +54,13 @@ class ChatInviteStore {
      * Icebear will monitor this list and remove keys from boot keg for leavers
      * if current user is an admin of specific channel. Then icebear will remove an item from this list.
      * todo: the whole system smells a bit, maybe think of something better
-     * @member {Map<{kegDbId: string, username: string}>} left
+     * @type {Map<{kegDbId: string, username: string}>}
      */
     @observable left = observable.shallowMap();
 
     /**
      * List of users who rejected invites and are pending to be removed from boot keg.
-     * @member {Map<{kegDbId: string, username: string}>} rejected
+     * @type {Map<{kegDbId: string, username: string}>}
      */
     @observable rejected = observable.shallowMap();
 
@@ -75,7 +75,7 @@ class ChatInviteStore {
 
     /**
      * Activate invite by id
-     * @param {string} kegDbId
+     * @param {string}
      */
     @action.bound activateInvite(kegDbId) {
         const invite = this.received.find(obj => {

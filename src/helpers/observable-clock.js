@@ -15,7 +15,7 @@ class Clock {
     _lastTickValue;
     /**
      * Default clock instance with `config.observableClockEventFrequency` interval
-     * @member {Clock}
+     * @type {Clock}
      */
     static default;
 
@@ -26,7 +26,7 @@ class Clock {
 
     /**
      * Current timestamp. Observable. Updates every `this.interval` seconds
-     * @member {number}
+     * @type {number}
      */
     get now() {
         if (this._atom.reportObserved()) {

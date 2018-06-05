@@ -41,74 +41,72 @@ class Contact {
      * This flag means that we are making attempts to load contact
      * once it's 'false' it means that we are done trying with ether positive (notFound=false) result
      * or negative result. It's set to true by default, right after it exits constructor.
-     * @member {boolean} loading
+     * @type {boolean}
      */
     @observable loading = true; // default state, because that's what we do from the moment contact is created
     /**
-     * @member {string}
+     * @type {string}
      */
     username;
     /**
      * '@username'
-     * @member {string}
+     * @type {string}
      */
     usernameTag;
     /**
-     * @member {array<string>} addresses
+     * @type {array<string>}
      */
     addresses = [];
     /**
-     * @member {string} firstName
+     * @type {string}
      */
     @observable firstName = '';
     /**
-     * @member {string} lastName
+     * @type {string}
      */
     @observable lastName = '';
     /**
-     * @member {Uint8Array} encryptionPublicKey
+     * @type {Uint8Array}
      */
     @observable encryptionPublicKey = null;
     /**
-     * @member {Uint8Array} signingPublicKey
+     * @type {Uint8Array}
      */
     @observable signingPublicKey = null;
     /**
-     * @member {boolean} tofuError
+     * @type {boolean}
      */
     @observable tofuError = false;
     /**
      * Wether or not user added this contact to his address book
-     * @member {boolean} isAdded
+     * @type {boolean}
      */
     @observable isAdded = false;
     /**
      * Some server-generated random chars to prevent enumeration of user-specific urls
-     * @member {string} urlSalt
+     * @type {string}
      */
     @observable urlSalt = null;
     /**
-     * @member {number} profileVersion
+     * @type {number}
      */
     @observable profileVersion = 0;
     /**
-     * @member {boolean} hasAvatar
+     * @type {boolean}
      */
     @observable hasAvatar = false;
     /**
-     * @member {boolean} isDeleted
+     * @type {boolean}
      */
     @observable isDeleted = false;
     /**
-     * '@appLabel'
-     * @member {string}
-     * @public
+     * @type {string}
      */
     appLabel;
 
     /**
      * RGB string built based on hashed signing public key, not cryptographically strong, just for better UX
-     * @member {string} color
+     * @type {string}
      */
     @computed get color() {
         if (!this.signingPublicKey) return '#9e9e9e';
@@ -117,14 +115,14 @@ class Contact {
 
     /**
      * First letter of first name or username.
-     * @member {string} letter
+     * @type {string}
      */
     @computed get letter() {
         return getFirstLetterUpperCase(this.firstName || this.username);
     }
 
     /**
-     * @member {string} fullName
+     * @type {string}
      */
     @computed get fullName() {
         let ret = '';
@@ -137,7 +135,7 @@ class Contact {
     }
 
     /**
-     * @member {string} fullNameAndUsername
+     * @type {string}
      */
     @computed get fullNameAndUsername() {
         let ret = '';
@@ -153,7 +151,7 @@ class Contact {
 
     /**
      * Lower cased full name for search/filter optimization
-     * @member {string} fullNameLower
+     * @type {string}
      */
     @computed get fullNameLower() {
         return this.fullName.toLocaleLowerCase();
@@ -168,7 +166,7 @@ class Contact {
     /**
      * Cryptographically strong User fingerprint based on signing public key.
      * Looks like '12345-12345-12345-12345-12345', empty value is '00000-00000-00000-00000-00000-00000'
-     * @member {string} fingerprint
+     * @type {string}
      */
     @computed get fingerprint() {
         if (!this.signingPublicKey) return nullFingerprint;
@@ -186,14 +184,14 @@ class Contact {
         return `${serverSettings.avatarServer}/v2/avatar/${this.urlSalt}`;
     }
     /**
-     * @member {string} largeAvatarUrl
+     * @type {string}
      */
     @computed get largeAvatarUrl() {
         if (!this.hasAvatar) return null;
         return `${this._avatarUrl}/large/?${this.profileVersion}`;
     }
     /**
-     * @member {string} mediumAvatarUrl
+     * @type {string}
      */
     @computed get mediumAvatarUrl() {
         if (!this.hasAvatar) return null;
@@ -203,7 +201,7 @@ class Contact {
 
     /**
      * Same as {@link fingerprint}, but formatted as: '1234 5123 4512\n3451 2345 1234 5123 45'
-     * @member {string} fingerprintSkylarFormatted
+     * @type {string}
      */
     @computed get fingerprintSkylarFormatted() {
         let i = 0;
@@ -216,7 +214,7 @@ class Contact {
 
     /**
      * Server said it couldn't find this user.
-     * @member {boolean}
+     * @type {boolean}
      */
     @observable notFound = false;
 

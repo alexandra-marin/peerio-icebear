@@ -78,40 +78,40 @@ class SocketClient {
     url = null;
     /**
      * Observable connection state.
-     * @member {boolean} connected
+     * @type {boolean}
      */
     @observable connected = false;
     /**
      * This flag means that connection has technically been authenticated from server's perspective,
      * but client is still initializing, loading boot keg and other important data needed before starting any other
      * processes and setting socket.authenticated to true.
-     * @member {boolean}
+     * @type {boolean}
      */
     preauthenticated = false;
     /**
      * Observable. Normally you want to use socket when it's authenticated rather then just connected.
-     * @member {boolean} authenticated
+     * @type {boolean}
      */
     @observable authenticated = false;
     /**
      * Observable. Is the connection currently throttled by server.
-     * @member {boolean} throttled
+     * @type {boolean}
      */
     @observable throttled = false;
     /**
      * Observable. In case reconnection attempt failed, this property will reflect current attempt number.
-     * @member {number} reconnectAttempt
+     * @type {number}
      */
     @observable reconnectAttempt = 0;
     /**
      * Observable. Shows current server response time in milliseconds. This is not a network ping,
      * this is a time needed for a websocket message to do a round trip.
-     * @member {number} latency
+     * @type {number}
      */
     @observable latency = 0;
     /**
      * Countdown to the next reconnect attempt.
-     * @member {Timer}
+     * @type {Timer}
      */
     reconnectTimer = new Timer();
 
@@ -121,12 +121,12 @@ class SocketClient {
     /**
      * Total amount of bytes received since socket was created.
      * Note that this is not including file downloads, because downloads go through https.
-     * @member {number}
+     * @type {number}
      */
     bytesReceived = 0;
     /**
      * Total amount of bytes sent since socket was created.
-     * @member {number}
+     * @type {number}
      */
     bytesSent = 0;
     /**
@@ -273,7 +273,7 @@ class SocketClient {
 
     /**
      * Returns connection state, one of {@link STATES}
-     * @member {string}
+     * @type {string}
      */
     get state() {
         // unknown states translated to 'closed' for safety

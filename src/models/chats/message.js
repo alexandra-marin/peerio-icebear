@@ -36,45 +36,38 @@ class Message extends Keg {
 
     static unfurlQueue = new TaskQueue(5);
     /**
-     * @member {boolean} sending
-     * @type {boolean} sending
+     * @type {boolean}
      */
     @observable sending = false;
     /**
-     * @member {boolean} sendError
-     * @type {boolean} sendError
+     * @type {boolean}
      */
     @observable sendError = false;
     /**
      * array of usernames to render receipts for
-     * @member {Array<string>} receipts
-     * @type {Array<string>} receipts
+     * @type {Array<string>}
      */
     @observable receipts;
     /**
      * Which usernames are mentioned in this message.
-     * @member {Array<string>} userMentions
-     * @type {Array<string>} userMentions
+     * @type {Array<string>}
      */
     @observable.shallow userMentions = [];
     // ----- calculated in chat store, used in ui
     /**
      * Is this message first in the day it was sent (and loaded message page)
-     * @member {boolean} firstOfTheDay
-     * @type {boolean} firstOfTheDay
+     * @type {boolean}
      */
     @observable firstOfTheDay;
     /**
      * whether or not to group this message with previous one in message list.
-     * @member {boolean} groupWithPrevious
-     * @type {boolean} groupWithPrevious
+     * @type {boolean}
      */
     @observable groupWithPrevious;
 
     /**
      * External image urls mentioned in this chat and safe to render in agreement with all settings.
-     * @member {Array<ExternalImage>} externalImages
-     * @type {Array<ExternalImage>} externalImages
+     * @type {Array<ExternalImage>}
      */
     @observable externalImages = [];
 
@@ -87,7 +80,7 @@ class Message extends Keg {
     // -----
     /**
      * used to compare calendar days
-     * @member {string} dayFingerprint
+     * @type {string}
      */
     @computed get dayFingerprint() {
         if (!this.timestamp) return null;
@@ -100,7 +93,7 @@ class Message extends Keg {
      * TODO: mobile uses this, but desktop uses
      * TODO: new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' });
      * TODO: resolve/unify this in favor of most performant method
-     * @member {string} messageTimestampText
+     * @type {string}
      */
     @computed get messageTimestampText() {
         const { timestamp } = this;
@@ -338,37 +331,37 @@ class Message extends Keg {
 
     deserializeKegPayload(payload) {
         /**
-         * @member {Contact} sender
+         * @type {Contact}
          */
         this.sender = contactStore.getContact(this.owner);
         /**
-         * @member {string} text
+         * @type {string}
          */
         this.text = payload.text;
 
         /**
-         * @member {Object=} richText
+         * @type {Object=}
          */
         this.richText = payload.richText;
 
         /**
          * For system messages like chat rename fact.
-         * @member {Object} systemData
+         * @type {Object}
          */
         this.systemData = payload.systemData;
         /**
-         * @member {Date} timestamp
+         * @type {Date}
          */
         this.timestamp = new Date(payload.timestamp);
         this.userMentions = payload.userMentions;
         /**
-         * @member {Array<string>} files
+         * @type {Array<string>}
          */
         this.files = payload.files ? JSON.parse(payload.files) : null;
         this.folders = payload.folders ? JSON.parse(payload.folders) : null;
         /**
          * Does this message mention current user.
-         * @member {boolean} isMention
+         * @type {boolean}
          */
         this.isMention = this.userMentions ? this.userMentions.includes(User.current.username) : false;
     }

@@ -15,37 +15,37 @@ class ClientApp {
      * Set this flag when to help Icebear know if user is currently interacting with your app or not.
      * One example of how this affects Icebear behavior:
      * messages will not be marked as 'read' unless isFocused == true
-     * @member {boolean} isFocused
+     * @type {boolean}
      */
     @observable isFocused = true;
 
     /**
      * Use this to let Icebear know if your app is currently showing any of the chats.
-     * @member {boolean} isInChatsView
+     * @type {boolean}
      */
     @observable isInChatsView = false;
 
     /**
      * Use this to let Icebear know if your app is currently showing main file view.
-     * @member {boolean} isInFilesView
+     * @type {boolean}
      */
     @observable isInFilesView = false;
 
     /**
      * Icebear sets this flag.
-     * @member {boolean} clientVersionDeprecated
+     * @type {boolean}
      */
     @observable clientVersionDeprecated = false;
 
     /**
      * Icebear sets this flag.
-     * @member {boolean} clientSessionExpired
+     * @type {boolean}
      */
     @observable clientSessionExpired = false;
 
     /**
      * UI should listen to this and request entering of 2fa code from user and then pass ot back to icebear.
-     * @member {TwoFARequest} active2FARequest
+     * @type {TwoFARequest}
      */
     @observable active2FARequest = null;
 
@@ -68,7 +68,7 @@ class ClientApp {
 
     /**
      * UI should listen to this and request entering of 2fa code from user and then pass ot back to icebear.
-     * @member {TwoFARequest} updatingAfterReconnect
+     * @type {TwoFARequest}
      */
     @computed get updatingAfterReconnect() {
         return socket.connected && !(

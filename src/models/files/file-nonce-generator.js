@@ -17,20 +17,20 @@ const util = require('../../crypto/util');
 class FileNonceGenerator {
     constructor(startChunkId, maxChunkId, nonce = util.getRandomNonce()) {
         /**
-         * @member {Uint8Array}
+         * @type {Uint8Array}
          */
         this.nonce = nonce;
         /**
-         * @member {number}
+         * @type {number}
          */
         this.chunkId = startChunkId;
         /**
-         * @member {number}
+         * @type {number}
          */
         this.maxChunkId = maxChunkId;
         this._resetControlBytes();
         /**
-         * @member {boolean}
+         * @type {boolean}
          */
         this.eof = false;
     }

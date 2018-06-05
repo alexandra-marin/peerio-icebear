@@ -461,6 +461,7 @@ class ChatStore {
         for (let i = 0; i < this.chats.length; i++) {
             const chat = this.chats[i];
             if (chat.leaving) continue;
+            if (config.whiteLabel.name === 'medcryptor' && chat.isInSpace) continue;
             this.activate(chat.id);
             return;
         }

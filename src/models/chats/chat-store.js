@@ -478,7 +478,6 @@ class ChatStore {
      * @returns {?Chat} - can return null in case of paywall
      */
     @action async startChat(participants = [], isChannel = false, name, purpose, noActivate, space = null) {
-        console.log('STARTING CHAT');
         const cached = isChannel ? null : this.findCachedChatWithParticipants(participants);
         if (cached) {
             if (!noActivate) this.activate(cached.id);

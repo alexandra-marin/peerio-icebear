@@ -36,7 +36,7 @@ class ChatStoreSpaces {
 
         // aggregate all spaces by name
         const spacesMap = new Map(channelsFromASpace.map(chat => [
-            chat.chatHead.spaceName, // key: the space's name
+            chat.chatHead.spaceId, // key: the space's name
             this.getSpaceFrom(chat) // value: the space object
         ]));
 

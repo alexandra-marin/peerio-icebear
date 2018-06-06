@@ -161,9 +161,9 @@ class App {
         // closing connections
         console.log('closing connection');
         this.world.ice.socket.close();
-        this.world.ice.socket.dispose();
         return new Promise((resolve) => {
             when(() => !this.world.ice.socket.connected, async () => {
+                this.world.ice.socket.dispose();
                 console.log('clearing tinydb');
                 // delete TinyDbs
                 if (this.world.ice.TinyDb.user) await this.world.ice.TinyDb.user.clear();

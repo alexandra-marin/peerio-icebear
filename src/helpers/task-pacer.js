@@ -33,6 +33,9 @@ class TaskPacer {
             setTimeout(this.taskRunner);
         }
     }
+    clear() {
+        this.queue.clear();
+    }
 
     logError(err) {
         console.error(err);

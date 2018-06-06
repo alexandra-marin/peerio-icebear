@@ -91,8 +91,13 @@ When('I share the uploaded file in the room', async function() {
 });
 
 async function checkFileIsShared(chat) {
+    console.debug('CHECK IF FILE IS SHARED');
+    console.debug('WAITING FOR META');
     await this.waitFor(() => chat.metaLoaded);
+    console.debug('META LOADED');
+    console.debug('GET BY ID IN CHAT', this.uploadedFile.fileId, chat.id);
     const file = ice.fileStore.getByIdInChat(this.uploadedFile.fileId, chat.id);
+    console.debug('ENSURE LOADED');
     await file.ensureLoaded();
     expect(file.deleted).to.be.not.true;
     const messages = chat.messages;

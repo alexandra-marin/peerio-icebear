@@ -61,6 +61,7 @@ Feature: Sharing files in DM
         Then  Cucumbot can see the uploaded file in the room
         And   Cucumbot has 0 files in his drive
 
+    @focus
     @BOT_unshare_file_in_room
     Scenario: Unshare in room
         Given I create a room with Cucumbot

@@ -2,13 +2,15 @@ set -x
 mkdir -p ./test-results/e2e
 
 export PEERIO_REDUCE_SCRYPT_FOR_TESTS=1
+export SHOW_APP_LOGS=1
 
 if [ $CI ]
 then
-    tags='not @wip and not @long and not @off'
+    tags='@focus and not @wip and not @long and not @off'
     export DEFAULT_TIMEOUT=300000
 else
     tags='not @wip and not @off'
+    export DEFAULT_TIMEOUT=180000
 fi
 
 node --expose-gc ./node_modules/.bin/cucumber-js test/e2e/spec \

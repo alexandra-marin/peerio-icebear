@@ -14,7 +14,7 @@ Given('I confirm the primary email', async function() {
     await getUrl(url);
     // giving confirmed status a chance to propagate
     return this.waitFor(
-        () => ice.User.current.primaryAddressConfirmed === true, 5000
+        () => ice.User.current.primaryAddressConfirmed === true
     );
 });
 
@@ -24,7 +24,7 @@ Then('my primary email is confirmed', function() {
 
 When('I delete my account', async function() {
     await ice.User.current.deleteAccount(this.username);
-    return this.waitFor(() => ice.socket.authenticated === false, 5000);
+    return this.waitFor(() => ice.socket.authenticated === false);
 });
 
 Then('I am not able to login', function() {
@@ -54,7 +54,7 @@ When('I change my account settings', async function() {
     settings.dataCollection = true;
     settings.subscribeToPromoEmails = true;
     await ice.User.current.saveSettings();
-    return this.waitFor(() => settings.version === 2, 5000);
+    return this.waitFor(() => settings.version === 2);
 });
 
 Then('my account settings are changed', async function() {
@@ -108,7 +108,7 @@ When('I install the mobile app', async function() {
 });
 
 Then('I unlock {int}MB of storage', async function(int) {
-    await this.waitFor(() => ice.User.current.currentOnboardingBonus === this.previousBonus + int, 1000);
+    await this.waitFor(() => ice.User.current.currentOnboardingBonus === this.previousBonus + int);
     this.previousBonus = ice.User.current.currentOnboardingBonus;
 });
 

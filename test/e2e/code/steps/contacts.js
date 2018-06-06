@@ -5,7 +5,7 @@ const testConfig = require('../test-config');
 
 async function findContact(query) {
     const contact = ice.contactStore.getContact(query);
-    await this.waitFor(() => contact.loading === false, 60000);
+    await this.waitFor(() => contact.loading === false);
     contact.notFound.should.be.false;
     return contact;
 }

@@ -22,12 +22,12 @@ jobs:
             node --version
             npm --version
       - restore_cache:
-          key: dependency-cache-2-{{ checksum "package.json" }}
+          key: dependency-cache-{{ checksum "package.json" }}
       - run:
           name: install-dependencies
           command: npm install
       - save_cache:
-          key: dependency-cache-2-{{ checksum "package.json" }}
+          key: dependency-cache-{{ checksum "package.json" }}
           paths:
             - ./node_modules
       - run:
@@ -49,12 +49,12 @@ jobs:
             - "2e:53:61:1e:34:dd:22:fd:d6:2d:4f:2b:44:ef:56:28"
       - checkout
       - restore_cache:
-          key: dependency-cache-2-{{ checksum "package.json" }}
+          key: dependency-cache-{{ checksum "package.json" }}
       - run:
           name: install-dependencies
           command: npm install
       - save_cache:
-          key: dependency-cache-2-{{ checksum "package.json" }}
+          key: dependency-cache-{{ checksum "package.json" }}
           paths:
             - ./node_modules
       - run: ./.circleci/create-netrc.sh

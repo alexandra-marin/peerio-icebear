@@ -6,6 +6,7 @@ export PEERIO_REDUCE_SCRYPT_FOR_TESTS=1
 if [ $CI ]
 then
     tags='not @wip and not @long and not @off'
+    export DEFAULT_TIMEOUT=300000
 else
     tags='not @wip and not @off'
 fi

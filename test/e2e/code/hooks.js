@@ -4,7 +4,7 @@ const { deleteFile } = require('./helpers/files');
 const CucumbotClient = require('./helpers/cucumbot-client');
 const CucumbotServer = require('./helpers/cucumbot-server');
 
-setDefaultTimeout(process.env.DEFAULT_TIMEOUT || 40000);
+setDefaultTimeout(process.env.DEFAULT_TIMEOUT || 60000);
 
 // before each scenario
 Before({ wrapperOptions: { noWrap: true } }, function(data) {

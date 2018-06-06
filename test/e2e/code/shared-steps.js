@@ -1,26 +1,25 @@
 const { Given, When, Then } = require('cucumber');
 
-// big timeouts on account creation and login due to scrypt being too heavy for CI container cpu
-Given('I create my account', { timeout: 60000 }, async function() {
+Given('I create my account', async function() {
     await this.createAccount();
     if (this.cucumbotClient) this.cucumbotClient.sendReady();
 });
 
-Given('I create a test account', { timeout: 60000 }, function() {
+Given('I create a test account', function() {
     return this.createTestAccount();
 });
 
-Given('I create a test account and my account', { timeout: 120000 }, async function() {
+Given('I create a test account and my account', async function() {
     await this.createTestAccount();
     await this.app.restart();
     return this.createAccount();
 });
 
-When('I login', { timeout: 60000 }, function() {
+When('I login', function() {
     return this.login();
 });
 
-When('Cucumbot logs in', { timeout: 60000 }, function() {
+When('Cucumbot logs in', function() {
     return this.login();
 });
 
@@ -37,8 +36,8 @@ async function restart() {
     return this.login();
 }
 
-When('I restart', { timeout: 60000 }, restart);
-When('Cucumbot restarts', { timeout: 60000 }, restart);
+When('I restart', restart);
+When('Cucumbot restarts', restart);
 
 When('I restart without login', function() {
     return this.app.restart();

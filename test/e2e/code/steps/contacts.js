@@ -5,7 +5,7 @@ const testConfig = require('../test-config');
 
 async function findContact(query) {
     const contact = ice.contactStore.getContact(query);
-    await this.waitFor(() => contact.loading === false, 5000);
+    await this.waitFor(() => contact.loading === false, 60000);
     contact.notFound.should.be.false;
     return contact;
 }
@@ -23,7 +23,7 @@ async function inviteRandomEmailWithTemplate(template, world) {
 Then('I can not find unregistered account by random username', function() {
     const username = getRandomUsername();
     const contact = ice.contactStore.getContact(username);
-    return this.waitFor(() => contact.notFound === true, 5000);
+    return this.waitFor(() => contact.notFound === true);
 });
 
 Then('I can find the test account by email', async function() {
@@ -71,7 +71,7 @@ When('I create a test account with invited email', function() {
 
 Then('the invite is converted to pending dm', async function() {
     const c = this.ice.contactStore.getContact(this.invitedEmail);
-    await this.waitFor(() => !c.loading, 5000);
+    await this.waitFor(() => !c.loading);
     expect(!!this.ice.chatStore.directMessages.find(
         chat => chat.isInvite && chat.username === c.username)).to.be.true;
 });
@@ -82,7 +82,7 @@ When('I delete invited random email', function() {
 
 Then('I don\'t have pending dm', async function() {
     const c = this.ice.contactStore.getContact(this.invitedEmail);
-    await this.waitFor(() => !c.loading, 5000);
+    await this.waitFor(() => !c.loading);
     expect(!!this.ice.chatStore.directMessages.find(
         chat => chat.isInvite && chat.username === c.username)).to.be.false;
 });
@@ -99,24 +99,24 @@ When('I invite a MedCryptor patient', function() {
     return inviteRandomEmailWithTemplate('medcryptor-patient', this);
 });
 
-Then('they receive Peerio templated email', { timeout: 120000 }, async function() {
+Then('they receive Peerio templated email', async function() {
     return waitForEmail(this.invitedEmail, testConfig.inviteEmailSubject);
 });
 
-Then('they receive MedCryptor doctor templated email', { timeout: 120000 }, async function() {
+Then('they receive MedCryptor doctor templated email', async function() {
     return waitForEmail(this.invitedEmail, testConfig.inviteEmailSubjectMCDoctor);
 });
 
-Then('they receive MedCryptor patient templated email', { timeout: 120000 }, async function() {
+Then('they receive MedCryptor patient templated email', async function() {
     return waitForEmail(this.invitedEmail, testConfig.inviteEmailSubjectMCPatient);
 });
 
-Then('Peerio invites default to Peerio templated email', { timeout: 120000 }, async function() {
+Then('Peerio invites default to Peerio templated email', async function() {
     await inviteRandomEmail(this);
     await waitForEmail(this.invitedEmail, testConfig.inviteEmailSubject);
 });
 
-Then('MedCryptor invites default to doctor templated email', { timeout: 120000 }, async function() {
+Then('MedCryptor invites default to doctor templated email', async function() {
     await inviteRandomEmail(this);
     await waitForEmail(this.invitedEmail, testConfig.inviteEmailSubjectMCDoctor);
 });

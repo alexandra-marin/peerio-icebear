@@ -5,7 +5,7 @@ const testConfig = require('../test-config');
 const { getRandomEmail, getRandomUsername } = require('../helpers/random-data');
 const otplib = require('otplib');
 
-Given('I confirm the primary email', { timeout: 120000 }, async function() {
+Given('I confirm the primary email', async function() {
     const email = await waitForEmail(
         ice.User.current.addresses[0].address,
         testConfig.primaryEmailConfirmSubject
@@ -22,7 +22,7 @@ Then('my primary email is confirmed', function() {
     ice.User.current.primaryAddressConfirmed.should.be.true;
 });
 
-When('I delete my account', { timeout: 7000 }, async function() {
+When('I delete my account', async function() {
     await ice.User.current.deleteAccount(this.username);
     return this.waitFor(() => ice.socket.authenticated === false, 5000);
 });
@@ -76,7 +76,7 @@ When('I save my account key as PDF document', async function() {
     await ice.User.current.setAccountKeyBackedUp();
 });
 
-When('I invite other users and they sign up', { timeout: 1000000 }, async function() {
+When('I invite other users and they sign up', async function() {
     // Get 5 random emails
     const invitedEmails = Array(5).fill().map(getRandomEmail);
 
@@ -100,7 +100,7 @@ When('I enable two-step verification', async function() {
     return ice.User.current.confirm2faSetup(this.token);
 });
 
-When('I install the mobile app', { timeout: 20000 }, async function() {
+When('I install the mobile app', async function() {
     // Login from ios
     await this.app.restart();
     ice.config.platform = 'ios';

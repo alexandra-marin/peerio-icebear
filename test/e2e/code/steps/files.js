@@ -2,7 +2,7 @@ const { When, Then } = require('cucumber');
 const { createRandomTempFile, getTempFileName, filesEqual } = require('../helpers/files');
 const { startDmWithCucumbot } = require('./dm.helpers');
 
-When('I upload a {int} byte file', { timeout: 100000 }, async function(int) {
+When('I upload a {int} byte file', async function(int) {
     const name = await createRandomTempFile(int);
     this.filesToCleanup.push(name);
     const keg = ice.fileStore.upload(name);
@@ -58,7 +58,7 @@ Then('Cucumbot can not see the uploaded file in DM', async function() {
     );
 });
 
-When('I download the uploaded file', { timeout: 100000 }, function() {
+When('I download the uploaded file', function() {
     const name = getTempFileName();
     this.downloadedFile = { name, fileId: this.uploadedFile.fileId };
     return ice.fileStore.getById(this.uploadedFile.fileId).download(name).then(() => {
@@ -100,11 +100,11 @@ async function checkFileIsShared(chat) {
     messages[messages.length - 1].files.should.deep.equal([this.uploadedFile.fileId]);
 }
 
-Then('Cucumbot can see the uploaded file in DM', { timeout: 40000 }, function() {
+Then('Cucumbot can see the uploaded file in DM', function() {
     const chat = ice.chatStore.directMessages[0];
     return checkFileIsShared.call(this, chat);
 });
-Then('Cucumbot can see the uploaded file in the room', { timeout: 40000 }, function() {
+Then('Cucumbot can see the uploaded file in the room', function() {
     const chat = ice.chatStore.channels[0];
     return checkFileIsShared.call(this, chat);
 });
@@ -113,11 +113,11 @@ async function checkIfUploadedFileIsShared(chat) {
     this.cucumbotClient.remoteEval(`this.world.uploadedFile={fileId:'${this.uploadedFile.fileId}'}`);
     await checkFileIsShared.call(this, chat);
 }
-Then('The uploaded file is shared with Cucumbot', { timeout: 40000 }, function() {
+Then('The uploaded file is shared with Cucumbot', function() {
     const chat = ice.chatStore.directMessages[0];
     return checkIfUploadedFileIsShared.call(this, chat);
 });
-Then('The uploaded file is shared in the room', { timeout: 40000 }, function() {
+Then('The uploaded file is shared in the room', function() {
     const chat = ice.chatStore.channels[0];
     return checkIfUploadedFileIsShared.call(this, chat);
 });

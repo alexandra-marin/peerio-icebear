@@ -45,7 +45,7 @@ When('I add a new email', async function() {
 
 // This IS very similar to confirming primary email address in account.js
 // but trying to merge these two into one universal step just makes things messy for not much benefit
-When('I confirm my new email', { timeout: 120000 }, async function() {
+When('I confirm my new email', async function() {
     const email = await waitForEmail(this.lastAddedEmail, testConfig.newEmailConfirmSubject);
     const url = testConfig.emailConfirmUrlRegex.exec(email.body)[1];
     await getUrl(url);
@@ -54,7 +54,7 @@ When('I confirm my new email', { timeout: 120000 }, async function() {
         const adr = ice.User.current.addresses.find(a => a.address === this.lastAddedEmail);
         if (!adr) return false;
         return adr.confirmed;
-    }, 5000);
+    });
 });
 
 Then('my new email is confirmed', function() {
@@ -62,7 +62,7 @@ Then('my new email is confirmed', function() {
     expect(adr.confirmed).to.be.true;
 });
 
-Given('I delete confirmation email', { timeout: 120000 }, async function() {
+Given('I delete confirmation email', async function() {
     const email = await waitForEmail(this.lastAddedEmail, testConfig.newEmailConfirmSubject);
     return deleteEmail(this.lastAddedEmail, email.id);
 });
@@ -75,10 +75,10 @@ When('I change my primary email', function() {
     return ice.User.current.makeEmailPrimary(this.lastAddedEmail);
 });
 
-Then('my primary email has been changed', { timeout: 15000 }, function() {
+Then('my primary email has been changed', function() {
     return this.waitFor(() => {
         return ice.User.current.email === this.lastAddedEmail;
-    }, 5000);
+    });
 });
 
 When('I upload an avatar', async function() {
@@ -90,8 +90,8 @@ When('I upload an avatar', async function() {
 
 Then('the avatar should appear in my profile', async function() {
     const user = ice.contactStore.currentUser;
-    await this.waitFor(() => user.hasAvatar, 10000);
-    // somtimes server is slow to update this and tests fail sporadically :(
+    await this.waitFor(() => user.hasAvatar);
+    // sometimes server is slow to update this and tests fail sporadically :(
     if (user.profileVersion <= this.lastProfileVersion) {
         console.error('Last profile version was not updated');
     }

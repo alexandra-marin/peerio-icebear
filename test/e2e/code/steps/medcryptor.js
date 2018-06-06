@@ -1,14 +1,14 @@
 const { Given, Then } = require('cucumber');
 const { getRandomUsername } = require('../helpers/random-data');
 
-Given('I create a MedCryptor account', { timeout: 60000 }, async function() {
+Given('I create a MedCryptor account', async function() {
     this.ice.config.whiteLabel.name = 'medcryptor';
     this.ice.config.platform = 'ios';
     await this.createAccount();
     if (this.cucumbotClient) this.cucumbotClient.sendReady();
 });
 
-Given('I create a MedCryptor account with metadata', { timeout: 60000 }, async function() {
+Given('I create a MedCryptor account with metadata', async function() {
     this.medicalId = getRandomUsername();
     this.ice.config.whiteLabel.name = 'medcryptor';
     this.ice.config.platform = 'ios';

@@ -104,7 +104,7 @@ Then('The invite sent is removed', function() {
 });
 
 Then('Cucumbot\'s invite is removed', function() {
-    return this.waitFor(() => ice.chatInviteStore.received.length === 0, 10000);
+    return this.waitFor(() => ice.chatInviteStore.received.length === 0);
 });
 
 Then('The Cucumbot is not a member of the room', function() {

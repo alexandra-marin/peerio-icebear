@@ -40,10 +40,6 @@ class File extends Keg {
      */
     @observable folderId = null;
     /**
-     * @type {string}
-     */
-    @observable name = '';
-    /**
      * Bytes
      * @type {number}
      */

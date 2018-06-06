@@ -6,7 +6,7 @@ export SHOW_APP_LOGS=1
 
 if [ $CI ]
 then
-    tags='@focus and not @wip and not @long and not @off'
+    tags='not @wip and not @long and not @off'
     export DEFAULT_TIMEOUT=300000
 else
     tags='not @wip and not @off'

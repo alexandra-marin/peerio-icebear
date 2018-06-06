@@ -22,7 +22,7 @@ class SyncedKeg extends Keg {
         tracker.onceUpdated(() => {
             // this is hacky, but there's no better way unless we refactor login seriously
             // the problem is with failed login leaving synced keg instances behind without cleaning up subscription
-            if (!this.db.boot || !this.db.boot.keys) return;
+            if (this.db.id === 'SELF' && (!this.db.boot || !this.db.boot.keys)) return;
             // this will make sure we'll update every time server sends a new digest
             // it will also happen after reconnect, because digest is always refreshed on reconnect
             tracker.subscribeToKegUpdates(db.id, kegName, this._enqueueLoad);

@@ -2,6 +2,87 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.2.0"></a>
+# [5.2.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.1.6...v5.2.0) (2018-06-06)
+
+
+### Bug Fixes
+
+* account test + add test for duplicate med ids ([a1e2cf3](https://github.com/PeerioTechnologies/peerio-icebear/commit/a1e2cf3))
+* add default props ([b003356](https://github.com/PeerioTechnologies/peerio-icebear/commit/b003356))
+* add missing param to tests ([4edb114](https://github.com/PeerioTechnologies/peerio-icebear/commit/4edb114))
+* add more comments ([d22ed45](https://github.com/PeerioTechnologies/peerio-icebear/commit/d22ed45))
+* add NonSpaceRooms, remove filtering from allRooms ([5e9a7bb](https://github.com/PeerioTechnologies/peerio-icebear/commit/5e9a7bb))
+* add roomsWithinSpaces computed ([f978dab](https://github.com/PeerioTechnologies/peerio-icebear/commit/f978dab))
+* allRooms ([5998250](https://github.com/PeerioTechnologies/peerio-icebear/commit/5998250))
+* avoid sending last know version on disconnected socket ([d1afd5a](https://github.com/PeerioTechnologies/peerio-icebear/commit/d1afd5a))
+* chat-store.spaces does not need to be computed ([3e2fb73](https://github.com/PeerioTechnologies/peerio-icebear/commit/3e2fb73))
+* check that room is in space ([15c9084](https://github.com/PeerioTechnologies/peerio-icebear/commit/15c9084))
+* compute internal+patient rooms ([e7fb2e3](https://github.com/PeerioTechnologies/peerio-icebear/commit/e7fb2e3))
+* contact tests ([fd8bda1](https://github.com/PeerioTechnologies/peerio-icebear/commit/fd8bda1))
+* copy ([5ad438f](https://github.com/PeerioTechnologies/peerio-icebear/commit/5ad438f))
+* copy and nameInSpace ([8bd3604](https://github.com/PeerioTechnologies/peerio-icebear/commit/8bd3604))
+* don't show snackbar on contact fav ([c350b40](https://github.com/PeerioTechnologies/peerio-icebear/commit/c350b40))
+* don't show snackbar on contact unfav ([d35ef61](https://github.com/PeerioTechnologies/peerio-icebear/commit/d35ef61))
+* folder conversion ux ([49caa45](https://github.com/PeerioTechnologies/peerio-icebear/commit/49caa45))
+* folder.canShare ([528085d](https://github.com/PeerioTechnologies/peerio-icebear/commit/528085d))
+* force reload synced keg on concurrency error ([185ce06](https://github.com/PeerioTechnologies/peerio-icebear/commit/185ce06))
+* lag on file keg copy operations ([29e6871](https://github.com/PeerioTechnologies/peerio-icebear/commit/29e6871))
+* lint ([61e2b18](https://github.com/PeerioTechnologies/peerio-icebear/commit/61e2b18))
+* lint ([d40dde7](https://github.com/PeerioTechnologies/peerio-icebear/commit/d40dde7))
+* lint ([8992364](https://github.com/PeerioTechnologies/peerio-icebear/commit/8992364))
+* lint ([b17d33c](https://github.com/PeerioTechnologies/peerio-icebear/commit/b17d33c))
+* lint ([d833d41](https://github.com/PeerioTechnologies/peerio-icebear/commit/d833d41))
+* lint ([4384a0e](https://github.com/PeerioTechnologies/peerio-icebear/commit/4384a0e))
+* lint ([31ad737](https://github.com/PeerioTechnologies/peerio-icebear/commit/31ad737))
+* merge issue in copy ([5504652](https://github.com/PeerioTechnologies/peerio-icebear/commit/5504652))
+* migitate Unicode text direction confusion with file extensions ([46164c8](https://github.com/PeerioTechnologies/peerio-icebear/commit/46164c8))
+* migration ([c0bd0d7](https://github.com/PeerioTechnologies/peerio-icebear/commit/c0bd0d7))
+* more small test fixes ([8cceda6](https://github.com/PeerioTechnologies/peerio-icebear/commit/8cceda6))
+* move steps to background ([26d57ed](https://github.com/PeerioTechnologies/peerio-icebear/commit/26d57ed))
+* no more dancing ([0ae9899](https://github.com/PeerioTechnologies/peerio-icebear/commit/0ae9899))
+* no observable on this property so that server gets clean data ([cc552a8](https://github.com/PeerioTechnologies/peerio-icebear/commit/cc552a8))
+* refactor whitelabel.getContact to exterminate race condition ([efc4d52](https://github.com/PeerioTechnologies/peerio-icebear/commit/efc4d52))
+* remane to spaceRoomType ([653eedc](https://github.com/PeerioTechnologies/peerio-icebear/commit/653eedc))
+* remove debug ([b2d0a19](https://github.com/PeerioTechnologies/peerio-icebear/commit/b2d0a19))
+* remove default to null ([844eb59](https://github.com/PeerioTechnologies/peerio-icebear/commit/844eb59))
+* remove extra ([f84ae5c](https://github.com/PeerioTechnologies/peerio-icebear/commit/f84ae5c))
+* remove extra observable with the same name ([61a4ece](https://github.com/PeerioTechnologies/peerio-icebear/commit/61a4ece))
+* remove helper ([9a836e8](https://github.com/PeerioTechnologies/peerio-icebear/commit/9a836e8))
+* remove unused ([4c5db8a](https://github.com/PeerioTechnologies/peerio-icebear/commit/4c5db8a))
+* remove unused ([3d6141a](https://github.com/PeerioTechnologies/peerio-icebear/commit/3d6141a))
+* **rooms:** list patient rooms with rooms on MC mobile ([58cf52f](https://github.com/PeerioTechnologies/peerio-icebear/commit/58cf52f))
+* remove useless fn ([20c67a1](https://github.com/PeerioTechnologies/peerio-icebear/commit/20c67a1))
+* replace strings for admin screen ([ab13a69](https://github.com/PeerioTechnologies/peerio-icebear/commit/ab13a69))
+* return bool ([7d78122](https://github.com/PeerioTechnologies/peerio-icebear/commit/7d78122))
+* **whiteLabel:** homogenize whiteLabel config ([77bd026](https://github.com/PeerioTechnologies/peerio-icebear/commit/77bd026))
+* revert wip tests ([2a6c7ca](https://github.com/PeerioTechnologies/peerio-icebear/commit/2a6c7ca))
+* save nameInSpace ([acefc86](https://github.com/PeerioTechnologies/peerio-icebear/commit/acefc86))
+* test path ([bb7c092](https://github.com/PeerioTechnologies/peerio-icebear/commit/bb7c092))
+* **contact:** make isHidden observable ([aec9e15](https://github.com/PeerioTechnologies/peerio-icebear/commit/aec9e15))
+* use Cucumbot for messages in patient space ([5a492ab](https://github.com/PeerioTechnologies/peerio-icebear/commit/5a492ab))
+* use store channels to filter spaces ([4fe3245](https://github.com/PeerioTechnologies/peerio-icebear/commit/4fe3245))
+* user white label name instead of app label ([65bbeee](https://github.com/PeerioTechnologies/peerio-icebear/commit/65bbeee))
+* validation returns undefined when disconnected [branch ch8165] ([0344345](https://github.com/PeerioTechnologies/peerio-icebear/commit/0344345))
+* wait before chatStore is loaded ([fb22a1e](https://github.com/PeerioTechnologies/peerio-icebear/commit/fb22a1e))
+* **contactStore:** don’t create Contact when filtering by whitelabel ([33e4ef7](https://github.com/PeerioTechnologies/peerio-icebear/commit/33e4ef7))
+* **spaces:** handle channels without spaces ([15c1710](https://github.com/PeerioTechnologies/peerio-icebear/commit/15c1710))
+
+
+### Features
+
+* **contacts:** patient space context ([418b90a](https://github.com/PeerioTechnologies/peerio-icebear/commit/418b90a))
+*  rename rooms for desktop MC admin ([6ff4f77](https://github.com/PeerioTechnologies/peerio-icebear/commit/6ff4f77))
+* add whitelabel filter to support mobile ([31a8d1e](https://github.com/PeerioTechnologies/peerio-icebear/commit/31a8d1e))
+* Admin state screen copy ([33dcad5](https://github.com/PeerioTechnologies/peerio-icebear/commit/33dcad5))
+* filtering function for contacts [ch7811] [ch7810] [ch7501] ([67055d8](https://github.com/PeerioTechnologies/peerio-icebear/commit/67055d8))
+* for mobile medcryptor always finds all users ([3018c40](https://github.com/PeerioTechnologies/peerio-icebear/commit/3018c40))
+* pass template to invitation API ([#205](https://github.com/PeerioTechnologies/peerio-icebear/issues/205)) ([8131ebc](https://github.com/PeerioTechnologies/peerio-icebear/commit/8131ebc))
+* support appLabel in profile ([23a4981](https://github.com/PeerioTechnologies/peerio-icebear/commit/23a4981))
+* validate ahrpa ([8905ba1](https://github.com/PeerioTechnologies/peerio-icebear/commit/8905ba1))
+
+
+
 <a name="5.1.6"></a>
 ## [5.1.6](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.1.5...v5.1.6) (2018-06-03)
 

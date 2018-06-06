@@ -186,7 +186,7 @@ class SocketClient {
                 }
                 return s.call(this, msg);
             };
-            setInterval(() => {
+            this.statInterval = setInterval(() => {
                 console.log('socket stat',
                     'sent:', util.formatBytes(self.bytesSent),
                     'received:', util.formatBytes(self.bytesReceived),
@@ -520,6 +520,7 @@ class SocketClient {
     };
 
     dispose() {
+        clearInterval(this.statInterval);
         this.taskPacer.clear();
         if (this._originalWSSend) WebSocket.prototype.send = this._originalWSSend;
     }

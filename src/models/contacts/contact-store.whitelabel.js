@@ -1,4 +1,4 @@
-const { when, action } = require('mobx');
+const { when } = require('mobx');
 const config = require('../../config');
 
 // Filter contacts in Peerio namespace
@@ -53,14 +53,16 @@ class ContactStoreWhitelabel {
     // returns only medcryptor
     getContact(usernameOrEmail, context) {
         const c = this.store.getContact(usernameOrEmail);
-        // when our request is complete, check and apply filter
-        when(() => !c.loading, action(() => {
-            const filter = getContactFilter();
-            if (!filter(c, context)) {
-                c.isHidden = true;
-            }
-        }));
-        return c;
+        return new Promise(resolve => {
+            // when our request is complete, check and apply filter
+            when(() => !c.loading, () => {
+                const filter = getContactFilter();
+                if (!filter(c, context)) {
+                    c.isHidden = true;
+                }
+                resolve(c);
+            });
+        });
     }
 
     filter(token, context) {

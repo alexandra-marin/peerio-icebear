@@ -34,7 +34,7 @@ class TaskPacer {
         }
     }
     clear() {
-        this.queue.clear();
+        this.queue.length = 0;
     }
 
     logError(err) {

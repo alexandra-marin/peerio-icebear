@@ -102,7 +102,9 @@ async function checkFileIsShared(chat) {
     expect(file.deleted).to.be.not.true;
     const messages = chat.messages;
     await this.waitFor(() => messages.length === chat.isChannel ? 3 : 2);
-    messages[messages.length - 1].files.should.deep.equal([this.uploadedFile.fileId]);
+    const lastMessage = messages[messages.length - 1];
+    console.log('========================', lastMessage, '===================================');
+    expect(lastMessage.files).deep.equal([this.uploadedFile.fileId]);
 }
 
 Then('Cucumbot can see the uploaded file in DM', function() {

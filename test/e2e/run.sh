@@ -2,7 +2,7 @@ set -x
 mkdir -p ./test-results/e2e
 
 export PEERIO_REDUCE_SCRYPT_FOR_TESTS=1
-export SHOW_APP_LOGS=0
+export SHOW_APP_LOGS=1
 
 if [ $CI ]
 then

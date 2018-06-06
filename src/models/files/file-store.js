@@ -108,7 +108,7 @@ class FileStore extends FileStoreBase {
                 console.log(`migrating file ${file.fileId}`);
                 this.migrationQueue.addTask(() =>
                     retryUntilSuccess(() => {
-                        return file.createDescriptor()
+                        return (keg.props.descriptor ? Promise.resolve() : file.createDescriptor())
                             .then(() => file.saveToServer())
                             .then(() => { file.migrating = false; })
                             .catch(err => {

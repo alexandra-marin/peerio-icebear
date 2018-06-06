@@ -346,6 +346,7 @@ class UpdateTracker {
         // console.debug('SEEN THIS', id, type, updateId);
         // consumers should not care if this call fails, it makes things simpler.
         // to cover failure cases, consumers should activate 'mark as read' logic after every reconnect
+        if (!socket.authenticated) return;
         socket.send('/auth/updates/last-known-version', {
             path: type ? `${id}:${type}` : id,
             lastKnownVersion: updateId

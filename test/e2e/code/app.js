@@ -51,6 +51,7 @@ class App {
         cfg.appVersion = '2.37.1';
         cfg.clientVersion = '2.9.0';
         cfg.platform = 'electron';
+        cfg.whiteLabel.name = '';
         cfg.arch = os.arch();
         cfg.os = os.type();
         cfg.FileStream = FileStream;

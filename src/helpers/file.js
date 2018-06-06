@@ -65,4 +65,114 @@ function isImage(ext) {
     return !!IMAGE_EXTS[ext.toLowerCase().trim()];
 }
 
-module.exports = { getFileName, getFileExtension, getFileNameWithoutExtension, getFileIconType, isImage };
+/*
+
+Unicode's right-to-left overrides in filenames may cause confusion
+and have been exploited for a long time:
+
+* 2011: https://boingboing.net/2011/10/03/unicodes-right-to-left-override-obfuscates-malwares-filenames.html
+* 2014: https://blog.malwarebytes.com/cybercrime/2014/01/the-rtlo-method/
+* 2017: https://securelist.com/zero-day-vulnerability-in-telegram/83800/
+
+As an example, this filename:
+
+    "photo\u202egnp.js"
+
+will be displayed as:
+
+    photojs.png
+
+making the user think this is a PNG picture, while in reality it's a .js file.
+
+To prevent this from being exploited -- specifically, for confusing users
+about the real extension -- we split filename into name and extension parts
+and then sanitize each separately, making sure each \u202e (RIGHT-TO-LEFT OVERRIDE)
+is followed at the end of the part by \u202c (POP DIRECTIONAL FORMATTING)
+which undoes the text direction change. If our sanitization is applied
+to the example above, it would be displayed as:
+
+    photopng.js
+
+*/
+
+// Regex for matching opening Directional Formatting Codes.
+const DFC_RX = /[\u202A-\u202E\u2066-\u2068]/;
+
+function sanitizeBidirectionalFilePart(name) {
+    // Quickly check if name contains characters we're interested in
+    // (only those that push to formatting stack, not pop).
+    if (name.length === 0 || !DFC_RX.test(name)) {
+        return name;
+    }
+
+    let formattingCount = 0;
+    let hadFormattingPop = false;
+    let isolateCount = 0;
+    let hadIsolatePop = false;
+
+    for (let i = 0; i < name.length; i++) {
+        switch (name.charCodeAt(i)) {
+            case 0x202A: // LEFT-TO-RIGHT EMBEDDING
+            case 0x202B: // RIGHT-TO-LEFT EMBEDDING
+            case 0x202D: // LEFT-TO-RIGHT OVERRIDE
+            case 0x202E: // RIGHT-TO-LEFT OVERRIDE
+                formattingCount++;
+                hadFormattingPop = false;
+                break;
+            case 0x202C: // POP DIRECTIONAL FORMATTING
+                if (!hadFormattingPop && formattingCount > 0) {
+                    formattingCount--;
+                }
+                hadFormattingPop = true;
+                break;
+
+            case 0x2066: // LEFT-TO-RIGHT ISOLATE
+            case 0x2067: // RIGHT-TO-LEFT ISOLATE
+            case 0x2068: // FIRST STRONG ISOLATE
+                isolateCount++;
+                hadIsolatePop = false;
+                break;
+            case 0x2069: // POP DIRECTIONAL ISOLATE
+                if (!hadIsolatePop && isolateCount > 0) {
+                    isolateCount--;
+                }
+                hadIsolatePop = true;
+                break;
+            default:
+                // nothing
+        }
+    }
+    // If counts aren't zero, add more pops.
+    while (formattingCount--) {
+        // eslint-disable-next-line
+        name += String.fromCharCode(0x202c); // POP DIRECTIONAL FORMATTING
+    }
+    while (isolateCount--) {
+        // eslint-disable-next-line
+        name += String.fromCharCode(0x2069); // POP DIRECTIONAL ISOLATE
+    }
+
+    return name;
+}
+
+function sanitizeBidirectionalFilename(filename) {
+    // Filename and extension are sanitize separately
+    // to ensure that bad name bidirectional formatting
+    // won't "corrupt" extension, and vice versa.
+    const dotIndex = filename.lastIndexOf('.');
+    if (dotIndex >= 0) {
+        const name = sanitizeBidirectionalFilePart(filename.substring(0, dotIndex));
+        const ext = sanitizeBidirectionalFilePart(filename.substring(dotIndex + 1));
+        return `${name}.${ext}`;
+    }
+    return sanitizeBidirectionalFilePart(filename);
+}
+
+module.exports = {
+    getFileName,
+    getFileExtension,
+    getFileNameWithoutExtension,
+    getFileIconType,
+    isImage,
+    sanitizeBidirectionalFilename
+};

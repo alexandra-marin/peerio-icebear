@@ -40,10 +40,6 @@ class File extends Keg {
      */
     @observable folderId = null;
     /**
-     * @member {string} name
-     */
-    @observable name = '';
-    /**
      * Bytes
      * @member {number} size
      */
@@ -58,6 +54,11 @@ class File extends Keg {
      * @member {string} fileOwner
      */
     @observable fileOwner;
+
+    /**
+     * @member {string} unsanitizedName
+     */
+    @observable unsanitizedName = '';
 
     /**
      * Indicates if last caching attempt failed
@@ -148,6 +149,18 @@ class File extends Keg {
     @observable visibleCounter = 0;
 
     // -- computed properties ------------------------------------------------------------------------------------
+    /**
+     * file name
+     * @member {string} name
+     */
+    @computed get name() {
+        return fileHelper.sanitizeBidirectionalFilename(this.unsanitizedName);
+    }
+
+    set name(name) {
+        this.unsanitizedName = name;
+    }
+
     /**
      * file extension
      * @member {string} ext

@@ -24,8 +24,8 @@ After({ wrapperOptions: { noWrap: true }, timeout: -1 }, async function() {
         // don't care
     }
     await this.app.dispose();
-    const scenarioLog = this.app.logs.join('\n');
-    this.attach(scenarioLog);
+    // const scenarioLog = this.app.logs.join('\n');
+    // this.attach(scenarioLog);
     delete this.app;
     this.filesToCleanup.forEach(f => deleteFile(f));
     if (!cucumbotSuccess) return Promise.reject(new Error('Cucumbot scenario failed'));

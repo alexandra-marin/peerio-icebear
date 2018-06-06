@@ -1,6 +1,7 @@
 const { observable, action, computed, reaction, autorunAsync, isObservableArray, when } = require('mobx');
 const Chat = require('./chat');
 const ChatStorePending = require('./chat-store.pending.js');
+const ChatStoreSpaces = require('./chat-store.spaces.js');
 const socket = require('../../network/socket');
 const tracker = require('../update-tracker');
 const { EventEmitter } = require('eventemitter3');
@@ -28,6 +29,7 @@ const Contact = require('../contacts/contact');
 class ChatStore {
     constructor() {
         this.pending = new ChatStorePending(this);
+        this.spacesHelper = new ChatStoreSpaces(this);
 
         reaction(() => this.activeChat, chat => {
             if (chat) chat.loadMessages();
@@ -55,47 +57,41 @@ class ChatStore {
     };
     /**
      * Events emitter.
-     * @member {EventEmitter}
      * @type {EventEmitter}
      */
     events = new EventEmitter();
 
     /**
      * Working set of chats. Server might have more, but we display only these at any time.
-     * @member {ObservableArray<Chat>} chats
+     * @type {ObservableArray<Chat>}
      */
     @observable.shallow chats = [];
 
     /**
-     * @member {boolean} unreadChatsAlwaysOnTop
-     * @type {boolean} unreadChatsAlwaysOnTop
+     * @type {boolean}
      */
     @observable unreadChatsAlwaysOnTop = false;
 
     /**
      * MyChats Keg
-     * @member {MyChats} myChats
-     * @type {MyChats} myChats
+     * @type {MyChats}
      */
     myChats;
 
     /**
      * To prevent duplicates
-     * @member {{chatId:Chat}}
      * @type {{[chatId : string]: Chat}}
      */
     chatMap = {};
     /**
      * True when chat list loading is in progress.
-     * @member {boolean} loading
-     * @type {boolean} loading
+     * @type {boolean}
      */
     @observable loading = false;
 
     /**
      * True when all chats has been updated after reconnect
-     * @member {boolean} updatedAfterReconnect
-     * @type {boolean} updatedAfterReconnect
+     * @type {boolean}
      */
     @computed get updatedAfterReconnect() {
         return this.chats.every(c => c.updatedAfterReconnect);
@@ -103,27 +99,23 @@ class ChatStore {
 
     /**
      * currently selected/focused chat.
-     * @member {Chat} activeChat
-     * @type {Chat} activeChat
+     * @type {Chat}
      */
     @observable activeChat = null;
     /**
      * Chats set this flag and UI should use it to prevent user from spam-clicking the 'hide' button
-     * @member {boolean} hidingChat
-     * @type {boolean} hidingChat
+     * @type {boolean}
      */
     @observable hidingChat = false;
     /**
      * True when loadAllChats() was called and finished once already.
-     * @member {boolean} loaded
-     * @type {boolean} loaded
+     * @type {boolean}
      */
     @observable loaded = false;
 
     /**
      * Total unread messages in all chats.
-     * @member {number} unreadMessages
-     * @type {number} unreadMessages
+     * @type {number}
      */
     @computed get unreadMessages() {
         return this.chats.reduce((acc, curr) => acc + curr.unreadCount, 0);
@@ -131,8 +123,7 @@ class ChatStore {
 
     /**
      * Subset of ChatStore#chats, contains direct message chats and pending DMs
-     * @member {Array<Chat>} directMessages
-     * @type {Array<Chat>} directMessages
+     * @type {Array<Chat>}
      */
     @computed get directMessages() {
         return this.chats.filter(chat => !chat.isChannel && chat.headLoaded);
@@ -140,17 +131,15 @@ class ChatStore {
 
     /**
      * Subset of ChatStore#chats, contains only channel chats
-     * @member {Array<Chat>} channels
-     * @type {Array<Chat>} channels
+     * @type {Array<Chat>}
      */
     @computed get channels() {
         return this.chats.filter(chat => chat.isChannel && chat.headLoaded);
     }
 
     /**
-     * Does chat store has any channels or not.
-     * @member {boolean} hasChannels
-     * @type {boolean} hasChannels
+     * Does chat store have any channels or not.
+     * @type {boolean}
      */
     @computed get hasChannels() {
         return !!this.channels.length;
@@ -158,8 +147,7 @@ class ChatStore {
 
     /**
      * Number of unread messages and invitations
-     * @member {number} badgeCount
-     * @type {number} badgeCount
+     * @type {number}
      */
     @computed
     get badgeCount() {
@@ -168,8 +156,7 @@ class ChatStore {
 
     /**
      * List of user's channels and invites
-     * @member {Array} allRooms
-     * @type {Array} allRooms
+     * @type {Array}
      */
     @computed
     get allRooms() {
@@ -179,8 +166,32 @@ class ChatStore {
             const second = b.name || b.channelName;
             return first.localeCompare(second);
         });
+
         return allRooms;
     }
+
+    /**
+     * List of chats that don't belong to a space
+     * @type {Array}
+     */
+    @computed
+    get nonSpaceRooms() {
+        return this.allRooms.filter(c => !c.isInSpace);
+    }
+
+    /**
+     * Subset of ChatStore#chats, contains all spaces
+     * @type {Array<Chat>}
+     */
+    get spaces() {
+        return this.spacesHelper.spaces;
+    }
+
+    /**
+     * currently selected/focused space.
+     * @type {string}
+     */
+    @observable activeSpace = null;
 
     /**
      * Does smart and efficient 'in-place' sorting of observable array.
@@ -443,9 +454,19 @@ class ChatStore {
      */
     @action.bound
     switchToFirstChat() {
+        if (config.whiteLabel.name === 'medcryptor' && this.activeSpace) {
+            const active = this.spaces.find(x => x.spaceId === this.activeSpace);
+            const chats = active.internalRooms.concat(active.patientRooms);
+            const chatId = chats.length ? chats[0].id : null;
+            if (chatId) {
+                this.activate(chatId);
+                return;
+            }
+        }
         for (let i = 0; i < this.chats.length; i++) {
             const chat = this.chats[i];
             if (chat.leaving) continue;
+            if (config.whiteLabel.name === 'medcryptor' && chat.isInSpace) continue;
             this.activate(chat.id);
             return;
         }
@@ -459,9 +480,10 @@ class ChatStore {
      * @param {boolean=} isChannel
      * @param {string=} name
      * @param {string=} purpose - only for channels, not relevant for DMs
+     * @param {object=} space - only to create a space
      * @returns {?Chat} - can return null in case of paywall
      */
-    @action async startChat(participants = [], isChannel = false, name, purpose, noActivate) {
+    @action async startChat(participants = [], isChannel = false, name, purpose, noActivate, space = null) {
         const cached = isChannel ? null : this.findCachedChatWithParticipants(participants);
         if (cached) {
             if (!noActivate) this.activate(cached.id);
@@ -486,6 +508,7 @@ class ChatStore {
             await chat.loadMetadata();
             if (!noActivate) this.activate(chat.id);
             if (name) await chat.rename(name);
+            if (space) await chat.setSpace(space);
             if (purpose) await chat.changePurpose(purpose);
             if (isChannel) {
                 chat.addParticipants(this.getSelflessParticipants(participants));

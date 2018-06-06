@@ -1,11 +1,23 @@
 const { Then, When } = require('cucumber');
 const { getRandomUsername, getRandomEmail } = require('../helpers/random-data');
+const { waitForEmail } = require('../helpers/maildrop');
+const testConfig = require('../test-config');
 
 async function findContact(query) {
     const contact = ice.contactStore.getContact(query);
     await this.waitFor(() => contact.loading === false, 5000);
     contact.notFound.should.be.false;
     return contact;
+}
+
+async function inviteRandomEmail(world) {
+    world.invitedEmail = getRandomEmail();
+    await world.ice.contactStore.invite(world.invitedEmail);
+}
+
+async function inviteRandomEmailWithTemplate(template, world) {
+    world.invitedEmail = getRandomEmail();
+    await world.ice.contactStore.invite(world.invitedEmail, template);
 }
 
 Then('I can not find unregistered account by random username', function() {
@@ -48,8 +60,8 @@ When('the test account is not my favorite contact', function() {
     c.isAdded.should.be.false;
 });
 
-When('I invite random email', function() {
-    this.invitedEmail = getRandomEmail();
+When('I invite random email', async function() {
+    await inviteRandomEmail(this);
     return ice.contactStore.invite(this.invitedEmail);
 });
 
@@ -73,4 +85,38 @@ Then('I don\'t have pending dm', async function() {
     await this.waitFor(() => !c.loading, 5000);
     expect(!!this.ice.chatStore.directMessages.find(
         chat => chat.isInvite && chat.username === c.username)).to.be.false;
+});
+
+When('I invite someone to Peerio', async function() {
+    return inviteRandomEmailWithTemplate('peerio', this);
+});
+
+When('I invite a MedCryptor doctor', async function() {
+    return inviteRandomEmailWithTemplate('medcryptor-doctor', this);
+});
+
+When('I invite a MedCryptor patient', function() {
+    return inviteRandomEmailWithTemplate('medcryptor-patient', this);
+});
+
+Then('they receive Peerio templated email', { timeout: 120000 }, async function() {
+    return waitForEmail(this.invitedEmail, testConfig.inviteEmailSubject);
+});
+
+Then('they receive MedCryptor doctor templated email', { timeout: 120000 }, async function() {
+    return waitForEmail(this.invitedEmail, testConfig.inviteEmailSubjectMCDoctor);
+});
+
+Then('they receive MedCryptor patient templated email', { timeout: 120000 }, async function() {
+    return waitForEmail(this.invitedEmail, testConfig.inviteEmailSubjectMCPatient);
+});
+
+Then('Peerio invites default to Peerio templated email', { timeout: 120000 }, async function() {
+    await inviteRandomEmail(this);
+    await waitForEmail(this.invitedEmail, testConfig.inviteEmailSubject);
+});
+
+Then('MedCryptor invites default to doctor templated email', { timeout: 120000 }, async function() {
+    await inviteRandomEmail(this);
+    await waitForEmail(this.invitedEmail, testConfig.inviteEmailSubjectMCDoctor);
 });

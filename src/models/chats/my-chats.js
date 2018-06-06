@@ -8,12 +8,12 @@ const { getUser } = require('../../helpers/di-current-user');
 class MyChats extends SyncedKeg {
     /**
      * Favorite chat ids
-     * @member {Array<string>}
+     * @type {Array<string>}
      */
     favorites = [];
     /**
      * Hidden chat ids
-     * @member {Array<string>}
+     * @type {Array<string>}
      */
     hidden = [];
 

@@ -129,6 +129,8 @@ const stringExists = pair(isNonEmptyString, 'error_fieldRequired');
 const firstNameReserved = pair(isValidSignupFirstName, 'error_invalidName');
 const lastNameReserved = pair(isValidSignupLastName, 'error_invalidName');
 const valueEquality = pair(areEqualValues, 'error_mustMatch');
+const isValidMcrAhpra = isValid('medcryptor', 'ahpra');
+const mcrAhpraAvailability = pair(isValidMcrAhpra, 'mcr_error_ahrpa');
 
 const validators = {
     /* available validators:
@@ -149,6 +151,7 @@ const validators = {
     usernameLogin: [usernameFormat, usernameExistence],
     firstName: [stringExists, firstNameReserved],
     lastName: [stringExists, lastNameReserved],
+    mcrAhpraAvailability,
     valueEquality,
     isValidSignupEmail,
     isValidSignupFirstName,

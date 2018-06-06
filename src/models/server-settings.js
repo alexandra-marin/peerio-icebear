@@ -11,23 +11,23 @@ const { retryUntilSuccess } = require('../helpers/retry');
 class ServerSettings {
     /**
      * Observable base url for avatars https service
-     * @member {string} avatarServer
+     * @type {string}
      */
     @observable avatarServer = '';
     /**
      * Observable client version range this server can work with.
-     * @member {string} acceptableClientVersions
+     * @type {string}
      */
     @observable.ref acceptableClientVersions;
     /**
      * Observable git tag for this server build
-     * @member {string} tag
+     * @type {string}
      */
     @observable tag;
 
     /**
      * Observable array of timestamps for maintenance begin and end, if applicable.
-     * @member {Array} downtimeMaintenance
+     * @type {Array}
      */
     @observable maintenanceWindow;
 

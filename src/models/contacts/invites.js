@@ -9,12 +9,12 @@ const _ = require('lodash');
  */
 class Invites extends SyncedKeg {
     /**
-     * @member {Array<InvitedContact>}
+     * @type {Array<InvitedContact>}
      */
     issued = [];
     /**
      * Usernames of users invited us before we created an account.
-     * @member {Array<string>}
+     * @type {Array<string>}
      */
     received = [];
     constructor() {

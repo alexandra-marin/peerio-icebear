@@ -88,30 +88,30 @@ class SharedDbBootKeg extends SyncedKeg {
      * Extracted from payload, most recent key to use for encryption.
      * The trick here is that this property will only get updated after new keg key
      * if it was added, is successfully saved to server.
-     * @member {Uint8Array}
+     * @type {Uint8Array}
      */
     kegKey;
     /**
      * Most recent key id
-     * @member {string}
+     * @type {string}
      */
     kegKeyId;
     /**
      * Extracted from payload to use for decryption.
-     * @member {{keyId: { createdAt: number, key: Uint8Array } }}
+     * @type {{keyId: { createdAt: number, key: Uint8Array } }}
      */
     keys = {};
 
     /**
      * List of usernames who have access to the shared DB currently.
      * This includes users pending join confirmation.
-     * @member {Array<Contact>} participants
+     * @type {Array<Contact>}
      */
     @observable.shallow participants = [];
 
     /**
      * Subset of `this.participants`.
-     * @member {Array<Contact>} admins
+     * @type {Array<Contact>}
      */
     @observable.shallow admins = [];
 

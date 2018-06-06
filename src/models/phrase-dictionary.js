@@ -51,7 +51,7 @@ class PhraseDictionary {
     }
     /**
      * Last chosen dictionary.
-     * @member {PhraseDictionary}
+     * @type {PhraseDictionary}
      */
     static current;
 

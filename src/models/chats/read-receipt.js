@@ -10,12 +10,12 @@ const Keg = require('../kegs/keg');
 class ReadReceipt extends Keg {
     /**
      * Id of the last read message
-     * @member {number}
+     * @type {number}
      */
     @observable chatPosition;
     /**
      * true if this receipt's name doesn't match keg owner.
-     * @member {bool}
+     * @type {bool}
      */
     receiptError;
 

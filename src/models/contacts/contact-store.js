@@ -14,6 +14,7 @@ const { getChatStore } = require('../../helpers/di-chat-store');
 const tofuStore = require('./tofu-store');
 const { asPromise } = require('../../helpers/prombservable');
 const { retryUntilSuccess } = require('../../helpers/retry');
+const ContactStoreWhitelabel = require('./contact-store.whitelabel');
 
 /**
  * Contact store handles all Peerio users you(your app) are in some contact with,
@@ -23,17 +24,17 @@ const { retryUntilSuccess } = require('../../helpers/retry');
 class ContactStore {
     /**
      * All peerio users your app encounters end up here (except invited by email, they're non-peerio users).
-     * @member {ObservableArray<Contact>} contacts
+     * @type {ObservableArray<Contact>}
      */
     @observable.shallow contacts = [];
     /**
      * My contacts keg.
-     * @member {MyContacts}
+     * @type {MyContacts}
      */
     @observable.ref myContacts;
     /**
      * Invites keg.
-     * @member {MyContacts}
+     * @type {MyContacts}
      */
     invites;
     _requestMap = {};
@@ -41,7 +42,7 @@ class ContactStore {
 
     /**
      * Favorite Contacts.
-     * @member {ObservableArray<Contact>} addedContacts
+     * @type {ObservableArray<Contact>}
      */
     @computed get addedContacts() {
         return this.contacts.filter(c => c.isAdded);
@@ -49,30 +50,30 @@ class ContactStore {
 
     /**
      * Invited contacts.
-     * @member {ObservableArray<InvitedContacts>} invitedContacts
+     * @type {ObservableArray<InvitedContacts>}
      */
     @observable.shallow invitedContacts = [];
 
     /**
      * options: firstName, lastName, username
-     * @member {string} uiViewSortBy
+     * @type {string}
      */
     @observable uiViewSortBy = 'firstName';
     /**
      * options: added, all
-     * @member {string} uiViewFilter
+     * @type {string}
      */
     @observable uiViewFilter = 'added';
     /**
      * Any string to search in user's names.
      * Set to `''` to clear search.
-     * @member {string} uiViewSearchQuery
+     * @type {string}
      */
     @observable uiViewSearchQuery = '';
 
     /**
      * Contact object instance for current user
-     * @member {Contact} currentUser
+     * @type {Contact}
      */
     currentUser;
 
@@ -81,7 +82,6 @@ class ContactStore {
     };
     /**
      * Events emitter.
-     * @member {EventEmitter}
      * @type {EventEmitter}
      */
     events = new EventEmitter();
@@ -111,7 +111,7 @@ class ContactStore {
 
     /**
      * Helper data view to simplify sorting and filtering.
-     * @member {Array<{letter:string, items:Array<Contact>}>} uiView
+     * @type {Array<{letter:string, items:Array<Contact>}>}
      */
     @computed get uiView() {
         let ret;
@@ -160,6 +160,7 @@ class ContactStore {
         intercept(this, 'uiViewSortBy', this._checkSortValue);
         intercept(this, 'uiViewFilter', this._checkFilterValue);
         this._contactMap = createMap(this.contacts, 'username').map;
+        this.whitelabel = new ContactStoreWhitelabel(this);
         socket.onceAuthenticated(() => {
             this.myContacts = new MyContacts();
             this.myContacts.onUpdated = this.applyMyContactsData;
@@ -412,8 +413,8 @@ class ContactStore {
      * @param {string} email
      * @returns {Promise}
      */
-    invite(email) {
-        return socket.send('/auth/contacts/invite', { email })
+    invite(email, context) {
+        return this.inviteNoWarning(email, context)
             .then(() => {
                 warnings.add('snackbar_contactInvited');
             })
@@ -427,8 +428,8 @@ class ContactStore {
      * @param {string} email
      * @returns {Promise}
      */
-    inviteNoWarning(email) {
-        return socket.send('/auth/contacts/invite', { email });
+    inviteNoWarning(email, context) {
+        return socket.send('/auth/contacts/invite', { email, context });
     }
 
     _merge(usernames) {

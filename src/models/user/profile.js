@@ -15,7 +15,8 @@ class Profile extends Keg {
         return {
             firstName: this.user.firstName.trim(),
             lastName: this.user.lastName.trim(),
-            locale: this.user.locale.trim()
+            locale: this.user.locale.trim(),
+            props: this.user.props
         };
     }
 
@@ -26,6 +27,7 @@ class Profile extends Keg {
         this.user.locale = data.locale;
         this.user.isDeleted = data.deleted;
         this.user.email = data.primaryAddressValue;
+        this.user.props = data.props;
         // don't needs this currently
         // this.user.primaryAddressType = data.primaryAddressType;
         (data.addresses || []).forEach(a => {

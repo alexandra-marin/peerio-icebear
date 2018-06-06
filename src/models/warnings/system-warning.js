@@ -17,7 +17,7 @@ class SystemWarning {
 
     /**
      * Observable current life cycle state.
-     * @member {number} state
+     * @type {number}
      */
     @observable state = SystemWarning.STATES.QUEUED
 

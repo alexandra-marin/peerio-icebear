@@ -31,27 +31,31 @@ class File extends Keg {
 
     /**
      * System-wide unique client-generated id
-     * @member {string} fileId
+     * @type {string}
      */
     @observable fileId = null;
     /**
      * Folder id
-     * @member {string} folderId
+     * @type {string}
      */
     @observable folderId = null;
     /**
+     * @type {string}
+     */
+    @observable name = '';
+    /**
      * Bytes
-     * @member {number} size
+     * @type {number}
      */
     @observable size = 0;
     /**
-     * @member {number} uploadedAt
+     * @type {number}
      */
     @observable uploadedAt = null;
 
     /**
      * Username uploaded this file.
-     * @member {string} fileOwner
+     * @type {string}
      */
     @observable fileOwner;
 
@@ -70,37 +74,37 @@ class File extends Keg {
     /**
      * When this is 'true' file is ready to be downloaded. Upload finishes before that,
      * then server needs some time to process file.
-     * @member {boolean} readyForDownload
+     * @type {boolean}
      */
     @observable readyForDownload = false;
     /**
-     * @member {boolean} uploading
+     * @type {boolean}
      */
     @observable uploading = false;
     /**
-     * @member {boolean} downloading
+     * @type {boolean}
      */
     @observable downloading = false;
     /**
      * Upload or download progress value in bytes. Note that when uploading it doesn't count overhead.
-     * @member {number} progress
+     * @type {number}
      */
     @observable progress = 0;
     /**
      * File size with overhead for downloads and without overhead for uploads.
-     * @member {number} progressMax
+     * @type {number}
      */
     @observable progressMax = 0;
 
     /**
      * currently mobile only: flag means file was downloaded and is available locally
-     * @member {boolean} cached
+     * @type {boolean}
      */
     @observable cached = false;
 
     /**
      * file was downloaded for inline image display
-     * @member {boolean} tmpCached
+     * @type {boolean}
      */
     @observable tmpCached = false;
 
@@ -108,7 +112,7 @@ class File extends Keg {
      * File was uploaded in this session from this device
      * and we saved it's original upload path. Useful for preview
      * launch
-     * @member {String} originalUploadPath
+     * @type {String}
      */
     @observable originalUploadPath;
 
@@ -117,7 +121,7 @@ class File extends Keg {
      * It was cached for inline image view, uploaded during this session
      * or downloaded manually by user
      * TODO: REVIEW THIS AFTER NEWFS MERGE
-     * @member {String} originalUploadPath
+     * @type {String}
      */
     get hasFileAvailableForPreview() {
         return this.originalUploadPath || this.cached || this.tmpCached;
@@ -127,24 +131,24 @@ class File extends Keg {
      * Is this file selected in file pickers for group operations.
      * It's a bit weird mix of UI state and logic, but it works fine at the moment,
      * we'll rethink it when we implement folders.
-     * @member {boolean} selected
+     * @type {boolean}
      */
     @observable selected = false;
     /**
      * Is this file visible or filtered by search. Also weird, needs refactor.
-     * @member {boolean} show
+     * @type {boolean}
      */
     @observable show = true;
 
     /**
      * Is this file currently shared with anyone.
-     * @member {boolean} shared
+     * @type {boolean}
      */
     @observable shared = false;
 
     /**
      * Amount of visual components which display this file currently
-     * @member {number} visibleCounter
+     * @type {number}
      */
     @observable visibleCounter = 0;
 
@@ -163,7 +167,7 @@ class File extends Keg {
 
     /**
      * file extension
-     * @member {string} ext
+     * @type {string}
      */
     @computed get ext() {
         return fileHelper.getFileExtension(this.name);
@@ -171,7 +175,7 @@ class File extends Keg {
 
     /**
      * file icon type
-     * @member {string} ext
+     * @type {string}
      */
     @computed get iconType() {
         return fileHelper.getFileIconType(this.ext);
@@ -181,7 +185,7 @@ class File extends Keg {
      * which folder is this file located in
      * default: undefined (folders have not been loaded)
      * null: file is in the root folder
-     * @member {FileFolder} folder
+     * @type {FileFolder}
      */
     @computed get folder() {
         const folder = this.store.folderStore.getById(this.folderId);
@@ -196,7 +200,7 @@ class File extends Keg {
     descriptorVersion = 0;
 
     /**
-     * @member {string} nameWithoutExt
+     * @type {string}
      */
     @computed get nameWithoutExtension() {
         return fileHelper.getFileNameWithoutExtension(this.name);
@@ -214,7 +218,7 @@ class File extends Keg {
     }
     /**
      * currently mobile only: Full path to locally stored file
-     * @member {string} cachePath
+     * @type {string}
      */
     @computed get cachePath() {
         if (!config.isMobile) return null;
@@ -224,28 +228,28 @@ class File extends Keg {
     }
     /**
      * Human readable file size
-     * @member {string} sizeFormatted
+     * @type {string}
      */
     @computed get sizeFormatted() {
         return util.formatBytes(this.size);
     }
 
     /**
-     * @member {number} chunksCount
+     * @type {number}
      */
     @computed get chunksCount() {
         return Math.ceil(this.size / this.chunkSize);
     }
 
     /**
-     * @member {boolean} canShare
+     * @type {boolean}
      */
     @computed get canShare() {
         return this.format === 1;
     }
     /**
      * Bytes
-     * @member {number}
+     * @type {number}
      */
     get sizeWithOverhead() {
         return this.size + this.chunksCount * config.CHUNK_OVERHEAD;

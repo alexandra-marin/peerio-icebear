@@ -13,23 +13,23 @@ class Tofu extends Keg {
     }
 
     /**
-     * @member {string}
+     * @type {string}
      */
     username;
     /**
-     * @member {string}
+     * @type {string}
      */
     firstName;
     /**
-     * @member {string}
+     * @type {string}
      */
     lastName;
     /**
-     * @member {Uint8Array}
+     * @type {Uint8Array}
      */
     encryptionPublicKey;
     /**
-     * @member {Uint8Array}
+     * @type {Uint8Array}
      */
     signingPublicKey;
 

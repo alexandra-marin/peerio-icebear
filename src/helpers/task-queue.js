@@ -12,17 +12,17 @@ class TaskQueue {
     paused = false;
     /**
      * List of tasks in queue. Running tasks are not here.
-     * @member {ObservableArray<function>} tasks
+     * @type {ObservableArray<function>}
      */
     @observable.shallow waitingTasks = [];
     /**
      * Amount of currently running tasks
-     * @member {Observable<number>} runningTasks
+     * @type {Observable<number>}
      */
     @observable runningTasks = 0;
     /**
      * Amount of currently running tasks + tasks in queue
-     * @member {Computed<number>} length
+     * @type {Computed<number>}
      */
     @computed get length() {
         return this.waitingTasks.length + this.runningTasks;

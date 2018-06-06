@@ -15,6 +15,7 @@ const warnings = require('../warnings');
 const Contact = require('../contacts/contact');
 const chatInviteStore = require('../chats/chat-invite-store');
 const { asPromise } = require('../../helpers/prombservable');
+const { cryptoUtil } = require('../../crypto');
 // const volumeStore = require('../volumes/volume-store');
 
 // to assign when sending a message and don't have an id yet
@@ -62,18 +63,18 @@ class Chat {
 
     /**
      * Chat id
-     * @member {?string} id
+     * @type {?string}
      */
     @observable id = null;
 
     /**
      * Render these messages.
-     * @member {ObservableArray<Message>} messages
+     * @type {ObservableArray<Message>}
      */
     @observable.shallow messages = [];
     /**
      * Render these messages at the bottom of the chat, they don't have Id yet, you can use tempId.
-     * @member {ObservableArray<Message>} limboMessages
+     * @type {ObservableArray<Message>}
      */
     @observable.shallow limboMessages = [];
 
@@ -89,7 +90,7 @@ class Chat {
     /**
      * All participants, including awaiting for invite accept or removal after leave.
      * Including current user.
-     * @member {ObservableArray<Contact>} allParticipants
+     * @type {ObservableArray<Contact>}
      */
     @computed get allParticipants() {
         if (!this.db.boot || !this.db.boot.participants) return [];
@@ -99,7 +100,7 @@ class Chat {
     /**
      * Participants, including awaiting for invite accept or removal after leave.
      * Excluding current user.
-     * @member {ObservableArray<Contact>} otherParticipants
+     * @type {ObservableArray<Contact>}
      */
     @computed get otherParticipants() {
         return this.allParticipants.filter(p => p.username !== User.current.username);
@@ -107,7 +108,7 @@ class Chat {
 
     /**
      * The username of the person you're having a DM with
-     * @member {string} dmPartnerUsername
+     * @type {string}
      */
     @computed get dmPartnerUsername() {
         if (this.isChannel) {
@@ -123,7 +124,7 @@ class Chat {
      * Room api. For DM will work too, but doesn't make sense, just use 'allParticipants'
      * Includes only currently joined room participants and current user.
      * Excludes users awaiting to accept invite or get removed after leave.
-     * @member {Array<Contact>} allJoinedParticipants
+     * @type {Array<Contact>}
      */
     @computed get allJoinedParticipants() {
         const filtered = this.allParticipants.slice();
@@ -140,111 +141,111 @@ class Chat {
 
     /**
      * If true - chat is not ready for anything yet.
-     * @member {boolean} loadingMeta
+     * @type {boolean}
      */
     @observable loadingMeta = false;
     /**
-     * @member {boolean} metaLoaded
+     * @type {boolean}
      */
     @observable metaLoaded = false;
 
 
     /**
      * This can happen when chat was just added or after reset()
-     * @member {boolean} loadingInitialPage
+     * @type {boolean}
      */
     @observable loadingInitialPage = false;
     /**
      * Ready to render messages.
-     * @member {boolean} initialPageLoaded
+     * @type {boolean}
      */
     @observable initialPageLoaded = false;
     /**
      * Ready to render most recent message contents in chat list.
-     * @member {boolean} mostRecentMessageLoaded
+     * @type {boolean}
      */
     @observable mostRecentMessageLoaded = false;
     /**
-     * @member {boolean} loadingTopPage
+     * @type {boolean}
      */
     @observable loadingTopPage = false;
     /**
-     * @member {boolean} loadingBottomPage
+     * @type {boolean}
      */
     @observable loadingBottomPage = false;
 
 
     /**
      * can we go back in history from where we are? (load older messages)
-     * @member {boolean} canGoUp
+     * @type {boolean}
      */
     @observable canGoUp = false;
     /**
      * can we go forward in history or we have the most recent data loaded
-     * @member {boolean} canGoDown
+     * @type {boolean}
      */
     @observable canGoDown = false;
 
     /**
      * currently selected/focused in UI
-     * @member {boolean} active
+     * @type {boolean}
      */
     @observable active = false;
 
     /**
      * Is this chat instance added to chat list already or not
-     * @member {boolean} active
+     * @type {boolean}
      */
     @observable added = false;
 
     /**
-     * @member {boolean} isFavorite
+     * @type {boolean}
      */
     @observable isFavorite = false;
 
     /**
      * Prevent spamming 'Favorite' button in GUI.
-     * @member {boolean} changingFavState
+     * @type {boolean}
      */
     @observable changingFavState = false;
 
     /**
      * Will be set to `true` after leave() is called on the channel so UI can react until channel is actually removed.
-     * @member {boolean} leaving
+     * @type {boolean}
      */
     @observable leaving = false;
 
     /**
      * Will be set to `true` after update logic is done on reconnect.
-     * @member {boolean} updatedAfterReconnect
+     * @type {boolean}
      */
     @observable updatedAfterReconnect = true;
 
     /**
      * list of files being uploaded to this chat.
-     * @member {ObservableArray<File>} uploadQueue
+     * @type {ObservableArray<File>}
      */
     @observable.shallow uploadQueue = [];
     /**
      * Unread message count in this chat.
-     * @member {number} unreadCount
+     * @type {number}
      */
     @observable unreadCount = 0;
     /**
      * when user is not looking but chat is active and receiving updates,
      * chat briefly sets this value to the id of last seen message so client can render separator marker.
-     * @member {string} newMessagesMarkerPos
+     * @type {string}
      */
     @observable newMessagesMarkerPos = '';
     /**
      * Indicates ongoing loading recent files list for this chat
-     * @member {bool} loadingRecentFiles
+     * @type {bool}
      */
     @observable loadingRecentFiles = false;
     @observable _recentFiles = null;
     /**
      * List of recent file ids for this chat.
-     * @member {Array<string>} recentFiles
+     * @type {Array<string>}
      */
     @computed get recentFiles() {
         if (this._recentFiles === null && !this.loadingRecentFiles) {
@@ -262,7 +263,7 @@ class Chat {
     /**
      * Chat head keg.
      * Observable, because `this.name` relies on it
-     * @member {?ChatHead} chatHead
+     * @type {?ChatHead}
      */
     @observable.ref chatHead;
     _messageHandler = null;
@@ -274,7 +275,7 @@ class Chat {
 
     _reactionsToDispose = [];
     /**
-     * @member {boolean} isReadOnly
+     * @type {boolean}
      */
     @computed get isReadOnly() {
         if (this.isChannel) return false;
@@ -284,14 +285,14 @@ class Chat {
 
     /**
      * Includes current user.
-     * @member {Array<string>} participantUsernames
+     * @type {Array<string>}
      */
     @computed get participantUsernames() {
         return this.allParticipants.map(p => p.username);
     }
 
     /**
-     * @member {string} name
+     * @type {string}
      */
     @computed get name() {
         if (this.isChannel && this.chatHead && this.chatHead.chatName) return this.chatHead.chatName;
@@ -301,14 +302,21 @@ class Chat {
     }
 
     /**
-     * @member {string} purpose
+     * @type {string}
      */
     @computed get purpose() {
         return this.chatHead && this.chatHead.purpose || '';
     }
 
     /**
-     * @member {string} headLoaded
+     * @type {bool}
+     */
+    @computed get isInSpace() {
+        return !!this.chatHead && !!this.chatHead.spaceId;
+    }
+
+    /**
+     * @type {string}
      */
     @computed get headLoaded() {
         return !!(this.chatHead && this.chatHead.loaded);
@@ -316,7 +324,7 @@ class Chat {
 
     /**
      * User should not be able to send multiple ack messages in a row. We don't limit it on SDK level, but GUIs should.
-     * @member {boolean} canSendAck
+     * @type {boolean}
      */
     @computed get canSendAck() {
         if (this.limboMessages.length) {
@@ -335,7 +343,7 @@ class Chat {
 
     /**
      * User should not be able to send multiple video call messages in a row. Similar setup to ack throttling.
-     * @member {boolean} canSendJitsi
+     * @type {boolean}
      */
     @computed get canSendJitsi() {
         if (this.limboMessages.length) {
@@ -357,7 +365,7 @@ class Chat {
 
     /**
      * Don't render message marker if this is false.
-     * @member {boolean} showNewMessagesMarker
+     * @type {boolean}
      */
     @computed get showNewMessagesMarker() {
         if (!this.newMessagesMarkerPos) return false;
@@ -369,7 +377,7 @@ class Chat {
 
     /**
      * True if current user is an admin of this chat.
-     * @member {boolean} canIAdmin
+     * @type {boolean}
      */
     @computed get canIAdmin() {
         if (!this.isChannel) return true;
@@ -381,7 +389,7 @@ class Chat {
 
     /**
      * True if current user can leave the channel. (Last admin usually can't)
-     * @member {boolean} canILeave
+     * @type {boolean}
      */
     @computed get canILeave() {
         if (!this.isChannel) return false;
@@ -391,21 +399,21 @@ class Chat {
 
 
     /**
-     * @member {?Message} mostRecentMessage
+     * @type {?Message}
      */
     @observable mostRecentMessage;
 
     /**
      * UI flag for chats created from chat-pending-dms
      * Will be set to true if it was for user who just signed up
-     * @member {boolean} isChatCreatedFromPendingDM
+     * @type {boolean}
      */
     @observable isChatCreatedFromPendingDM;
 
     /**
      * UI flag for chats where user is a new user who accepted an invite to join
      * Will be set to true in a DM with the user who invited this user
-     * @member {boolean} isNewUserFromInvite
+     * @type {boolean}
      */
     @observable isNewUserFromInvite;
 
@@ -781,6 +789,20 @@ class Chat {
     }
 
     /**
+     * @param {string} name - name to appear for MC admin users
+     */
+    renameInSpace(name = '') {
+        const validated = name.trim().substr(0, config.chat.maxChatNameLength);
+
+        if (this.chatHead.nameInSpace === validated || (!this.chatHead.nameInSpace && !validated)) {
+            return Promise.resolve(); // nothing to rename
+        }
+        return this.chatHead.save(() => {
+            this.chatHead.nameInSpace = validated;
+        }, null, 'error_chatRename');
+    }
+
+    /**
      * @param {string} purpose - pass empty string to remove chat purpose
      */
     changePurpose(purpose) {
@@ -797,6 +819,27 @@ class Chat {
                 m.setPurposeChangeFact(validated);
                 return this._sendMessage(m);
             });
+    }
+
+    /**
+     * @param {object} space - contains id, name, description, type
+     */
+    setSpace(space) {
+        const validated = space;
+        if (!space.spaceId) {
+            validated.spaceId = cryptoUtil.getRandomGlobalShortIdHex();
+        }
+        validated.spaceName = space.spaceName.trim().substr(0, config.chat.maxChatNameLength);
+        validated.nameInSpace = space.nameInSpace.trim().substr(0, config.chat.maxChatNameLength);
+        validated.spaceDescription = space.spaceDescription.trim().substr(0, config.chat.maxChatPurposeLength);
+
+        return this.chatHead.save(() => {
+            this.chatHead.spaceId = validated.spaceId;
+            this.chatHead.spaceName = validated.spaceName;
+            this.chatHead.nameInSpace = validated.nameInSpace;
+            this.chatHead.spaceDescription = validated.spaceDescription;
+            this.chatHead.spaceRoomType = validated.spaceRoomType;
+        }, null, 'title_error');
     }
 
     /**

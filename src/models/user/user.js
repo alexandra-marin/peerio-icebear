@@ -30,7 +30,7 @@ let currentUser;
 class User {
     _username = '';
     /**
-     * @member {string} username
+     * @type {string}
      */
     get username() {
         return this._username;
@@ -41,72 +41,75 @@ class User {
     }
     // -- profile data
     /**
-     * @member {string} firstName
+     * @type {string}
      */
     @observable firstName = '';
     /**
-     * @member {string} lastName
+     * @type {string}
      */
     @observable lastName = '';
     /**
-     * @member {string} email
+     * @type {string}
      */
     @observable email = '';
     /**
-     * @member {string} locale
+     * @type {string}
      */
     @observable locale = 'en';
     /**
      * Currently unused, maybe we will bring passcodes back eventually
-     * @member {boolean} passcodeIsSet
+     * @type {boolean}
      */
     @observable passcodeIsSet = false;
     /**
      * Quota object as received from server, it has complex and weird format.
      * You don't need to use this directly, use computed properties that are based on this.
-     * @member {Object} quota
+     * @type {Object}
      */
     @observable quota = null;
     /**
      * Sets to `true` when profile is loaded for the first time and is not empty anymore.
-     * @member {boolean} profileLoaded
+     * @type {boolean}
      */
     @observable profileLoaded = false;
     /**
-     * @member {Array<Address>} addresses
+     * @type {Array<Address>}
      */
     @observable.ref addresses = [];
     /**
-     * @member {boolean} primaryAddressConfirmed
+     * @type {boolean}
      */
     @observable primaryAddressConfirmed = false;
     /**
-     * @member {boolean} deleted
+     * @type {boolean}
      */
     @observable deleted = false;
     /**
-     * @member {boolean} blacklisted
+     * @type {boolean}
      */
     @observable blacklisted = false;
     /**
      * Don't try to upload another avatar while this is `true`
-     * @member {boolean} savingAvatar
+     * @type {boolean}
      */
     @observable savingAvatar = false;
     /**
      * UI-controlled flag, Icebear doesn't use it
-     * @member {boolean} autologinEnabled
+     * @type {boolean}
      */
     @observable autologinEnabled = false;
     /**
      * UI-controlled flag, Icebear doesn't use it
-     * @member {boolean} secureWithTouchID
+     * @type {boolean}
      */
     @observable secureWithTouchID = false;
-
+    /**
+     * @type {string}
+     */
+    props = {};
     /**
      * Indicates 2fa state on current user.
-     * @member {boolean} twoFAEnabled
+     * @type {boolean}
      */
     @observable twoFAEnabled = false;
 
@@ -114,13 +117,13 @@ class User {
     /**
      * Indicates device trust if 2fa is enabled.
      *
-     * @member {boolean|undefined} trustedDevice
+     * @type {boolean|undefined}
      */
     @observable trustedDevice = undefined;
 
     /**
      * Computed `firstName+' '+lastName`
-     * @member {string} fullName
+     * @type {string}
      */
     @computed get fullName() {
         let ret = '';
@@ -133,38 +136,38 @@ class User {
     }
     /**
      * Account creation timestamp. Is null until `profileLoaded != true`.
-     * @member {number}
+     * @type {number}
      */
     createdAt = null;
     // -- key data
     /**
-     * @member {string}
+     * @type {string}
      */
     passphrase;
     /**
-     * @member {Uint8Array}
+     * @type {Uint8Array}
      */
     authSalt;
     /**
      * Key for SELF database boot keg.
-     * @member {Uint8Array}
+     * @type {Uint8Array}
      */
     bootKey;
     /**
-     * @member {KeyPair}
+     * @type {KeyPair}
      */
     authKeys;
     /**
-     * @member {KeyPair}
+     * @type {KeyPair}
      */
     signKeys;
     /**
-     * @member {KeyPair}
+     * @type {KeyPair}
      */
     encryptionKeys;
     /**
      * Key for SELF keg database.
-     * @member {Uint8Array}
+     * @type {Uint8Array}
      */
     kegKey;
     /**
@@ -178,7 +181,7 @@ class User {
 
     /**
      * Most recently used emoji.
-     * @member {MRUList}
+     * @type {MRUList}
      */
     emojiMRU = new MRUList('emojiPicker', 30);
 
@@ -194,7 +197,7 @@ class User {
 
     /**
      * All current active plan names
-     * @member {Array<string>} activePlans
+     * @type {Array<string>}
      */
     @computed get activePlans() {
         if (this.quota == null || this.quota.quotas === null) return [];
@@ -205,7 +208,7 @@ class User {
 
     /**
      * Total amounts of bytes user can upload.
-     * @member {number} fileQuotaTotal
+     * @type {number}
      */
     @computed get fileQuotaTotal() {
         if (this.quota == null || !this.quota.resultingQuotas
@@ -221,7 +224,7 @@ class User {
 
     /**
      * Formatted total amounts of bytes user can upload.
-     * @member {string} fileQuotaTotalFmt
+     * @type {string}
      */
     @computed get fileQuotaTotalFmt() {
         return formatBytes(this.fileQuotaTotal);
@@ -229,7 +232,7 @@ class User {
 
     /**
      * Free bytes left for uploads.
-     * @member {number} fileQuotaLeft
+     * @type {number}
      */
     @computed get fileQuotaLeft() {
         if (this.quota == null || !this.quota.quotasLeft
@@ -243,7 +246,7 @@ class User {
 
     /**
      * Formatted bytes left for uploads.
-     * @member {string} fileQuotaLeftFmt
+     * @type {string}
      */
     @computed get fileQuotaLeftFmt() {
         return formatBytes(this.fileQuotaLeft);
@@ -251,7 +254,7 @@ class User {
 
     /**
      * Maximum file size user can upload.
-     * @member {number} fileSizeLimit
+     * @type {number}
      */
     @computed get fileSizeLimit() {
         if (this.quota == null
@@ -268,7 +271,7 @@ class User {
 
     /**
      * Formatted maximum file size user can upload.
-     * @member {number} fileSizeLimitFmt
+     * @type {number}
      */
     @computed get fileSizeLimitFmt() {
         return formatBytes(this.fileSizeLimit);
@@ -276,7 +279,7 @@ class User {
 
     /**
      * Used bytes in storage.
-     * @member {number} fileQuotaUsed
+     * @type {number}
      */
     @computed get fileQuotaUsed() {
         return this.fileQuotaTotal - this.fileQuotaLeft;
@@ -284,7 +287,7 @@ class User {
 
     /**
      * Formatted used bytes in storage.
-     * @member {number} fileQuotaUsedFmt
+     * @type {number}
      */
     @computed get fileQuotaUsedFmt() {
         return formatBytes(this.fileQuotaUsed);
@@ -292,7 +295,7 @@ class User {
 
     /**
      * Amount of % used bytes in storage.
-     * @member {number} fileQuotaUsedPercent
+     * @type {number}
      */
     @computed get fileQuotaUsedPercent() {
         return this.fileQuotaTotal === 0 ? 0 : Math.round(this.fileQuotaUsed / (this.fileQuotaTotal / 100));
@@ -300,7 +303,7 @@ class User {
 
     /**
      * Maximum number of channels user can have
-     * @member {number} channelLimit
+     * @type {number}
      */
     @computed get channelLimit() {
         if (this.quota == null || !this.quota.resultingQuotas
@@ -316,7 +319,7 @@ class User {
 
     /**
      * Available channel slots left.
-     * @member {number} channelsLeft
+     * @type {number}
      */
     @computed get channelsLeft() {
         if (this.quota == null || !this.quota.quotasLeft
@@ -343,7 +346,7 @@ class User {
 
     /**
      * Maximum amount of people invited which give you bonus
-     * @member {number} maxInvitedPeopleBonus
+     * @type {number}
      */
     @computed get maxInvitedPeopleBonus() {
         // TODO[backlog]: this should be stored in server
@@ -352,7 +355,7 @@ class User {
 
     /**
      * Maximum amount of people invited which give you bonus
-     * @member {number} currentInvitedPeopleBonus
+     * @type {number}
      */
     @computed get currentInvitedPeopleBonus() {
         // TODO[backlog]: this should be stored in server
@@ -363,7 +366,7 @@ class User {
 
     /**
      * Maximum bonus user can achieve if they complete all tasks
-     * @member {number} maximumOnboardingBonus
+     * @type {number}
      */
     @computed get maximumOnboardingBonus() {
         // TODO[backlog]: this should be stored in server
@@ -380,7 +383,7 @@ class User {
 
     /**
      * Maximum bonus user can achieve if they complete all tasks
-     * @member {number} currentOnboardingBonus
+     * @type {number}
      */
     @computed get currentOnboardingBonus() {
         if (!User.current.quota) return 0;
@@ -546,7 +549,7 @@ class User {
 
     /**
      * Currently authenticated user.
-     * @member {User}
+     * @type {User}
      */
     static get current() {
         return currentUser;

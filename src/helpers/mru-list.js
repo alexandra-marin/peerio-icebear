@@ -15,7 +15,7 @@ class MRUList {
 
     /**
      * Observable list of current MRU list. Readonly.
-     * @member {ObservableArray<string>} list
+     * @type {ObservableArray<string>}
      */
     @observable.shallow list = [];
     _name;

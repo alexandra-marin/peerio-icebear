@@ -523,7 +523,7 @@
   "title_updateWillBeInstalled": "Peerio will be updated when you quit the app.",
   "title_updateFailed": "Update failed",
   "title_updateFailedMessage": "Unfortunately, the new version of Peerio failed to install. We recommend trying to install it again or download it manually. Alternatively, you can continue using the older version for some time, but you will miss bug fixes and new features.",
-  "button_continueUsingOlderVersion": "Continue using older version",
+  "button_continueUsingOlderVersion": "Update later",
   "button_downloadManually": "Download manually",
   "button_tryAgain": "Try again",
   "button_installUpdate": "Update",

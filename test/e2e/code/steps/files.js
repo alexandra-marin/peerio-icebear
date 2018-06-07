@@ -98,7 +98,6 @@ async function checkFileIsShared(chat) {
     const messages = chat.messages;
     await this.waitFor(() => messages.length === (chat.isChannel ? 3 : 2));
     const lastMessage = messages[messages.length - 1];
-    console.log('========================', lastMessage, '===================================');
     expect(lastMessage.files).deep.equal([this.uploadedFile.fileId]);
 }
 

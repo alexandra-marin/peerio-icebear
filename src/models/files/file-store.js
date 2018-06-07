@@ -219,6 +219,7 @@ class FileStore extends FileStoreBase {
     async loadKegByFileId(fileId) {
         try {
             const file = new File(this.kegDb, this);
+            file.fileId = fileId;
             const resp = await retryUntilSuccess(() => {
                 return socket.send('/auth/kegs/db/query', {
                     kegDbId: this.kegDb.id,
@@ -244,6 +245,7 @@ class FileStore extends FileStoreBase {
         const chat = getChatStore().chatMap[kegDbId];
         if (!chat) {
             const file = new File();
+            file.fileId = fileId;
             file.deleted = true; // maybe not really, but it's the best option for now
             return file;
         }
@@ -340,6 +342,7 @@ class FileStore extends FileStoreBase {
      */
     upload = (filePath, fileName, folder) => {
         const keg = new File(User.current.kegDb, this);
+        keg.generateFileId();
         // if user uploads to main store folder - we place the file there
         // otherwise place it in the root of main store and then copy to volume
 
@@ -367,7 +370,7 @@ class FileStore extends FileStoreBase {
                 // move file into folder as soon as we have file id
                 // it will either move it to local folder or volume
                 if (folder) {
-                    when(() => keg.fileId, () => folder.attach(keg));
+                    when(() => keg.version > 1, () => folder.attach(keg));
                 }
                 return ret;
             });

@@ -13,6 +13,39 @@ const { retryUntilSuccess } = require('../../helpers/retry');
 const { ServerError } = require('../../errors');
 const clientApp = require('../client-app');
 const { asPromise } = require('../../helpers/prombservable');
+
+// every unique file (fileId) has a set of properties we want to be shared between all the file kegs
+// representing this file
+class FileData {
+    @observable size = 0;
+    @observable uploadedAt = null;
+    @observable updatedAt = null;
+    @observable fileOwner;
+    @observable unsanitizedName = '';
+    @observable cachingFailed = false;
+    @observable readyForDownload = false;
+    // 'uploading' is not here because while uploading == true it's not possible to have 2+ kegs for the file
+    @observable downloading = false;
+    @observable progress = 0;
+    @observable progressMax = 0;
+    @observable cached = false;
+    @observable tmpCached = false;
+    @observable originalUploadPath;
+    @observable shared = false;
+    @observable sharedBy = '';
+    @observable visibleCounter = 0;
+    @observable role = '';
+    descriptorVersion = 0;
+    descriptorFormat = 1;
+    chunkSize = 0;
+    blobKey = null;
+    blobNonce = null;
+}
+
+// TODO: deleted/unshared files will leak FileData object memory
+// need ideas how to fix it without hooking into file stores
+const fileDataMap = new Map();
+
 /**
  * File keg and model.
  * @param {KegDb} db
@@ -24,7 +57,16 @@ class File extends Keg {
         this.store = store;
         this.format = 1;
         this.latestFormat = 1;
-        this.descriptorFormat = 1;
+    }
+
+    get data() {
+        if (!this.fileId) return null;
+        let ret = fileDataMap.get(this.fileId);
+        if (!ret) {
+            ret = new FileData();
+            fileDataMap.set(this.fileId, ret);
+        }
+        return ret;
     }
 
     @observable migrating = false;
@@ -34,6 +76,11 @@ class File extends Keg {
      * @type {string}
      */
     @observable fileId = null;
+
+    generateFileId() {
+        if (this.fileId) return;
+        this.fileId = cryptoUtil.getRandomUserSpecificIdB64(getUser().username);
+    }
     /**
      * Folder id
      * @type {string}
@@ -43,66 +90,123 @@ class File extends Keg {
      * Bytes
      * @type {number}
      */
-    @observable size = 0;
+    get size() {
+        return this.data.size;
+    }
+    set size(val) {
+        this.data.size = val;
+    }
     /**
      * @type {number}
      */
-    @observable uploadedAt = null;
-
+    get uploadedAt() {
+        return this.data.uploadedAt;
+    }
+    set uploadedAt(val) {
+        this.data.uploadedAt = val;
+    }
+    /**
+     * @type {number}
+     */
+    get updatedAt() {
+        return this.data.updatedAt;
+    }
+    set updatedAt(val) {
+        this.data.updatedAt = val;
+    }
     /**
      * Username uploaded this file.
      * @type {string}
      */
-    @observable fileOwner;
-
-    /**
-     * @member {string} unsanitizedName
-     */
-    @observable unsanitizedName = '';
+    get fileOwner() {
+        return this.data.fileOwner;
+    }
+    set fileOwner(val) {
+        this.data.fileOwner = val;
+    }
 
     /**
      * Indicates if last caching attempt failed
      */
-    @observable cachingFailed = false;
+    get cachingFailed() {
+        return this.data.cachingFailed;
+    }
 
-    // -- View state data ----------------------------------------------------------------------------------------
-    // Depends on server set property 'fileProcessingState'
+    set cachingFailed(val) {
+        this.data.cachingFailed = val;
+    }
+
     /**
      * When this is 'true' file is ready to be downloaded. Upload finishes before that,
      * then server needs some time to process file.
      * @type {boolean}
      */
-    @observable readyForDownload = false;
+    get readyForDownload() {
+        return this.data.readyForDownload;
+    }
+
+    set readyForDownload(val) {
+        this.data.readyForDownload = val;
+    }
+
     /**
      * @type {boolean}
      */
     @observable uploading = false;
+
     /**
      * @type {boolean}
      */
-    @observable downloading = false;
+    get downloading() {
+        return this.data.downloading;
+    }
+
+    set downloading(val) {
+        this.data.downloading = val;
+    }
     /**
      * Upload or download progress value in bytes. Note that when uploading it doesn't count overhead.
      * @type {number}
      */
-    @observable progress = 0;
+    get progress() {
+        return this.data.progress;
+    }
+
+    set progress(val) {
+        this.data.progress = val;
+    }
     /**
      * File size with overhead for downloads and without overhead for uploads.
      * @type {number}
      */
-    @observable progressMax = 0;
+    get progressMax() {
+        return this.data.progressMax;
+    }
+    set progressMax(val) {
+        this.data.progressMax = val;
+    }
 
     /**
      * currently mobile only: flag means file was downloaded and is available locally
      * @type {boolean}
      */
-    @observable cached = false;
+    get cached() {
+        return this.data.cached;
+    }
+    set cached(val) {
+        this.data.cached = val;
+    }
 
     /**
      * file was downloaded for inline image display
      * @type {boolean}
      */
-    @observable tmpCached = false;
+    get tmpCached() {
+        return this.data.tmpCached;
+    }
+    set tmpCached(val) {
+        this.data.tmpCached = val;
+    }
 
     /**
      * File was uploaded in this session from this device
@@ -110,14 +214,18 @@ class File extends Keg {
      * launch
      * @type {String}
      */
-    @observable originalUploadPath;
+    get originalUploadPath() {
+        return this.data.originalUploadPath;
+    }
+    set originalUploadPath(val) {
+        this.data.originalUploadPath = val;
+    }
 
     /**
      * We have some type of path available for our file
      * It was cached for inline image view, uploaded during this session
      * or downloaded manually by user
-     * TODO: REVIEW THIS AFTER NEWFS MERGE
-     * @type {String}
+     * @type {bool}
      */
     get hasFileAvailableForPreview() {
         return this.originalUploadPath || this.cached || this.tmpCached;
@@ -140,13 +248,33 @@ class File extends Keg {
      * Is this file currently shared with anyone.
      * @type {boolean}
      */
-    @observable shared = false;
+    get shared() {
+        return this.data.shared;
+    }
+
+    set shared(val) {
+        this.data.shared = val;
+    }
+
+    get sharedBy() {
+        return this.data.sharedBy;
+    }
+
+    set sharedBy(val) {
+        this.data.sharedBy = val;
+    }
 
     /**
      * Amount of visual components which display this file currently
      * @type {number}
      */
-    @observable visibleCounter = 0;
+    get visibleCounter() {
+        return this.data.visibleCounter;
+    }
+
+    set visibleCounter(val) {
+        this.data.visibleCounter = val;
+    }
 
     // -- computed properties ------------------------------------------------------------------------------------
     /**
@@ -154,11 +282,11 @@ class File extends Keg {
      * @member {string} name
      */
     @computed get name() {
-        return fileHelper.sanitizeBidirectionalFilename(this.unsanitizedName);
+        return fileHelper.sanitizeBidirectionalFilename(this.data.unsanitizedName);
     }
 
     set name(name) {
-        this.unsanitizedName = name;
+        this.data.unsanitizedName = name;
     }
 
     /**
@@ -193,7 +321,13 @@ class File extends Keg {
     }
 
 
-    descriptorVersion = 0;
+    get descriptorVersion() {
+        return this.data.descriptorVersion;
+    }
+
+    set descriptorVersion(val) {
+        this.data.descriptorVersion = val;
+    }
 
     /**
      * @type {string}
@@ -258,6 +392,45 @@ class File extends Keg {
     @computed get isOversizeCutoff() {
         return this.size > config.chat.inlineImageSizeLimitCutoff;
     }
+
+    get chunkSize() {
+        return this.data.chunkSize;
+    }
+    set chunkSize(val) {
+        this.data.chunkSize = val;
+    }
+
+    get role() {
+        return this.data.role;
+    }
+
+    set role(val) {
+        this.data.role = val;
+    }
+
+    get descriptorFormat() {
+        return this.data.descriptorFormat;
+    }
+
+    set descriptorFormat(val) {
+        this.data.descriptorFormat = val;
+    }
+
+    get blobKey() {
+        return this.data.blobKey;
+    }
+
+    set blobKey(val) {
+        this.data.blobKey = val;
+    }
+    get blobNonce() {
+        return this.data.blobNonce;
+    }
+
+    set blobNonce(val) {
+        this.data.blobNonce = val;
+    }
+
 
     serializeKegPayload() {
         if (!this.format) {

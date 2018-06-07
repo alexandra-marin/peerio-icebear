@@ -224,6 +224,65 @@ class FileStore extends FileStoreBase {
         return found;
     }
 
+    loadRecentFilesForChat(kegDbId) {
+        return retryUntilSuccess(
+            () => socket.send('/auth/kegs/db/list-ext', {
+                kegDbId,
+                options: {
+                    type: 'file',
+                    reverse: true,
+                    count: config.recentFilesDisplayLimit
+                },
+                filter: {
+                    deleted: false
+                }
+            }, false),
+            `loading recent files for ${kegDbId}`, 10
+        ).then(resp => {
+            if (!resp || !resp.kegs) {
+                return;
+            }
+            for (const keg of kegs.kegs) {
+                if (keg.deleted || keg.hidden) {
+                    console.log('Hidden or deleted file kegs should not have been returned by server.', keg.id);
+                    continue;
+                }
+                const file = new File(this.kegDb, this);
+                if (keg.collectionVersion > this.maxUpdateId) {
+                    this.maxUpdateId = keg.collectionVersion;
+                }
+                if (keg.collectionVersion > this.knownUpdateId) {
+                    this.knownUpdateId = keg.collectionVersion;
+                }
+                if (file.loadFromKeg(keg)) {
+                    if (!file.fileId) {
+                        if (file.version > 1) console.error('File keg missing fileId', file.id);
+                        // we can get a freshly created keg, it's not a big deal
+                        continue;
+                    }
+                    if (this.fileMap[file.fileId]) {
+                        console.error('File keg has duplicate fileId', file.id);
+                        continue;
+                    }
+                    this.files.unshift(file);
+                    if (!this.loaded && this.onInitialFileAdded) {
+                        this.onInitialFileAdded(keg, file);
+                    }
+                } else {
+                    console.error('Failed to load file keg.', keg.kegId);
+                    // trying to be safe performing destructive operation of deleting a corrupted file keg
+                    // (old file system had some)
+                    if (keg.decryptionError && keg.type === 'file' && !keg.format) {
+                        console.log('Removing invalid file keg', keg.id);
+                        file.remove();
+                    }
+                    continue;
+                }
+            }
+        });
+    }
+
+
     /**
      * Returns file shared in specific chat. Loads it if needed.
      * @param {string} fileId

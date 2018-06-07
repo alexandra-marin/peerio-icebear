@@ -165,7 +165,8 @@ class UpdateTracker {
     processDigestEvent(kegDbId, ev, isFromEvent) {
         /* eslint-disable prefer-const, no-unused-vars */
         let [kegType, maxUpdateId, sessionUpdateId, newKegsCount] = ev;
-        // GOTCHA: sessionUpdateId is actually not session specific
+        // GOTCHA: when this is a digest event and not the result of getDigest
+        // sessionUpdateId is actually not session specific
         // we track session known update id from within session (because session knows what it knows, right?)
         // global (user-specific) known update id only interests us at the session start
         // unpacking

@@ -30,6 +30,7 @@ class ChatFileHandler {
         this.copyFileKegs();
     }
 
+
     copyFileKegs() {
         if (!this.maxUpdateId || this.maxUpdateId === this.knownUpdateId || this.copyingFiles) return;
         this.copyingFiles = true;
@@ -142,27 +143,6 @@ class ChatFileHandler {
             );
         }
         return file.remove();
-    }
-
-
-    getRecentFiles() {
-        return retryUntilSuccess(() => {
-            return socket.send(
-                '/auth/kegs/db/files/latest',
-                { kegDbId: this.chat.id, count: config.chat.recentFilesDisplayLimit },
-                false
-            )
-                .then(res => {
-                    const ids = [];
-                    res.forEach(raw => {
-                        const fileIds = JSON.parse(raw);
-                        fileIds.forEach(id => {
-                            if (!ids.includes(id)) ids.push(id);
-                        });
-                    });
-                    return ids;
-                });
-        });
     }
 }
 module.exports = ChatFileHandler;

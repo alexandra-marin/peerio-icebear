@@ -56,7 +56,9 @@ class ChatStoreSpaces {
         ]));
 
         // return all unique spaces as array
-        const spaces = [...spacesMap.values()];
+        const spaces = [...spacesMap.values()].sort((a, b) => {
+            return a.spaceName.localeCompare(b.spaceName);
+        });
 
         return spaces;
     }

@@ -204,7 +204,7 @@ class FileStore extends FileStoreBase {
         }
         // looking in volumes
         let found;
-        FileStoreBase.instances.every(store => {
+        FileStoreBase.instances.values().every(store => {
             found = store.getById(fileId);
             return !found;
         });

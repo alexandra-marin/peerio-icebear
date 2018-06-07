@@ -101,12 +101,14 @@ async function checkFileIsShared(chat) {
     expect(lastMessage.files).deep.equal([this.uploadedFile.fileId]);
 }
 
-Then('Cucumbot can see the uploaded file in DM', function() {
+Then('Cucumbot can see the uploaded file in DM', async function() {
     const chat = ice.chatStore.directMessages[0];
+    await chat._messageHandler.getInitialPage(); // might not be active in multi-chat test after restart
     return checkFileIsShared.call(this, chat);
 });
-Then('Cucumbot can see the uploaded file in the room', function() {
+Then('Cucumbot can see the uploaded file in the room', async function() {
     const chat = ice.chatStore.channels[0];
+    await chat._messageHandler.getInitialPage();// might not be active in multi-chat test after restart
     return checkFileIsShared.call(this, chat);
 });
 

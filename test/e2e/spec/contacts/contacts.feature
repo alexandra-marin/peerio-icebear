@@ -35,7 +35,6 @@ Feature: Contact management
         And   I restart
         Then  the invite is converted to pending dm
 
-    @wip
     Scenario: Remove invite before invited email is confirmed
         Given I create my account
         And   I invite random email

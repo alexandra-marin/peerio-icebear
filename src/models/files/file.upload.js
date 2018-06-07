@@ -11,7 +11,6 @@ const keys = require('../../crypto/keys');
 const fileHelper = require('../../helpers/file');
 const FileNonceGenerator = require('./file-nonce-generator');
 const TinyDb = require('../../db/tiny-db');
-const User = require('../user/user');
 
 function _getUlResumeParams(path) {
     return config.FileStream.getStat(path)
@@ -61,9 +60,7 @@ function upload(filePath, fileName, resume) {
             p = this._getUlResumeParams(filePath);
         }
         // we need fileId to be set before function returns
-        if (!this.fileId) {
-            this.fileId = cryptoUtil.getRandomUserSpecificIdB64(User.current.username);
-        }
+        this.generateFileId();
         let stream, nextChunkId, nonceGen;
         return p.then(nextChunk => {
             nextChunkId = nextChunk;

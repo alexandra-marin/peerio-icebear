@@ -66,22 +66,19 @@ class FileStore extends FileStoreBase {
             taskId
         ).then(async resp => {
             await Promise.map(resp, fileId => {
-                const files = this.getAllById(fileId);
-                if (!files.length) return Promise.resolve();
+                const file = this.getAnyById(fileId);
+                if (!file) return Promise.resolve();
                 return socket.send('/auth/file/descriptor/get', { fileId }, false)
                     .then(d => {
-                        // todo: optimise, do not repeat decrypt operations
-                        files.forEach(f => {
-                            if (!f.format) {
-                                // time to migrate keg
-                                f.format = f.latestFormat;
-                                f.descriptorKey = f.blobKey;
-                                f.deserializeDescriptor(d);
-                                this.migrationQueue.addTask(() => f.saveToServer());
-                            } else {
-                                f.deserializeDescriptor(d);
-                            }
-                        });
+                        if (!file.format) {
+                            // time to migrate keg
+                            file.format = file.latestFormat;
+                            file.descriptorKey = file.blobKey;
+                            file.deserializeDescriptor(d);
+                            this.migrationQueue.addTask(() => file.saveToServer());
+                        } else {
+                            file.deserializeDescriptor(d);
+                        }
                         if (this.knownDescriptorVersion < d.collectionVersion) {
                             this.knownDescriptorVersion = d.collectionVersion;
                         }
@@ -199,6 +196,34 @@ class FileStore extends FileStoreBase {
         });
         return files;
     }
+    getAnyById(fileId) {
+        // looking in SELF
+        const personal = this.getById(fileId);
+        if (personal && personal.loaded && !personal.deleted && personal.version > 1) {
+            return personal;
+        }
+        // looking in volumes
+        let found;
+        FileStoreBase.instances.values().every(store => {
+            found = store.getById(fileId);
+            return !found;
+        });
+        if (found) return found;
+
+        // looking in chats
+        this.chatFileMap.values().every(fileMap => {
+            fileMap.values().every(file => {
+                if (file.id === fileId && file.loaded && !file.deleted && file.version > 1) {
+                    found = file;
+                    return false;
+                }
+                return true;
+            });
+            return !found;
+        });
+        return found;
+    }
+
     /**
      * Returns file shared in specific chat. Loads it if needed.
      * @param {string} fileId
@@ -219,6 +244,7 @@ class FileStore extends FileStoreBase {
     async loadKegByFileId(fileId) {
         try {
             const file = new File(this.kegDb, this);
+            file.fileId = fileId;
             const resp = await retryUntilSuccess(() => {
                 return socket.send('/auth/kegs/db/query', {
                     kegDbId: this.kegDb.id,
@@ -244,6 +270,7 @@ class FileStore extends FileStoreBase {
         const chat = getChatStore().chatMap[kegDbId];
         if (!chat) {
             const file = new File();
+            file.fileId = fileId;
             file.deleted = true; // maybe not really, but it's the best option for now
             return file;
         }
@@ -340,6 +367,7 @@ class FileStore extends FileStoreBase {
      */
     upload = (filePath, fileName, folder) => {
         const keg = new File(User.current.kegDb, this);
+        keg.generateFileId();
         // if user uploads to main store folder - we place the file there
         // otherwise place it in the root of main store and then copy to volume
 
@@ -367,7 +395,7 @@ class FileStore extends FileStoreBase {
                 // move file into folder as soon as we have file id
                 // it will either move it to local folder or volume
                 if (folder) {
-                    when(() => keg.fileId, () => folder.attach(keg));
+                    when(() => keg.version > 1, () => folder.attach(keg));
                 }
                 return ret;
             });

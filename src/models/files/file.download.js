@@ -29,9 +29,20 @@ function _getDlResumeParams(path) {
 }
 
 function downloadToTmpCache() {
-    return this.download(this.tmpCachePath, undefined, true)
+    return this.download(this.tmpCachePath, true, true)
         .then(() => FileCacheHandler.cacheMonitor(this))
-        .tapCatch(() => { this.cachingFailed = true; });
+        .tapCatch(() => {
+            this.cachingFailed = true;
+
+            // XHR usually fails before socket detects disconnection
+            if (socket.authenticated) {
+                socket.onceDisconnected(() => {
+                    socket.onceAuthenticated(() => this.tryToCacheTemporarily());
+                });
+            } else {
+                socket.onceAuthenticated(() => this.tryToCacheTemporarily());
+            }
+        });
 }
 
 const tempExt = '.peeriodownload';

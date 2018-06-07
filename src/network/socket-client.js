@@ -444,6 +444,17 @@ class SocketClient {
         };
         this.subscribe(SOCKET_EVENTS.authenticated, handler);
     }
+    onceDisconnected(callback) {
+        if (!this.connected) {
+            setTimeout(callback, 0);
+            return;
+        }
+        const handler = () => {
+            setTimeout(callback, 0);
+            this.unsubscribe(SOCKET_EVENTS.disconnect, handler);
+        };
+        this.subscribe(SOCKET_EVENTS.disconnect, handler);
+    }
 
     /**
      * Executes a callback once socket is started.

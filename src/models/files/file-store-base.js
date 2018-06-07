@@ -230,7 +230,7 @@ class FileStoreBase {
         ).then(action(kegs => {
             for (const keg of kegs.kegs) {
                 if (keg.deleted || keg.hidden) {
-                    console.log('Hidden or deleted file kegs should not have been returned by server.', keg);
+                    console.log('Hidden or deleted file kegs should not have been returned by server.', keg.id);
                     continue;
                 }
                 const file = new File(this.kegDb, this);
@@ -259,7 +259,7 @@ class FileStoreBase {
                     // trying to be safe performing destructive operation of deleting a corrupted file keg
                     // (old file system had some)
                     if (keg.decryptionError && keg.type === 'file' && !keg.format) {
-                        console.log('Removing invalid file keg', keg);
+                        console.log('Removing invalid file keg', keg.id);
                         file.remove();
                     }
                     continue;

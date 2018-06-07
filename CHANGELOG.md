@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.2.4"></a>
+## [5.2.4](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.2.3...v5.2.4) (2018-06-07)
+
+
+### Bug Fixes
+
+* inline files download resume ([a1b2b56](https://github.com/PeerioTechnologies/peerio-icebear/commit/a1b2b56))
+
+
+
+<a name="5.2.3"></a>
+## [5.2.3](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.2.2...v5.2.3) (2018-06-07)
+
+
+### Bug Fixes
+
+* order spaces ([0a9fa9a](https://github.com/PeerioTechnologies/peerio-icebear/commit/0a9fa9a))
+* reduce descriptor update operations ([a490682](https://github.com/PeerioTechnologies/peerio-icebear/commit/a490682))
+* shared file data for all same file id kegs ([b30c220](https://github.com/PeerioTechnologies/peerio-icebear/commit/b30c220))
+* tests ([6d7229f](https://github.com/PeerioTechnologies/peerio-icebear/commit/6d7229f))
+* tests ([97be3a0](https://github.com/PeerioTechnologies/peerio-icebear/commit/97be3a0))
+* typo ([b599191](https://github.com/PeerioTechnologies/peerio-icebear/commit/b599191))
+
+
+
 <a name="5.2.2"></a>
 ## [5.2.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.2.1...v5.2.2) (2018-06-06)
 

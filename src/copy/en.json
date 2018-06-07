@@ -846,6 +846,7 @@
   "mcr_title_offerNewRoom": "Want to chat with a group, or have a consultation space for your patient? <toCreateRoom>Create a Room instead</>.",
   "mcr_title_newInternalRoom": "Open a Room inside Patient Space",
   "mcr_title_newInternalRoomDescription": "Rooms created inside this space work best if topic of conversation pertain to the patient.",
+  "mcr_title_newPatientRoomPlaceholder": "New Patient Room",
   "mcr_title_newPatientRoom": "Open additional Patient Room for {patientName}",
   "mcr_title_newPatientRoomDescription": "Add a Room to consult your patient on a different topic, with different participants.",
   "mcr_button_addPatient": "Add a Patient",

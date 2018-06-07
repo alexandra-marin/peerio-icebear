@@ -66,22 +66,19 @@ class FileStore extends FileStoreBase {
             taskId
         ).then(async resp => {
             await Promise.map(resp, fileId => {
-                const files = this.getAllById(fileId);
-                if (!files.length) return Promise.resolve();
+                const file = this.getAnyById(fileId);
+                if (!file) return Promise.resolve();
                 return socket.send('/auth/file/descriptor/get', { fileId }, false)
                     .then(d => {
-                        // todo: optimise, do not repeat decrypt operations
-                        files.forEach(f => {
-                            if (!f.format) {
-                                // time to migrate keg
-                                f.format = f.latestFormat;
-                                f.descriptorKey = f.blobKey;
-                                f.deserializeDescriptor(d);
-                                this.migrationQueue.addTask(() => f.saveToServer());
-                            } else {
-                                f.deserializeDescriptor(d);
-                            }
-                        });
+                        if (!file.format) {
+                            // time to migrate keg
+                            file.format = file.latestFormat;
+                            file.descriptorKey = file.blobKey;
+                            file.deserializeDescriptor(d);
+                            this.migrationQueue.addTask(() => file.saveToServer());
+                        } else {
+                            file.deserializeDescriptor(d);
+                        }
                         if (this.knownDescriptorVersion < d.collectionVersion) {
                             this.knownDescriptorVersion = d.collectionVersion;
                         }
@@ -199,6 +196,34 @@ class FileStore extends FileStoreBase {
         });
         return files;
     }
+    getAnyById(fileId) {
+        // looking in SELF
+        const personal = this.getById(fileId);
+        if (personal && personal.loaded && !personal.deleted && personal.version > 1) {
+            return personal;
+        }
+        // looking in volumes
+        let found;
+        FileStoreBase.instances.every(store => {
+            found = store.getById(fileId);
+            return !found;
+        });
+        if (found) return found;
+
+        // looking in chats
+        this.chatFileMap.values().every(fileMap => {
+            fileMap.values().every(file => {
+                if (file.id === fileId && file.loaded && !file.deleted && file.version > 1) {
+                    found = file;
+                    return false;
+                }
+                return true;
+            });
+            return !found;
+        });
+        return found;
+    }
+
     /**
      * Returns file shared in specific chat. Loads it if needed.
      * @param {string} fileId

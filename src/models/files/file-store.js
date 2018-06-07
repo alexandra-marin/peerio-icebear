@@ -242,7 +242,7 @@ class FileStore extends FileStoreBase {
             if (!resp || !resp.kegs) {
                 return;
             }
-            for (const keg of kegs.kegs) {
+            for (const keg of resp.kegs) {
                 if (keg.deleted || keg.hidden) {
                     console.log('Hidden or deleted file kegs should not have been returned by server.', keg.id);
                     continue;

@@ -844,6 +844,7 @@
   "mcr_title_newRoom": "Open a Room for your practice",
   "mcr_title_offerNewPatient": "Want to open a consultation room for a patient? <toCreatePatient>Create a Patient File instead</>.",
   "mcr_title_offerNewRoom": "Want to chat with a group, or have a consultation space for your patient? <toCreateRoom>Create a Room instead</>.",
+  "mcr_title_newInternalRoomPlaceholder": "New Internal Room",
   "mcr_title_newInternalRoom": "Open a Room inside Patient Space",
   "mcr_title_newInternalRoomDescription": "Rooms created inside this space work best if topic of conversation pertain to the patient.",
   "mcr_title_newPatientRoomPlaceholder": "New Patient Room",

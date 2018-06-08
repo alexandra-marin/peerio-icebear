@@ -51,6 +51,8 @@ class ChatFileHandler {
                         fileStore.removeCachedChatKeg(this.chat.id, keg.kegId);
                         return;
                     }
+                    // it's our own file, no need to copy to SELF
+                    if (keg && keg.descriptor && keg.descriptor.owner === getUser().username) return;
                     const file = new File(this.chat.db, fileStore);
                     try {
                         if (file.loadFromKeg(keg) && !file.deleted) {

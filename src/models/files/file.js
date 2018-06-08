@@ -643,6 +643,7 @@ class File extends Keg {
                 .then(resp => {
                     // file already exists in this db
                     if (resp.kegs.length) {
+                        if (!folderId) return Promise.resolve;
                         const existingKeg = new File(db, store);
                         existingKeg.loadFromKeg(resp.kegs[0]);
                         existingKeg.folderId = folderId;

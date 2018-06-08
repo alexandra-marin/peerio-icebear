@@ -643,6 +643,8 @@
   "title_roomInviteHeading": "Behold! You have been invited to join",
   "title_dmInviteHeading": "Good news! <b>{contactName}</> just joined Peerio.",
   "title_newUserDmInviteHeading": "Hello! <b>{contactName}</> added you to their Contacts.",
+  "title_userInAddressBook": "{firstName} ({email}) is in your address book",
+  "title_invitedUserViaEmail": "You invited {firstName} via email ({email})",
   "button_nay": "Nay, decline",
   "button_aye": "Aye, accept",
   "title_roomInviteUpgradeNotice": "Hi there. Basic Peerio accounts have access to <b>3 free rooms</>. Upgrade your account to get more, or decline this invite.",

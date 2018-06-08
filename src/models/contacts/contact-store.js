@@ -413,8 +413,8 @@ class ContactStore {
      * @param {string} email
      * @returns {Promise}
      */
-    invite(email, context) {
-        return this.inviteNoWarning(email, context)
+    invite(email, context, isAutoAdd) {
+        return this.inviteNoWarning(email, context, isAutoAdd)
             .then(() => {
                 warnings.add('snackbar_contactInvited');
             })
@@ -428,8 +428,8 @@ class ContactStore {
      * @param {string} email
      * @returns {Promise}
      */
-    inviteNoWarning(email, context) {
-        return socket.send('/auth/contacts/invite', { email, context });
+    inviteNoWarning(email, context, isAutoAdd) {
+        return socket.send('/auth/contacts/invite', { email, context, isAutoAdd });
     }
 
     _merge(usernames) {

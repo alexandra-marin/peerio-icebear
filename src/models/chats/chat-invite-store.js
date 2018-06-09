@@ -21,6 +21,7 @@ class ChatHead extends Keg {
 
 class ReceivedInvite {
     @observable declined = false;
+    metaLoaded = true;
     constructor(data) {
         Object.assign(this, data);
     }

@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.3.0"></a>
+# [5.3.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.2.8...v5.3.0) (2018-06-09)
+
+
+### Bug Fixes
+
+* add metaLoaded to ReceivedInvite ([a7bbf07](https://github.com/PeerioTechnologies/peerio-icebear/commit/a7bbf07))
+
+
+### Features
+
+* chat#nameInSpace ([b79de8c](https://github.com/PeerioTechnologies/peerio-icebear/commit/b79de8c))
+
+
+
 <a name="5.2.8"></a>
 ## [5.2.8](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.2.7...v5.2.8) (2018-06-08)
 

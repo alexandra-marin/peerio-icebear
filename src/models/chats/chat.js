@@ -304,6 +304,14 @@ class Chat {
     /**
      * @type {string}
      */
+    @computed get nameInSpace() {
+        if (this.chatHead && this.chatHead.chatName) return this.chatHead.nameInSpace;
+        return '';
+    }
+
+    /**
+     * @type {string}
+     */
     @computed get purpose() {
         return this.chatHead && this.chatHead.purpose || '';
     }

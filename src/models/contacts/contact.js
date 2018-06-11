@@ -301,6 +301,7 @@ class Contact {
                 this.addresses = profile.addresses || [];
                 this.mentionRegex = new RegExp(`@${this.username}`, 'gi');
                 this.profileVersion = profile.profileVersion || 0;
+                this.mcrRoles = profile.props ? profile.props.mcrRoles : null;
 
                 // this is server - controlled data, so we don't account for cases when it's invalid
                 this.encryptionPublicKey = new Uint8Array(profile.encryptionPublicKey);

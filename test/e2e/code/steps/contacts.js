@@ -3,13 +3,6 @@ const { getRandomUsername, getRandomEmail } = require('../helpers/random-data');
 const { waitForEmail } = require('../helpers/maildrop');
 const testConfig = require('../test-config');
 
-async function findContact(query) {
-    const contact = ice.contactStore.getContact(query);
-    await this.waitFor(() => contact.loading === false);
-    contact.notFound.should.be.false;
-    return contact;
-}
-
 async function inviteRandomEmail(world) {
     world.invitedEmail = getRandomEmail();
     await world.ice.contactStore.invite(world.invitedEmail);
@@ -27,12 +20,12 @@ Then('I can not find unregistered account by random username', function() {
 });
 
 Then('I can find the test account by email', async function() {
-    const contact = await findContact.call(this, this.testAccount.email);
+    const contact = await this.findContact.call(this, this.testAccount.email);
     contact.username.should.equal(this.testAccount.username);
 });
 
 Then('I can find the test account by username', async function() {
-    const contact = await findContact.call(this, this.testAccount.username);
+    const contact = await this.findContact.call(this, this.testAccount.username);
     contact.addresses[0].should.equal(this.testAccount.email);
 });
 

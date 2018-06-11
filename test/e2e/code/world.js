@@ -95,8 +95,12 @@ class PeerioAppWorld {
         return this.createAccount(username, email, true);
     }
 
-    createMedcryptorAccount = async (medcryptorData) => {
-        return this.createAccount(null, null, false, medcryptorData);
+
+    findContact = async (query) => {
+        const contact = ice.contactStore.getContact(query);
+        await this.waitFor(() => contact.loading === false);
+        contact.notFound.should.be.false;
+        return contact;
     }
 }
 

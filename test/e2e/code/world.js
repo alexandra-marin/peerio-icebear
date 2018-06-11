@@ -95,7 +95,6 @@ class PeerioAppWorld {
         return this.createAccount(username, email, true);
     }
 
-
     findContact = async (query) => {
         const contact = ice.contactStore.getContact(query);
         await this.waitFor(() => contact.loading === false);

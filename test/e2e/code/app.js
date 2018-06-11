@@ -185,6 +185,12 @@ class App {
         this.start();
     }
 
+    startMedcryptor() {
+        const cfg = this.world.ice.config;
+        cfg.whiteLabel.name = 'medcryptor';
+        cfg.platform = 'ios';
+    }
+
     async dispose() {
         if (this.started) await this.stop();
         this._releaseConsole();

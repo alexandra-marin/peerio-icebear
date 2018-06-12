@@ -552,6 +552,7 @@
   "title_couldntLocateContact2": "Invite them to join you on Peerio?",
   "title_importInviteText": "Peerio is more fun with friends",
   "title_contactZeroState": "You have no pending invites. Invite a friend to join you on Peerio",
+  "mcr_title_contactZeroState": "You have no pending invites. Invite your colleagues to join you on Peerio",
   "button_invite": "Invite",
   "button_inviteEmailContact": "Invite contact",
   "button_addFavourite": "Add favourite",

@@ -142,7 +142,7 @@ Then('I create another patient space', async function() {
 });
 
 Then('I can see their role in the contact details', async function() {
-    const contact = await this.findContact.call(this, this.testAccount.username);
+    const contact = await this.contactsHelper.findContact(this.testAccount.username);
     contact.mcrRoles.should.be.an('array');
     contact.mcrRoles[0].should.equal(this.role);
 });

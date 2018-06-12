@@ -1,17 +1,7 @@
 const { Then, When } = require('cucumber');
-const { getRandomUsername, getRandomEmail } = require('../helpers/random-data');
+const { getRandomUsername } = require('../helpers/random-data');
 const { waitForEmail } = require('../helpers/maildrop');
 const testConfig = require('../test-config');
-
-async function inviteRandomEmail(world) {
-    world.invitedEmail = getRandomEmail();
-    await world.ice.contactStore.invite(world.invitedEmail);
-}
-
-async function inviteRandomEmailWithTemplate(template, world) {
-    world.invitedEmail = getRandomEmail();
-    await world.ice.contactStore.invite(world.invitedEmail, template);
-}
 
 Then('I can not find unregistered account by random username', function() {
     const username = getRandomUsername();
@@ -20,12 +10,12 @@ Then('I can not find unregistered account by random username', function() {
 });
 
 Then('I can find the test account by email', async function() {
-    const contact = await this.findContact.call(this, this.testAccount.email);
+    const contact = await this.contactsHelper.findContact(this.testAccount.email);
     contact.username.should.equal(this.testAccount.username);
 });
 
 Then('I can find the test account by username', async function() {
-    const contact = await this.findContact.call(this, this.testAccount.username);
+    const contact = await this.contactsHelper.findContact(this.testAccount.username);
     contact.addresses[0].should.equal(this.testAccount.email);
 });
 
@@ -54,7 +44,7 @@ When('the test account is not my favorite contact', function() {
 });
 
 When('I invite random email', async function() {
-    await inviteRandomEmail(this);
+    await this.contactsHelper.inviteRandomEmail();
     return ice.contactStore.invite(this.invitedEmail);
 });
 
@@ -81,15 +71,15 @@ Then('I don\'t have pending dm', async function() {
 });
 
 When('I invite someone to Peerio', async function() {
-    return inviteRandomEmailWithTemplate('peerio', this);
+    return this.contactsHelper.inviteRandomEmailWithTemplate('peerio');
 });
 
 When('I invite a MedCryptor doctor', async function() {
-    return inviteRandomEmailWithTemplate('medcryptor-doctor', this);
+    return this.contactsHelper.inviteRandomEmailWithTemplate('medcryptor-doctor');
 });
 
 When('I invite a MedCryptor patient', function() {
-    return inviteRandomEmailWithTemplate('medcryptor-patient', this);
+    return this.contactsHelper.inviteRandomEmailWithTemplate('medcryptor-patient');
 });
 
 Then('they receive Peerio templated email', async function() {
@@ -105,11 +95,11 @@ Then('they receive MedCryptor patient templated email', async function() {
 });
 
 Then('Peerio invites default to Peerio templated email', async function() {
-    await inviteRandomEmail(this);
+    await this.contactsHelper.inviteRandomEmail();
     await waitForEmail(this.invitedEmail, testConfig.inviteEmailSubject);
 });
 
 Then('MedCryptor invites default to doctor templated email', async function() {
-    await inviteRandomEmail(this);
+    await this.contactsHelper.inviteRandomEmail();
     await waitForEmail(this.invitedEmail, testConfig.inviteEmailSubjectMCDoctor);
 });

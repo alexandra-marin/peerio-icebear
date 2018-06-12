@@ -141,6 +141,7 @@
   "title_pending2": "Pending",
   "title_oldVersionDescription1": "The file owner still needs to upgrade.",
   "title_oldVersionDescription2": "File actions are limited to <b>download</> and <b>delete</>.",
+  "title_oldVersionTooltip": "Cannot be reshared until owner updates",
   "title_fileUpdateProgressDescription": "This dialog will close when the update is complete",
   "title_sharedFilesUnshared": "All shared files were unshared.",
   "error_fieldRequired": "Required",

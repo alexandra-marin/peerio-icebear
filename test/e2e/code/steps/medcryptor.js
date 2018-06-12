@@ -54,7 +54,7 @@ Then('I can edit specialization, medical ID, country and role', async function()
     await this.ice.User.current.saveProfile();
 
     await this.app.restart();
-    this.ice.config.platform = 'ios';
+    this.app.startMedcryptor();
     await this.login();
 
     this.ice.User.current.props.should.deep.contain(medcryptorData);

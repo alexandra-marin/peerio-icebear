@@ -127,7 +127,7 @@ class FileFolder {
         return this.files.sort((f1, f2) => f2.uploadedAt - f1.uploadedAt);
     }
 
-    @computed get foldersAndFilesDefaultSorting() {
+    @computed get filesAndFoldersDefaultSorting() {
         return this.foldersSortedByName.concat(this.filesSortedByDate);
     }
 

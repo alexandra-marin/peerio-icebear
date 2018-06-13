@@ -136,6 +136,7 @@ class VolumeStore {
         folder.progress = newFolder.progress = folder.progressMax = newFolder.progressMax = 0;
         folder.convertingToVolume = false;
         newFolder.convertingFromFolder = false;
+        return Promise.resolve();
     }
 }
 

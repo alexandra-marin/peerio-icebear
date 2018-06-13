@@ -180,12 +180,6 @@ class ChatStore {
     }
 
     /**
-     * currently selected/focused space.
-     * @type {string}
-     */
-    @observable activeSpace = null;
-
-    /**
      * Does smart and efficient 'in-place' sorting of observable array.
      * Note that ObservableArray#sort creates copy of the array. This function sorts in place.
      */
@@ -446,8 +440,8 @@ class ChatStore {
      */
     @action.bound
     switchToFirstChat() {
-        if (config.whiteLabel.name === 'medcryptor' && this.activeSpace) {
-            const active = this.spaces.find(x => x.spaceId === this.activeSpace);
+        if (config.whiteLabel.name === 'medcryptor' && this.spaces.activeSpaceId) {
+            const active = this.spaces.find(x => x.spaceId === this.spaces.activeSpaceId);
             const chats = active.internalRooms.concat(active.patientRooms);
             const chatId = chats.length ? chats[0].id : null;
             if (chatId) {

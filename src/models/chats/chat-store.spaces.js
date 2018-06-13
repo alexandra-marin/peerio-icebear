@@ -88,9 +88,17 @@ class ChatStoreSpaces {
         return chat;
     }
 
+    /**
+     * @type {string}
+     */
+    @observable activeSpaceId = null;
+
+    /**
+     * @type {Space}
+     */
     @computed get currentSpace() {
-        if (!this.spacesList || !this.store.activeSpace) return null;
-        return this.spacesList.find(x => x.spaceId === this.store.activeSpace);
+        if (!this.spacesList || !this.activeSpaceId) return null;
+        return this.spacesList.find(x => x.spaceId === this.activeSpaceId);
     }
 
     @computed get currentSpaceName() {

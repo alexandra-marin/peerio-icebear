@@ -30,7 +30,6 @@ class ChatFileHandler {
         this.copyFileKegs();
     }
 
-
     copyFileKegs() {
         if (!this.maxUpdateId || this.maxUpdateId === this.knownUpdateId || this.copyingFiles) return;
         this.copyingFiles = true;

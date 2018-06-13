@@ -239,6 +239,9 @@ class Chat {
      * @type {string}
      */
     @observable newMessagesMarkerPos = '';
+
+    @observable loadingRecentFiles = false;
+    recentFilesLoaded = false;
     /**
      * List of recent file ids for this chat.
      * @type {Array<string>}

@@ -44,7 +44,11 @@ class ChatStoreSpaces {
         return this.store.channels.filter(chat => chat.isInSpace);
     }
 
-    @computed get spaces() {
+    /**
+     * Subset of ChatStore#chats, contains all spaces
+     * @type {Array<Chat>}
+     */
+    @computed get spacesList() {
         if (config.whiteLabel.name !== 'medcryptor') {
             return [];
         }
@@ -76,16 +80,10 @@ class ChatStoreSpaces {
      * @returns {Chat}
      */
     createRoomInSpace = async (space, roomName, roomType, participants) => {
-        const roomSpaceProperties = {
-            spaceId: space.spaceId,
-            spaceName: space.spaceName,
-            nameInSpace: roomName,
-            spaceDescription: space.spaceDescription,
-            spaceRoomType: roomType
-        };
-
+        space.nameInSpace = roomName;
+        space.spaceRoomType = roomType;
         const name = `${space.spaceName} - ${roomName}`;
-        const chat = await this.startChat(participants, true, name, '', true, roomSpaceProperties);
+        const chat = await this.store.startChat(participants, true, name, '', true, space);
 
         return chat;
     }

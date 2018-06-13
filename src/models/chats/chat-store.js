@@ -29,7 +29,7 @@ const Contact = require('../contacts/contact');
 class ChatStore {
     constructor() {
         this.pending = new ChatStorePending(this);
-        this.spacesHelper = new ChatStoreSpaces(this);
+        this.spaces = new ChatStoreSpaces(this);
 
         reaction(() => this.activeChat, chat => {
             if (chat) chat.loadMessages();
@@ -177,14 +177,6 @@ class ChatStore {
     @computed
     get nonSpaceRooms() {
         return this.allRooms.filter(c => !c.isInSpace);
-    }
-
-    /**
-     * Subset of ChatStore#chats, contains all spaces
-     * @type {Array<Chat>}
-     */
-    get spaces() {
-        return this.spacesHelper.spaces;
     }
 
     /**

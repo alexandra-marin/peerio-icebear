@@ -104,6 +104,7 @@ class ChatStoreSpaces {
     @computed get currentSpaceName() {
         return this.currentSpace.spaceName;
     }
+
     get isPatientRoomOpen() {
         if (!this.store.activeChat || !this.currentSpace || !this.currentSpace.patientRooms) return null;
         return this.currentSpace.patientRooms.find(r => r.id === this.store.activeChat.id);

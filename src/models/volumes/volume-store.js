@@ -126,8 +126,7 @@ class VolumeStore {
 
     @action.bound async shareFolder(folder, participants) {
         if (folder.isShared && participants) {
-            folder.addParticipants(participants);
-            return;
+            return folder.addParticipants(participants);
         }
         if (folder.store.id !== 'main') throw new Error('Can only share local folders');
         const newFolder = await this.createVolume(participants, folder.name);

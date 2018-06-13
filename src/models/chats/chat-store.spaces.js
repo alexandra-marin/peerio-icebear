@@ -92,6 +92,10 @@ class ChatStoreSpaces {
         if (!this.spacesList || !this.store.activeSpace) return null;
         return this.spacesList.find(x => x.spaceId === this.store.activeSpace);
     }
+
+    @computed get currentSpaceName() {
+        return this.currentSpace.spaceName;
+    }
 }
 
 module.exports = ChatStoreSpaces;

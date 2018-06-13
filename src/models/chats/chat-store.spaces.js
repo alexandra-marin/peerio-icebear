@@ -75,16 +75,16 @@ class ChatStoreSpaces {
     /**
      * @returns {Chat}
      */
-    createRoomInPatientSpace = async (space, roomName, roomType, participants) => {
+    createRoomInSpace = async (space, roomName, roomType, participants) => {
         const roomSpaceProperties = {
-            spaceId: space.currentSpace.spaceId,
-            spaceName: space.currentSpace.spaceName,
+            spaceId: space.spaceId,
+            spaceName: space.spaceName,
             nameInSpace: roomName,
-            spaceDescription: space.currentSpace.spaceDescription,
+            spaceDescription: space.spaceDescription,
             spaceRoomType: roomType
         };
 
-        const name = `${space.currentSpace.spaceName} - ${roomName}`;
+        const name = `${space.spaceName} - ${roomName}`;
         const chat = await this.startChat(participants, true, name, '', true, roomSpaceProperties);
 
         return chat;

@@ -72,9 +72,6 @@ class ChatStoreSpaces {
         return space;
     }
 
-    createNewInternalRoom = () => { this.createRoomInPatientSpace('internal'); }
-    createNewPatientRoom = () => { this.createRoomInPatientSpace('patient'); }
-
     /**
      * @returns {Chat}
      */

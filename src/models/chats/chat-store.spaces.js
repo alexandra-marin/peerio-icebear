@@ -104,6 +104,21 @@ class ChatStoreSpaces {
     @computed get currentSpaceName() {
         return this.currentSpace.spaceName;
     }
+    get isPatientRoomOpen() {
+        if (!this.store.activeChat || !this.currentSpace || !this.currentSpace.patientRooms) return null;
+        return this.currentSpace.patientRooms.find(r => r.id === this.store.activeChat.id);
+    }
+
+    get isInternalRoomOpen() {
+        if (!this.store.activeChat || !this.currentSpace || !this.currentSpace.internalRooms) return null;
+        return this.currentSpace.internalRooms.find(r => r.id === this.store.activeChat.id);
+    }
+
+    get currentRoomType() {
+        if (this.isPatientRoomOpen) return 'patientroom';
+        if (this.isInternalRoomOpen) return 'internalroom';
+        return null;
+    }
 }
 
 module.exports = ChatStoreSpaces;

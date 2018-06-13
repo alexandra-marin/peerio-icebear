@@ -2,6 +2,56 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.3.0"></a>
+# [5.3.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.2.8...v5.3.0) (2018-06-09)
+
+
+### Bug Fixes
+
+* add metaLoaded to ReceivedInvite ([a7bbf07](https://github.com/PeerioTechnologies/peerio-icebear/commit/a7bbf07))
+
+
+### Features
+
+* chat#nameInSpace ([b79de8c](https://github.com/PeerioTechnologies/peerio-icebear/commit/b79de8c))
+
+
+
+<a name="5.2.8"></a>
+## [5.2.8](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.2.7...v5.2.8) (2018-06-08)
+
+
+
+<a name="5.2.7"></a>
+## [5.2.7](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.2.6...v5.2.7) (2018-06-08)
+
+
+### Performance Improvements
+
+* cut some unneeded operations ([e9abd44](https://github.com/PeerioTechnologies/peerio-icebear/commit/e9abd44))
+
+
+
+<a name="5.2.6"></a>
+## [5.2.6](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.2.5...v5.2.6) (2018-06-07)
+
+
+### Bug Fixes
+
+* files deserialization ([6623fb5](https://github.com/PeerioTechnologies/peerio-icebear/commit/6623fb5))
+
+
+
+<a name="5.2.5"></a>
+## [5.2.5](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.2.4...v5.2.5) (2018-06-07)
+
+
+### Bug Fixes
+
+* safer logs [skip ci] ([66e1156](https://github.com/PeerioTechnologies/peerio-icebear/commit/66e1156))
+
+
+
 <a name="5.2.4"></a>
 ## [5.2.4](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.2.3...v5.2.4) (2018-06-07)
 

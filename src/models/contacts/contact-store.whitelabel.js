@@ -15,7 +15,7 @@ function medcryptorContactFilter(contact, context) {
     if (config.isMobile) return true;
     switch (context) {
         case 'newchat':
-        case 'newpatientroom':
+        case 'patientroom':
         case 'addcontact':
         case 'sharefiles':
             return contact.appLabel === 'peerio' || contact.appLabel === 'medcryptor';

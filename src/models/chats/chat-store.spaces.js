@@ -107,12 +107,12 @@ class ChatStoreSpaces {
 
     get isPatientRoomOpen() {
         if (!this.store.activeChat || !this.currentSpace || !this.currentSpace.patientRooms) return null;
-        return this.currentSpace.patientRooms.find(r => r.id === this.store.activeChat.id);
+        return this.currentSpace.patientRooms.some(r => r.id === this.store.activeChat.id);
     }
 
     get isInternalRoomOpen() {
         if (!this.store.activeChat || !this.currentSpace || !this.currentSpace.internalRooms) return null;
-        return this.currentSpace.internalRooms.find(r => r.id === this.store.activeChat.id);
+        return this.currentSpace.internalRooms.some(r => r.id === this.store.activeChat.id);
     }
 
     get currentRoomType() {

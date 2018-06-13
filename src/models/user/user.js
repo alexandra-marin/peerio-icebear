@@ -112,7 +112,7 @@ class User {
         if (!this.props || !this.props.mcrRoles) return null;
         return this.props.mcrRoles.some(x => x.includes('admin'));
     }
-    
+
     /**
      * Indicates 2fa state on current user.
      * @type {boolean}

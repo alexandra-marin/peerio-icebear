@@ -78,26 +78,19 @@ class ChatStoreSpaces {
     /**
      * @returns {Chat}
      */
-    createRoomInPatientSpace = async (SPACE, type) => {
+    createRoomInPatientSpace = async (space, roomName, roomType, participants) => {
         const roomSpaceProperties = {
-            spaceId: SPACE.currentSpace.spaceId,
-            spaceName: SPACE.currentSpace.spaceName,
-            nameInSpace: this.channelName,
-            spaceDescription: SPACE.currentSpace.spaceDescription,
-            spaceRoomType: type
+            spaceId: space.currentSpace.spaceId,
+            spaceName: space.currentSpace.spaceName,
+            nameInSpace: roomName,
+            spaceDescription: space.currentSpace.spaceDescription,
+            spaceRoomType: roomType
         };
 
-        const name = `${SPACE.currentSpace.spaceName} - ${this.channelName}`;
-        const chat = await this.startChat(this.userPicker.selected, true, name, '', true, roomSpaceProperties);
+        const name = `${space.currentSpace.spaceName} - ${roomName}`;
+        const chat = await this.startChat(participants, true, name, '', true, roomSpaceProperties);
 
         return chat;
-        // if (!chat) {
-        //     this.waiting = false;
-        //     return;
-        // }
-        // when(() => chat.added === true, () => {
-        //     routerStore.navigateTo(routerStore.ROUTES.patients);
-        // });
     }
 }
 

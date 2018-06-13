@@ -17,6 +17,9 @@ const { asPromise } = require('../../helpers/prombservable');
 // every unique file (fileId) has a set of properties we want to be shared between all the file kegs
 // representing this file
 class FileData {
+    constructor(fileId) {
+        this.fileId = fileId;
+    }
     @observable size = 0;
     @observable uploadedAt = null;
     @observable updatedAt = null;
@@ -35,11 +38,66 @@ class FileData {
     @observable sharedBy = '';
     @observable visibleCounter = 0;
     @observable role = '';
+    fileId = null;
     descriptorVersion = 0;
     descriptorFormat = 1;
     chunkSize = 0;
     blobKey = null;
     blobNonce = null;
+
+    @computed get name() {
+        return fileHelper.sanitizeBidirectionalFilename(this.unsanitizedName);
+    }
+
+    @computed get normalizedName() {
+        return this.unsanitizedName ? this.unsanitizedName.toUpperCase() : '';
+    }
+
+    @computed get ext() {
+        return fileHelper.getFileExtension(this.name);
+    }
+
+    @computed get iconType() {
+        return fileHelper.getFileIconType(this.ext);
+    }
+
+    @computed get nameWithoutExtension() {
+        return fileHelper.getFileNameWithoutExtension(this.name);
+    }
+
+    @computed get isImage() {
+        return fileHelper.isImage(this.ext);
+    }
+
+    @computed get fsSafeUid() {
+        return cryptoUtil.getHexHash(16, cryptoUtil.b64ToBytes(this.fileId));
+    }
+
+    @computed get tmpCachePath() {
+        return config.FileStream.getTempCachePath(`${this.fsSafeUid}.${this.ext}`);
+    }
+
+    @computed get cachePath() {
+        if (!config.isMobile) return null;
+
+        const name = `${this.name || this.fsSafeUid}.${this.ext}`;
+        return config.FileStream.getFullPath(this.fsSafeUid, name);
+    }
+    @computed get sizeFormatted() {
+        return util.formatBytes(this.size);
+    }
+
+    @computed get chunksCount() {
+        return Math.ceil(this.size / this.chunkSize);
+    }
+
+    @computed get isOverInlineSizeLimit() {
+        return clientApp.uiUserPrefs.limitInlineImageSize && this.size > config.chat.inlineImageSizeLimit;
+    }
+
+    @computed get isOversizeCutoff() {
+        return this.size > config.chat.inlineImageSizeLimitCutoff;
+    }
 }
 
 // TODO: deleted/unshared files will leak FileData object memory
@@ -63,7 +121,7 @@ class File extends Keg {
         if (!this.fileId) return null;
         let ret = fileDataMap.get(this.fileId);
         if (!ret) {
-            ret = new FileData();
+            ret = new FileData(this.fileId);
             fileDataMap.set(this.fileId, ret);
         }
         return ret;
@@ -71,11 +129,12 @@ class File extends Keg {
 
     @observable migrating = false;
 
+
     /**
      * System-wide unique client-generated id
      * @type {string}
      */
-    @observable fileId = null;
+    @observable fileId;
 
     generateFileId() {
         if (this.fileId) return;
@@ -238,11 +297,6 @@ class File extends Keg {
      * @type {boolean}
      */
     @observable selected = false;
-    /**
-     * Is this file visible or filtered by search. Also weird, needs refactor.
-     * @type {boolean}
-     */
-    @observable show = true;
 
     /**
      * Is this file currently shared with anyone.
@@ -281,28 +335,32 @@ class File extends Keg {
      * file name
      * @member {string} name
      */
-    @computed get name() {
-        return fileHelper.sanitizeBidirectionalFilename(this.data.unsanitizedName);
+    get name() {
+        return this.data.name;
     }
 
     set name(name) {
         this.data.unsanitizedName = name;
     }
 
+    get normalizedName() {
+        return this.data.normalizedName;
+    }
+
     /**
      * file extension
      * @type {string}
      */
-    @computed get ext() {
-        return fileHelper.getFileExtension(this.name);
+    get ext() {
+        return this.data.ext;
     }
 
     /**
      * file icon type
      * @type {string}
      */
-    @computed get iconType() {
-        return fileHelper.getFileIconType(this.ext);
+    get iconType() {
+        return this.data.iconType;
     }
 
     /**
@@ -329,46 +387,42 @@ class File extends Keg {
         this.data.descriptorVersion = val;
     }
 
-    /**
-     * @type {string}
-     */
-    @computed get nameWithoutExtension() {
-        return fileHelper.getFileNameWithoutExtension(this.name);
+    get nameWithoutExtension() {
+        return this.data.nameWithoutExtension;
     }
 
-    @computed get isImage() {
-        return fileHelper.isImage(this.ext);
+    get isImage() {
+        return this.data.isImage;
     }
 
-    @computed get fsSafeUid() {
-        return cryptoUtil.getHexHash(16, cryptoUtil.b64ToBytes(this.fileId));
+    get fsSafeUid() {
+        return this.data.fsSafeUid;
     }
-    @computed get tmpCachePath() {
-        return config.FileStream.getTempCachePath(`${this.fsSafeUid}.${this.ext}`);
+
+    get tmpCachePath() {
+        return this.data.tmpCachePath;
     }
+
     /**
      * currently mobile only: Full path to locally stored file
      * @type {string}
      */
-    @computed get cachePath() {
-        if (!config.isMobile) return null;
-
-        const name = `${this.name || this.fsSafeUid}.${this.ext}`;
-        return config.FileStream.getFullPath(this.fsSafeUid, name);
+    get cachePath() {
+        return this.data.cachePath;
     }
     /**
      * Human readable file size
      * @type {string}
      */
-    @computed get sizeFormatted() {
-        return util.formatBytes(this.size);
+    get sizeFormatted() {
+        return this.data.sizeFormatted;
     }
 
     /**
      * @type {number}
      */
-    @computed get chunksCount() {
-        return Math.ceil(this.size / this.chunkSize);
+    get chunksCount() {
+        return this.data.chunksCount;
     }
 
     /**
@@ -385,12 +439,12 @@ class File extends Keg {
         return this.size + this.chunksCount * config.CHUNK_OVERHEAD;
     }
 
-    @computed get isOverInlineSizeLimit() {
-        return clientApp.uiUserPrefs.limitInlineImageSize && this.size > config.chat.inlineImageSizeLimit;
+    get isOverInlineSizeLimit() {
+        return this.data.isOverInlineSizeLimit;
     }
 
-    @computed get isOversizeCutoff() {
-        return this.size > config.chat.inlineImageSizeLimitCutoff;
+    get isOversizeCutoff() {
+        return this.data.isOversizeCutoff;
     }
 
     get chunkSize() {

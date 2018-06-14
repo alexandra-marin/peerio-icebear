@@ -27,7 +27,8 @@
     "opt-in-npm-install": "opt --in npm-install --exec \"node ./scripts/npm_install_if_changed.js\""
   },
   "files": [
-    "src"
+    "src",
+    "test"
   ],
   "repository": {
     "type": "git",

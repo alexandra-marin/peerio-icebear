@@ -94,7 +94,7 @@ class FileStore extends FileStoreBase {
             tracker.seenThis(tracker.DESCRIPTOR_PATH, null, this.knownDescriptorVersion);
             if (this.knownDescriptorVersion < tracker.fileDescriptorDigest.maxUpdateId) this.updateDescriptors();
         });
-    }, 2000, { leading: true, maxWait: 4000 });
+    }, 1500, { leading: true, maxWait: 3000 });
 
     @action.bound onInitialFileAdded(keg, file) {
         if (!file.format) {

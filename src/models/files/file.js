@@ -13,6 +13,8 @@ const { retryUntilSuccess } = require('../../helpers/retry');
 const { ServerError } = require('../../errors');
 const clientApp = require('../client-app');
 const { asPromise } = require('../../helpers/prombservable');
+const TaskQueue = require('../../helpers/task-queue');
+
 
 // every unique file (fileId) has a set of properties we want to be shared between all the file kegs
 // representing this file
@@ -110,6 +112,8 @@ const fileDataMap = new Map();
  * @extends {Keg}
  */
 class File extends Keg {
+    static copyQueue = new TaskQueue(1, 200);
+
     constructor(db, store) {
         super(null, 'file', db);
         this.store = store;
@@ -687,43 +691,45 @@ class File extends Keg {
      * @param {KegDb} db
      */
     copyTo(db, store, folderId) {
-        return retryUntilSuccess(() => {
-            // to avoid creating empty keg
-            return socket.send('/auth/kegs/db/query', {
-                kegDbId: db.id,
-                type: 'file',
-                filter: { fileId: this.fileId }
-            }, false)
-                .then(resp => {
-                    // file already exists in this db
-                    if (resp.kegs.length) {
-                        if (!folderId) return Promise.resolve;
-                        const existingKeg = new File(db, store);
-                        existingKeg.loadFromKeg(resp.kegs[0]);
-                        existingKeg.folderId = folderId;
-                        return existingKeg.saveToServer();
-                    }
-                    const file = new File(db, store);
-                    file.descriptorKey = this.descriptorKey;
-                    file.fileId = this.fileId;
-                    file.folderId = folderId;
-                    return file.saveToServer()
-                        .then(() => {
-                            // a little hack adding the file object to store before it manages to update
-                            // to reduce lag before file appears
-                            if (!store.getById(this.fileId)) {
-                                store.files.unshift(file);
-                            }
-                        })
-                        .catch(err => {
-                            if (err && err.code === ServerError.codes.fileKegAlreadyExists) {
-                                // need to delete empty keg
-                                return file.remove();
-                            }
-                            return Promise.reject(err);
-                        });
-                });
-        }, `copying ${this.fileId} to ${db.id}`, 10);
+        File.copyQueue.addTask(() =>
+            retryUntilSuccess(() => {
+                // to avoid creating empty keg
+                return socket.send('/auth/kegs/db/query', {
+                    kegDbId: db.id,
+                    type: 'file',
+                    filter: { fileId: this.fileId }
+                }, false)
+                    .then(resp => {
+                        // file already exists in this db
+                        if (resp.kegs.length) {
+                            if (!folderId) return Promise.resolve;
+                            const existingKeg = new File(db, store);
+                            existingKeg.loadFromKeg(resp.kegs[0]);
+                            existingKeg.folderId = folderId;
+                            return existingKeg.saveToServer();
+                        }
+                        const file = new File(db, store);
+                        file.descriptorKey = this.descriptorKey;
+                        file.fileId = this.fileId;
+                        file.folderId = folderId;
+                        return file.saveToServer()
+                            .then(() => {
+                                // a little hack adding the file object to store before it manages to update
+                                // to reduce lag before file appears
+                                if (!store.getById(this.fileId)) {
+                                    store.files.unshift(file);
+                                }
+                            })
+                            .catch(err => {
+                                if (err && err.code === ServerError.codes.fileKegAlreadyExists) {
+                                    // need to delete empty keg
+                                    return file.remove();
+                                }
+                                return Promise.reject(err);
+                            });
+                    });
+            }, `copying ${this.fileId} to ${db.id}`, 5)
+        );
     }
 }
 

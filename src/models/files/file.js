@@ -691,7 +691,7 @@ class File extends Keg {
      * @param {KegDb} db
      */
     copyTo(db, store, folderId) {
-        File.copyQueue.addTask(() =>
+        return File.copyQueue.addTask(() =>
             retryUntilSuccess(() => {
                 // to avoid creating empty keg
                 return socket.send('/auth/kegs/db/query', {

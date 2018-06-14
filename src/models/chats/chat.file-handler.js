@@ -23,13 +23,12 @@ class ChatFileHandler {
         tracker.onUpdated(this.onFileDigestUpdate, true);
     }
 
-    onFileDigestUpdate = async (kegDbId, noRetry) => {
+    onFileDigestUpdate = async (kegDbId, digestEnsured) => {
         const msgDigest = tracker.getDigest(this.chat.id, 'file');
         this.maxUpdateId = msgDigest.maxUpdateId;
         if (this.knownUpdateId < msgDigest.knownUpdateId) this.knownUpdateId = msgDigest.knownUpdateId;
         if (!this.maxUpdateId) return;
-        if (!this.knownUpdateId) {
-            if (noRetry) return;
+        if (!this.knownUpdateId && !digestEnsured) {
             await this.chat.ensureDigestLoaded();
             this.onFileDigestUpdate(null, true);
             return;

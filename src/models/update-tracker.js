@@ -285,6 +285,12 @@ class UpdateTracker {
         }
     }
 
+    // call this to make sure db digest is loaded disregarding its unread status
+    async loadDigestFor(kegDbId) {
+        let resp = await socket.send('/auth/updates/digest', { prefixes: [kegDbId] }, false);
+        this.processDigestResponse(resp);
+    }
+
     // In the beginning of session, any unread digest items with newKegsCount = 0
     // or with newKegsCount>0 but for keg types which counters are not useful to us - are leftovers that we can
     // remove to minimize digest size

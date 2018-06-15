@@ -691,6 +691,7 @@ class File extends Keg {
      * @param {KegDb} db
      */
     copyTo(db, store, folderId) {
+        if (store.getById(this.fileId)) return Promise.resolve();
         return File.copyQueue.addTask(() =>
             retryUntilSuccess(() => {
                 // to avoid creating empty keg

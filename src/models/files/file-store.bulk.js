@@ -33,6 +33,9 @@ class FileStoreBulk {
         return !getFileStore().selectedFilesOrFolders
             .some(f => f.isFolder && !f.canShare || f.isLegacy);
     }
+    @computed get hasLegacyObjectsSelected() {
+        return getFileStore().selectedFilesOrFolders.some(f => f.isLegacy || (f.isFolder && f.hasLegacyFiles));
+    }
 
     async removeOne(i, batch) {
         if (i.isFolder && this.deleteFolderConfirmator) {

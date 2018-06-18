@@ -39,12 +39,6 @@ class FileStoreFolders {
         return this.foldersMap.get(id);
     }
 
-    searchAllFoldersByName(name) {
-        const q = name ? name.toLowerCase() : '';
-        return this.root.allFolders
-            .filter(f => f.normalizedName.includes(q));
-    }
-
     @computed get selectedFolders() {
         let ret = this.folders.filter(f => f.selected);
         if (!this.fileStore.isMainStore) return ret;

@@ -23,10 +23,16 @@ class ChatFileHandler {
         tracker.onUpdated(this.onFileDigestUpdate, true);
     }
 
-    onFileDigestUpdate = () => {
+    onFileDigestUpdate = async (kegDbId, digestEnsured) => {
         const msgDigest = tracker.getDigest(this.chat.id, 'file');
         this.maxUpdateId = msgDigest.maxUpdateId;
         if (this.knownUpdateId < msgDigest.knownUpdateId) this.knownUpdateId = msgDigest.knownUpdateId;
+        if (!this.maxUpdateId) return;
+        if (!this.knownUpdateId && !digestEnsured) {
+            await this.chat.ensureDigestLoaded();
+            this.onFileDigestUpdate(null, true);
+            return;
+        }
         this.copyFileKegs();
     }
 
@@ -51,8 +57,6 @@ class ChatFileHandler {
                         fileStore.removeCachedChatKeg(this.chat.id, keg.kegId);
                         return;
                     }
-                    // it's our own file, no need to copy to SELF
-                    if (keg && keg.descriptor && keg.descriptor.owner === getUser().username) return;
                     const file = new File(this.chat.db, fileStore);
                     try {
                         if (file.loadFromKeg(keg) && !file.deleted) {
@@ -60,6 +64,8 @@ class ChatFileHandler {
                             if (this.chat.isChannel) {
                                 return;
                             }
+                            // it's our own file, no need to copy to SELF
+                            if (keg.props.descriptor.owner === getUser().username) return;
                             // Not waiting for this to resolve. Internally it will do retries,
                             // but on larger scale it's too complicated to handle recovery
                             // from non-connection related errors

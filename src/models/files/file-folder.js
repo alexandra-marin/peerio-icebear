@@ -92,7 +92,7 @@ class FileFolder {
     }
 
     @computed get owner() {
-        if (!this.isShared) return getUser().username;
+        if (!this.isShared && !this.root.isShared) return getUser().username;
         // store and kegDb already exist and never change.
         // boot is observable
         const boot = this.store.kegDb.boot;

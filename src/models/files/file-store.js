@@ -239,28 +239,19 @@ class FileStore extends FileStoreBase {
             }, false),
             `loading recent files for ${kegDbId}`, 10
         ).then(resp => {
-            if (!resp || !resp.kegs) {
-                return;
-            }
             for (const keg of resp.kegs) {
                 if (keg.deleted || keg.hidden) {
                     console.log('Hidden or deleted file kegs should not have been returned by server.', keg.id);
                     continue;
                 }
                 const file = new File(this.kegDb, this);
-                if (keg.collectionVersion > this.maxUpdateId) {
-                    this.maxUpdateId = keg.collectionVersion;
-                }
-                if (keg.collectionVersion > this.knownUpdateId) {
-                    this.knownUpdateId = keg.collectionVersion;
-                }
                 if (file.loadFromKeg(keg)) {
                     if (!file.fileId) {
                         if (file.version > 1) console.error('File keg missing fileId', file.id);
                         // we can get a freshly created keg, it's not a big deal
                         continue;
                     }
-                    if (this.fileMap[file.fileId]) {
+                    if (this.chatFileMap. [file.fileId]) {
                         console.error('File keg has duplicate fileId', file.id);
                         continue;
                     }
@@ -324,6 +315,16 @@ class FileStore extends FileStoreBase {
         }
     }
 
+    setChatFile(kegDbId, file) {
+        let fileMap = this.chatFileMap.get(kegDbId);
+        if (!fileMap) {
+            fileMap = observable.map();
+            this.chatFileMap.set(kegDbId, fileMap);
+        }
+        const existing =
+            fileMap.set(file.fileId, file);
+    }
+
     // TODO: i think this will do parallel loading with chat.file-handler of newly shared files
     loadChatFile(fileId, kegDbId) {
         const chat = getChatStore().chatMap[kegDbId];
@@ -336,12 +337,7 @@ class FileStore extends FileStoreBase {
         const file = new File(chat.db, this);
         file.fileId = fileId;
         setTimeout(() => {
-            let fileMap = this.chatFileMap.get(kegDbId);
-            if (!fileMap) {
-                fileMap = observable.map();
-                this.chatFileMap.set(kegDbId, fileMap);
-            }
-            fileMap.set(fileId, file);
+            this.setChatFile(kegDbId, file);
             retryUntilSuccess(() => {
                 return socket.send('/auth/kegs/db/query', {
                     kegDbId: chat.id,

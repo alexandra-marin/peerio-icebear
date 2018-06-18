@@ -251,26 +251,31 @@ class FileStore extends FileStoreBase {
                         // we can get a freshly created keg, it's not a big deal
                         continue;
                     }
-                    if (this.chatFileMap. [file.fileId]) {
-                        console.error('File keg has duplicate fileId', file.id);
-                        continue;
-                    }
-                    this.files.unshift(file);
-                    if (!this.loaded && this.onInitialFileAdded) {
-                        this.onInitialFileAdded(keg, file);
-                    }
+                    this.setChatFile(kegDbId, file);
                 } else {
-                    console.error('Failed to load file keg.', keg.kegId);
-                    // trying to be safe performing destructive operation of deleting a corrupted file keg
-                    // (old file system had some)
-                    if (keg.decryptionError && keg.type === 'file' && !keg.format) {
-                        console.log('Removing invalid file keg', keg.id);
-                        file.remove();
-                    }
+                    console.error('Failed to load file keg in chat.', keg.kegId, kegDbId);
                     continue;
                 }
             }
         });
+    }
+
+    getCachedRecentFilesForChat(kegDbId) {
+        const fileMap = this.chatFileMap.get(kegDbId);
+        if (!fileMap) {
+            return [];
+        }
+        const ret = fileMap.values()
+            .filter(f => f.loaded && !f.deleted)
+            .sort(
+                (f1, f2) => {
+                    if (f1.kegCreatedAt > f2.kegCreatedAt) return 1;
+                    if (f1.kegCreatedAt < f2.kegCreatedAt) return -1;
+                    return 0;
+                }
+            );
+        if (ret.length > config.recentFilesDisplayLimit) ret.length = config.recentFilesDisplayLimit;
+        return ret;
     }
 
 
@@ -321,8 +326,11 @@ class FileStore extends FileStoreBase {
             fileMap = observable.map();
             this.chatFileMap.set(kegDbId, fileMap);
         }
-        const existing =
-            fileMap.set(file.fileId, file);
+        const existing = fileMap.get(file.fileId);
+        if (existing && existing.version < file.version) {
+            return;
+        }
+        fileMap.set(file.fileId, file);
     }
 
     // TODO: i think this will do parallel loading with chat.file-handler of newly shared files
@@ -384,7 +392,7 @@ class FileStore extends FileStoreBase {
     updateCachedChatKeg(chatId, keg) {
         const map = this.chatFileMap.get(chatId);
         if (!map) return;
-        map.set(keg.fileId, keg);
+        this.setChatFile(chatId, keg);
     }
 
     /**

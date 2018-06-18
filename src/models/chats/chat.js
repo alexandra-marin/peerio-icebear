@@ -240,14 +240,26 @@ class Chat {
      */
     @observable newMessagesMarkerPos = '';
 
-    @observable loadingRecentFiles = false;
+    // for internal use
+    loadingRecentFiles = false;
     recentFilesLoaded = false;
     /**
      * List of recent file ids for this chat.
      * @type {Array<string>}
      */
     @computed get recentFiles() {
-        return getFileStore().getRecentFilesForChat(this.id);
+        if (!this.recentFilesLoaded && !this.loadingRecentFiles) {
+            this.loadingRecentFiles = true;
+            getFileStore()
+                .loadRecentFilesForChat(this.id)
+                .then(() => {
+                    this.recentFilesLoaded = true;
+                })
+                .finally(() => {
+                    this.loadingRecentFiles = false;
+                });
+        }
+        return getFileStore().getCachedRecentFilesForChat(this.id);
     }
 
     /**

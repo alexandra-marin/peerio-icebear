@@ -1,7 +1,6 @@
 const { when } = require('mobx');
 const fileStore = require('../files/file-store');
 const config = require('../../config');
-const { retryUntilSuccess } = require('../../helpers/retry');
 const socket = require('../../network/socket');
 const tracker = require('../update-tracker');
 const { getUser } = require('../../helpers/di-current-user');
@@ -150,27 +149,6 @@ class ChatFileHandler {
             );
         }
         return file.remove();
-    }
-
-
-    getRecentFiles() {
-        return retryUntilSuccess(() => {
-            return socket.send(
-                '/auth/kegs/db/files/latest',
-                { kegDbId: this.chat.id, count: config.chat.recentFilesDisplayLimit },
-                false
-            )
-                .then(res => {
-                    const ids = [];
-                    res.forEach(raw => {
-                        const fileIds = JSON.parse(raw);
-                        fileIds.forEach(id => {
-                            if (!ids.includes(id)) ids.push(id);
-                        });
-                    });
-                    return ids;
-                });
-        });
     }
 }
 module.exports = ChatFileHandler;

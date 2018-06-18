@@ -3,6 +3,7 @@ const { getUrl } = require('./helpers/https');
 const { getRandomUsername } = require('./helpers/random-data');
 const { waitForEmail } = require('./helpers/maildrop');
 const testConfig = require('./test-config');
+const ContactsHelper = require('./helpers/contacts');
 
 /**
  * Cucumber creates an instance of this class for each scenario.
@@ -14,6 +15,7 @@ class PeerioAppWorld {
         this.attach = attach;
         this.parameters = parameters;
         this.filesToCleanup = [];
+        this.contactsHelper = new ContactsHelper(this);
     }
 
     /**
@@ -93,10 +95,6 @@ class PeerioAppWorld {
 
     createTestAccount = async (username = null, email = null) => {
         return this.createAccount(username, email, true);
-    }
-
-    createMedcryptorAccount = async (medcryptorData) => {
-        return this.createAccount(null, null, false, medcryptorData);
     }
 }
 

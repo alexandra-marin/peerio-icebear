@@ -16,7 +16,9 @@ const Contact = require('../contacts/contact');
 const chatInviteStore = require('../chats/chat-invite-store');
 const { asPromise } = require('../../helpers/prombservable');
 const { cryptoUtil } = require('../../crypto');
+const tracker = require('../update-tracker');
 const { getFileStore } = require('../../helpers/di-file-store');
+const { retryUntilSuccess } = require('../../helpers/retry');
 
 // const volumeStore = require('../volumes/volume-store');
 
@@ -1177,6 +1179,12 @@ class Chat {
 
     ensureMetaLoaded() {
         return asPromise(this, 'metaLoaded', true);
+    }
+
+    async ensureDigestLoaded() {
+        if (this.digestLoaded) return;
+        await retryUntilSuccess(() => tracker.loadDigestFor(this.id), `loading digest for ${this.id}`, 5);
+        this.digestLoaded = true;
     }
 
     dispose() {

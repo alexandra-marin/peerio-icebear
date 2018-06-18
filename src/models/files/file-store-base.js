@@ -56,29 +56,33 @@ class FileStoreBase {
     }
 
     // Subset of files not currently hidden by any applied filters
-    @computed get visibleFiles() {
-        return this.allFiles.filter(f => f.show);
+    @computed get filesSearchResult() {
+        if (!this.searchQuery) return [];
+        const q = this.searchQuery.toUpperCase();
+        return this.allFiles
+            .filter(f => f.normalizedName.includes(q));
+    }
+
+    // Subset of folders not currently hidden by any applied filters
+    @computed get foldersSearchResult() {
+        if (!this.searchQuery) return [];
+        const q = this.searchQuery.toUpperCase();
+        return this.folderStore.root.allFolders
+            .filter(f => f.normalizedName.includes(q));
     }
 
     // Subset of files and folders not currently hidden by any applied filters
-    @computed get visibleFilesAndFolders() {
-        return this.visibleFolders.concat(this.visibleFiles);
+    @computed get filesAndFoldersSearchResult() {
+        return this.foldersSearchResult.concat(this.filesSearchResult);
     }
 
-    // Filter to apply when computing visible folders
-    @observable folderFilter = '';
-
-    // Subset of folders not currently hidden by any applied filters
-    @computed get visibleFolders() {
-        return this.folderStore.searchAllFoldersByName(this.folderFilter);
-    }
+    // Filter to apply when computing search for files and folders
+    @observable searchQuery = '';
 
     // Store is loading full file list for the first time.
     @observable loading = false;
     // Will set to true after file list has been updated upon reconnect.
     @observable updatedAfterReconnect = true;
-    // Readonly, shows which keyword was used with last call to `filter()`, this need refactoring.
-    @observable currentFilter = '';
     // Initial file list was loaded.
     @observable loaded = false;
     // Updates to file store are paused.
@@ -116,18 +120,6 @@ class FileStoreBase {
         return this.hasSelectedFiles && this.allFiles.every(FileStoreBase.isSelectedFileShareable);
     }
 
-    @computed get allVisibleSelected() {
-        for (let i = 0; i < this.allFiles.length; i++) {
-            if (!this.allFiles[i].show) continue;
-            if (this.allFiles[i].selected === false) return false;
-        }
-        return true;
-    }
-
-    @computed get selectedCount() {
-        return this.selectedFiles.length;
-    }
-
     getFilesSharedBy(username) {
         return this.files.filter(f => f.owner === username);
     }
@@ -163,28 +155,6 @@ class FileStoreBase {
         });
     }
 
-    // Applies filter to files.
-    @action filterByName(query) {
-        this.currentFilter = query;
-        const regex = new RegExp(_.escapeRegExp(query), 'i');
-        for (let i = 0; i < this.allFiles.length; i++) {
-            const f = this.allFiles[i];
-            f.show = regex.test(f.name);
-            if (!f.show) f.selected = false;
-        }
-    }
-
-    // Resets filter
-    @action clearFilter() {
-        this.currentFilter = '';
-        for (let i = 0; i < this.files.length; i++) {
-            this.files[i].show = true;
-        }
-        if (this.isMainStore) {
-            FileStoreBase.instances.forEach(store => store.clearFilter());
-        }
-    }
-
     onFileDigestUpdate = _.debounce(() => {
         const digest = tracker.getDigest(this.kegDb.id, 'file');
         // this.unreadFiles = digest.newKegsCount;
@@ -194,7 +164,7 @@ class FileStoreBase {
         }
         this.maxUpdateId = digest.maxUpdateId;
         this.updateFiles();
-    }, 2000, { leading: true, maxWait: 4000 });
+    }, 1500, { leading: true, maxWait: 3000 });
 
     _getFiles() {
         const filter = this.knownUpdateId ? { minCollectionVersion: this.knownUpdateId } : {};

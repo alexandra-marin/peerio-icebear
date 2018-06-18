@@ -244,7 +244,9 @@ class FileStore extends FileStoreBase {
                     console.log('Hidden or deleted file kegs should not have been returned by server.', keg.id);
                     continue;
                 }
-                const file = new File(this.kegDb, this);
+                const chat = getChatStore().chatMap[kegDbId];
+                if (!chat) continue;
+                const file = new File(chat.db, this);
                 if (file.loadFromKeg(keg)) {
                     if (!file.fileId) {
                         if (file.version > 1) console.error('File keg missing fileId', file.id);

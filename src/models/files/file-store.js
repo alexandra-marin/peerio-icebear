@@ -269,8 +269,8 @@ class FileStore extends FileStoreBase {
             .filter(f => f.loaded && !f.deleted)
             .sort(
                 (f1, f2) => {
-                    if (f1.kegCreatedAt > f2.kegCreatedAt) return 1;
-                    if (f1.kegCreatedAt < f2.kegCreatedAt) return -1;
+                    if (f1.kegCreatedAt > f2.kegCreatedAt) return -1;
+                    if (f1.kegCreatedAt < f2.kegCreatedAt) return 1;
                     return 0;
                 }
             );

@@ -1,17 +1,24 @@
 const { Given, Then } = require('cucumber');
 const { getRandomUsername } = require('../helpers/random-data');
 
+async function createRole(role, world) {
+    world.role = role;
+    world.app.startMedcryptor();
+    const medcryptorData = {
+        mcrRoles: [role]
+    };
+    await world.createAccount(null, null, true, medcryptorData);
+}
+
 Given('I create a MedCryptor account', async function() {
-    this.ice.config.whiteLabel.name = 'medcryptor';
-    this.ice.config.platform = 'ios';
+    this.app.startMedcryptor();
     await this.createAccount();
     if (this.cucumbotClient) this.cucumbotClient.sendReady();
 });
 
 Given('I create a MedCryptor account with metadata', async function() {
+    this.app.startMedcryptor();
     this.medicalId = getRandomUsername();
-    this.ice.config.whiteLabel.name = 'medcryptor';
-    this.ice.config.platform = 'ios';
     const medcryptorData = {
         mcrCountry: 'Canada',
         mcrSpecialty: 'cardiology',
@@ -19,12 +26,20 @@ Given('I create a MedCryptor account with metadata', async function() {
         mcrAHPRA: this.medicalId
     };
 
-    await this.createMedcryptorAccount(medcryptorData);
+    await this.createAccount(null, null, false, medcryptorData);
     await this.app.restart();
-    this.ice.config.platform = 'ios';
+    this.app.startMedcryptor();
     await this.login();
 
     this.ice.User.current.props.should.deep.contain(medcryptorData);
+});
+
+Given('I create a Medcryptor doctor account', async function() {
+    await createRole('doctor', this);
+});
+
+Given('I create a Medcryptor admin account', async function() {
+    await createRole('admin', this);
 });
 
 Then('I can edit specialization, medical ID, country and role', async function() {
@@ -39,7 +54,7 @@ Then('I can edit specialization, medical ID, country and role', async function()
     await this.ice.User.current.saveProfile();
 
     await this.app.restart();
-    this.ice.config.platform = 'ios';
+    this.app.startMedcryptor();
     await this.login();
 
     this.ice.User.current.props.should.deep.contain(medcryptorData);
@@ -57,7 +72,7 @@ Then('I can not register another user with same AHPRA', async function() {
         mcrAHPRA: this.medicalId
     };
 
-    await this.createMedcryptorAccount(medcryptorData).should.be.rejected;
+    await this.createAccount(null, null, false, medcryptorData).should.be.rejected;
 });
 
 Then('I create a patient space', async function() {
@@ -124,4 +139,10 @@ Then('I create another patient space', async function() {
     ice.chatStore.spaces.length.should.equal(2);
     ice.chatStore.spaces[0].spaceName.should.equal(this.space.spaceName);
     ice.chatStore.spaces[1].spaceName.should.equal(this.anotherSpace.spaceName);
+});
+
+Then('I can see their role in the contact details', async function() {
+    const contact = await this.contactsHelper.findContact(this.testAccount.username);
+    contact.mcrRoles.should.be.an('array');
+    contact.mcrRoles[0].should.equal(this.role);
 });

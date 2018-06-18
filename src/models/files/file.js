@@ -691,6 +691,14 @@ class File extends Keg {
      * @param {KegDb} db
      */
     copyTo(db, store, folderId) {
+        // TODO: ugly, refactor when chats get their own file stores
+        const dstIsChat = db.id.startsWith('channel:') || db.id.startsWith('chat:');
+        if (dstIsChat) {
+            const chatFile = store.getByIdInChat(db.id, this.fileId);
+            if (chatFile && chatFile.loaded && !chatFile.deleted) return Promise.resolve();
+        } else if (store.getById(this.fileId)) {
+            return Promise.resolve();
+        }
         return File.copyQueue.addTask(() =>
             retryUntilSuccess(() => {
                 // to avoid creating empty keg
@@ -716,7 +724,7 @@ class File extends Keg {
                             .then(() => {
                                 // a little hack adding the file object to store before it manages to update
                                 // to reduce lag before file appears
-                                if (!store.getById(this.fileId)) {
+                                if (!dstIsChat && !store.getById(this.fileId)) {
                                     store.files.unshift(file);
                                 }
                             })

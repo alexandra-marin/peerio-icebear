@@ -164,7 +164,7 @@ class FileStoreBase {
         }
         this.maxUpdateId = digest.maxUpdateId;
         this.updateFiles();
-    }, 2000, { leading: true, maxWait: 4000 });
+    }, 1500, { leading: true, maxWait: 3000 });
 
     _getFiles() {
         const filter = this.knownUpdateId ? { minCollectionVersion: this.knownUpdateId } : {};

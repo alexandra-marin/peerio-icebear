@@ -94,7 +94,7 @@ class FileStore extends FileStoreBase {
             tracker.seenThis(tracker.DESCRIPTOR_PATH, null, this.knownDescriptorVersion);
             if (this.knownDescriptorVersion < tracker.fileDescriptorDigest.maxUpdateId) this.updateDescriptors();
         });
-    }, 2000, { leading: true, maxWait: 4000 });
+    }, 1500, { leading: true, maxWait: 3000 });
 
     @action.bound onInitialFileAdded(keg, file) {
         if (!file.format) {
@@ -224,6 +224,61 @@ class FileStore extends FileStoreBase {
         return found;
     }
 
+    loadRecentFilesForChat(kegDbId) {
+        return retryUntilSuccess(
+            () => socket.send('/auth/kegs/db/list-ext', {
+                kegDbId,
+                options: {
+                    type: 'file',
+                    reverse: true,
+                    count: config.recentFilesDisplayLimit
+                },
+                filter: {
+                    deleted: false
+                }
+            }, false),
+            `loading recent files for ${kegDbId}`, 10
+        ).then(resp => {
+            for (const keg of resp.kegs) {
+                if (keg.deleted || keg.hidden) {
+                    console.log('Hidden or deleted file kegs should not have been returned by server.', keg.id);
+                    continue;
+                }
+                const file = new File(this.kegDb, this);
+                if (file.loadFromKeg(keg)) {
+                    if (!file.fileId) {
+                        if (file.version > 1) console.error('File keg missing fileId', file.id);
+                        // we can get a freshly created keg, it's not a big deal
+                        continue;
+                    }
+                    this.setChatFile(kegDbId, file);
+                } else {
+                    console.error('Failed to load file keg in chat.', keg.kegId, kegDbId);
+                    continue;
+                }
+            }
+        });
+    }
+
+    getCachedRecentFilesForChat(kegDbId) {
+        const fileMap = this.chatFileMap.get(kegDbId);
+        if (!fileMap) {
+            return [];
+        }
+        const ret = fileMap.values()
+            .filter(f => f.loaded && !f.deleted)
+            .sort(
+                (f1, f2) => {
+                    if (f1.kegCreatedAt > f2.kegCreatedAt) return -1;
+                    if (f1.kegCreatedAt < f2.kegCreatedAt) return 1;
+                    return 0;
+                }
+            );
+        if (ret.length > config.recentFilesDisplayLimit) ret.length = config.recentFilesDisplayLimit;
+        return ret;
+    }
+
+
     /**
      * Returns file shared in specific chat. Loads it if needed.
      * @param {string} fileId
@@ -265,6 +320,19 @@ class FileStore extends FileStoreBase {
         }
     }
 
+    setChatFile(kegDbId, file) {
+        let fileMap = this.chatFileMap.get(kegDbId);
+        if (!fileMap) {
+            fileMap = observable.map();
+            this.chatFileMap.set(kegDbId, fileMap);
+        }
+        const existing = fileMap.get(file.fileId);
+        if (existing && existing.version < file.version) {
+            return;
+        }
+        fileMap.set(file.fileId, file);
+    }
+
     // TODO: i think this will do parallel loading with chat.file-handler of newly shared files
     loadChatFile(fileId, kegDbId) {
         const chat = getChatStore().chatMap[kegDbId];
@@ -277,12 +345,7 @@ class FileStore extends FileStoreBase {
         const file = new File(chat.db, this);
         file.fileId = fileId;
         setTimeout(() => {
-            let fileMap = this.chatFileMap.get(kegDbId);
-            if (!fileMap) {
-                fileMap = observable.map();
-                this.chatFileMap.set(kegDbId, fileMap);
-            }
-            fileMap.set(fileId, file);
+            this.setChatFile(kegDbId, file);
             retryUntilSuccess(() => {
                 return socket.send('/auth/kegs/db/query', {
                     kegDbId: chat.id,
@@ -329,7 +392,7 @@ class FileStore extends FileStoreBase {
     updateCachedChatKeg(chatId, keg) {
         const map = this.chatFileMap.get(chatId);
         if (!map) return;
-        map.set(keg.fileId, keg);
+        this.setChatFile(chatId, keg);
     }
 
     /**

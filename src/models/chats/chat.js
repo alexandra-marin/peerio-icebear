@@ -16,6 +16,10 @@ const Contact = require('../contacts/contact');
 const chatInviteStore = require('../chats/chat-invite-store');
 const { asPromise } = require('../../helpers/prombservable');
 const { cryptoUtil } = require('../../crypto');
+const tracker = require('../update-tracker');
+const { getFileStore } = require('../../helpers/di-file-store');
+const { retryUntilSuccess } = require('../../helpers/retry');
+
 // const volumeStore = require('../volumes/volume-store');
 
 // to assign when sending a message and don't have an id yet
@@ -237,27 +241,27 @@ class Chat {
      * @type {string}
      */
     @observable newMessagesMarkerPos = '';
-    /**
-     * Indicates ongoing loading recent files list for this chat
-     * @type {bool}
-     */
-    @observable loadingRecentFiles = false;
-    @observable _recentFiles = null;
+
+    // for internal use
+    loadingRecentFiles = false;
+    recentFilesLoaded = false;
     /**
      * List of recent file ids for this chat.
      * @type {Array<string>}
      */
     @computed get recentFiles() {
-        if (this._recentFiles === null && !this.loadingRecentFiles) {
+        if (!this.recentFilesLoaded && !this.loadingRecentFiles) {
             this.loadingRecentFiles = true;
-            if (this.metaLoaded) {
-                this._fileHandler.getRecentFiles().then(res => {
-                    this._recentFiles = res;
+            getFileStore()
+                .loadRecentFilesForChat(this.id)
+                .then(() => {
+                    this.recentFilesLoaded = true;
+                })
+                .finally(() => {
                     this.loadingRecentFiles = false;
                 });
-            }
         }
-        return this._recentFiles || [];
+        return getFileStore().getCachedRecentFilesForChat(this.id);
     }
 
     /**
@@ -557,7 +561,6 @@ class Chat {
             this._reTriggerPaging(prepend, kegs);
         }
         this.onNewMessageLoad(newMentionCount, newMessageCount, lastMentionId);
-        if (!this.canGoDown && this.initialPageLoaded) this.detectFileAttachments(accumulator);
         // sort
         this.sortMessages();
         if (!prepend) {
@@ -903,7 +906,6 @@ class Chat {
         this._cancelTopPageLoad = false;
         this._cancelBottomPageLoad = false;
         this.updatedAfterReconnect = true;
-        this._recentFiles = null;
         this.loadMessages();
     }
 
@@ -1162,25 +1164,6 @@ class Chat {
     }
 
 
-    /**
-     * Checks if there are any file attachments in new message batch and adds them to _recentFiles if needed.
-     */
-    @action detectFileAttachments(messages) {
-        if (!this._recentFiles) {
-            this._recentFiles = [];
-        }
-        for (let i = 0; i < messages.length; i++) {
-            const { files } = messages[i];
-            if (!files || !files.length) continue;
-            for (let j = 0; j < files.length; j++) {
-                if (!this._recentFiles.includes(files[j])) this._recentFiles.unshift(files[j]);
-            }
-        }
-        if (this._recentFiles.length > config.chat.recentFilesDisplayLimit) {
-            this._recentFiles.length = config.chat.recentFilesDisplayLimit;
-        }
-    }
-
     resetExternalContent = () => {
         if (this.resetScheduled) return;
         this.resetScheduled = true;
@@ -1196,6 +1179,12 @@ class Chat {
 
     ensureMetaLoaded() {
         return asPromise(this, 'metaLoaded', true);
+    }
+
+    async ensureDigestLoaded() {
+        if (this.digestLoaded) return;
+        await retryUntilSuccess(() => tracker.loadDigestFor(this.id), `loading digest for ${this.id}`, 5);
+        this.digestLoaded = true;
     }
 
     dispose() {

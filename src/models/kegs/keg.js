@@ -347,6 +347,8 @@ class Keg {
             this.owner = keg.owner;
             this.deleted = keg.deleted;
             this.collectionVersion = keg.collectionVersion || ''; // protect from potential server bugs sending null
+            this.kegCreatedAt = keg.createdAt;
+            this.kegUpdatedAt = keg.updatedAt;
             if (keg.props) this.deserializeProps(keg.props);
             //  is this an empty keg? probably just created.
             if (!keg.payload) {

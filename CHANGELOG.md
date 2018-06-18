@@ -2,6 +2,37 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.4.0"></a>
+# [5.4.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.3.0...v5.4.0) (2018-06-18)
+
+
+### Bug Fixes
+
+* 'file unshared' issue ([50b0217](https://github.com/PeerioTechnologies/peerio-icebear/commit/50b0217))
+* add contactsHelper file ([ff9ad2f](https://github.com/PeerioTechnologies/peerio-icebear/commit/ff9ad2f))
+* failing test ([1608545](https://github.com/PeerioTechnologies/peerio-icebear/commit/1608545))
+* file copy from DM logic ([900ea38](https://github.com/PeerioTechnologies/peerio-icebear/commit/900ea38))
+* file sharing in dm ([066d0f7](https://github.com/PeerioTechnologies/peerio-icebear/commit/066d0f7))
+* lint ([c15f583](https://github.com/PeerioTechnologies/peerio-icebear/commit/c15f583))
+* recent files sorting ([9db576d](https://github.com/PeerioTechnologies/peerio-icebear/commit/9db576d))
+* rework search ([5ea7a3f](https://github.com/PeerioTechnologies/peerio-icebear/commit/5ea7a3f))
+* shareFolder now works on volumes to add participants ([d318cae](https://github.com/PeerioTechnologies/peerio-icebear/commit/d318cae))
+* show volume owner as owner of all nested folders inside volume ([84688c1](https://github.com/PeerioTechnologies/peerio-icebear/commit/84688c1))
+
+
+### Features
+
+* support isAutoAdded field in invitations ([4315e13](https://github.com/PeerioTechnologies/peerio-icebear/commit/4315e13))
+
+
+### Performance Improvements
+
+* more efficient file copy ([6c5ef1f](https://github.com/PeerioTechnologies/peerio-icebear/commit/6c5ef1f))
+* move more props to shared file data ([bddf8a5](https://github.com/PeerioTechnologies/peerio-icebear/commit/bddf8a5))
+* queue on file copy operations ([500e231](https://github.com/PeerioTechnologies/peerio-icebear/commit/500e231))
+
+
+
 <a name="5.3.0"></a>
 # [5.3.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.2.8...v5.3.0) (2018-06-09)
 

@@ -102,20 +102,21 @@ class ChatStoreSpaces {
     }
 
     @computed get currentSpaceName() {
+        if (!this.currentSpace) return '';
         return this.currentSpace.spaceName;
     }
 
-    get isPatientRoomOpen() {
+    @computed get isPatientRoomOpen() {
         if (!this.store.activeChat || !this.currentSpace || !this.currentSpace.patientRooms) return null;
         return this.currentSpace.patientRooms.some(r => r.id === this.store.activeChat.id);
     }
 
-    get isInternalRoomOpen() {
+    @computed get isInternalRoomOpen() {
         if (!this.store.activeChat || !this.currentSpace || !this.currentSpace.internalRooms) return null;
         return this.currentSpace.internalRooms.some(r => r.id === this.store.activeChat.id);
     }
 
-    get currentRoomType() {
+    @computed get currentRoomType() {
         if (this.isPatientRoomOpen) return 'patientroom';
         if (this.isInternalRoomOpen) return 'internalroom';
         return null;

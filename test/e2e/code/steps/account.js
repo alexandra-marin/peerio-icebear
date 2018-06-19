@@ -68,19 +68,31 @@ When('I save my account key as PDF document', async function() {
     await ice.User.current.setAccountKeyBackedUp();
 });
 
-When('I invite other users and they sign up', { timeout: 450000 }, async function() {
-    // Get 5 random emails
-    const invitedEmails = Array(5).fill().map(getRandomEmail);
+When('I invite other users and they sign up', { timeout: 1000000 }, async function() {
+    const userCount = 5;
+    // Get userCount random emails
+    const invitedEmails = Array(userCount).fill().map(getRandomEmail);
 
     // Invite them all to join
     await Promise.map(invitedEmails, (invited) => ice.contactStore.invite(invited));
 
     // Create accounts for all
-    await Promise.map(invitedEmails, async (invited) => {
-        await this.app.restart();
-        await this.createTestAccount(getRandomUsername(), invited);
-        await this.confirmPrimaryEmail(invited);
-    }, { concurrency: 1 });
+    await Promise.map(
+        invitedEmails,
+        async (invited) => {
+            await this.app.restart();
+            await this.createTestAccount(getRandomUsername(), invited);
+        },
+        { concurrency: 1 }
+    );
+
+    // confirmPrimaryEmail is an independent from current context/world helper method
+    // so it's safe to call it here for all the users
+    await Promise.map(
+        invitedEmails,
+        invited => this.confirmPrimaryEmail(invited),
+        { concurrency: userCount }
+    );
 
     await this.app.restart();
     await this.login();

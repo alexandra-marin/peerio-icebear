@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.5.0"></a>
+# [5.5.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.4.2...v5.5.0) (2018-06-19)
+
+
+### Bug Fixes
+
+* add invite colleague copy ([1b7e527](https://github.com/PeerioTechnologies/peerio-icebear/commit/1b7e527))
+* folder sync issues ([15d0c63](https://github.com/PeerioTechnologies/peerio-icebear/commit/15d0c63))
+* Refactor whitelabeling on Peerio ID ([81509c0](https://github.com/PeerioTechnologies/peerio-icebear/commit/81509c0))
+
+
+### Features
+
+* Chat#shareFilesAndFolders will share anything now ([18edc7b](https://github.com/PeerioTechnologies/peerio-icebear/commit/18edc7b))
+* snackbar on changing volume participants ([6547e7e](https://github.com/PeerioTechnologies/peerio-icebear/commit/6547e7e))
+
+
+
 <a name="5.4.2"></a>
 ## [5.4.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.4.1...v5.4.2) (2018-06-19)
 

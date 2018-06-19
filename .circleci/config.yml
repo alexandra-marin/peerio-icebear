@@ -2,7 +2,7 @@
 test_defaults: &test_defaults
   docker:
     - image: circleci/node:9.8
-   working_directory: ~/repo
+  working_directory: ~/repo
 
 test_step_defaults: &test_step_defaults
   - checkout

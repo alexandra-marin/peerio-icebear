@@ -228,7 +228,7 @@ class FileStoreBase {
                     console.error('Failed to load file keg.', keg.kegId);
                     // trying to be safe performing destructive operation of deleting a corrupted file keg
                     // (old file system had some)
-                    if (keg.decryptionError && keg.type === 'file' && !keg.format) {
+                    if (file.decryptionError && keg.type === 'file' && !keg.format) {
                         console.log('Removing invalid file keg', keg.id);
                         file.remove();
                     }

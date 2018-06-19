@@ -4,35 +4,15 @@ test_defaults: &test_defaults
     - image: circleci/node:9.8
   working_directory: ~/repo
 
-test_step_defaults: &test_step_defaults
-  - checkout
-  - run:
-      name: "Checking Versions"
-      command: |
-        node --version
-        npm --version
-  - restore_cache:
-      key: dependency-cache-{{ checksum "package.json" }}
-  - run:
-      name: install-dependencies
-      command: npm install
-  - save_cache:
-      key: dependency-cache-{{ checksum "package.json" }}
-      paths:
-        - ./node_modules
-
 version: 2
 jobs:
   test1:
     <<: *test_defaults
     steps:
-      <<: *test_step_defaults
-      - run:
-          name: eslint
-          command: npm run code:verify
-      - run:
-          name: unit-test
-          command: npm run test:unit
+      - checkout
+      - run: npm install
+      - run: npm run code:verify
+      - run: npm run test:unit
       - store_artifacts:
           path: test-results
           prefix: test-results
@@ -40,21 +20,18 @@ jobs:
   test2:
     <<: *test_defaults
     steps:
-      <<: *test_step_defaults
-      - run:
-          name: e2e tests part 1/4
-          command: ./test/e2e/run.sh 1 4
+      - checkout
+      - run: npm install
+      - run: ./test/e2e/run.sh 1 4
       - store_artifacts:
           path: test-results
           prefix: test-results
-
   test3:
     <<: *test_defaults
     steps:
-      <<: *test_step_defaults
-      - run:
-          name: e2e tests part 2/4
-          command: ./test/e2e/run.sh 2 4
+      - checkout
+      - run: npm install
+      - run: ./test/e2e/run.sh 2 4
       - store_artifacts:
           path: test-results
           prefix: test-results
@@ -62,10 +39,9 @@ jobs:
   test4:
     <<: *test_defaults
     steps:
-      <<: *test_step_defaults
-      - run:
-          name: e2e tests part 3/4
-          command: ./test/e2e/run.sh 3 4
+      - checkout
+      - run: npm install
+      - run: ./test/e2e/run.sh 3 4
       - store_artifacts:
           path: test-results
           prefix: test-results
@@ -73,14 +49,12 @@ jobs:
   test5:
     <<: *test_defaults
     steps:
-      <<: *test_step_defaults
-      - run:
-          name: e2e tests part 4/4
-          command: ./test/e2e/run.sh 4 4
+      - checkout
+      - run: npm install
+      - run: ./test/e2e/run.sh 4 4
       - store_artifacts:
           path: test-results
           prefix: test-results
-
 
   deploy:
     docker:

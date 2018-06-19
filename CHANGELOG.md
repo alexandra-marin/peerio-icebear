@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.4.2"></a>
+## [5.4.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.4.1...v5.4.2) (2018-06-19)
+
+
+### Bug Fixes
+
+* yaml ([665a265](https://github.com/PeerioTechnologies/peerio-icebear/commit/665a265))
+* yaml ([2c12d3f](https://github.com/PeerioTechnologies/peerio-icebear/commit/2c12d3f))
+* yaml ([0ebb697](https://github.com/PeerioTechnologies/peerio-icebear/commit/0ebb697))
+
+
+
 <a name="5.4.1"></a>
 ## [5.4.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.4.0...v5.4.1) (2018-06-18)
 

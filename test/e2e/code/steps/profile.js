@@ -45,7 +45,7 @@ When('I add a new email', async function() {
 
 // This IS very similar to confirming primary email address in account.js
 // but trying to merge these two into one universal step just makes things messy for not much benefit
-When('I confirm my new email', async function() {
+When('I confirm my new email', { timeout: 400000 }, async function() {
     const email = await waitForEmail(this.lastAddedEmail, testConfig.newEmailConfirmSubject);
     const url = testConfig.emailConfirmUrlRegex.exec(email.body)[1];
     await getUrl(url);
@@ -62,7 +62,7 @@ Then('my new email is confirmed', function() {
     expect(adr.confirmed).to.be.true;
 });
 
-Given('I delete confirmation email', async function() {
+Given('I delete confirmation email', { timeout: 400000 }, async function() {
     const email = await waitForEmail(this.lastAddedEmail, testConfig.newEmailConfirmSubject);
     return deleteEmail(this.lastAddedEmail, email.id);
 });

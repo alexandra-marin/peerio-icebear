@@ -1,10 +1,10 @@
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
-defaults: &test_defaults
+test_defaults: &test_defaults
   docker:
     - image: circleci/node:9.8
    working_directory: ~/repo
 
-defaults: &test_step_defaults
+test_step_defaults: &test_step_defaults
   - checkout
   - run:
       name: "Checking Versions"

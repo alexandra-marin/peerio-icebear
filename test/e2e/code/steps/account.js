@@ -1,17 +1,9 @@
 const { Given, When, Then } = require('cucumber');
-const { waitForEmail } = require('../helpers/maildrop');
-const { getUrl } = require('../helpers/https');
-const testConfig = require('../test-config');
 const { getRandomEmail, getRandomUsername } = require('../helpers/random-data');
 const otplib = require('otplib');
 
-Given('I confirm the primary email', async function() {
-    const email = await waitForEmail(
-        ice.User.current.addresses[0].address,
-        testConfig.primaryEmailConfirmSubject
-    );
-    const url = testConfig.emailConfirmUrlRegex.exec(email.body)[1];
-    await getUrl(url);
+Given('I confirm the primary email', { timeout: 4000000 }, async function() {
+    await this.confirmPrimaryEmail(ice.User.current.addresses[0].address);
     // giving confirmed status a chance to propagate
     return this.waitFor(
         () => ice.User.current.primaryAddressConfirmed === true
@@ -76,7 +68,7 @@ When('I save my account key as PDF document', async function() {
     await ice.User.current.setAccountKeyBackedUp();
 });
 
-When('I invite other users and they sign up', async function() {
+When('I invite other users and they sign up', { timeout: 450000 }, async function() {
     // Get 5 random emails
     const invitedEmails = Array(5).fill().map(getRandomEmail);
 

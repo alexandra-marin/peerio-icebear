@@ -82,24 +82,24 @@ When('I invite a MedCryptor patient', function() {
     return this.contactsHelper.inviteRandomEmailWithTemplate('medcryptor-patient');
 });
 
-Then('they receive Peerio templated email', async function() {
+Then('they receive Peerio templated email', { timeout: 400000 }, async function() {
     return waitForEmail(this.invitedEmail, testConfig.inviteEmailSubject);
 });
 
-Then('they receive MedCryptor doctor templated email', async function() {
+Then('they receive MedCryptor doctor templated email', { timeout: 400000 }, async function() {
     return waitForEmail(this.invitedEmail, testConfig.inviteEmailSubjectMCDoctor);
 });
 
-Then('they receive MedCryptor patient templated email', async function() {
+Then('they receive MedCryptor patient templated email', { timeout: 400000 }, async function() {
     return waitForEmail(this.invitedEmail, testConfig.inviteEmailSubjectMCPatient);
 });
 
-Then('Peerio invites default to Peerio templated email', async function() {
+Then('Peerio invites default to Peerio templated email', { timeout: 400000 }, async function() {
     await this.contactsHelper.inviteRandomEmail();
     await waitForEmail(this.invitedEmail, testConfig.inviteEmailSubject);
 });
 
-Then('MedCryptor invites default to doctor templated email', async function() {
+Then('MedCryptor invites default to doctor templated email', { timeout: 400000 }, async function() {
     await this.contactsHelper.inviteRandomEmail();
     await waitForEmail(this.invitedEmail, testConfig.inviteEmailSubjectMCDoctor);
 });

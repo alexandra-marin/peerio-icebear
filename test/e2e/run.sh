@@ -13,7 +13,14 @@ else
     export DEFAULT_TIMEOUT=180000
 fi
 
-node --expose-gc ./node_modules/.bin/cucumber-js test/e2e/spec \
+if [ $1 ]
+then
+    scenarios=("`${BASH_SOURCE%/*}/split.js $1 $2`")
+else
+    scenarios=test/e2e/spec
+fi
+
+node --expose-gc ./node_modules/.bin/cucumber-js $scenarios \
         -r test/e2e/code \
         --require-module babel-register \
         --format node_modules/cucumber-pretty \

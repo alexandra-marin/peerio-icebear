@@ -325,6 +325,7 @@
   "title_filesShared": "{count} files were shared.",
   "title_downloading": "Downloading",
   "title_uploading": "Uploading {name}",
+  "title_uploadingAndEncrypting": "Uploading and encrypting {name}",
   "title_fileName": "File name",
   "title_noPreview": "No preview available",
   "title_downloadingFile": "Downloading file",

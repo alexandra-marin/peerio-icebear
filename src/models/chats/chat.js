@@ -19,8 +19,7 @@ const { cryptoUtil } = require('../../crypto');
 const tracker = require('../update-tracker');
 const { getFileStore } = require('../../helpers/di-file-store');
 const { retryUntilSuccess } = require('../../helpers/retry');
-
-// const volumeStore = require('../volumes/volume-store');
+const { getVolumeStore } = require('../../helpers/di-volume-store');
 
 // to assign when sending a message and don't have an id yet
 let temporaryChatId = 0;
@@ -741,13 +740,19 @@ class Chat {
 
     async shareFilesAndFolders(filesAndFolders) {
         const files = filesAndFolders.filter(f => !f.isFolder);
-        const folders = filesAndFolders.filter(f => f.isFolder);
+        const folders = filesAndFolders.filter(f => f.isFolder && !f.isShared);
+        const volumes = filesAndFolders.filter(f => f.isFolder && f.isShared);
+        const participants = [this.dmPartnerUsername];
         if (files.length) {
             await this.shareFiles(files);
         }
-        if (folders.length) {
-            folders.forEach(f => f.isShared && f.addParticipants([this.dmPartnerUsername]));
-        }
+        volumes.forEach(f => f.isShared && f.addParticipants(participants));
+        folders.forEach(f => {
+            if (f.root.isShared) {
+                console.error('Can not share folder inside shared folder.');
+            }
+            getVolumeStore().shareFolder(f, participants);
+        });
     }
 
     /**

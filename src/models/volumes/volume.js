@@ -94,10 +94,11 @@ class Volume extends FileFolder {
             },
             'error_addParticipant'
         );
+        warnings.add('title_addedToVolume');
         return contacts.forEach(c => getChatStore().startChatAndShareVolume(c, this));
     }
 
-    removeParticipant(participant) {
+    async removeParticipant(participant) {
         let contact = participant;
         if (typeof contact === 'string') {
             // we don't really care if it's loaded or not, we just need Contact instance
@@ -106,7 +107,7 @@ class Volume extends FileFolder {
         const boot = this.db.boot;
         const wasAdmin = boot.admins.includes(contact);
 
-        return contact.ensureLoaded()
+        await contact.ensureLoaded()
             .then(() => {
                 return boot.save(
                     () => {
@@ -121,6 +122,7 @@ class Volume extends FileFolder {
                     'error_removeParticipant'
                 );
             });
+        warnings.add('title_removedFromVolume');
     }
 
     /**

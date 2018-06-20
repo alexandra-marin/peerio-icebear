@@ -85,10 +85,14 @@ class FileStoreFolders {
         // so we can detect removed folders afterwards
         const newTreeMap = {};
         this.keg.folders.forEach((folderData) => this._syncFolder(folderData, null, newTreeMap));
+        const toRemove = [];
         this.folders.forEach(folder => {
             if (!folder.isRoot && !newTreeMap[folder.id]) {
-                this.folders.remove(folder);
+                toRemove.push(folder);
             }
+        });
+        toRemove.forEach(folder => {
+            this.folders.remove(folder);
         });
     }
 }

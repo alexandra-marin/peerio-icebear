@@ -353,7 +353,7 @@ class FileFolder {
     }
 
     deserialize(data, parentId) {
-        if (this.id && data.id !== this.id) {
+        if (this.id && data.folderId !== this.id) {
             throw new Error('Trying to deserialize folder from a different folder data');
         }
         this.id = data.folderId; // 'folderId' is legacy name, don't want to migrate

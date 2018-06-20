@@ -246,7 +246,7 @@
   "title_moveFileTo": "Move file or folder to:",
   "dialog_fileMoved": "Your {fileOrFolder} was moved to {folderName}.",
   "title_moveToSharedFolder": "Move to shared folder?",
-  "title_moveToSharedFolderDescription": "You're about to move a file to a shared folder. Anyone that can access this folder will be able to access this file.",
+  "title_moveToSharedFolderDescription": "Items in a shared folder are available to anyone with access to that folder.",
   "title_dontShowMessageAgain": "Don't show this message again",
   "title_sharedFolderCannotBeMoved": "Cannot move shared folder",
   "title_sharedFolderCannotBeMovedDescription": "Shared folders currently cannot be moved into other folders",

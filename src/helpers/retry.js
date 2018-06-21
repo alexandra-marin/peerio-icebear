@@ -47,13 +47,11 @@ function retryUntilSuccess(fn, id = Math.random(), maxRetries = maxRetryCount, e
                 try {
                     const res = errorHandler();
                     if (res && res.then) {
-                        res.then(() => scheduleRetry(fn, id));
+                        res.finally(() => scheduleRetry(fn, id));
                         return;
                     }
-                    scheduleRetry(fn, id);
                 } catch (err2) {
                     console.error(err2);
-                    scheduleRetry(fn, id);
                 }
             }
         }

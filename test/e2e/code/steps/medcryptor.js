@@ -1,5 +1,5 @@
 const { Given, Then } = require('cucumber');
-const { getRandomUsername } = require('../helpers/random-data');
+const { getRandomUsername, getRandomMcrId } = require('../helpers/random-data');
 
 async function createRole(role, world) {
     world.role = role;
@@ -39,7 +39,8 @@ Given('I create a Medcryptor doctor account', async function() {
 });
 
 Given('I create a Medcryptor admin account', async function() {
-    await createRole('admin', this);
+    const adminNumber = `admin:${getRandomMcrId()}`;
+    await createRole(adminNumber, this);
 });
 
 Then('I can edit specialization, medical ID, country and role', async function() {

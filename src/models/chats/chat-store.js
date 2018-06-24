@@ -370,6 +370,7 @@ class ChatStore {
      */
     @action async loadAllChats() {
         if (this.loaded || this.loading) return;
+        performance.mark('Start loading all chats');
         this.loading = true;
 
         await tracker.waitUntilUpdated();
@@ -415,6 +416,8 @@ class ChatStore {
         if (lastUsed && this.chatMap[lastUsed]) this.activate(lastUsed);
         else if (this.chats.length) this.activate(this.chats[0].id);
 
+        performance.mark('End loading all chats');
+        performance.measure('ChatStore#loadAllChats()', 'Start loading all chats', 'End loading all chats');
         this.loading = false;
         this.loaded = true;
     }

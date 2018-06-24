@@ -200,7 +200,7 @@ class FileStoreBase {
         ).then(action(kegs => {
             for (const keg of kegs.kegs) {
                 if (keg.deleted || keg.hidden) {
-                    console.log('Hidden or deleted file kegs should not have been returned by server.', keg.id);
+                    console.log('Hidden or deleted file kegs should not have been returned by server.', keg.kegId);
                     continue;
                 }
                 const file = new File(this.kegDb, this);
@@ -247,6 +247,10 @@ class FileStoreBase {
         tracker.onUpdated(this.onFileDigestUpdate);
         setTimeout(this.onFileDigestUpdate);
         tracker.seenThis(this.kegDb.id, 'file', this.knownUpdateId);
+        performance.mark(`End loading all files ${this.id}`);
+        performance.measure(`FileStore#loadAllFiles() ${this.id}`,
+            `Start loading all files ${this.id}`,
+            `End loading all files ${this.id}`);
     }
 
     /**
@@ -254,6 +258,7 @@ class FileStoreBase {
      */
     loadAllFiles = async () => {
         if (this.loading || this.loaded) return;
+        performance.mark(`Start loading all files ${this.id}`);
         this.loading = true;
         let lastPage = { maxId: '999' };
         do {

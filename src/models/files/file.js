@@ -706,6 +706,7 @@ class File extends Keg {
         // TODO: ugly, refactor when chats get their own file stores
         const dstIsChat = db.id.startsWith('channel:') || db.id.startsWith('chat:');
         const dstIsSELF = db.id === 'SELF';
+        const dstIsVolume = db.id.startsWith('volume:');
         if (dstIsChat) {
             const chatFile = store.getByIdInChat(db.id, this.fileId);
             if (chatFile && chatFile.loaded && !chatFile.deleted) return Promise.resolve();
@@ -753,7 +754,9 @@ class File extends Keg {
                 },
                 `copying ${this.fileId} to ${db.id}`,
                 5
-            ).then(() => this.hide())
+            ).then(() => {
+                if (dstIsVolume && this.db.id === 'SELF') this.hide();
+            })
         );
     }
 }

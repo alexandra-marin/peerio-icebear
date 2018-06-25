@@ -152,19 +152,6 @@ class FileStore extends FileStoreBase {
         });
     }
 
-    /**
-     * Call at least once from UI.
-     */
-    loadAllFiles = Promise.method(async () => {
-        if (this.loading || this.loaded) return;
-        this.loading = true;
-        let lastPage = { maxId: '999' };
-        do {
-            lastPage = await this._loadPage(lastPage.maxId); // eslint-disable-line no-await-in-loop
-        } while (lastPage.size > 0);
-        this._finishLoading();
-    });
-
     onAfterUpdate(dirty) {
         if (dirty) {
             this.resumeBrokenDownloads();
@@ -241,7 +228,7 @@ class FileStore extends FileStoreBase {
         ).then(resp => {
             for (const keg of resp.kegs) {
                 if (keg.deleted || keg.hidden) {
-                    console.log('Hidden or deleted file kegs should not have been returned by server.', keg.id);
+                    console.log('Hidden or deleted file kegs should not have been returned by server.', keg.kegId);
                     continue;
                 }
                 const chat = getChatStore().chatMap[kegDbId];

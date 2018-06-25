@@ -115,7 +115,7 @@ class Contact {
      */
     @computed get color() {
         if (!this.signingPublicKey) return { value: '#e0e1e6', isLight: true };
-        const int = cryptoUtil.getByteHash(1, this.signingPublicKey)[0] % ContactColors.length;
+        const int = this.signingPublicKey[0] % ContactColors.length;
         return ContactColors[int];
     }
 

@@ -142,7 +142,6 @@ class FileStoreMigration {
         this.started = false;
         this.performedByAnotherClient = false;
         this.progress = 100;
-        this.fileStore.resume();
     }
 
     /**

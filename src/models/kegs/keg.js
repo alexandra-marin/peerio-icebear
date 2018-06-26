@@ -1,7 +1,7 @@
 const socket = require('../../network/socket');
 const { secret, sign, cryptoUtil } = require('../../crypto');
 const { AntiTamperError, ServerError } = require('../../errors');
-const { observable, action } = require('mobx');
+const { observable, action, when } = require('mobx');
 const { getContactStore } = require('../../helpers/di-contact-store');
 const { getUser } = require('../../helpers/di-current-user');
 const { asPromise, asPromiseMultiValue } = require('../../helpers/prombservable');
@@ -450,24 +450,36 @@ class Keg {
      */
     verifyKegSignature(payload, props) {
         if (!payload || this.lastLoadHadError) return;
-        let { signature } = props;
-        if (!signature) {
+        try {
+            let { signature } = props;
+            if (!signature) {
+                this.signatureError = true;
+                return;
+            }
+            signature = cryptoUtil.b64ToBytes(signature); // eslint-disable-line no-param-reassign
+            let signer = this.owner;
+            if (this.storeSignerData && props.signedBy) {
+                signer = props.signedBy;
+            }
+            const contact = getContactStore().getContact(signer);
+            contact.whenLoaded(async () => {
+                if (this.lastLoadHadError || contact.notFound) {
+                    this.signatureError = true;
+                    return;
+                }
+                try {
+                    const data = this.plaintext ? cryptoUtil.strToBytes(payload) : payload;
+                    const res = await sign.verifyDetached(data, signature, contact.signingPublicKey);
+                    this.signatureError = !res;
+                } catch (err) {
+                    console.error(err);
+                    this.signatureError = true;
+                }
+            });
+        } catch (err) {
+            console.error(err);
             this.signatureError = true;
-            return;
         }
-        signature = cryptoUtil.b64ToBytes(signature); // eslint-disable-line no-param-reassign
-        let signer = this.owner;
-        if (this.storeSignerData && props.signedBy) {
-            signer = props.signedBy;
-        }
-        const contact = getContactStore().getContact(signer);
-        contact.whenLoaded(() => {
-            if (this.lastLoadHadError) return;
-            contact.notFound ? Promise.resolve(false) :
-                sign.verifyDetached(
-                    this.plaintext ? cryptoUtil.strToBytes(payload) : payload, signature, contact.signingPublicKey
-                ).then(r => { this.signatureError = !r; });
-        });
     }
 
     /**
@@ -522,6 +534,10 @@ class Keg {
         if (payload._sys.type !== this.type) {
             throw new AntiTamperError(`Inner ${payload._sys.type} and outer ${this.type} keg type mismatch.`);
         }
+    }
+
+    onceVerified(callback) {
+        when(() => this.signatureError !== null, callback);
     }
 }
 

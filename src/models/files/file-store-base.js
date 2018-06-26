@@ -1,4 +1,4 @@
-const { observable, action, computed } = require('mobx');
+const { observable, action, runInAction, computed } = require('mobx');
 const socket = require('../../network/socket');
 const File = require('./file');
 const tracker = require('../update-tracker');
@@ -8,25 +8,20 @@ const createMap = require('../../helpers/dynamic-array-map');
 const FileStoreFolders = require('./file-store.folders');
 const { getUser } = require('../../helpers/di-current-user');
 const { getFileStore } = require('../../helpers/di-file-store');
+const config = require('../../config');
+
+const PAGE_SIZE = 25;
+function isFileSelected(file) {
+    return file.selected;
+}
+
+function isSelectedFileShareable(file) {
+    return !file.selected ? true : file.canShare;
+}
 
 class FileStoreBase {
+    // #region File store instances
     static instances = observable.map();
-
-    constructor(kegDb, root = null, id) {
-        this.id = id; // something to identify this instance in runtime
-        this._kegDb = kegDb;
-        const m = createMap(this.files, 'fileId');
-        this.fileMap = m.map;
-        this.fileMapObservable = m.observableMap;
-        this.folderStore = new FileStoreFolders(this, root);
-        if (id !== 'main') FileStoreBase.instances.set(this.id, this);
-
-        tracker.subscribeToKegUpdates(kegDb ? kegDb.id : 'SELF', 'file', () => {
-            console.log('Files update event received');
-            if (this.paused) return;
-            this.onFileDigestUpdate();
-        });
-    }
     getFileStoreById(id) {
         if (id === 'main') return getFileStore();
         return FileStoreBase.instances.get(id);
@@ -38,13 +33,44 @@ class FileStoreBase {
     dispose() {
         FileStoreBase.instances.delete(this.id);
     }
+    // #endregion
 
+    constructor(kegDb, root = null, id) {
+        this.id = id; // something to identify this instance in runtime
+        this._kegDb = kegDb;
+        const m = createMap(this.files, 'fileId');
+        this.fileMap = m.map;
+        this.fileMapObservable = m.observableMap;
+        this.folderStore = new FileStoreFolders(this, root);
+        if (id !== 'main') {
+            FileStoreBase.instances.set(this.id, this);
+        } else {
+            tracker.onceUpdated(this.onFileDigestUpdate);
+        }
+    }
+
+    // #region Properties
+    @observable.shallow files = [];
+    // Filter to apply when computing search for files and folders
+    @observable searchQuery = '';
+    // Store is loading full file list for the first time.
+    @observable loading = false;
+    // Will set to true after file list has been updated upon reconnect.
+    @observable updatedAfterReconnect = true;
+    // Initial file list was loaded.
+    @observable loaded = false;
+    // Currently updating files from server
+    updating = false;
+
+    maxUpdateId = '';
+    knownUpdateId = '';
+
+    // #endregion
+
+    // #region Computed and getters
     get kegDb() {
         return this._kegDb || getUser().kegDb;
     }
-
-    // Full list of user's files in SELF.
-    @observable.shallow files = [];
 
     // all files currently loaded in RAM, including volumes, excluding chats
     @computed get allFiles() {
@@ -76,40 +102,8 @@ class FileStoreBase {
         return this.foldersSearchResult.concat(this.filesSearchResult);
     }
 
-    // Filter to apply when computing search for files and folders
-    @observable searchQuery = '';
-
-    // Store is loading full file list for the first time.
-    @observable loading = false;
-    // Will set to true after file list has been updated upon reconnect.
-    @observable updatedAfterReconnect = true;
-    // Initial file list was loaded.
-    @observable loaded = false;
-    // Updates to file store are paused.
-    @observable paused = false;
-    // Currently updating file list from server, this is not observable property.
-    updating = false;
-
-    maxUpdateId = '';
-    knownUpdateId = '';
-
-    // optimization to avoid creating functions every time
-    static isFileSelected(file) {
-        return file.selected;
-    }
-
-    // optimization to avoid creating functions every time
-    static isSelectedFileShareable(file) {
-        return !file.selected ? true : file.canShare;
-    }
-
-    // optimization to avoid creating functions every time
-    static isFileShareable(file) {
-        return file.canShare;
-    }
-
     @computed get hasSelectedFiles() {
-        return this.allFiles.some(FileStoreBase.isFileSelected);
+        return this.allFiles.some(isFileSelected);
     }
 
     @computed get hasSelectedFilesOrFolders() {
@@ -117,20 +111,11 @@ class FileStoreBase {
     }
 
     @computed get canShareSelectedFiles() {
-        return this.hasSelectedFiles && this.allFiles.every(FileStoreBase.isSelectedFileShareable);
-    }
-
-    getFilesSharedBy(username) {
-        return this.files.filter(f => f.owner === username);
+        return this.hasSelectedFiles && this.allFiles.every(isSelectedFileShareable);
     }
     // Returns currently selected files (file.selected == true)
     @computed get selectedFiles() {
-        return this.allFiles.filter(FileStoreBase.isFileSelected);
-    }
-
-    // Returns currently selected files that are also shareable.
-    getShareableSelectedFiles() {
-        return this.allFiles.filter(FileStoreBase.isFileSelectedAndShareable);
+        return this.allFiles.filter(isFileSelected);
     }
 
     // Returns currently selected folders (folder.selected == true)
@@ -140,6 +125,31 @@ class FileStoreBase {
 
     @computed get selectedFilesOrFolders() {
         return this.selectedFolders.concat(this.selectedFiles);
+    }
+
+    // #endregion
+
+    // #region functions and actions
+    /**
+     * Finds file in user's drive by fileId. Creates a mobx subscription.
+     * @param {string} fileId
+     * @returns {?File}
+     */
+    getById(fileId) {
+        return this.fileMapObservable.get(fileId);
+    }
+    /**
+     * Finds file in user's drive by kegId. This is not used often, only to detect deleted descriptor and remove file
+     * from memory, since deleted keg has no props to link it to the file.
+     * @param {string} kegId
+     * @returns {?File}
+     */
+    getByKegId(kegId) {
+        return this.files.find(f => f.id === kegId);
+    }
+
+    getFilesSharedBy(username) {
+        return this.files.filter(f => f.owner === username);
     }
 
     // Deselects all files and folders
@@ -154,6 +164,9 @@ class FileStoreBase {
             f.selected = false;
         });
     }
+    // #endregion
+
+    // #region Files update logic
 
     onFileDigestUpdate = _.debounce(() => {
         const digest = tracker.getDigest(this.kegDb.id, 'file');
@@ -166,185 +179,120 @@ class FileStoreBase {
         this.updateFiles();
     }, 1500, { leading: true, maxWait: 3000 });
 
-    _getFiles() {
-        const filter = this.knownUpdateId ? { minCollectionVersion: this.knownUpdateId } : {};
+    getFileKegsFromServer() {
+        const filter = { collectionVersion: { $gt: this.knownUpdateId || '' } };
+        if (!this.loaded) {
+            filter.deleted = false;
+        }
+        const options = { count: PAGE_SIZE, reverse: false };
         // this is naturally paged because every update calls another update in the end
         // until all update pages are loaded
-        return socket.send('/auth/kegs/db/list-ext', {
+        return socket.send('/auth/kegs/db/query', {
             kegDbId: this.kegDb.id,
-            options: {
-                type: 'file',
-                reverse: false,
-                count: 50
-            },
-            filter
+            type: 'file',
+            filter,
+            options
         }, false);
     }
 
-    @action _loadPage(fromKegId) {
-        return retryUntilSuccess(
-            () => socket.send('/auth/kegs/db/list-ext', {
-                kegDbId: this.kegDb.id,
-                options: {
-                    type: 'file',
-                    reverse: false,
-                    fromKegId,
-                    count: 50
-                },
-                filter: {
-                    deleted: false,
-                    hidden: false
-                }
-            }, false),
-            `Initial file list loading for ${this.kegDb.id}`
-        ).then(action(kegs => {
-            for (const keg of kegs.kegs) {
-                if (keg.deleted || keg.hidden) {
-                    console.log('Hidden or deleted file kegs should not have been returned by server.', keg.kegId);
-                    continue;
-                }
-                const file = new File(this.kegDb, this);
-                if (keg.collectionVersion > this.maxUpdateId) {
-                    this.maxUpdateId = keg.collectionVersion;
-                }
+    cacheOnceVerified = (file, keg) => {
+        file.onceVerified(() => {
+            this.cache.setValue(file.fileId, JSON.stringify(keg));
+        });
+    }
+
+    updateFiles = async () => {
+        if (this.updating || (this.loaded && this.knownUpdateId === this.maxUpdateId)) return;
+        if (!this.cache) {
+            this.cache = new config.CacheEngine(`${getUser().username}_file_store_${this.id}`);
+        }
+        console.log(`Proceeding to file update. Known collection version: ${this.knownUpdateId}`);
+
+        if (!this.loaded) this.loading = true;
+        this.updating = true;
+        let dirty = false;
+        const resp = await retryUntilSuccess(
+            () => this.getFileKegsFromServer(),
+            `Updating file list for ${this.id}`
+        );
+
+        runInAction(() => {
+            for (const keg of resp.kegs) {
                 if (keg.collectionVersion > this.knownUpdateId) {
                     this.knownUpdateId = keg.collectionVersion;
                 }
-                if (file.loadFromKeg(keg)) {
-                    if (!file.fileId) {
-                        if (file.version > 1) console.error('File keg missing fileId', file.id);
-                        // we can get a freshly created keg, it's not a big deal
-                        continue;
+                if (keg.collectionVersion > this.maxUpdateId) {
+                    this.maxUpdateId = keg.collectionVersion;
+                }
+                if (!keg.props.fileId && !keg.deleted) {
+                    if (keg.version > 1) {
+                        // this is not normal, kegs with version > 1 should have fileId or should be deleted
+                        console.error('File keg missing fileId', keg.kegId);
                     }
-                    if (this.fileMap[file.fileId]) {
-                        console.error('File keg has duplicate fileId', file.id);
-                        continue;
-                    }
-                    this.files.unshift(file);
-                    if (!this.loaded && this.onInitialFileAdded) {
-                        this.onInitialFileAdded(keg, file);
-                    }
-                } else {
-                    console.error('Failed to load file keg.', keg.kegId);
-                    // trying to be safe performing destructive operation of deleting a corrupted file keg
-                    // (old file system had some)
-                    if (file.decryptionError && keg.type === 'file' && !keg.format) {
-                        console.log('Removing invalid file keg', keg.id);
-                        file.remove();
-                    }
+                    // this is normal, keg version 1
                     continue;
                 }
+                const existing = this.fileMap[keg.props.fileId] || this.getByKegId(keg.kegId);
+                const file = existing || new File(this.kegDb, this);
+                if (keg.deleted) {
+                    // deleted keg that exists gets wiped from store and cache
+                    if (existing) {
+                        this.files.remove(existing);
+                        this.cache.removeValue(existing.fileId);
+                    }
+                    // if it didn't exist, normally it's not in the cache too
+                    continue;
+                }
+                // if keg existed in store and got hidden, we remove it from store, bug also will want to update cache
+                // we keep hidden kegs in cache for future use
+                if (keg.hidden && existing) {
+                    this.files.remove(existing);
+                }
+                // this will deserialize new keg in to new file object or existing file object
+                if (!file.loadFromKeg(keg)) {
+                    console.error('Failed to load file keg.', keg.kegId);
+                    // broken keg, removing from cache
+                    if (keg.hidden && existing) {
+                        this.cache.removeValue(existing.fileId);
+                    }
+                    continue;
+                } else {
+                    // ok, scheduling caching when signature is verified
+                    this.cacheOnceVerified(file, keg);
+                    // but if keg was hidden we don't want to process it further
+                    if (keg.hidden) continue;
+                }
+                // existing keg data got updated earlier
+                // otherwise we insert it into the store
+                if (!existing) {
+                    dirty = true;
+                    this.files.unshift(file);
+                    if (this.onFileAdded) {
+                        this.onFileAdded(keg, file);
+                    }
+                }
             }
-            const size = kegs.kegs.length;
-            return { size, maxId: size > 0 ? kegs.kegs[0].kegId : 0 };
-        }));
-    }
-
-    @action _finishLoading() {
-        this.loading = false;
-        this.loaded = true;
-        socket.onDisconnect(() => { this.updatedAfterReconnect = false; });
-        tracker.onUpdated(this.onFileDigestUpdate);
-        setTimeout(this.onFileDigestUpdate);
-        tracker.seenThis(this.kegDb.id, 'file', this.knownUpdateId);
-    }
-
-    /**
-     * Call at least once from UI.
-     */
-    loadAllFiles = async () => {
-        if (this.loading || this.loaded) return;
-        this.loading = true;
-        let lastPage = { maxId: '999' };
-        do {
-            lastPage = await this._loadPage(lastPage.maxId); // eslint-disable-line no-await-in-loop
-        } while (lastPage.size > 0);
-        this._finishLoading();
-    };
-
-    // this essentially does the same as loadAllFiles but with filter,
-    // we reserve this way of updating anyway for future, when we'll not gonna load entire file list on start
-    updateFiles = () => {
-        if (!this.loaded || this.updating || this.knownUpdateId === this.maxUpdateId) return;
-        const maxId = this.maxUpdateId; // eslint-disable-line
-        console.log(`Proceeding to file update. Known collection version: ${this.knownUpdateId}`);
-        this.updating = true;
-        let dirty = false;
-        retryUntilSuccess(() => this._getFiles(), `Updating file list for ${this.kegDb.id}`)
-            .then(action(resp => {
-                const { kegs } = resp;
-                for (const keg of kegs) {
-                    if (keg.collectionVersion > this.knownUpdateId) {
-                        this.knownUpdateId = keg.collectionVersion;
-                    }
-                    if (!keg.props.fileId && !keg.deleted) {
-                        if (keg.version > 1) console.error('File keg missing fileId', keg.kegId);
-                        continue;
-                    }
-                    const existing = this.getById(keg.props.fileId) || this.getByKegId(keg.kegId);
-                    const file = existing || new File(this.kegDb, this);
-                    if (keg.deleted || keg.hidden) {
-                        if (existing) this.files.remove(existing);
-                        continue;
-                    }
-                    if (!file.loadFromKeg(keg) || file.isEmpty) continue;
-                    if (!existing) {
-                        dirty = true;
-                        this.files.unshift(file);
-                    }
-                }
-                this.updating = false;
-                // need this because if u delete all files knownUpdateId won't be set at all after initial load
-                if (this.knownUpdateId < maxId) this.knownUpdateId = maxId;
-                // in case we missed another event while updating
-                setTimeout(this.onFileDigestUpdate);
-
-                this.updatedAfterReconnect = true;
-                tracker.seenThis(this.kegDb.id, 'file', this.knownUpdateId);
-                if (this.onAfterUpdate) {
-                    this.onAfterUpdate(dirty);
-                }
-            }));
-    };
-
-    /**
-     * Finds file in user's drive by fileId.
-     * Looks for loaded files only (all of them are loaded normally)
-     * @param {string} fileId
-     * @returns {?File}
-     */
-    getById(fileId) {
-        return this.fileMapObservable.get(fileId);
-    }
-    /**
-     * Finds file in user's drive by kegId. This is not used often,
-     * only to detect deleted descriptor and remove file from memory,
-     * since deleted keg has no props to link it to the file.
-     * Looks for loaded files only (all of them are loaded normally)
-     * @param {string} kegId
-     * @returns {?File}
-     */
-    getByKegId(kegId) {
-        return this.files.find(f => f.id === kegId);
-    }
-
-    /**
-     * Pause file store updates.
-     */
-    pause() {
-        this.paused = true;
-    }
-
-    /**
-     * Resume file store updates.
-     */
-    resume() {
-        if (!this.paused) return;
-        this.paused = false;
-        setTimeout(() => {
-            this.onFileDigestUpdate();
+            // in a series of calls, when we got results count less then page size - we've loaded all files
+            if (!resp.hasMore && !this.loaded) {
+                this.loaded = true;
+                this.loading = false;
+                tracker.onUpdated(this.onFileDigestUpdate);
+                tracker.subscribeToKegUpdates(this.kegDb.id, 'file', this.onFileDigestUpdate);
+                socket.onDisconnect(() => { this.updatedAfterReconnect = false; });
+            }
+            this.updating = false;
+            // keep the paging going
+            setTimeout(this.onFileDigestUpdate);
+            // this is kinda true, because if there's more then 1 page of updates it's not really true
+            // but his flag is for UI indication only so it's fine
+            this.updatedAfterReconnect = true;
+            tracker.seenThis(this.kegDb.id, 'file', this.knownUpdateId);
+            if (this.onAfterUpdate) {
+                this.onAfterUpdate(dirty);
+            }
         });
-    }
+    };
+    // #endregion
 }
 
 module.exports = FileStoreBase;

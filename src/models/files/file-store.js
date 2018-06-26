@@ -50,8 +50,6 @@ class FileStore extends FileStoreBase {
     }
 
     updateDescriptors = _.debounce(() => {
-        if (this.paused) return;
-
         const taskId = 'updating descriptors';
         if (isRunning('taskId')) return;
         if (!this.knownDescriptorVersion) {
@@ -96,7 +94,7 @@ class FileStore extends FileStoreBase {
         });
     }, 1500, { leading: true, maxWait: 3000 });
 
-    @action.bound onInitialFileAdded(keg, file) {
+    @action.bound onFileAdded(keg, file) {
         if (!file.format) {
             if (file.fileOwner === User.current.username) {
                 file.migrating = true;
@@ -515,17 +513,6 @@ class FileStore extends FileStoreBase {
             setTimeout(checkFile);
         };
         checkFile();
-    }
-
-    /**
-     * Resume file store updates.
-     */
-    resume() {
-        super.resume();
-        setTimeout(() => {
-            this.onFileDigestUpdate();
-            this.updateDescriptors();
-        });
     }
 }
 

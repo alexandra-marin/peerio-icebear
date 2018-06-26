@@ -13,7 +13,6 @@ const { asPromise } = require('../../helpers/prombservable');
 const { getUser } = require('../../helpers/di-current-user');
 const warnings = require('../warnings');
 const { setChatStore } = require('../../helpers/di-chat-store');
-const { getFileStore } = require('../../helpers/di-file-store');
 const { cryptoUtil } = require('../../crypto');
 const chatInviteStore = require('./chat-invite-store');
 const dbListProvider = require('../../helpers/keg-db-list-provider');
@@ -404,11 +403,7 @@ class ChatStore {
         // 7. waiting for most chats to load but up to a reasonable time
         await Promise.map(this.chats, chat => asPromise(chat, 'headLoaded', true))
             .timeout(5000)
-            .catch(() => { /* well, the rest will trigger re-render */ })
-            .then(() => {
-                // not returning promise because don't want to wait
-                getFileStore().loadAllFiles();
-            });
+            .catch(() => { /* well, the rest will trigger re-render */ });
 
         // 8. find out which chat to activate.
         const lastUsed = await TinyDb.user.getValue('lastUsedChat');

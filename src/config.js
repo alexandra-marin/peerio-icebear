@@ -206,6 +206,13 @@ const config = new class {
      */
     StorageEngine = null;
     /**
+     * Storage engine implementation class.
+     *
+     * **Client app is required to set this property before using Icebear SDK.**
+     * @type {StorageEngineInterface}
+     */
+    CacheEngine = null;
+    /**
      * Frequency (seconds) at which default observable clock will be changing its value.
      * Default clock can be used for refreshing timestamps and other time counters.
      * Do not set this value too low, create custom clocks instead.

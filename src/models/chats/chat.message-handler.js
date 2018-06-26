@@ -76,6 +76,7 @@ class ChatMessageHandler {
 
     removeMaker() {
         if (!clientApp.isFocused || !clientApp.isInChatsView || !this.chat.active) return;
+        if (this._removeMarkerTimer) clearTimeout(this._removeMarkerTimer);
         this._removeMarkerTimer = setTimeout(() => {
             this._removeMarkerTimer = null;
             if (!clientApp.isFocused || !clientApp.isInChatsView || !this.chat.active) return;

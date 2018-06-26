@@ -5,6 +5,7 @@ const socket = require('../../network/socket');
 const warnings = require('../warnings');
 const dbListProvider = require('../../helpers/keg-db-list-provider');
 const tracker = require('../update-tracker');
+const TaskQueue = require('../../helpers/task-queue');
 
 class VolumeStore {
     constructor() {
@@ -14,6 +15,7 @@ class VolumeStore {
         });
     }
 
+    shareQueue = new TaskQueue(1);
     @observable.shallow volumes = [];
     volumeMap = {};
     @observable loading = false;
@@ -129,14 +131,16 @@ class VolumeStore {
             return folder.addParticipants(participants);
         }
         if (folder.store.id !== 'main') throw new Error('Can only share local folders');
-        const newFolder = await this.createVolume(participants, folder.name);
-        folder.convertingToVolume = true;
-        newFolder.convertingFromFolder = true;
-        await newFolder.attach(folder, false, true);
-        folder.progress = newFolder.progress = folder.progressMax = newFolder.progressMax = 0;
-        folder.convertingToVolume = false;
-        newFolder.convertingFromFolder = false;
-        return Promise.resolve();
+        return this.shareQueue.addTask(async () => {
+            const newFolder = await this.createVolume(participants, folder.name);
+            folder.convertingToVolume = true;
+            newFolder.convertingFromFolder = true;
+            await newFolder.attach(folder, false, true);
+            folder.progress = newFolder.progress = folder.progressMax = newFolder.progressMax = 0;
+            folder.convertingToVolume = false;
+            newFolder.convertingFromFolder = false;
+            return Promise.resolve();
+        });
     }
 }
 

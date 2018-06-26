@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.6.0"></a>
+# [5.6.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.5.0...v5.6.0) (2018-06-21)
+
+
+### Bug Fixes
+
+* move some file hide/unhide logic to client ([f17fe93](https://github.com/PeerioTechnologies/peerio-icebear/commit/f17fe93))
+
+
+### Features
+
+* share folder queue ([d2eedf5](https://github.com/PeerioTechnologies/peerio-icebear/commit/d2eedf5))
+
+
+
 <a name="5.5.0"></a>
 # [5.5.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.4.2...v5.5.0) (2018-06-19)
 

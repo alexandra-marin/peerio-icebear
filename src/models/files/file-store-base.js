@@ -200,7 +200,7 @@ class FileStoreBase {
         ).then(action(kegs => {
             for (const keg of kegs.kegs) {
                 if (keg.deleted || keg.hidden) {
-                    console.log('Hidden or deleted file kegs should not have been returned by server.', keg.id);
+                    console.log('Hidden or deleted file kegs should not have been returned by server.', keg.kegId);
                     continue;
                 }
                 const file = new File(this.kegDb, this);

@@ -229,6 +229,12 @@ class Chat {
      * @type {ObservableArray<File>}
      */
     @observable.shallow uploadQueue = [];
+
+    /**
+     * list of folders being converted to volumes to share to this chat.
+     * @type {ObservableArray<FileFolder>}
+     */
+    @observable.shallow folderShareQueue = [];
     /**
      * Unread message count in this chat.
      * @type {number}
@@ -751,7 +757,12 @@ class Chat {
             if (f.root.isShared) {
                 console.error('Can not share folder inside shared folder.');
             }
-            getVolumeStore().shareFolder(f, participants);
+            this.folderShareQueue.push(f);
+            getVolumeStore()
+                .shareFolder(f, participants)
+                .finally(() => {
+                    this.folderShareQueue.remove(f);
+                });
         });
     }
 

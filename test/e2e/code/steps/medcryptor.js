@@ -1,5 +1,5 @@
 const { Given, Then } = require('cucumber');
-const { getRandomUsername } = require('../helpers/random-data');
+const { getRandomUsername, getRandomMcrId } = require('../helpers/random-data');
 
 async function createRole(role, world) {
     world.role = role;
@@ -39,7 +39,8 @@ Given('I create a Medcryptor doctor account', async function() {
 });
 
 Given('I create a Medcryptor admin account', async function() {
-    await createRole('admin', this);
+    const adminNumber = `admin:${getRandomMcrId()}`;
+    await createRole(adminNumber, this);
 });
 
 Then('I can edit specialization, medical ID, country and role', async function() {
@@ -100,9 +101,9 @@ Then('I create a patient room', async function() {
 });
 
 Then('I can view the patient space', async function() {
-    ice.chatStore.spaces.length.should.equal(1);
+    ice.chatStore.spaces.spacesList.length.should.equal(1);
 
-    const returnedSpace = ice.chatStore.spaces[0];
+    const returnedSpace = ice.chatStore.spaces.spacesList[0];
 
     returnedSpace.spaceName.should.equal(this.space.spaceName);
     returnedSpace.spaceDescription.should.equal(this.space.spaceDescription);
@@ -121,7 +122,7 @@ Then('I get notified of unread messages', async function() {
         this.internalRoom2.unreadCount +
         this.patientRoom.unreadCount;
 
-    const returnedSpace = ice.chatStore.spaces[0];
+    const returnedSpace = ice.chatStore.spaces.spacesList[0];
     returnedSpace.unreadCount.should.equal(allUnread);
 });
 
@@ -136,9 +137,9 @@ Then('I create another patient space', async function() {
     const room = await ice.chatStore.startChat([], true, 'test-space-2', 'test', null, this.anotherSpace);
     await this.waitFor(() => room.metaLoaded && ice.chatStore.activeChat);
 
-    ice.chatStore.spaces.length.should.equal(2);
-    ice.chatStore.spaces[0].spaceName.should.equal(this.space.spaceName);
-    ice.chatStore.spaces[1].spaceName.should.equal(this.anotherSpace.spaceName);
+    ice.chatStore.spaces.spacesList.length.should.equal(2);
+    ice.chatStore.spaces.spacesList[0].spaceName.should.equal(this.space.spaceName);
+    ice.chatStore.spaces.spacesList[1].spaceName.should.equal(this.anotherSpace.spaceName);
 });
 
 Then('I can see their role in the contact details', async function() {

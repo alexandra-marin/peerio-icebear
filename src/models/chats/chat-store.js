@@ -29,7 +29,7 @@ const Contact = require('../contacts/contact');
 class ChatStore {
     constructor() {
         this.pending = new ChatStorePending(this);
-        this.spacesHelper = new ChatStoreSpaces(this);
+        this.spaces = new ChatStoreSpaces(this);
 
         reaction(() => this.activeChat, chat => {
             if (chat) chat.loadMessages();
@@ -178,20 +178,6 @@ class ChatStore {
     get nonSpaceRooms() {
         return this.allRooms.filter(c => !c.isInSpace);
     }
-
-    /**
-     * Subset of ChatStore#chats, contains all spaces
-     * @type {Array<Chat>}
-     */
-    get spaces() {
-        return this.spacesHelper.spaces;
-    }
-
-    /**
-     * currently selected/focused space.
-     * @type {string}
-     */
-    @observable activeSpace = null;
 
     /**
      * Does smart and efficient 'in-place' sorting of observable array.
@@ -454,8 +440,8 @@ class ChatStore {
      */
     @action.bound
     switchToFirstChat() {
-        if (config.whiteLabel.name === 'medcryptor' && this.activeSpace) {
-            const active = this.spaces.find(x => x.spaceId === this.activeSpace);
+        if (config.whiteLabel.name === 'medcryptor' && this.spaces.activeSpaceId) {
+            const active = this.spaces.spacesList.find(x => x.spaceId === this.spaces.activeSpaceId);
             const chats = active.internalRooms.concat(active.patientRooms);
             const chatId = chats.length ? chats[0].id : null;
             if (chatId) {

@@ -18,9 +18,6 @@
  *                   make sure they haven't been used by name anywhere.
  */
 
-// jsdoc freaks out and merges next jsdoc with previous if this var is not defined here
-let a; // eslint-disable-line
-
 /**
  * Use this helper to resolve returning error value.
  * If you:

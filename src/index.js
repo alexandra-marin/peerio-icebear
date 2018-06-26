@@ -29,10 +29,6 @@ Promise.config({ warnings: { wForgottenReturn: false } });
 // extending native classes
 require('./extensions/uint8array');
 
-// @ts-ignore
-// for JSDoc's sake
-require('./typedefs');
-
 // exporting Icebear Library Interface
 const socket = require('./network/socket');
 const User = require('./models/user/user');

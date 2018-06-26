@@ -2,9 +2,6 @@
  * Various utility functions that didn't fit anywhere else.
  */
 
-// jsdoc (or documentationjs?) freaks out and pulls param from the next function
-// unless this useless variable is defined
-let a;// eslint-disable-line
 
 /**
  * Finds all ArrayBuffer type properties recursively and changes them to Uint8Array created with the same ArrayBuffer.

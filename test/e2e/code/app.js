@@ -4,7 +4,6 @@ global.WebSocket = require('websocket').w3cwebsocket;
 const safeJsonStringify = require('safe-json-stringify');
 const testConfig = require('./test-config');
 
-
 /**
  * App class is supposed to emulate real-world application (sdk consumer).
  * It is able to reset current js environment, emulating application restart.
@@ -46,6 +45,8 @@ class App {
         const os = require('os');
         const FileStream = require('~/models/files/node-file-stream');
         const StorageEngine = require('~/models/storage/node-json-storage');
+        const TestStorageEngine = require('~/db/test-storage-engine');
+        TestStorageEngine.setStorage(this.world.cacheStorage);
         const cfg = this.world.ice.config;
         // todo: make special test platform?
         cfg.appVersion = '2.37.1';
@@ -58,6 +59,7 @@ class App {
         cfg.StorageEngine = StorageEngine;
         cfg.StorageEngine.storageFolder = path.join(os.homedir(),
             process.env.CUCUMBOT ? '.peerio-icebear-tests-cucumbot' : '.peerio-icebear-tests');
+        cfg.CacheEngine = TestStorageEngine;
         cfg.socketServerUrl = testConfig.socketServerUrl;
         if (testConfig.logSocketMessages) {
             cfg.debug = { trafficReportInterval: 15000, socketLogEnabled: true };

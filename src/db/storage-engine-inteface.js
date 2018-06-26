@@ -42,6 +42,12 @@ class StorageEngineInterface {
     getAllKeys() { }
 
     /**
+     * Asynchronously retrieves a list of all values in current namespace
+     * @returns {Promise<string[]>}
+     */
+    getAllValues() { }
+
+    /**
      * Removes all data from current namespace.
      */
     clear() { }

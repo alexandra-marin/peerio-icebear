@@ -146,4 +146,14 @@ Then('I can see their role in the contact details', async function() {
     const contact = await this.contactsHelper.findContact(this.testAccount.username);
     contact.mcrRoles.should.be.an('array');
     contact.mcrRoles[0].should.equal(this.role);
+
+    if (this.role === 'doctor') {
+        ice.contactStore.whitelabel.checkMCAdmin(this.testAccount.username).should.equal(false);
+        ice.contactStore.whitelabel.checkMCDoctor(this.testAccount.username).should.equal(true);
+    }
+
+    if (this.role.startsWith('admin')) {
+        ice.contactStore.whitelabel.checkMCAdmin(this.testAccount.username).should.equal(true);
+        ice.contactStore.whitelabel.checkMCDoctor(this.testAccount.username).should.equal(false);
+    }
 });

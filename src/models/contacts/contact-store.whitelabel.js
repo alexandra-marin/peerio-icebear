@@ -69,6 +69,18 @@ class ContactStoreWhitelabel {
         const filter = getContactFilter();
         return this.store.filter(token).filter(c => filter(c, context));
     }
+
+    checkMCAdmin(username) {
+        const c = this.getContact(username);
+        if (!c || !c.props.mcrRoles) return null;
+        return c.props.mcrRoles.some(x => x.includes('admin'));
+    }
+
+    checkMCDoctor(username) {
+        const c = this.getContact(username);
+        if (!c || !c.props.mcrRoles) return null;
+        return c.props.mcrRoles.includes('doctor');
+    }
 }
 
 module.exports = ContactStoreWhitelabel;

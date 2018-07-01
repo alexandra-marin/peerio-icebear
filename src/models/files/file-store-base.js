@@ -10,7 +10,7 @@ const { getUser } = require('../../helpers/di-current-user');
 const { getFileStore } = require('../../helpers/di-file-store');
 const config = require('../../config');
 
-const PAGE_SIZE = 25;
+// const PAGE_SIZE = 25;
 function isFileSelected(file) {
     return file.selected;
 }
@@ -179,12 +179,12 @@ class FileStoreBase {
         this.updateFiles();
     }, 1500, { leading: true, maxWait: 3000 });
 
-    getFileKegsFromServer() {
-        const filter = { collectionVersion: { $gt: this.knownUpdateId || '' } };
+    async getFileKegsFromServer() {
+        const filter = { collectionVersion: { $gte: this.knownUpdateId } };
         if (!this.loaded) {
             filter.deleted = false;
         }
-        const options = { count: PAGE_SIZE, reverse: false };
+        const options = { /* count: PAGE_SIZE, reverse: false */ };
         // this is naturally paged because every update calls another update in the end
         // until all update pages are loaded
         return socket.send('/auth/kegs/db/query', {
@@ -197,25 +197,35 @@ class FileStoreBase {
 
     cacheOnceVerified = (file, keg) => {
         file.onceVerified(() => {
-            this.cache.setValue(file.fileId, JSON.stringify(keg));
+            this.cache.setValue(file.fileId, keg);
         });
     }
 
     updateFiles = async () => {
         if (this.updating || (this.loaded && this.knownUpdateId === this.maxUpdateId)) return;
-        if (!this.cache) {
-            this.cache = new config.CacheEngine(`${getUser().username}_file_store_${this.id}`);
-        }
         console.log(`Proceeding to file update. Known collection version: ${this.knownUpdateId}`);
 
-        if (!this.loaded) this.loading = true;
+        if (!this.loaded) {
+            performance.mark(`start loading files ${this.id}`);
+            this.loading = true;
+        }
         this.updating = true;
-        let dirty = false;
-        const resp = await retryUntilSuccess(
-            () => this.getFileKegsFromServer(),
-            `Updating file list for ${this.id}`
-        );
 
+        if (!this.cache) {
+            this.cache = new config.CacheEngine(`${getUser().username}_file_store_${this.id}`, 'props.fileId');
+            await this.cache.open();
+        }
+
+        let dirty = false;
+        let resp;
+        if (this.cacheLoaded) {
+            resp = await retryUntilSuccess(
+                () => this.getFileKegsFromServer(),
+                `Updating file list for ${this.id}`);
+        } else {
+            resp = { kegs: await this.cache.getAllValues(), hasMore: true };
+            this.cacheLoaded = true;
+        }
         runInAction(() => {
             for (const keg of resp.kegs) {
                 if (keg.collectionVersion > this.knownUpdateId) {
@@ -266,7 +276,7 @@ class FileStoreBase {
                 // otherwise we insert it into the store
                 if (!existing) {
                     dirty = true;
-                    this.files.unshift(file);
+                    this.files.push(file);
                     if (this.onFileAdded) {
                         this.onFileAdded(keg, file);
                     }
@@ -274,6 +284,12 @@ class FileStoreBase {
             }
             // in a series of calls, when we got results count less then page size - we've loaded all files
             if (!resp.hasMore && !this.loaded) {
+                window.performance.mark(`end loading files ${this.id}`); // eslint-ignore-line
+                window.performance.measure(
+                    `loading files ${this.id}`,
+                    `start loading files ${this.id}`,
+                    `end loading files ${this.id}`); // eslint-ignore-line
+
                 this.loaded = true;
                 this.loading = false;
                 tracker.onUpdated(this.onFileDigestUpdate);

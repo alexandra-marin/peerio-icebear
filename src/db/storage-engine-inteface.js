@@ -12,6 +12,13 @@
 class StorageEngineInterface {
     constructor(namespace) { }
 
+
+    /**
+     * Ensures database is open and ready (in case of async).
+     * @returns {Promise}
+     */
+    open() { }
+
     /**
      * Asynchronously gets a value from storage.
      * @param {string} key

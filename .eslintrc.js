@@ -21,6 +21,7 @@ module.exports = {
         window: false,
         xdescribe: false,
         WebSocket: false,
-        XMLHttpRequest: false
+        XMLHttpRequest: false,
+        performance: false
     }
 };

@@ -9,18 +9,14 @@
  * - extends Uint8Array prototype. See {@link extensions/uint8array}.
  */
 
+require('./helpers/performance-polyfill');
+
 // replacing native Promise with bluebird implementation
 const Promise = require('bluebird');
+const globalContext = require('./helpers/global-context');
 
-if (typeof window !== 'undefined') {
-    // @ts-ignore oddly should work with typescript, but can't seem to make jsdoc recognize it
-    window.Promise = Promise;
-}
-
-if (typeof global !== 'undefined') {
-    // noinspection JSAnnotator
-    global.Promise = Promise;
-}
+// @ts-ignore
+globalContext.Promise = Promise;
 
 // Enables all warnings except forgotten return statements.
 Promise.config({ warnings: { wForgottenReturn: false } });

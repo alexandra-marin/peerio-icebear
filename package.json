@@ -21,6 +21,8 @@
     "=== VALIDATION ===": "",
     "code:lint": "eslint . --fix --ext .js",
     "code:verify": "eslint . --ext .js --max-warnings 0 && ./scripts/lint-copy.sh",
+    "=== BENCHMARKS ===": "",
+    "bench": "node ./benchmarks/index",
     "=== RELEASE ===": "",
     "release": "./scripts/release.sh",
     "=== UTILS ===": "",

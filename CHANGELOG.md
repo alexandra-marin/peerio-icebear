@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.6.2"></a>
+## [5.6.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.6.1...v5.6.2) (2018-06-27)
+
+
+
+<a name="5.6.1"></a>
+## [5.6.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.6.0...v5.6.1) (2018-06-26)
+
+
+### Bug Fixes
+
+* check for null + add computed decorator ([0cf7e6a](https://github.com/PeerioTechnologies/peerio-icebear/commit/0cf7e6a))
+* lint ([7017c3c](https://github.com/PeerioTechnologies/peerio-icebear/commit/7017c3c))
+* new message marker ([0544930](https://github.com/PeerioTechnologies/peerio-icebear/commit/0544930))
+* retry ([7fefebd](https://github.com/PeerioTechnologies/peerio-icebear/commit/7fefebd))
+* send ahrpa numer for admins ([2b8c601](https://github.com/PeerioTechnologies/peerio-icebear/commit/2b8c601))
+* tests ([2aad5e4](https://github.com/PeerioTechnologies/peerio-icebear/commit/2aad5e4))
+* too eager file hiding ([af90c40](https://github.com/PeerioTechnologies/peerio-icebear/commit/af90c40))
+
+
+
 <a name="5.6.0"></a>
 # [5.6.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.5.0...v5.6.0) (2018-06-21)
 

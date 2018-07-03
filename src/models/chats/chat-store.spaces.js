@@ -44,7 +44,11 @@ class ChatStoreSpaces {
         return this.store.channels.filter(chat => chat.isInSpace);
     }
 
-    @computed get spaces() {
+    /**
+     * Subset of ChatStore#chats, contains all spaces
+     * @type {Array<Chat>}
+     */
+    @computed get spacesList() {
         if (config.whiteLabel.name !== 'medcryptor') {
             return [];
         }
@@ -70,6 +74,52 @@ class ChatStoreSpaces {
         space.spaceDescription = chat.chatHead.spaceDescription;
 
         return space;
+    }
+
+    /**
+     * @returns {Chat}
+     */
+    createRoomInSpace = async (space, roomName, roomType, participants) => {
+        space.nameInSpace = roomName;
+        space.spaceRoomType = roomType;
+        const name = `${space.spaceName} - ${roomName}`;
+        const chat = await this.store.startChat(participants, true, name, '', true, space);
+
+        return chat;
+    }
+
+    /**
+     * @type {string}
+     */
+    @observable activeSpaceId = null;
+
+    /**
+     * @type {Space}
+     */
+    @computed get currentSpace() {
+        if (!this.spacesList || !this.activeSpaceId) return null;
+        return this.spacesList.find(x => x.spaceId === this.activeSpaceId);
+    }
+
+    @computed get currentSpaceName() {
+        if (!this.currentSpace) return '';
+        return this.currentSpace.spaceName;
+    }
+
+    @computed get isPatientRoomOpen() {
+        if (!this.store.activeChat || !this.currentSpace || !this.currentSpace.patientRooms) return null;
+        return this.currentSpace.patientRooms.some(r => r.id === this.store.activeChat.id);
+    }
+
+    @computed get isInternalRoomOpen() {
+        if (!this.store.activeChat || !this.currentSpace || !this.currentSpace.internalRooms) return null;
+        return this.currentSpace.internalRooms.some(r => r.id === this.store.activeChat.id);
+    }
+
+    @computed get currentRoomType() {
+        if (this.isPatientRoomOpen) return 'patientroom';
+        if (this.isInternalRoomOpen) return 'internalroom';
+        return null;
     }
 }
 

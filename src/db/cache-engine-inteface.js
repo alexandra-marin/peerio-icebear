@@ -1,16 +1,25 @@
 /* eslint-disable */
 // This file exists just for the sake of documentation.
-// StorageEngineInterface class is never used.
+// CacheEngineInterface class is never used.
 
 /**
- * This is a contract for the actual client-specific StorageEngine client has to implement and set to config module.
- * TinyDb will get the implementation from config module and use it.
- * @param {string} namespace - unique namespace will be passed to storage engine when instantiating.
- * Values in current instance should be stored under that unique namespace.
- * @interface StorageEngineInterface
+ * @callback StorageEngineInterface~cacheUpdateCallback
+ * @param {object} oldValue
+ * @param {object} newValue
+ * @returns {bool} True - update, False - don't
+ */
+
+/**
+ * @interface CacheEngineInterface
  */
 class StorageEngineInterface {
     constructor(namespace) { }
+
+    /**
+     * Ensures database is open and ready (in case of async).
+     * @returns {Promise}
+     */
+    open() { }
 
     /**
      * Asynchronously gets a value from storage.
@@ -24,9 +33,11 @@ class StorageEngineInterface {
      * Asynchronously saves a value to storage.
      * @param {string} key - if key already exists - overwrite.
      * @param {string} value - TinyDb will serialize any value to string before saving it.
+     * @callback {[cacheUpdateCallback]} confirm - a callback to confirm update if value already exists
+     *                                           this should be done in atomic/transactional way.
      * @returns {Promise}
      */
-    setValue(key, value) { }
+    setValue(key, value, confirmUpdate) { }
 
     /**
      * Asynchronously removes key/value from store.
@@ -41,6 +52,11 @@ class StorageEngineInterface {
      */
     getAllKeys() { }
 
+    /**
+     * Asynchronously retrieves a list of all values in current namespace
+     * @returns {Promise<string[]>}
+     */
+    getAllValues() { }
 
     /**
      * Removes all data from current namespace.

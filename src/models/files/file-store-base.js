@@ -171,7 +171,7 @@ class FileStoreBase {
     onFileDigestUpdate = _.debounce(() => {
         const digest = tracker.getDigest(this.kegDb.id, 'file');
         // this.unreadFiles = digest.newKegsCount;
-        if (this.loaded && digest.maxUpdateId === this.maxUpdateId) {
+        if (this.loaded && digest.maxUpdateId === this.knownUpdateId) {
             this.updatedAfterReconnect = true;
             return;
         }
@@ -195,12 +195,54 @@ class FileStoreBase {
         }, false);
     }
 
+    verifyCacheObjectUpdate(oldKeg, newKeg) {
+        // new cache item, just save
+        if (!oldKeg) return newKeg;
+        const oldDesc = oldKeg.props.descriptor;
+        const newDesc = newKeg.props.descriptor;
+        let correctDescriptor = newDesc || oldDesc;
+        if (oldDesc && newDesc && oldDesc.collectionVersion > newDesc.collectionVersion) {
+            correctDescriptor = oldDesc;
+        }
+        let correctKeg = newKeg || oldKeg;
+        if (oldKeg.collectionVersion > newKeg.collectionVersion) {
+            correctKeg = oldKeg;
+        }
+        correctKeg.props.descriptor = correctDescriptor;
+
+        return correctKeg;
+    }
+
+    processCacheUpdateError(err) {
+        console.error(err);
+    }
+
     cacheOnceVerified = (file, keg) => {
         file.onceVerified(() => {
-            this.cache.setValue(file.fileId, keg);
+            this.cache.setValue(keg.kegId, keg, this.verifyCacheObjectUpdate)
+                .catch(this.processCacheUpdateError);
         });
     }
 
+    async cacheDescriptor(d) {
+        const file = this.getById(d.fileId);
+        if (!file) return null;
+        const cached = this.cache.get(file.id);
+        if (!cached) {
+            console.error('cacheDescriptor was called, but cached keg not found');
+            return null;
+        }
+        if (cached.props.descriptor && cached.props.descriptor.version >= d.version) return null;
+        cached.props.descriptor = d;
+        return this.cache.setValue(file.id, cached, this.verifyCacheObjectUpdate)
+            .catch(this.processCacheUpdateError);
+    }
+
+    // TODO: flags are a bit of a mess, maybe simplify and refactor consumer code
+    // updating - any time kegs are being loaded from cache or server
+    // loading - initial keg list load in progress (from cache + from server)
+    // loaded - initial keg list loaded and now we only update
+    // cacheLoaded - kegs from cache loaded (but might still be 'loading' from server)
     updateFiles = async () => {
         if (this.updating || (this.loaded && this.knownUpdateId === this.maxUpdateId)) return;
         console.log(`Proceeding to file update. Known collection version: ${this.knownUpdateId}`);
@@ -211,21 +253,28 @@ class FileStoreBase {
         }
         this.updating = true;
 
+        // creating cache storage object
         if (!this.cache) {
-            this.cache = new config.CacheEngine(`${getUser().username}_file_store_${this.id}`, 'props.fileId');
+            this.cache = new config.CacheEngine(`${getUser().username}_file_store_${this.id}`, 'kegId');
             await this.cache.open();
         }
 
-        let dirty = false;
+        let fromCache = false; // current cycle is from cache
+        let dirty = false; // wether or not files were added in this cycle
         let resp;
+
+        // get kegs from cache or server
         if (this.cacheLoaded) {
             resp = await retryUntilSuccess(
                 () => this.getFileKegsFromServer(),
                 `Updating file list for ${this.id}`);
         } else {
+            performance.mark(`start loading files cache ${this.id}`);
             resp = { kegs: await this.cache.getAllValues(), hasMore: true };
             this.cacheLoaded = true;
+            fromCache = true;
         }
+        // process kegs
         runInAction(() => {
             for (const keg of resp.kegs) {
                 if (keg.collectionVersion > this.knownUpdateId) {
@@ -242,35 +291,31 @@ class FileStoreBase {
                     // this is normal, keg version 1
                     continue;
                 }
-                const existing = this.fileMap[keg.props.fileId] || this.getByKegId(keg.kegId);
-                const file = existing || new File(this.kegDb, this);
-                if (keg.deleted) {
+                //  no point wasting time looking up existing kegs when we load from cache
+                const existing = fromCache ? null : (this.fileMap[keg.props.fileId] || this.getByKegId(keg.kegId));
+                if (keg.deleted || keg.hidden) {
                     // deleted keg that exists gets wiped from store and cache
                     if (existing) {
                         this.files.remove(existing);
-                        this.cache.removeValue(existing.fileId);
                     }
-                    // if it didn't exist, normally it's not in the cache too
+                    this.cache.removeValue(keg.kegId);
                     continue;
                 }
-                // if keg existed in store and got hidden, we remove it from store, bug also will want to update cache
-                // we keep hidden kegs in cache for future use
-                if (keg.hidden && existing) {
-                    this.files.remove(existing);
-                }
+                const file = existing || new File(this.kegDb, this);
                 // this will deserialize new keg in to new file object or existing file object
-                if (!file.loadFromKeg(keg)) {
+                if (!file.loadFromKeg(keg, fromCache)) {
                     console.error('Failed to load file keg.', keg.kegId);
-                    // broken keg, removing from cache
-                    if (keg.hidden && existing) {
-                        this.cache.removeValue(existing.fileId);
+                    // broken keg, removing from store and cache
+                    if (existing) {
+                        this.files.remove(existing);
                     }
+                    this.cache.removeValue(keg.kegId);
                     continue;
-                } else {
-                    // ok, scheduling caching when signature is verified
+                }
+
+                if (!fromCache) {
+                    // scheduling caching when signature is verified, unless we process cached keg
                     this.cacheOnceVerified(file, keg);
-                    // but if keg was hidden we don't want to process it further
-                    if (keg.hidden) continue;
                 }
                 // existing keg data got updated earlier
                 // otherwise we insert it into the store
@@ -282,13 +327,20 @@ class FileStoreBase {
                     }
                 }
             }
+            if (fromCache) {
+                performance.mark(`stop loading files cache ${this.id}`);
+                performance.measure(
+                    `loading files cache ${this.id}`,
+                    `start loading files cache ${this.id}`,
+                    `stop loading files cache ${this.id}`);
+            }
             // in a series of calls, when we got results count less then page size - we've loaded all files
             if (!resp.hasMore && !this.loaded) {
-                window.performance.mark(`end loading files ${this.id}`); // eslint-ignore-line
-                window.performance.measure(
+                performance.mark(`stop loading files ${this.id}`);
+                performance.measure(
                     `loading files ${this.id}`,
                     `start loading files ${this.id}`,
-                    `end loading files ${this.id}`); // eslint-ignore-line
+                    `stop loading files ${this.id}`);
 
                 this.loaded = true;
                 this.loading = false;

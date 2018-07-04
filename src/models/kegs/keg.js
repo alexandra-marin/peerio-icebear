@@ -328,10 +328,11 @@ class Keg {
      * multiple kegs from server and want to instantiate them use this function
      * after creating appropriate keg instance.
      * @param {Object} keg data as received from server
+     * @param {bool} noVerify - prevents signature verification (for example, when loading cached keg)
      * @returns {Keg|boolean} - returns false if keg data could not have been loaded. This function doesn't throw,
      * you have to check error flags if you received false return value.
      */
-    @action loadFromKeg(keg) {
+    @action loadFromKeg(keg, noVerify = false) {
         try {
             this.lastLoadHadError = false;
             if (this.id && this.id !== keg.kegId) {
@@ -366,7 +367,7 @@ class Keg {
                 payload = new Uint8Array(keg.payload);
             }
             // SELF kegs do not require signing
-            if (this.forceSign || (!this.plaintext && this.db.id !== 'SELF')) {
+            if (!noVerify && (this.forceSign || (!this.plaintext && this.db.id !== 'SELF'))) {
                 this.verifyKegSignature(payload, keg.props);
             } else {
                 this.signatureError = false;

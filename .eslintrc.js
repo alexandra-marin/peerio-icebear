@@ -12,7 +12,8 @@ module.exports = {
         'no-void': 0,
         'prefer-arrow-callback': 0,
         'no-debugger': 0,
-        'prefer-destructuring': 0
+        'prefer-destructuring': 0,
+        'no-await-in-loop': 0
     },
     globals: {
         TextEncoder: false,

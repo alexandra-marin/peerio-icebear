@@ -3,7 +3,7 @@
 // CacheEngineInterface class is never used.
 
 /**
- * @callback StorageEngineInterface~cacheUpdateCallback
+ * @callback CacheEngineInterface~cacheUpdateCallback
  * @param {object} oldValue
  * @param {object} newValue
  * @returns {bool} True - update, False - don't
@@ -12,7 +12,7 @@
 /**
  * @interface CacheEngineInterface
  */
-class StorageEngineInterface {
+class CacheEngineInterface {
     constructor(namespace) { }
 
     /**

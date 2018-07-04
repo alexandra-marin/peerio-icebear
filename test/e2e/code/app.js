@@ -45,8 +45,8 @@ class App {
         const os = require('os');
         const FileStream = require('~/models/files/node-file-stream');
         const StorageEngine = require('~/models/storage/node-json-storage');
-        const TestStorageEngine = require('~/db/test-storage-engine');
-        TestStorageEngine.setStorage(this.world.cacheStorage);
+        const TestCacheEngine = require('~/db/test-cache-engine');
+        TestCacheEngine.setStorage(this.world.cacheStorage);
         const cfg = this.world.ice.config;
         // todo: make special test platform?
         cfg.appVersion = '2.37.1';
@@ -59,7 +59,7 @@ class App {
         cfg.StorageEngine = StorageEngine;
         cfg.StorageEngine.storageFolder = path.join(os.homedir(),
             process.env.CUCUMBOT ? '.peerio-icebear-tests-cucumbot' : '.peerio-icebear-tests');
-        cfg.CacheEngine = TestStorageEngine;
+        cfg.CacheEngine = TestCacheEngine;
         cfg.socketServerUrl = testConfig.socketServerUrl;
         if (testConfig.logSocketMessages) {
             cfg.debug = { trafficReportInterval: 15000, socketLogEnabled: true };

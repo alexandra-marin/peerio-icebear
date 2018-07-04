@@ -236,6 +236,8 @@
   "title_today": "Today",
   "title_newMessages": "New messages",
   "error_messageSendFail": "Unable to send your message",
+  "error_messageNotSent": "Message wasn't sent.",
+  "title_sendRetry": "Trying to send...",
   "error_chatRename": "Unable to change chat title",
   "error_chatPurposeChange": "Unable to change chat purpose",
   "error_invalidMessageSignature": "The message's signature is invalid. It may be a forgery.",

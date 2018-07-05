@@ -20,6 +20,10 @@ class TestStorageEngine {
         return this.storage[this.namespace];
     }
 
+    open() {
+        return Promise.resolve();
+    }
+
     getValue(key) {
         return new Promise(resolve => {
             setTimeout(() => resolve(this.db[key]));

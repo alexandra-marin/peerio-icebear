@@ -247,7 +247,7 @@ class FileStoreBase {
         if (this.updating || (this.loaded && this.knownUpdateId === this.maxUpdateId)) return;
         console.log(`Proceeding to file update. Known collection version: ${this.knownUpdateId}`);
 
-        if (!this.loaded) {
+        if (!this.loaded && !this.loading) {
             performance.mark(`start loading files ${this.id}`);
             this.loading = true;
         }
@@ -274,6 +274,7 @@ class FileStoreBase {
             this.cacheLoaded = true;
             fromCache = true;
         }
+        console.log(`file store ${this.id} got ${resp.kegs.length} kegs from ${fromCache ? 'cache' : 'server'}`);
         // process kegs
         runInAction(() => {
             for (const keg of resp.kegs) {

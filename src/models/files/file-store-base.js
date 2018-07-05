@@ -59,6 +59,7 @@ class FileStoreBase {
     @observable updatedAfterReconnect = true;
     // Initial file list was loaded.
     @observable loaded = false;
+    @observable cacheLoaded = false;
     // Currently updating files from server
     updating = false;
 

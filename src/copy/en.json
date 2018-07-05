@@ -264,6 +264,7 @@
   "dialog_deleteSharedFolderText": "All of your files will be deleted, and all members will lose access to this folder.",
   "dialog_deleteSharedFolderNonOwnerText": "You will no longer have access to any files in the folder.  Files owned by you will be deleted for everyone including you.",
   "warning_folderDeleted": "{folderName} was deleted.",
+  "title_draggingMultipleItems": "{count} items",
   "warning_oneFileOrFolderMoved": "{fileOrFolderName} was moved to {targetFolderName}.",
   "warning_multipleFilesOrFoldersMoved": "{count} items were moved to {targetFolderName}.",
   "title_noFilesInFolder": "No files in this folder",

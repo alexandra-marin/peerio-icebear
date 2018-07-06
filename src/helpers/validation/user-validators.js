@@ -34,6 +34,7 @@ const socket = require('../../network/socket');
 const VALIDATION_THROTTLING_PERIOD_MS = 400;
 const usernameRegex = /^\w{1,16}$/;
 const emailRegex = /^[^ ]+@[^ ]+/i;
+const medicalIdRegex = /MED\d{10}/i;
 // const phoneRegex =
 //     /^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$/i;
 
@@ -79,6 +80,10 @@ function isValidEmail(val) {
     return Promise.resolve(emailRegex.test(val));
 }
 
+function isValidMedicalId(val) {
+    return Promise.resolve(medicalIdRegex.test(val));
+}
+
 function isValid(context, name) {
     return (value, n) =>
         (value ? _callServer(context, name || n, value) : Promise.resolve(false));
@@ -121,6 +126,7 @@ const isValidSignupUsername = isValid('signup', 'username');
 const isValidSignupFirstName = isValid('signup', 'firstName');
 const isValidSignupLastName = isValid('signup', 'lastName');
 const emailFormat = pair(isValidEmail, 'error_invalidEmail');
+const medicalIdFormat = pair(isValidMedicalId, 'mcr_error_ahrpa');
 const emailAvailability = pair(isValidSignupEmail, 'error_addressNotAvailable');
 const usernameFormat = pair(isValidUsername, 'error_usernameBadFormat');
 const usernameAvailability = pair(isValidSignupUsername, 'error_usernameNotAvailable');
@@ -155,6 +161,7 @@ const validators = {
     lastName: [stringExists, lastNameReserved],
     mcrDoctorAhpraAvailability,
     mcrAdminAhpraAvailability,
+    medicalIdFormat,
     valueEquality,
     isValidSignupEmail,
     isValidSignupFirstName,

@@ -256,7 +256,7 @@ class FileStoreBase {
 
         // creating cache storage object
         if (!this.cache) {
-            this.cache = new config.CacheEngine(`${getUser().username}_file_store_${this.id}`, 'kegId');
+            this.cache = new config.CacheEngine(`peerio_${getUser().username}_file_store_${this.id}`, 'kegId');
             await this.cache.open();
         }
 

@@ -159,7 +159,7 @@ class FileStore extends FileStoreBase {
             }
         });
 
-        this.descriptorsCache = new config.CacheEngine(`${User.current.username}_file_descriptors`, 'key');
+        this.descriptorsCache = new config.CacheEngine(`peerio_${User.current.username}_file_store_meta`, 'key');
         await this.descriptorsCache.open();
         const known = await this.descriptorsCache.getValue('knownDescriptorVersion');
         if (known) {

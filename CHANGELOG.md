@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.7.0"></a>
+# [5.7.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.6.4...v5.7.0) (2018-07-06)
+
+
+### Features
+
+* add medical id format ([#247](https://github.com/PeerioTechnologies/peerio-icebear/issues/247)) ([aab0904](https://github.com/PeerioTechnologies/peerio-icebear/commit/aab0904))
+
+
+
 <a name="5.6.4"></a>
 ## [5.6.4](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.6.3...v5.6.4) (2018-07-03)
 

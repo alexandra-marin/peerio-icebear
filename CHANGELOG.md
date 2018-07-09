@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.8.0"></a>
+# [5.8.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.7.1...v5.8.0) (2018-07-09)
+
+
+### Features
+
+* Medcryptor mobile patient spaces ([#241](https://github.com/PeerioTechnologies/peerio-icebear/issues/241)) ([8727674](https://github.com/PeerioTechnologies/peerio-icebear/commit/8727674))
+
+
+
 <a name="5.7.1"></a>
 ## [5.7.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.7.0...v5.7.1) (2018-07-09)
 

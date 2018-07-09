@@ -12,7 +12,7 @@ function peerioContactFilter(contact /* , context */) {
 // For desktop, various rules (MC only, Peerio only, or both) based on context
 // For mobile always returns all users
 function medcryptorContactFilter(contact, context) {
-    if (config.isMobile) return true;
+    if (config.isMobile) return contact.appLabel === 'medcryptor';
     switch (context) {
         case 'newchat':
         case 'patientroom':

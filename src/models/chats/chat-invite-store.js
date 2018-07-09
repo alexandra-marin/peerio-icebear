@@ -16,6 +16,12 @@ class ChatHead extends Keg {
 
     deserializeKegPayload(payload) {
         this.chatName = payload.chatName || '';
+        this.purpose = payload.purpose || '';
+        this.spaceId = payload.spaceId;
+        this.spaceName = payload.spaceName;
+        this.nameInSpace = payload.nameInSpace;
+        this.spaceDescription = payload.spaceDescription;
+        this.spaceRoomType = payload.spaceRoomType;
     }
 }
 
@@ -129,15 +135,30 @@ class ChatInviteStore {
         return socket.send('/auth/kegs/channel/invites')
             .then(action(res => {
                 const newReceivedInvites = res.map(i => {
-                    const channelName = this.decryptChannelName(i);
+                    const chatHead = this.getChatHead(i);
                     const participants = this.getParticipants(i);
-                    return new ReceivedInvite({
+                    const channelName = chatHead.chatName || '';
+                    const data = {
                         username: i.admin,
                         kegDbId: i.channel,
                         timestamp: i.timestamp,
                         participants,
                         channelName
-                    });
+                    };
+
+                    const isInSpace = !!chatHead.spaceId;
+                    if (isInSpace) {
+                        data.isInSpace = isInSpace;
+                        data.chatHead = {
+                            spaceId: chatHead.spaceId,
+                            spaceName: chatHead.spaceName,
+                            spaceDescription: chatHead.spaceDescription,
+                            spaceRoomType: chatHead.spaceRoomType,
+                            nameInSpace: chatHead.nameInSpace
+                        };
+                    }
+
+                    return new ReceivedInvite(data);
                 });
                 if (this.initialInvitesProcessed) {
                     // Find new invites and notify about them.
@@ -187,9 +208,9 @@ class ChatInviteStore {
 
     /**
      * @param {Object} data - invite objects
-     * @returns {string}
+     * @returns {ChatHead}
      */
-    decryptChannelName(data) {
+    getChatHead(data) {
         try {
             const { bootKeg, chatHeadKeg } = data;
             bootKeg.payload = JSON.parse(bootKeg.payload);
@@ -203,12 +224,14 @@ class ChatInviteStore {
             const chatHead = new ChatHead(fakeDb);
             chatHead.overrideKey = kegKey;
             chatHead.loadFromKeg(chatHeadKeg);
-            return chatHead.chatName;
+
+            return chatHead;
         } catch (ex) {
             console.error(ex);
             return '';
         }
     }
+
     /**
      * Updates local data from server.
      * @function

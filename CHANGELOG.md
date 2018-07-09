@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.7.1"></a>
+## [5.7.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.7.0...v5.7.1) (2018-07-09)
+
+
+### Bug Fixes
+
+* amend ([b2e9f32](https://github.com/PeerioTechnologies/peerio-icebear/commit/b2e9f32))
+* doctor can't be made admin of a room in patient space ([7502922](https://github.com/PeerioTechnologies/peerio-icebear/commit/7502922))
+* missed localization string ([e1c341d](https://github.com/PeerioTechnologies/peerio-icebear/commit/e1c341d))
+* upload progress ([0d48495](https://github.com/PeerioTechnologies/peerio-icebear/commit/0d48495))
+
+
+
 <a name="5.7.0"></a>
 # [5.7.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.6.4...v5.7.0) (2018-07-06)
 

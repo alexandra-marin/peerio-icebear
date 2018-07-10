@@ -34,10 +34,16 @@ class Telemetry {
         // base properties to be sent with all events
         // TODO: mobile & desktop have different base props
         this.baseObj.properties.distinct_id = uuid;
+        console.log('BASE OBJECT');
+        console.log(this.baseObj);
     }
 
     send(eventObj) {
+        // `baseObj`'s properties will be overwritten on assign.
+        // This song-and-dance merges the properties first, assigns the object, then assigns the object's properties
+        const properties = Object.assign(this.baseObj.properties, eventObj.properties);
         const object = Object.assign(this.baseObj, eventObj);
+        object.properties = properties;
 
         const data = config.isMobile
             ? null // TODO: pretty sure window.btoa() won't work on mobile
@@ -50,7 +56,10 @@ class Telemetry {
         //     method: 'POST'
         // }).then(response => console.log(response.json()));
 
+        console.log('SEND OBJECT');
         console.log(object);
+
+        console.log('URL');
         console.log(url);
     }
 }

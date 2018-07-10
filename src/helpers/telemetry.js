@@ -26,7 +26,7 @@ class Telemetry {
         const uuid = await this.getUserId();
 
         // base properties to be sent with all events
-        console.log(config.isMobile); // TODO: mobile & desktop have different base props
+        // TODO: mobile & desktop have different base props
         const obj = {
             properties: {
                 distinct_id: uuid,
@@ -39,7 +39,10 @@ class Telemetry {
     send(eventObj) {
         const object = Object.assign(this.baseObj, eventObj);
 
-        const data = window.btoa(JSON.stringify(object)); // TODO: pretty sure this won't work on mobile
+        const data = config.isMobile
+            ? null // TODO: pretty sure window.btoa() won't work on mobile
+            : window.btoa(JSON.stringify(object));
+
         const url = `${this.baseUrl}${data}`;
 
         // // uncomment to send the event

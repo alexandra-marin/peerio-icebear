@@ -8,6 +8,7 @@ class Telemetry {
     baseObj = {
         properties: {
             token: '', // TODO: remember to put the token here before trying to send data
+            Device: config.isMobile ? 'mobile' : 'desktop',
             'App Version': config.appVersion,
             'Version Number': 1 // refers to our own tracker library versioning
         }
@@ -34,8 +35,6 @@ class Telemetry {
         // base properties to be sent with all events
         // TODO: mobile & desktop have different base props
         this.baseObj.properties.distinct_id = uuid;
-        console.log('BASE OBJECT');
-        console.log(this.baseObj);
     }
 
     send(eventObj) {

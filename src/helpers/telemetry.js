@@ -8,7 +8,7 @@ class Telemetry {
     baseObj = {
         properties: {
             token: '', // TODO: remember to put the token here before trying to send data
-            Device: config.isMobile ? 'mobile' : 'desktop',
+            Device: config.isMobile ? 'Mobile' : 'Desktop',
             'App Version': config.appVersion,
             'Version Number': 1 // refers to our own tracker library versioning
         }

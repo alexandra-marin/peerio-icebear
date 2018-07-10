@@ -40,8 +40,8 @@ class Telemetry {
     send(eventObj) {
         // `baseObj`'s properties will be overwritten on assign.
         // This song-and-dance merges the properties first, assigns the object, then assigns the object's properties
-        const properties = Object.assign(this.baseObj.properties, eventObj.properties);
-        const object = Object.assign(this.baseObj, eventObj);
+        const properties = Object.assign({}, eventObj.properties, this.baseObj.properties);
+        const object = Object.assign({}, eventObj, this.baseObj);
         object.properties = properties;
 
         const data = config.isMobile

@@ -5,7 +5,13 @@ const { cryptoUtil } = require('../crypto');
 class Telemetry {
     // TODO: may need to support other baseUrls if we want to use /engage/ functionality?
     baseUrl = 'https://api.mixpanel.com/track/?data=';
-    baseObj = {};
+    baseObj = {
+        properties: {
+            token: '', // TODO: remember to put the token here before trying to send data
+            'App Version': config.appVersion,
+            'Version Number': 1 // refers to our own tracker library versioning
+        }
+    };
 
     getUserId = () => {
         return TinyDb.system.getValue('uuid')
@@ -27,13 +33,7 @@ class Telemetry {
 
         // base properties to be sent with all events
         // TODO: mobile & desktop have different base props
-        const obj = {
-            properties: {
-                distinct_id: uuid,
-                token: '' // TODO: remember to put the token here before trying to send data
-            }
-        };
-        this.baseObj = obj;
+        this.baseObj.properties.distinct_id = uuid;
     }
 
     send(eventObj) {
@@ -50,6 +50,7 @@ class Telemetry {
         //     method: 'POST'
         // }).then(response => console.log(response.json()));
 
+        console.log(object);
         console.log(url);
     }
 }

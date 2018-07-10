@@ -64,6 +64,7 @@ const chatInviteStore = require('./models/chats/chat-invite-store');
 const Contact = require('./models/contacts/contact');
 const prombservable = require('./helpers/prombservable');
 const tracker = require('./models/update-tracker');
+const telemetry = require('./helpers/telemetry');
 
 
 // MEMO: Do NOT export NodeJsonStorage and NodeFileStream here for compatibility reasons
@@ -99,5 +100,6 @@ module.exports = {
     prombservable,
     __: {
         tracker
-    }
+    },
+    telemetry
 };

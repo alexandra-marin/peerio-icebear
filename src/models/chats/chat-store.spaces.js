@@ -11,7 +11,7 @@ class Space {
     spaceDescription = '';
 
     @computed get allRooms() {
-        return this.store.channels
+        return this.store.allRooms
             .filter(c => c.isInSpace)
             .filter(c => c.chatHead.spaceId === this.spaceId);
     }
@@ -41,7 +41,7 @@ class ChatStoreSpaces {
     }
 
     @computed get roomsWithinSpaces() {
-        return this.store.channels.filter(chat => chat.isInSpace);
+        return this.store.allRooms.filter(chat => chat.isInSpace);
     }
 
     /**

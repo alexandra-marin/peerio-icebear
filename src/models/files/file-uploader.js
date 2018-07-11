@@ -123,7 +123,7 @@ class FileUploader extends FileProcessor {
                 this.chunksWaitingForResponse--;
                 // console.log(`chunk ${chunk.id} sent`);
                 if (this.stopped) return;
-                this.file.progress += this.file.chunkSize;
+                this.file.progress += chunk.buffer.length;
                 this._tick();
             })
             .catch(this._error);

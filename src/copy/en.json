@@ -528,6 +528,7 @@
   "button_feedbackChat": "Chat with our staff",
   "button_contact": "Contact Peerio",
   "button_terms": "Terms",
+  "title_viewYourPlan": "View your {title} plan",
   "title_getMoreGoPro": "Get more. Go Pro",
   "title_storageUsed": "{percent}% of {storage} used",
   "title_unlockMoreStorage": "Unlock more storage",

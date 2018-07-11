@@ -1,6 +1,7 @@
 const config = require('../config');
 const TinyDb = require('../db/tiny-db');
 const { cryptoUtil } = require('../crypto');
+const os = require('os');
 
 class Telemetry {
     // TODO: may need to support other baseUrls if we want to use /engage/ functionality?
@@ -9,6 +10,8 @@ class Telemetry {
         properties: {
             token: '', // TODO: remember to put the token here before trying to send data
             Device: config.isMobile ? 'Mobile' : 'Desktop',
+            'Operating System': os.type(),
+            'OS Version': os.release(),
             'App Version': config.appVersion,
             'Version Number': 1 // refers to our own tracker library versioning
         }

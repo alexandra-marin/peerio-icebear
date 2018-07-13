@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.8.5"></a>
+## [5.8.5](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.8.4...v5.8.5) (2018-07-13)
+
+
+
+<a name="5.8.4"></a>
+## [5.8.4](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.8.3...v5.8.4) (2018-07-13)
+
+
+
+<a name="5.8.3"></a>
+## [5.8.3](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.8.2...v5.8.3) (2018-07-13)
+
+
+### Bug Fixes
+
+* recent chat limit weren't working [ch11142] ([2b96ff8](https://github.com/PeerioTechnologies/peerio-icebear/commit/2b96ff8))
+
+
+
 <a name="5.8.2"></a>
 ## [5.8.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.8.1...v5.8.2) (2018-07-11)
 

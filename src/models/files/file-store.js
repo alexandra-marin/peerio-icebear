@@ -284,7 +284,7 @@ class FileStore extends FileStoreBase {
                     return 0;
                 }
             );
-        if (ret.length > config.recentFilesDisplayLimit) ret.length = config.recentFilesDisplayLimit;
+        if (ret.length > config.chat.recentFilesDisplayLimit) ret.length = config.chat.recentFilesDisplayLimit;
         return ret;
     }
 

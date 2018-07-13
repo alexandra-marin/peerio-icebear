@@ -280,7 +280,7 @@ const config = new class {
          * Maximum amount of recent files to maintain in chat object to be able to display the list on UI.
          * @type {number}
          */
-        recentFilesDisplayLimit: 10,
+        recentFilesDisplayLimit: 25,
         /**
          * Maximum number of characters chat name can have.
          * Do not override this in clients, it's supposed to be a system limit.

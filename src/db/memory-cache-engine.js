@@ -1,10 +1,10 @@
 // Use this with tests
 
-class TestStorageEngine {
-    // pass an empty(or existing) object as storage - TestStorageEngine will read and write objects to it
+class MemoryCacheEngine {
+    // pass an empty(or existing) object as storage - MemoryCacheEngine will read and write objects to it
     constructor(namespace) {
         this.namespace = namespace;
-        this.storage = TestStorageEngine.defaultStorage;
+        this.storage = MemoryCacheEngine.defaultStorage;
         if (!this.storage[namespace]) {
             this.storage[namespace] = {};
         }
@@ -13,11 +13,15 @@ class TestStorageEngine {
     static defaultStorage = {};
 
     static setStorage(val) {
-        TestStorageEngine.defaultStorage = val;
+        MemoryCacheEngine.defaultStorage = val;
     }
 
     get db() {
         return this.storage[this.namespace];
+    }
+
+    open() {
+        return Promise.resolve();
     }
 
     getValue(key) {
@@ -26,10 +30,19 @@ class TestStorageEngine {
         });
     }
 
-    async setValue(key, value) {
+    async setValue(key, value, callback) {
+        let newVal = value;
+        if (callback) {
+            const old = await this.getValue(key);
+            newVal = callback(old, value);
+            if (!newVal) {
+                console.log('cache update rejected');
+                return Promise.resolve();
+            }
+        }
         return new Promise(resolve => {
             setTimeout(() => {
-                this.db[key] = value;
+                this.db[key] = newVal;
                 resolve();
             });
         });
@@ -64,4 +77,4 @@ class TestStorageEngine {
     }
 }
 
-module.exports = TestStorageEngine;
+module.exports = MemoryCacheEngine;

@@ -49,8 +49,9 @@ const { observable, computed } = require('mobx');
  * @param {bool} [isChannel=false] - does this db belong to a DM or Channel
  */
 class SharedKegDb {
-    constructor(id, participants = [], isChannel = false) {
+    constructor(id, participants = [], isChannel = false, onBootKegLoadedFromKeg) {
         this.id = id;
+        this.onBootKegLoadedFromKeg = onBootKegLoadedFromKeg;
         const usernames = _.uniq(participants.map(p => p.username));
         if (usernames.length !== participants.length) {
             console.warn('ChatKegDb constructor received participant list containing duplicates.');
@@ -69,7 +70,7 @@ class SharedKegDb {
 
     /**
      * Returns the name of keg type for URLs.
-     * APIs wil get called as `/auth/kegs/db/create-${this.urlName}`.
+     * APIs will get called as `/auth/kegs/db/create-${this.urlName}`.
      */
     get urlName() {
         throw new Error('SharedKegDB: urlName not implemented in the child');
@@ -142,19 +143,22 @@ class SharedKegDb {
      * Will create kegDb and boot keg if needed.
      * @returns {Promise}
      */
-    loadMeta() {
+    loadMeta(cachedMeta, cachedBootKeg) {
         return retryUntilSuccess(() => {
             if (this.id) {
-                return this._loadExistingMeta();
+                return this._loadExistingMeta(cachedMeta, cachedBootKeg);
             }
             return this._createMeta();
         }, this._retryId);
     }
 
-    _loadExistingMeta() {
-        return socket.send('/auth/kegs/db/meta', { kegDbId: this.id }, false)
-            .then(this._parseMeta)
-            .then(this._resolveBootKeg);
+    async _loadExistingMeta(cachedMeta, cachedBootKeg) {
+        let meta = cachedMeta;
+        if (!meta) {
+            meta = await socket.send('/auth/kegs/db/meta', { kegDbId: this.id }, false);
+        }
+        this._parseMeta(meta);
+        return this._resolveBootKeg(cachedBootKeg);
     }
 
     _createMeta() {
@@ -175,6 +179,7 @@ class SharedKegDb {
 
     // fills current object properties from raw keg metadata
     _parseMeta = (meta) => {
+        this.rawMeta = meta;
         this.id = meta.id;
         if (!this.isChannel && meta.permissions && meta.permissions.users) {
             this._metaParticipants = Object.keys(meta.permissions.users)
@@ -183,11 +188,12 @@ class SharedKegDb {
     }
 
     // figures out if we need to load/create boot keg and does it
-    _resolveBootKeg = () => {
-        return this.loadBootKeg()
+    _resolveBootKeg = (cachedBootKeg) => {
+        return this.loadBootKeg(cachedBootKeg)
             .then(boot => {
                 if (boot.version > 1) {
-                    // disabled for now
+                    // disabled for now, not sure we will ever need to migrate DM boot kegs
+                    // (rooms are all in new format from the start)
                     // Migrating boot keg
                     if (!boot.format) {
                         boot.participants = this._metaParticipants;
@@ -207,7 +213,7 @@ class SharedKegDb {
             .spread((boot, justCreated) => {
                 this.boot = boot;
                 if (!this.key && !justCreated) this.dbIsBroken = true;
-                return justCreated;
+                return { justCreated, rawMeta: this.rawMeta };
             })
             .tapCatch(err => console.error(err));
     }
@@ -223,6 +229,7 @@ class SharedKegDb {
             .then(() => {
                 // keg key for this db
                 const boot = new SharedDbBootKeg(this, User.current);
+                boot.onLoadedFromKeg = this.onBootKegLoadedFromKeg;
                 boot.addKey();
                 participants.forEach(p => {
                     boot.addParticipant(p);
@@ -239,9 +246,13 @@ class SharedKegDb {
     /**
      * Retrieves boot keg for the db and initializes this KegDb instance with required data.
      */
-    loadBootKeg() {
+    async loadBootKeg(cachedBootKeg) {
         // console.log(`Loading chat boot keg for ${this.id}`);
         const boot = new SharedDbBootKeg(this, User.current);
+        boot.onLoadedFromKeg = this.onBootKegLoadedFromKeg;
+        if (cachedBootKeg && boot.loadFromKeg(cachedBootKeg)) {
+            return boot;
+        }
         return boot._enqueueLoad().return(boot);
     }
 }

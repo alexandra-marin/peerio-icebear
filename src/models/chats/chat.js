@@ -44,7 +44,9 @@ class Chat {
         this.store = store;
         this.isChannel = isChannel;
         if (!id) this.tempId = getTemporaryChatId();
-        this.db = new ChatKegDb(id, participants, isChannel);
+        this.db = new ChatKegDb(id, participants, isChannel, (keg) => {
+            this.store.cache.saveBootKeg(this.id, keg);
+        });
         this._reactionsToDispose.push(
             reaction(
                 () => this.active && clientApp.isFocused && clientApp.isReadingNewestMessages
@@ -434,36 +436,45 @@ class Chat {
      */
     @observable isNewUserFromInvite;
 
-    _metaPromise = null;
     /**
      * @returns {Promise}
      */
-    loadMetadata() {
-        if (this.metaLoaded || this.loadingMeta) return this._metaPromise;
+    async loadMetadata() {
+        if (this.metaLoaded) return null;
+        if (this.loadingMeta) return asPromise(this, 'metaLoaded', true);
+
         this.loadingMeta = true;
-        // retry is handled inside loadMeta()
-        this._metaPromise = this.db.loadMeta()
-            .then(action(justCreated => { // eslint-disable-line
-                if (this.db.dbIsBroken) {
-                    const errmsg = `Detected broken database. id ${this.db.id}`;
-                    console.error(errmsg);
-                    throw new Error(errmsg);
-                }
-                this.id = this.db.id;
-                this._messageHandler = new ChatMessageHandler(this);
-                this._fileHandler = new ChatFileHandler(this);
-                this._receiptHandler = new ChatReceiptHandler(this);
-                this.chatHead = new ChatHead(this.db);
-                this.loadingMeta = false;
-                this.metaLoaded = true;
-                if (justCreated) {
-                    const m = new Message(this.db);
-                    m.setChatCreationFact();
-                    return this._sendMessage(m);
-                }
-                setTimeout(() => this._messageHandler.onMessageDigestUpdate(), 2000);
-            }));
-        return this._metaPromise;
+        // retry is handled inside db.loadMeta()
+        const cachedData = (this.id && await this.store.cache.loadData(this.id)) || {};
+        const { justCreated, rawMeta } = await this.db.loadMeta(cachedData.rawMeta, cachedData.bootKeg);
+        if (this.db.dbIsBroken) {
+            const errmsg = `Detected broken database. id ${this.db.id}`;
+            console.error(errmsg);
+            throw new Error(errmsg);
+        }
+        this.id = this.db.id;
+        this._messageHandler = new ChatMessageHandler(this);
+        this._fileHandler = new ChatFileHandler(this);
+        this._receiptHandler = new ChatReceiptHandler(this);
+        if (this.isChannel) {
+            this.chatHead = new ChatHead(this.db);
+            if (cachedData.chatHead) {
+                this.chatHead.loadFromKeg(cachedData.chatHead);
+            }
+            this.chatHead.onLoadedFromKeg = (chatHeadKeg) => {
+                this.store.cache.saveChatHead(this.id, chatHeadKeg);
+            };
+        }
+        if (!cachedData.rawMeta) await this.store.cache.saveMeta(this.id, rawMeta);
+        this.loadingMeta = false;
+        this.metaLoaded = true;
+        if (justCreated) {
+            const m = new Message(this.db);
+            m.setChatCreationFact();
+            this._sendMessage(m);
+        }
+        setTimeout(() => this._messageHandler.onMessageDigestUpdate(), 2000);
+        return null;
     }
 
     /**

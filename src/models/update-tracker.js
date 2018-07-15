@@ -69,7 +69,7 @@ class UpdateTracker {
     }
 
     onceUpdated(handler) {
-        when(() => this.updated, handler);
+        when(() => this.updated, () => setTimeout(handler));
     }
 
     constructor() {

@@ -445,8 +445,12 @@ class Chat {
 
         this.loadingMeta = true;
         // retry is handled inside db.loadMeta()
+        console.log(this.id, 'cache: loading cache object');
         const cachedData = (this.id && await this.store.cache.loadData(this.id)) || {};
+        console.log(this.id, 'cache: cache object loaded', Object.keys(cachedData));
+        console.log(this.id, 'cache: loading meta');
         const { justCreated, rawMeta } = await this.db.loadMeta(cachedData.rawMeta, cachedData.bootKeg);
+        console.log(this.id, 'cache: meta loaded boot keg', this.db.boot ? 'exists' : 'DOES NOT EXIST');
         if (this.db.dbIsBroken) {
             const errmsg = `Detected broken database. id ${this.db.id}`;
             console.error(errmsg);
@@ -457,6 +461,7 @@ class Chat {
         this._fileHandler = new ChatFileHandler(this);
         this._receiptHandler = new ChatReceiptHandler(this);
         if (this.isChannel) {
+            console.log(this.id, 'cache: creating chat head');
             this.chatHead = new ChatHead(this.db);
             if (cachedData.chatHead) {
                 this.chatHead.loadFromKeg(cachedData.chatHead);

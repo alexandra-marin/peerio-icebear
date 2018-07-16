@@ -5,6 +5,7 @@ const Tofu = require('./tofu');
 const config = require('../../config');
 const { asPromise } = require('../../helpers/prombservable');
 const { retryUntilSuccess } = require('../../helpers/retry');
+const { getCacheDbFullName } = require('../../util');
 
 class TofuStore {
     @observable loaded = false;
@@ -13,9 +14,9 @@ class TofuStore {
     @action.bound async load() {
         if (this.loading || this.loaded) return;
         this.loading = true;
-        this.cache = new config.CacheEngine(`peerio_${getUser().username}_cache_tofu`, 'username');
+        this.cache = new config.CacheEngine(getCacheDbFullName('tofu'), 'username');
         await this.cache.open();
-        this.cacheMeta = new config.CacheEngine(`peerio_${getUser().username}_cache_tofu_meta`, 'key');
+        this.cacheMeta = new config.CacheEngine(getCacheDbFullName('tofu_meta'), 'key');
         await this.cacheMeta.open();
         while (await this.loadTofuKegs()) {
             console.log('Loaded a page of tofu kegs from server.');

@@ -9,6 +9,7 @@ const FileStoreFolders = require('./file-store.folders');
 const { getUser } = require('../../helpers/di-current-user');
 const { getFileStore } = require('../../helpers/di-file-store');
 const config = require('../../config');
+const { getCacheDbFullName } = require('../../util');
 
 // const PAGE_SIZE = 25;
 function isFileSelected(file) {
@@ -178,7 +179,7 @@ class FileStoreBase {
         }
         this.maxUpdateId = digest.maxUpdateId;
         this.updateFiles();
-    }, 1500, { leading: true, maxWait: 3000 });
+    }, 1500, { leading: false, maxWait: 3000 });
 
     async getFileKegsFromServer() {
         const filter = { collectionVersion: { $gte: this.knownUpdateId } };
@@ -256,7 +257,7 @@ class FileStoreBase {
 
         // creating cache storage object
         if (!this.cache) {
-            this.cache = new config.CacheEngine(`peerio_${getUser().username}_file_store_${this.id}`, 'kegId');
+            this.cache = new config.CacheEngine(getCacheDbFullName(`file_store_${this.id}`), 'kegId');
             await this.cache.open();
         }
 

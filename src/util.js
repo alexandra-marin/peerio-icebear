@@ -1,4 +1,7 @@
-/**
+const { getUser } = require('./helpers/di-current-user');
+const config = require('./config');
+
+/*
  * Various utility functions that didn't fit anywhere else.
  */
 
@@ -54,5 +57,26 @@ function tryToGet(fn, defaultValue) {
     return defaultValue;
 }
 
-module.exports = { convertBuffers, formatBytes, tryToGet };
+
+function getCacheDbFullName(name) {
+    if (!name) throw new Error('Cache database has to have a name');
+    const prefix = 'peerio'; // something to separate our databases in case they're in global scope
+    const username = getUser().username; // separate user spaces
+    const server = simpleHash(config.socketServerUrl); // during development and testing different servers can happen
+    return `${prefix}_${username}_${name}_cache_${server}`;
+}
+
+function simpleHash(str) {
+    let hash = 0;
+    if (!str.length) {
+        return hash;
+    }
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash &= hash; // Convert to 32bit integer
+    }
+    return hash;
+}
+module.exports = { convertBuffers, formatBytes, tryToGet, getCacheDbFullName };
 

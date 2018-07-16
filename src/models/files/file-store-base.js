@@ -179,7 +179,7 @@ class FileStoreBase {
         }
         this.maxUpdateId = digest.maxUpdateId;
         this.updateFiles();
-    }, 1500, { leading: false, maxWait: 3000 });
+    }, 1500, { leading: true, maxWait: 3000 });
 
     async getFileKegsFromServer() {
         const filter = { collectionVersion: { $gte: this.knownUpdateId } };

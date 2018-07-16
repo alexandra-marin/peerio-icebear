@@ -49,7 +49,7 @@ class CucumbotClient extends CucumbotBase {
         if (!testConfig.muteCucumbot) {
             child.stdout.on('data', data => {
                 const msg = data.toString().split('\n');
-                msg.forEach(m => m && console._log('>>>>>>BOT:', m));
+                msg.forEach(m => m && console._logBot('[[CUCUMBOT]]:', m));
             });
         }
 

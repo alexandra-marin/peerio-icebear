@@ -81,7 +81,16 @@ class App {
             error: console.error,
             debug: console.debug
         };
+        const separator = '----------- MAIN USER -----------';
+        let lastMsgWasBot = false;
         console._log = console.log;
+        console._logBot = function(...args) {
+            if (!lastMsgWasBot) {
+                lastMsgWasBot = true;
+                console._log('----------- CUCUMBOT ------------');
+            }
+            console._log(...args);
+        };
         const write = (type, args) => {
             // DisconnectedError naturally happens all the time during tests.
             // It generates too much noise and hardly has any value, we can figure
@@ -101,8 +110,15 @@ class App {
                     line += `${args[i]} `;
                 }
             }
+            if (lastMsgWasBot) {
+                lastMsgWasBot = false;
+                this.logs.push(separator);
+                this._consoleBackup.log.call(console, separator);
+            }
             this.logs.push(line);
-            if (testConfig.showAppLogs) this._consoleBackup.log.call(console, line);
+            if (testConfig.showAppLogs) {
+                this._consoleBackup.log.call(console, line);
+            }
         };
         console.log = function(...args) {
             write('LOG:', args);
@@ -128,7 +144,7 @@ class App {
     // This function emulates application start and should be run before any scenario.
     start() {
         if (this.started) throw new Error('The test app is already started.');
-        console.log('===== STARTING TEST APP =====');
+        console.log(`===== STARTING TEST APP ${process.env.CUCUMBOT ? 'CUCUMBOT' : ''} =====`);
         App.lastInstanceDisposed = false;
         this._setupChai();
         global.ice = this.world.ice = require('~/');

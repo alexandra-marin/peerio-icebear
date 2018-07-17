@@ -167,6 +167,16 @@ class ChatMessageHandler {
     }
 
     loadMostRecentMessage() {
+        // This feature is not being used anymore,
+        // but it is not easy just to get rid of the flag,
+        // because it's being listened to by chat update code
+        // and it's being set when it is ok to actually load any updates (metaLoaded).
+        // In other words - it's in a chain of things that are supposed to execute in order.
+        // So maybe let's keep it this way for now to avoid refactoring that.
+        // Also maybe this feature will be requested again by product team.
+        setTimeout(() => { this.chat.mostRecentMessageLoaded = true; });
+        // DO NOT delete commented code, unless you are getting rid of the flag and the whole feature
+        /*
         retryUntilSuccess(() => socket.send('/auth/kegs/db/list-ext', {
             kegDbId: this.chat.id,
             options: {
@@ -181,6 +191,7 @@ class ChatMessageHandler {
                 this.chat.mostRecentMessageLoaded = true;
                 return this.chat.addMessages(resp.kegs);
             }));
+        */
     }
 
     getInitialPage() {

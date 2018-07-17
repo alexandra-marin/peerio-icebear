@@ -409,10 +409,12 @@ class Keg {
             if (keg.props && keg.props.descriptor) this.deserializeDescriptor(keg.props.descriptor);
             if (this.afterLoad) this.afterLoad();
             this.loaded = true;
+            // TODO: not proud of this, looking for better ideas to get the raw keg from here to interested party
+            if (this.onLoadedFromKeg) this.onLoadedFromKeg(keg);
             return this;
         } catch (err) {
             console.error(err, this.id);
-            // TODO: refactor this fucntion to return error code instead
+            // TODO: refactor this function to return error code instead
             if (err instanceof DecryptionError) {
                 this.decryptionError = true;
             }

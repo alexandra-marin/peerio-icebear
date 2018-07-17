@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.9.0"></a>
+# [5.9.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.8.5...v5.9.0) (2018-07-17)
+
+
+### Features
+
+* new contact color calculations ([fcc8e22](https://github.com/PeerioTechnologies/peerio-icebear/commit/fcc8e22))
+
+
+
 <a name="5.8.5"></a>
 ## [5.8.5](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.8.4...v5.8.5) (2018-07-13)
 

@@ -71,6 +71,12 @@ class FileStoreBase {
             .filter(f => f.normalizedName.includes(q));
     }
 
+    // Filter folders by a query via function argument instead of using this.searchQuery
+    foldersFiltered = (q) => {
+        return this.folderStore.root.allFolders
+            .filter(f => f.normalizedName.includes(q));
+    }
+
     // Subset of files and folders not currently hidden by any applied filters
     @computed get filesAndFoldersSearchResult() {
         return this.foldersSearchResult.concat(this.filesSearchResult);

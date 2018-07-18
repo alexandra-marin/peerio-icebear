@@ -69,7 +69,6 @@ class FileStoreBase {
         return this.foldersFiltered(this.searchQuery);
     }
 
-    // Filter folders by a query via function argument instead of using this.searchQuery
     foldersFiltered = (query) => {
         const q = query.toUpperCase();
         return this.folderStore.root.allFolders

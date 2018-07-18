@@ -18,7 +18,6 @@ const FileStoreBulk = require('./file-store.bulk');
 const util = require('../../util');
 const { asPromise } = require('../../helpers/prombservable');
 const _ = require('lodash');
-const { getCacheDbFullName } = require('../../util');
 
 class FileStore extends FileStoreBase {
     isMainStore = true;
@@ -160,7 +159,7 @@ class FileStore extends FileStoreBase {
             }
         });
 
-        this.descriptorsCache = new config.CacheEngine(getCacheDbFullName('file_store_meta'), 'key');
+        this.descriptorsCache = new config.CacheEngine('file_store_meta', 'key');
         await this.descriptorsCache.open();
         const known = await this.descriptorsCache.getValue('knownDescriptorVersion');
         if (known) {

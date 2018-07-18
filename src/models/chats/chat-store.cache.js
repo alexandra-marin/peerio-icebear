@@ -1,5 +1,4 @@
 const config = require('../../config');
-const { getCacheDbFullName } = require('../../util');
 
 class ChatStoreCache {
     /** @param {ChatStore} store */
@@ -9,7 +8,7 @@ class ChatStoreCache {
 
     async open() {
         if (!this.cache) {
-            this.cache = new config.CacheEngine(getCacheDbFullName('chat_store'), 'kegDbId');
+            this.cache = new config.CacheEngine('chat_store', 'kegDbId');
             await this.cache.open();
         }
     }

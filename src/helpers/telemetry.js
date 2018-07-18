@@ -40,29 +40,36 @@ class Telemetry {
         this.baseObj.properties.distinct_id = uuid;
     }
 
+    camelToTitleCase(text) {
+        return (text[0].toUpperCase() + text.slice(1)).split(/(?=[A-Z])/).join(' ');
+    }
+
     send(eventObj) {
+        // Marketing wants all items (property names and values) to be in Title Case, but this breaks code style.
+        // So we still write props in camelCase when sending events from client, and convert them here.
+        let properties = {};
+        Object.keys(eventObj.properties).forEach(itemInCamel => {
+            const item = this.camelToTitleCase(itemInCamel);
+            properties[item] = eventObj.properties[itemInCamel];
+        });
+
         // `baseObj`'s properties will be overwritten on assign.
         // This song-and-dance merges the properties first, assigns the object, then assigns the object's properties
-        const properties = Object.assign({}, eventObj.properties, this.baseObj.properties);
+        properties = Object.assign(properties, this.baseObj.properties);
         const object = Object.assign({}, eventObj, this.baseObj);
         object.properties = properties;
 
-        const data = config.isMobile
-            ? null // TODO: pretty sure window.btoa() won't work on mobile
-            : window.btoa(JSON.stringify(object));
-
-        const url = `${this.baseUrl}${data}`;
-
         // // uncomment to send the event
+        // const data = config.isMobile
+        //     ? null // TODO: pretty sure window.btoa() won't work on mobile
+        //     : window.btoa(JSON.stringify(object));
+        // const url = `${this.baseUrl}${data}`;
+        //
         // window.fetch(url, {
         //     method: 'POST'
         // }).then(response => console.log(response.json()));
 
-        console.log('SEND OBJECT');
         console.log(object);
-
-        console.log('URL');
-        console.log(url);
     }
 }
 

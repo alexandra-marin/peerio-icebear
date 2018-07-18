@@ -10,6 +10,7 @@ const serverSettings = require('../server-settings');
 const { t } = require('peerio-translator');
 const clientApp = require('../client-app');
 const { getContactStore } = require('../../helpers/di-contact-store');
+const ContactColors = require('./contact.colors');
 
 const nullFingerprint = '00000-00000-00000-00000-00000-00000';
 
@@ -113,8 +114,9 @@ class Contact {
      * @type {string}
      */
     @computed get color() {
-        if (!this.signingPublicKey) return '#9e9e9e';
-        return `#${cryptoUtil.getHexHash(3, this.signingPublicKey)}`;
+        if (!this.signingPublicKey) return { value: '#e0e1e6', isLight: true };
+        const int = this.signingPublicKey[0] % ContactColors.length;
+        return ContactColors[int];
     }
 
     /**

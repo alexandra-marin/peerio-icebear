@@ -1,6 +1,9 @@
 module.exports = {
     root: true,
-    parser: 'babel-eslint',
+    parser: 'typescript-eslint-parser',
+    plugins: [
+        'typescript'
+    ],
     extends: [
         'peerio/index.base.js'
     ],
@@ -13,7 +16,9 @@ module.exports = {
         'prefer-arrow-callback': 0,
         'no-debugger': 0,
         'prefer-destructuring': 0,
-        'no-await-in-loop': 0
+        'no-await-in-loop': 0,
+        'strict': 0,
+        'typescript/no-unused-vars': 2
     },
     globals: {
         TextEncoder: false,

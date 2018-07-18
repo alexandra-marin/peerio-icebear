@@ -368,7 +368,8 @@ class Keg {
             }
             // SELF kegs do not require signing
             if (!noVerify && (this.forceSign || (!this.plaintext && this.db.id !== 'SELF'))) {
-                this.verifyKegSignature(payload, keg.props);
+                const payloadToVerify = payload;
+                setTimeout(() => this.verifyKegSignature(payloadToVerify, keg.props), 3000);
             } else {
                 this.signatureError = false;
             }

@@ -66,13 +66,12 @@ class FileStoreBase {
     // Subset of folders not currently hidden by any applied filters
     @computed get foldersSearchResult() {
         if (!this.searchQuery) return [];
-        const q = this.searchQuery.toUpperCase();
-        return this.folderStore.root.allFolders
-            .filter(f => f.normalizedName.includes(q));
+        return this.foldersFiltered(this.searchQuery);
     }
 
     // Filter folders by a query via function argument instead of using this.searchQuery
-    foldersFiltered = (q) => {
+    foldersFiltered = (query) => {
+        const q = query.toUpperCase();
         return this.folderStore.root.allFolders
             .filter(f => f.normalizedName.includes(q));
     }

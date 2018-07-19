@@ -367,7 +367,8 @@ class Keg {
             }
             // SELF kegs do not require signing
             if (this.forceSign || (!this.plaintext && this.db.id !== 'SELF')) {
-                this.verifyKegSignature(payload, keg.props);
+                const payloadToVerify = payload;
+                setTimeout(() => this.verifyKegSignature(payloadToVerify, keg.props), 3000);
             }
             this.pendingReEncryption = !!(keg.props.sharedBy && keg.props.sharedKegSenderPK);
             // is this keg shared with us and needs re-encryption?

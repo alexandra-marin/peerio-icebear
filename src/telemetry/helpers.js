@@ -1,5 +1,17 @@
 const S = require('./strings');
 
+function errorMessage(msg) {
+    const messageNames = {
+        error_usernameBadFormat: 'Bad Characters',
+        error_usernameNotFound: 'Username Not Found',
+        error_usernameNotAvailable: 'Name Already Exists',
+        error_invalidEmail: 'Not Valid Email',
+        error_addressNotAvailable: 'Email Not Available',
+        error_fieldRequired: 'Required'
+    };
+    return messageNames[msg] || 'Unknown Error Type';
+}
+
 // Factory for text input events
 function textInput(item, location, sublocation, state, errorMsg) {
     const ret = [
@@ -11,31 +23,7 @@ function textInput(item, location, sublocation, state, errorMsg) {
     if (sublocation) ret[1].sublocation = sublocation;
 
     if (errorMsg) {
-        let errorType = '';
-        switch (errorMsg) {
-            case ('error_usernameBadFormat'):
-                errorType = 'Bad Characters';
-                break;
-            case ('error_usernameNotFound'):
-                errorType = 'Username Not Found';
-                break;
-            case ('error_usernameNotAvailable'):
-                errorType = 'Name Already Exists';
-                break;
-            case ('error_invalidEmail'):
-                errorType = 'Not Valid Email';
-                break;
-            case ('error_addressNotAvailable'):
-                errorType = 'Email Not Available';
-                break;
-            case ('error_fieldRequired'):
-                errorType = 'Required';
-                break;
-            default:
-                errorType = errorMsg;
-                break;
-        }
-        ret[1].errorType = errorType;
+        ret[1].errorType = errorMessage(errorMsg);
     }
 
     return ret;

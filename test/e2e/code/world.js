@@ -4,6 +4,7 @@ const { getRandomUsername } = require('./helpers/random-data');
 const { waitForEmail } = require('./helpers/maildrop');
 const testConfig = require('./test-config');
 const ContactsHelper = require('./helpers/contacts');
+const AccountHelper = require('./helpers/create-account');
 
 /**
  * Cucumber creates an instance of this class for each scenario.
@@ -16,6 +17,7 @@ class PeerioAppWorld {
         this.parameters = parameters;
         this.filesToCleanup = [];
         this.contactsHelper = new ContactsHelper(this);
+        this.accountHelper = new AccountHelper(this);
     }
 
     /**
@@ -64,37 +66,11 @@ class PeerioAppWorld {
     }
 
     createAccount = async (username, email, isTestAccount = false, extraProps = null) => {
-        await this.libs.prombservable.asPromise(ice.socket, 'connected', true);
-
-        const u = new ice.User();
-        u.username = username || getRandomUsername();
-        u.email = email || `${u.username}@${testConfig.emailDomain}`;
-        u.firstName = 'Firstname';
-        u.lastName = 'Lastname';
-        u.locale = 'en';
-        u.passphrase = testConfig.defaultPassphrase;
-        u.props = extraProps;
-        ice.User.current = u;
-        if (!isTestAccount) {
-            this.username = u.username;
-            this.passphrase = u.passphrase;
-        } else {
-            this.testAccount = {
-                username: u.username,
-                passphrase: u.passphrase,
-                email: u.email
-            };
-        }
-
-        console.log(`creating ${isTestAccount ? 'test ' : ''}user username: ${u.username} passphrase: ${u.passphrase}`);
-
-        await u.createAccountAndLogin();
-        console.log('Account created, waiting for initialization.');
-        await this.waitForAccountDataInit();
+        return this.accountHelper.createAccount(username, email, isTestAccount, extraProps);
     };
 
     createTestAccount = async (username = null, email = null) => {
-        return this.createAccount(username, email, true);
+        return this.accountHelper.createAccount(username, email, true);
     }
 }
 

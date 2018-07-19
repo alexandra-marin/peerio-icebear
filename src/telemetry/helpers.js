@@ -21,10 +21,7 @@ function textInput(item, location, sublocation, state, errorMsg) {
 
     if (location) ret[1].location = location;
     if (sublocation) ret[1].sublocation = sublocation;
-
-    if (errorMsg) {
-        ret[1].errorType = errorMessage(errorMsg);
-    }
+    if (errorMsg) ret[1].errorType = errorMessage(errorMsg);
 
     return ret;
 }

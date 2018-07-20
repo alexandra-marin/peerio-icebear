@@ -61,7 +61,7 @@ function send(eventObj) {
     const data = config.isMobile
         ? null // TODO: pretty sure window.btoa() won't work on mobile
         : window.btoa(JSON.stringify(object));
-    const url = `${this.baseUrl}${data}`;
+    const url = `${baseUrl}${data}`;
 
     window.fetch(url, {
         method: 'POST'

@@ -7,7 +7,7 @@ const os = require('os');
 const baseUrl = 'https://api.mixpanel.com/track/?data=';
 const baseObj = {
     properties: {
-        token: '', // TODO: remember to put the token here before trying to send data
+        token: '05ee93d5cdb68e0de0709b6c85200c44', // TODO: this is for "Test setup". remember to replace it. env var?
         Device: config.isMobile ? 'Mobile' : 'Desktop',
         'Operating System': os.type(),
         'OS Version': os.release(),
@@ -58,17 +58,14 @@ function send(eventObj) {
     const object = Object.assign({}, eventObj, baseObj);
     object.properties = properties;
 
-    // // uncomment to send the event
-    // const data = config.isMobile
-    //     ? null // TODO: pretty sure window.btoa() won't work on mobile
-    //     : window.btoa(JSON.stringify(object));
-    // const url = `${this.baseUrl}${data}`;
-    //
-    // window.fetch(url, {
-    //     method: 'POST'
-    // }).then(response => console.log(response.json()));
+    const data = config.isMobile
+        ? null // TODO: pretty sure window.btoa() won't work on mobile
+        : window.btoa(JSON.stringify(object));
+    const url = `${this.baseUrl}${data}`;
 
-    console.log(object);
+    window.fetch(url, {
+        method: 'POST'
+    }).then(response => console.log(response.json()));
 }
 
 module.exports = {

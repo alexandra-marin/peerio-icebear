@@ -10,7 +10,7 @@ const { getUser } = require('../../helpers/di-current-user');
 const { getFileStore } = require('../../helpers/di-file-store');
 const config = require('../../config');
 
-// const PAGE_SIZE = 25;
+const PAGE_SIZE = 100;
 function isFileSelected(file) {
     return file.selected;
 }
@@ -168,8 +168,7 @@ class FileStoreBase {
     // #endregion
 
     // #region Files update logic
-
-    onFileDigestUpdate = _.debounce(() => {
+    _onFileDigestUpdate = () => {
         const digest = tracker.getDigest(this.kegDb.id, 'file');
         // this.unreadFiles = digest.newKegsCount;
         if (this.loaded && digest.maxUpdateId === this.knownUpdateId) {
@@ -178,14 +177,16 @@ class FileStoreBase {
         }
         this.maxUpdateId = digest.maxUpdateId;
         this.updateFiles();
-    }, 1500, { leading: true, maxWait: 3000 });
+    };
+
+    onFileDigestUpdate = _.debounce(this._onFileDigestUpdate, 700, { leading: true, maxWait: 1500 });
 
     async getFileKegsFromServer() {
-        const filter = { collectionVersion: { $gte: this.knownUpdateId } };
+        const filter = { collectionVersion: { $gt: this.knownUpdateId } };
         if (!this.loaded) {
             filter.deleted = false;
         }
-        const options = { /* count: PAGE_SIZE, reverse: false */ };
+        const options = { count: PAGE_SIZE/* , reverse: false */ };
         // this is naturally paged because every update calls another update in the end
         // until all update pages are loaded
         return socket.send('/auth/kegs/db/query', {
@@ -352,7 +353,7 @@ class FileStoreBase {
             }
             this.updating = false;
             // keep the paging going
-            setTimeout(this.onFileDigestUpdate);
+            if (fromCache || resp.kegs.length > 0) setTimeout(this._onFileDigestUpdate);
             // this is kinda true, because if there's more then 1 page of updates it's not really true
             // but his flag is for UI indication only so it's fine
             this.updatedAfterReconnect = true;

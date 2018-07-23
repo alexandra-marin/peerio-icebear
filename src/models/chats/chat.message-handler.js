@@ -200,14 +200,15 @@ class ChatMessageHandler {
         }, false))
             .then(action(resp => {
                 this.chat.canGoUp = resp.hasMore;
-                this.chat.initialPageLoaded = true;
-                this.chat.loadingInitialPage = false;
                 this.chat._cancelTopPageLoad = false;
                 this.chat._cancelBottomPageLoad = false;
                 this.setDownloadedUpdateId(resp.kegs);
                 if (!this.chat.canGoDown) this.markAllAsSeen();
                 console.log(`got initial ${resp.kegs.length} for this.chat`, this.chat.id);
-                return this.chat.addMessages(resp.kegs);
+                return this.chat.addMessages(resp.kegs).finally(() => {
+                    this.chat.loadingInitialPage = false;
+                    this.chat.initialPageLoaded = true;
+                });
             }))
             .catch((err) => {
                 if (err && err.code === errorCodes.accessForbidden) {

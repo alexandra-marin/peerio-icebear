@@ -1,4 +1,3 @@
-const { retryUntilSuccess } = require('./retry');
 const socket = require('../network/socket');
 
 /**
@@ -6,18 +5,45 @@ const socket = require('../network/socket');
  * Retrieves the list only once and caches it.
  */
 class KegDbListProvider {
+    constructor() {
+        socket.onAuthenticated(() => {
+            this.prevCachedList = this.cachedList;
+            this.cachedList = null;
+            this.cacheList();
+        });
+    }
+
     loadingPromise = null;
     cachedList = null;
 
-    cacheList() {
+    dbAddedHandlers = [];
+    dbRemovedHandlers = [];
+
+    async cacheList() {
         if (this.loadingPromise) return this.loadingPromise;
-        this.loadingPromise = retryUntilSuccess(() =>
+        if (this.cachedList) return this.cachedList;
+        this.loadingPromise =
             socket.send('/auth/kegs/user/dbs')
                 .then(list => {
+                    this.loadingPromise = null;
                     this.cachedList = list;
-                })
-        );
+                    this.compareChanges();
+                });
+
         return this.loadingPromise;
+    }
+    compareChanges() {
+        if (!this.cachedList || !this.prevCachedList) return;
+        for (const id of this.cachedList) {
+            if (!this.prevCachedList.includes(id)) {
+                this.dbAddedHandlers.forEach(h => h(id));
+            }
+        }
+        for (const id of this.prevCachedList) {
+            if (!this.cachedList.includes(id)) {
+                this.dbRemovedHandlers.forEach(h => h(id));
+            }
+        }
     }
 
     async filterBy(dbType) {
@@ -35,6 +61,14 @@ class KegDbListProvider {
 
     getVolumes() {
         return this.filterBy('volume:');
+    }
+
+    onDbAdded(handler) {
+        this.dbAddedHandlers.push(handler);
+    }
+
+    onDbRemoved(handler) {
+        this.dbRemovedHandlers.push(handler);
     }
 }
 

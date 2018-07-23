@@ -285,7 +285,6 @@ class ChatStore {
 
     /**
      * Adds chat to the list.
-     * @function addChat
      * @param {string | Chat} chat - chat id or Chat instance
      */
     @action.bound addChat(chat, noActivate) {
@@ -351,7 +350,6 @@ class ChatStore {
      * - see if digest contains some new chats that are not hidden
      *
      * ORDER OF THE STEPS IS IMPORTANT ON MANY LEVELS
-     * @function loadAllChats
      * @returns {Promise}
      */
     @action async loadAllChats() {
@@ -387,7 +385,7 @@ class ChatStore {
             chatsLeft--;
         }
 
-        // 7. waiting for most chats to load but up to a reasonable time
+        // waiting for most chats to load but up to a reasonable time
         await Promise.map(this.chats, chat => asPromise(chat, 'headLoaded', true))
             .timeout(5000)
             .catch(() => { /* well, the rest will trigger re-render */ })
@@ -403,6 +401,10 @@ class ChatStore {
 
         this.loading = false;
         this.loaded = true;
+
+        // TODO: remove when kegdb add/remove will make it's way to digest
+        dbListProvider.onDbAdded(this.addChat);
+        dbListProvider.onDbRemoved(this.unloadChat);
     }
 
     getSelflessParticipants(participants) {
@@ -461,7 +463,6 @@ class ChatStore {
 
     /**
      * Starts new chat or loads existing one and
-     * @function startChat
      * @param {Array<Contact>=} participants
      * @param {boolean=} isChannel
      * @param {string=} name
@@ -508,7 +509,6 @@ class ChatStore {
 
     /**
      * Activates the chat.
-     * @function activate
      * @param {string} id - chat id
      */
     @action activate(id) {
@@ -524,7 +524,6 @@ class ChatStore {
 
     /**
      * Deactivates currently active chat.
-     * @function deactivateCurrentChat
      */
     @action deactivateCurrentChat() {
         if (!this.activeChat) return;
@@ -534,7 +533,6 @@ class ChatStore {
 
     /**
      * Can be used from file view.
-     * @function startChatAndShareFiles
      * @param {Array<Contact>} participants
      * @param {File|Array<File>} fileOrFiles
      * @returns {Promise}
@@ -558,10 +556,13 @@ class ChatStore {
 
     /**
      * Removes chat from working set.
-     * @function unloadChat
      * @param {Chat} chat
      */
-    @action unloadChat(chat) {
+    @action.bound unloadChat(chat) {
+        if (typeof chat === 'string') {
+            chat = this.chatMap[chat]; // eslint-disable-line no-param-reassign
+            if (!chat) return;
+        }
         if (chat.active) {
             this.deactivateCurrentChat();
         }

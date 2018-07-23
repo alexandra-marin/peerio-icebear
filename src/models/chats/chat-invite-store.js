@@ -234,7 +234,6 @@ class ChatInviteStore {
 
     /**
      * Updates local data from server.
-     * @function
      */
     update = () => {
         if (this.updating) {

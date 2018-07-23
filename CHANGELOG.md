@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.10.0"></a>
+# [5.10.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.9.0...v5.10.0) (2018-07-23)
+
+
+### Bug Fixes
+
+* performance polyfill crashes android ([18c9d16](https://github.com/PeerioTechnologies/peerio-icebear/commit/18c9d16))
+
+
+### Features
+
+* ContactStore#invitedNotJoinedContacts ([91c495a](https://github.com/PeerioTechnologies/peerio-icebear/commit/91c495a))
+
+
+### Performance Improvements
+
+* defer signature verification ([3176495](https://github.com/PeerioTechnologies/peerio-icebear/commit/3176495))
+
+
+
 <a name="5.9.0"></a>
 # [5.9.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.8.5...v5.9.0) (2018-07-17)
 

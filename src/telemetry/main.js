@@ -55,9 +55,7 @@ function send(eventObj) {
     const object = Object.assign({}, eventObj, baseObj);
     object.properties = properties;
 
-    const data = config.isMobile
-        ? null // TODO: pretty sure window.btoa() won't work on mobile
-        : window.btoa(JSON.stringify(object));
+    const data = global.btoa(JSON.stringify(object));
     const url = `${baseUrl}${data}`;
 
     console.log(object);

@@ -589,7 +589,7 @@
   "title_allContacts": "All Contacts",
   "title_exactMatch": "Exact match",
   "title_findAContact": "Search your contacts",
-  "error_contactNotFound": "Your search for <b>{searchString}</> did not match any of your current contacts.<br/>Would you like to <toAddContact>add a new contact</>?",
+  "error_contactNotFound": "Nope, there's no one in sight with the username <b>{searchString}</>.<br/>Would you like to <toAddContact>add a new contact</>?",
   "title_shareSocial": "Invite elsewhere",
   "button_addToYourContacts": "Add to your favourites",
   "button_removeFromYourContacts": "Remove from your favourites",

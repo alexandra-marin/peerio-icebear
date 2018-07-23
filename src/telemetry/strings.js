@@ -1,5 +1,6 @@
 const S = {
     ACCOUNT_KEY: 'Account Key',
+    WHERE_ACCOUNT_KEY: 'Where to find Account Key',
     ADD_PHOTO: 'Add Photo',
     AK_CONFIRMATION: 'AK Confirmation',
     BACK: 'Back',

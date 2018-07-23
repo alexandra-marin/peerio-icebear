@@ -2,6 +2,10 @@ const globalContext = require('./global-context');
 
 try {
     (function(scope) {
+        if (scope.performance) {
+            console.log(`performance is already present in the scope`);
+            return;
+        }
         const performance = scope.performance || {};
         scope.performance = performance;
         const _entries = [];

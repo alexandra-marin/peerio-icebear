@@ -2,6 +2,7 @@
 const socket = require('../network/socket');
 const { observable, when, reaction } = require('mobx');
 const { asPromise } = require('../helpers/prombservable');
+
 /**
  * Data update tracking module. This is an internal module that allows Icebear to get and report new data as it arrives
  * and is needed by your client.
@@ -195,7 +196,7 @@ class UpdateTracker {
             typeDigest.newKegsCount = newKegsCount;
 
 
-            if (isFromEvent) this.emitKegTypeUpdatedEvent(kegDbId, kegType);
+            if (isFromEvent || this.loadedOnce) this.emitKegTypeUpdatedEvent(kegDbId, kegType);
         } else {
             const d = this.globalDigest[kegDbId];
             d.maxUpdateId = maxUpdateId;
@@ -270,10 +271,23 @@ class UpdateTracker {
     loadDigest = async () => {
         console.log('Requesting full digest');
         try {
-            let resp = await socket.send('/auth/updates/digest', { prefixes: ['global:'] }, false);
+            // we are always interested in latest changes in global space and self,
+            // the size of the update is small and it's safer and easier to reload it every reconnect
+            let resp = await socket.send('/auth/updates/digest', {
+                prefixes: ['global:', 'SELF']
+            }, false);
             this.processDigestResponse(resp);
+            // we load digest that might have gotten stale due to cache on this client
+            // and new digest marked as read on our other client
+            resp = await socket.send('/auth/updates/digest', {
+                prefixes: ['channel:'],
+                kegTypes: ['boot', 'chat_head']
+            }, false);
+            this.processDigestResponse(resp);
+
             resp = await socket.send('/auth/updates/digest', { unread: true }, false);
             this.processDigestResponse(resp);
+
             if (!this.loadedOnce) {
                 this.markZeroCounterTypesAsRead();
             }

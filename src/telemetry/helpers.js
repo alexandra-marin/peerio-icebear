@@ -10,7 +10,7 @@ function errorMessage(msg) {
         error_fieldRequired: 'Required',
         error_loginFailed: 'Sign-in Failed'
     };
-    return messageNames[msg] || 'Unknown Error Type';
+    return messageNames[msg] || msg || 'Unknown Error Type';
 }
 
 // Factory for text input events

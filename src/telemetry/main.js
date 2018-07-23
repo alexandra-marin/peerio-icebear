@@ -60,9 +60,11 @@ function send(eventObj) {
         : window.btoa(JSON.stringify(object));
     const url = `${baseUrl}${data}`;
 
-    window.fetch(url, {
-        method: 'POST'
-    }).then(response => console.log(response.json()));
+    console.log(object);
+
+    // window.fetch(url, {
+    //     method: 'POST'
+    // }).then(response => console.log(response.json()));
 }
 
 module.exports = {

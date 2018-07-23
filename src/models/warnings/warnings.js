@@ -73,7 +73,6 @@ class Warnings {
      * @param {Object} [data] - variables to pass to translator.
      * @param {string} [level='medium'] - severity level.
      * @param {function} [callback] - executes when warning is dismissed
-     * @function add
      */
     @action add(content, title, data, level = 'medium', callback) {
         this.queueItem(new SystemWarning(content, title, data, level, callback));
@@ -86,7 +85,6 @@ class Warnings {
      * @param {string} [title] - optional translation key for title, will not be shown in snackbars.
      * @param {Object} [data] - variables to pass to translator.
      * @param {function} [callback] - executes when warning is dismissed
-     * @function addSevere
      */
     @action addSevere(content, title, data, callback) {
         this.add(content, title, data, 'severe', callback);
@@ -95,7 +93,6 @@ class Warnings {
     /**
      * Adds server warning to the queue.
      * @param {Object} serverObj - as received from server
-     * @function addServerWarning
      */
     @action.bound addServerWarning(serverObj) {
         if (serverObj.msg === 'serverWarning_promoConsentRequest') return;

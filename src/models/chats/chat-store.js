@@ -285,7 +285,6 @@ class ChatStore {
 
     /**
      * Adds chat to the list.
-     * @function addChat
      * @param {string | Chat} chat - chat id or Chat instance
      */
     @action.bound addChat(chat, noActivate) {
@@ -351,7 +350,6 @@ class ChatStore {
      * - see if digest contains some new chats that are not hidden
      *
      * ORDER OF THE STEPS IS IMPORTANT ON MANY LEVELS
-     * @function loadAllChats
      * @returns {Promise}
      */
     @action async loadAllChats() {
@@ -461,7 +459,6 @@ class ChatStore {
 
     /**
      * Starts new chat or loads existing one and
-     * @function startChat
      * @param {Array<Contact>=} participants
      * @param {boolean=} isChannel
      * @param {string=} name
@@ -508,7 +505,6 @@ class ChatStore {
 
     /**
      * Activates the chat.
-     * @function activate
      * @param {string} id - chat id
      */
     @action activate(id) {
@@ -524,7 +520,6 @@ class ChatStore {
 
     /**
      * Deactivates currently active chat.
-     * @function deactivateCurrentChat
      */
     @action deactivateCurrentChat() {
         if (!this.activeChat) return;
@@ -534,7 +529,6 @@ class ChatStore {
 
     /**
      * Can be used from file view.
-     * @function startChatAndShareFiles
      * @param {Array<Contact>} participants
      * @param {File|Array<File>} fileOrFiles
      * @returns {Promise}
@@ -558,7 +552,6 @@ class ChatStore {
 
     /**
      * Removes chat from working set.
-     * @function unloadChat
      * @param {Chat} chat
      */
     @action unloadChat(chat) {

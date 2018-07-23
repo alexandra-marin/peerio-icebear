@@ -412,7 +412,6 @@ class FileStore extends FileStoreBase {
 
     /**
      * Start new file upload and get the file keg for it.
-     * @function upload
      * @param {string} filePath - full path with name
      * @param {string} [fileName] - if u want to override name in filePath
      * @param {FileFolder} [folder] - where to put the file

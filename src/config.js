@@ -44,7 +44,6 @@ class UploadConfig {
 
     /**
      * Finds which chunk size to use for given file size based on {@link chunkSizes} reference table.
-     * @function upload.getChunkSize
      * @param {number} fileSize - in bytes.
      * @returns {number} chunk size to use, in bytes.
      */

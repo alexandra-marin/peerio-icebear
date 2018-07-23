@@ -45,7 +45,11 @@ class Chat {
         this.isChannel = isChannel;
         if (!id) this.tempId = getTemporaryChatId();
         this.db = new ChatKegDb(id, participants, isChannel, (keg) => {
-            this.store.cache.saveBootKeg(this.id, keg);
+            if (this.id) {
+                this.store.cache.saveBootKeg(this.id, keg);
+                return;
+            }
+            when(() => this.id, () => this.store.cache.saveBootKeg(this.id, keg));
         });
         this._reactionsToDispose.push(
             reaction(

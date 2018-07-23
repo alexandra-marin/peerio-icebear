@@ -37,7 +37,6 @@ class FileStreamAbstract {
 
     /**
      * Reads a chunk of data from file stream.
-     * @function read
      * @param {number} size - amount of bytes to read (if possible)
      * @return {Promise<Uint8Array>} - resolves with a number of bytes written to buffer
      */
@@ -65,7 +64,6 @@ class FileStreamAbstract {
 
     /**
      * Writes a chunk of data to file stream
-     * @function write
      * @param {Uint8Array} buffer
      * @returns {Promise} - resolves when chunk is written out
      */
@@ -90,7 +88,6 @@ class FileStreamAbstract {
 
     /**
      * Move file position pointer.
-     * @function seek
      * @param {number} pos
      * @returns {number} new position
      */

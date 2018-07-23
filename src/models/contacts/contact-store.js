@@ -54,6 +54,10 @@ class ContactStore {
      */
     @observable.shallow invitedContacts = [];
 
+    @computed get invitedNotJoinedContacts() {
+        return this.invitedContacts.filter(c => !c.username);
+    }
+
     /**
      * options: firstName, lastName, username
      * @type {string}

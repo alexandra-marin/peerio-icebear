@@ -11,7 +11,6 @@ if (typeof (Uint8Array.prototype.slice) === 'undefined') {
      * @param {number} [end=this.length] - ending index (exclusive) in the original array.
      * Can be negative to mark position counting from the end the array.
      * @returns {Uint8Array} new array containing a range of bytes from original array.
-     * @function slice
      * @extends Uint8Array
      */
     Uint8Array.prototype.slice = function(begin, end) {

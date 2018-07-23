@@ -201,7 +201,7 @@ class FileStoreBase {
                 }
             }, false),
             `Initial file list loading for ${this.kegDb.id}`
-        ).then(action(kegs => {
+        ).then(action(async kegs => {
             for (const keg of kegs.kegs) {
                 if (keg.deleted || keg.hidden) {
                     console.log('Hidden or deleted file kegs should not have been returned by server.', keg.kegId);
@@ -214,7 +214,7 @@ class FileStoreBase {
                 if (keg.collectionVersion > this.knownUpdateId) {
                     this.knownUpdateId = keg.collectionVersion;
                 }
-                if (file.loadFromKeg(keg)) {
+                if (await file.loadFromKeg(keg)) {
                     if (!file.fileId) {
                         if (file.version > 1) console.error('File keg missing fileId', file.id);
                         // we can get a freshly created keg, it's not a big deal
@@ -275,7 +275,7 @@ class FileStoreBase {
         this.updating = true;
         let dirty = false;
         retryUntilSuccess(() => this._getFiles(), `Updating file list for ${this.kegDb.id}`)
-            .then(action(resp => {
+            .then(action(async resp => {
                 const { kegs } = resp;
                 for (const keg of kegs) {
                     if (keg.collectionVersion > this.knownUpdateId) {
@@ -291,7 +291,7 @@ class FileStoreBase {
                         if (existing) this.files.remove(existing);
                         continue;
                     }
-                    if (!file.loadFromKeg(keg) || file.isEmpty) continue;
+                    if (!(await file.loadFromKeg(keg)) || file.isEmpty) continue;
                     if (!existing) {
                         dirty = true;
                         this.files.unshift(file);

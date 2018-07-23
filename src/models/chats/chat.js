@@ -484,10 +484,10 @@ class Chat {
     }
 
     // decrypting a bunch of kegs in one call is tough on mobile, so we do it asynchronously one by one
-    _parseMessageKeg(keg, accumulator) {
+    async _parseMessageKeg(keg, accumulator) {
         const msg = new Message(this.db);
         // no payload for some reason. probably because of connection break after keg creation
-        if (!msg.loadFromKeg(keg) || msg.isEmpty) {
+        if (!(await msg.loadFromKeg(keg)) || msg.isEmpty) {
             console.debug('empty message keg', keg);
             return;
         }

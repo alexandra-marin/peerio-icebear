@@ -21,15 +21,15 @@ class TofuStore {
                 type: 'tofu',
                 reverse: false
             }
-        }, false).then(res => {
+        }, false).then(async res => {
             if (!res.kegs || !res.kegs.length) {
                 return;
             }
-            res.kegs.forEach(data => {
+            for (const data of res.kegs) {
                 const keg = new Tofu(getUser().kegDb);
-                keg.loadFromKeg(data);
+                await keg.loadFromKeg(data);
                 this.cache[keg.username] = keg;
-            });
+            }
 
             this.preCacheRequests.forEach(u => {
                 u.resolve(this.cache[u.username]);
@@ -66,10 +66,10 @@ class TofuStore {
                 reverse: false
             },
             filter: { username }
-        }, false).then(res => {
+        }, false).then(async res => {
             if (!res.kegs || !res.kegs.length) return null;
             const keg = new Tofu(getUser().kegDb);
-            keg.loadFromKeg(res.kegs[0]); // TODO: detect and delete excess? shouldn't really happen though
+            await keg.loadFromKeg(res.kegs[0]); // TODO: detect and delete excess? shouldn't really happen though
             // we are caching it here. when updates are implemented later on
             // this should be taken into account when invalidating cache
             this.cache[username] = keg;

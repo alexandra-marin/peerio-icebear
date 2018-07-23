@@ -299,8 +299,8 @@ class Keg {
                 }
                 return Promise.reject(err);
             })
-            .then(keg => {
-                const ret = this.loadFromKeg(keg);
+            .then(async keg => {
+                const ret = await this.loadFromKeg(keg);
                 if (ret === false) {
                     const err = new Error(
                         `Failed to hydrate keg id ${this.id} with server data from db ${this.db ? this.db.id : 'null'}`
@@ -323,15 +323,15 @@ class Keg {
     }
 
     /**
-     * Synchronous function to rehydrate current Keg instance with data from server.
+     * Asynchronous function to rehydrate current Keg instance with data from server.
      * `load()` uses this function, you don't need to call it if you use `load()`, but in case you are requesting
      * multiple kegs from server and want to instantiate them use this function
      * after creating appropriate keg instance.
      * @param {Object} keg data as received from server
-     * @returns {Keg|boolean} - returns false if keg data could not have been loaded. This function doesn't throw,
+     * @returns {Promise<Keg|false>} - This function doesn't throw,
      * you have to check error flags if you received false return value.
      */
-    @action loadFromKeg(keg) {
+    @action async loadFromKeg(keg) {
         try {
             this.lastLoadHadError = false;
             if (this.id && this.id !== keg.kegId) {

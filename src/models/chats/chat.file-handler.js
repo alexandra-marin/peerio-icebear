@@ -45,10 +45,11 @@ class ChatFileHandler {
                 collectionVersion: { $gt: this.knownUpdateId }
             }
         }, false)
-            .then(resp => {
+            .then(async resp => {
                 if (!resp.kegs || !resp.kegs.length) return;
 
-                resp.kegs.forEach(keg => {
+
+                for (const keg of resp.kegs) {
                     if (this.knownUpdateId < keg.collectionVersion) {
                         this.knownUpdateId = keg.collectionVersion;
                     }
@@ -58,7 +59,7 @@ class ChatFileHandler {
                     }
                     const file = new File(this.chat.db, fileStore);
                     try {
-                        if (file.loadFromKeg(keg) && !file.deleted) {
+                        if (await file.loadFromKeg(keg) && !file.deleted) {
                             fileStore.updateCachedChatKeg(this.chat.id, file);
                             if (this.chat.isChannel) {
                                 return;
@@ -73,7 +74,7 @@ class ChatFileHandler {
                     } catch (err) {
                         console.error(err);
                     }
-                });
+                }
             })
             .then(() => {
                 this.copyingFiles = false;

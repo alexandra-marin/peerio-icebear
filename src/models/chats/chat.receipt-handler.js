@@ -121,7 +121,7 @@ class ChatReceiptHandler {
                 reverse: false
             },
             filter
-        }, false).then(res => {
+        }, false).then(async res => {
             const { kegs } = res;
             if (!kegs || !kegs.length) return;
             for (let i = 0; i < kegs.length; i++) {
@@ -130,7 +130,7 @@ class ChatReceiptHandler {
                 }
                 try {
                     const r = new ReadReceipt(null, this.chat.db);
-                    r.loadFromKeg(kegs[i]);
+                    await r.loadFromKeg(kegs[i]);
                     if (r.owner === User.current.username) {
                         if (this._ownReceipt && this._ownReceipt.version < r.version) {
                             this._ownReceipt = r;

@@ -53,7 +53,7 @@ class GhostStore {
         if (this.loading || this.loaded) return;
         this.loading = true;
         this._getGhosts()
-            .then(action(resp => {
+            .then(action(async resp => {
                 const { kegs } = resp;
                 console.log('there are mail kegs', kegs.length);
                 for (const keg of kegs) {
@@ -61,7 +61,7 @@ class GhostStore {
                     if (keg.collectionVersion > this.knownCollectionVersion) {
                         this.knownCollectionVersion = keg.collectionVersion;
                     }
-                    if (ghost.loadFromKeg(keg)) {
+                    if (await ghost.loadFromKeg(keg)) {
                         console.log('loading ghost', ghost.ghostId);
                         this.ghostMap.set(ghost.ghostId, ghost);
                     }
@@ -84,14 +84,14 @@ class GhostStore {
         if (this.updating || this.loading) return;
         this.updating = true;
         this._getGhosts()
-            .then(action((kegs) => {
+            .then(action(async kegs => {
                 for (const keg of kegs) {
                     const inCollection = this.getById(keg.props.ghostId);
                     const g = inCollection || new Ghost(User.current.kegDb);
                     if (keg.collectionVersion > this.knownCollectionVersion) {
                         this.knownCollectionVersion = keg.collectionVersion;
                     }
-                    if (!g.loadFromKeg(keg) || g.isEmpty) continue;
+                    if (!(await g.loadFromKeg(keg)) || g.isEmpty) continue;
                     if (!g.deleted && !inCollection) this.ghostMap.set(g.ghostId, g);
                     if (g.deleted && inCollection) this.ghostMap.delete(keg.ghostId);
                 }

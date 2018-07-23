@@ -727,7 +727,7 @@ class File extends Keg {
                         // we want to change folder and unhide file if needed
                         if (!folderId && !dstIsSELF) return null;
                         const existingKeg = new File(db, store);
-                        existingKeg.loadFromKeg(resp.kegs[0]);
+                        await existingKeg.loadFromKeg(resp.kegs[0]);
                         existingKeg.folderId = folderId || existingKeg.folderId;
                         existingKeg.hidden = false;
                         return existingKeg.saveToServer();

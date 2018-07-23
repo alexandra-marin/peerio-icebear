@@ -115,7 +115,7 @@ class ChatMessageHandler {
             filter
         }, false)
             .tapCatch(() => { this._loadingUpdates = false; })
-            .then(action(resp => {
+            .then(action(async resp => {
                 this._loadingUpdates = false;
                 // there's way more updates then we are allowed to load
                 // so we jump to most recent messages
@@ -126,7 +126,7 @@ class ChatMessageHandler {
                 this.setDownloadedUpdateId(resp.kegs);
                 this.markAllAsSeen();
                 console.log(`Got ${resp.kegs.length} updates for chat`, this.chat.id);
-                this.chat.addMessages(resp.kegs);
+                await this.chat.addMessages(resp.kegs);
                 this.onMessageDigestUpdate();
                 this.chat.updatedAfterReconnect = true;
             }))

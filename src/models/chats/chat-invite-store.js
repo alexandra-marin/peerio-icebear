@@ -133,9 +133,10 @@ class ChatInviteStore {
 
     updateInvites = () => {
         return socket.send('/auth/kegs/channel/invites')
-            .then(action(res => {
-                const newReceivedInvites = res.map(i => {
-                    const chatHead = this.getChatHead(i);
+            .then(action(async res => {
+                const newReceivedInvites = [];
+                for (const i of res) {
+                    const chatHead = await this.getChatHead(i);
                     const participants = this.getParticipants(i);
                     const channelName = chatHead.chatName || '';
                     const data = {
@@ -157,9 +158,8 @@ class ChatInviteStore {
                             nameInSpace: chatHead.nameInSpace
                         };
                     }
-
-                    return new ReceivedInvite(data);
-                });
+                    newReceivedInvites.push(new ReceivedInvite(data));
+                }
                 if (this.initialInvitesProcessed) {
                     // Find new invites and notify about them.
                     newReceivedInvites.forEach(invite => {
@@ -208,9 +208,9 @@ class ChatInviteStore {
 
     /**
      * @param {Object} data - invite objects
-     * @returns {ChatHead}
+     * @returns {Promise<ChatHead>}
      */
-    getChatHead(data) {
+    async getChatHead(data) {
         try {
             const { bootKeg, chatHeadKeg } = data;
             bootKeg.payload = JSON.parse(bootKeg.payload);
@@ -223,7 +223,7 @@ class ChatInviteStore {
             const fakeDb = { id: data.channel };
             const chatHead = new ChatHead(fakeDb);
             chatHead.overrideKey = kegKey;
-            chatHead.loadFromKeg(chatHeadKeg);
+            await chatHead.loadFromKeg(chatHeadKeg);
 
             return chatHead;
         } catch (ex) {

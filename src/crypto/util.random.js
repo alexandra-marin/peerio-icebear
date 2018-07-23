@@ -10,7 +10,6 @@ const globalContext = require('../helpers/global-context');
  * Generates random bytes suitable for crypto use
  * @param {number} num - byte count to return
  * @returns {Uint8Array} - random bytes array of `num` size
- * @function getRandomBytes
  */
 let getRandomBytes;
 

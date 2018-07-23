@@ -37,7 +37,6 @@ class TaskQueue {
      * Adds task to the queue.
      * Depending on return value task will be considered finished right after exit from the function or
      * after returned promise is fulfilled.
-     * @function addTask
      * @param {function} task - function to run
      * @param {Object} [context] - 'this' context to execute the task with
      * @param {Array<any>} [args] - arguments to pass to the task
@@ -66,7 +65,6 @@ class TaskQueue {
 
     /**
      * Runs the next task in queue if it is possible
-     * @function runTask
      */
     @action.bound runTask() {
         if (this.paused) return;
@@ -97,7 +95,6 @@ class TaskQueue {
 
     /**
      * Performs necessary actions when a task is finished
-     * @function onTaskComplete
      */
     @action.bound onTaskComplete() {
         this.runningTasks--;

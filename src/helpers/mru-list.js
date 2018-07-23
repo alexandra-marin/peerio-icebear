@@ -40,7 +40,6 @@ class MRUList {
 
     /**
      * Adds item usage fact to the list. Saves it to TinyDb in a throttled manner.
-     * @function addItem
      * @param {string} item
      */
     @action addItem(item) {

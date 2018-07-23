@@ -485,7 +485,6 @@ class Chat {
      * Adds messages to current message list.
      * @param {Array<Object|Message>} kegs - list of messages to add
      * @param {boolean} [prepend=false] - add message to top of bottom
-     * @function addMessages
      */
     @action addMessages(kegs, prepend = false) {
         if (!kegs || !kegs.length) return Promise.resolve();
@@ -643,7 +642,6 @@ class Chat {
     }
 
     /**
-     * @function _sendMessage
      * @param {Message} m
      * @returns {Promise}
      */
@@ -669,7 +667,6 @@ class Chat {
     /**
      * Create a new Message keg attached to this chat with the given
      * plaintext (and optional files) and send it to the server.
-     * @function sendMessage
      * @param {string} text
      * @param {Array<string>} [files] an array of file ids.
      * @returns {Promise}
@@ -685,7 +682,6 @@ class Chat {
     /**
      * Create a new Message keg attached to this chat with the given
      * plaintext (and optional files) and send it to the server.
-     * @function sendMessage
      * @param {Object} richText A ProseMirror document tree, as JSON
      * @param {string} legacyText The rendered HTML of the rich text, for back-compat with older clients
      * @param {Array<string>} [files] An array of file ids
@@ -702,7 +698,6 @@ class Chat {
     /**
      * todo: this is temporary, for messages that failed to send.
      * When we have message delete - it should be unified process.
-     * @function removeMessage
      * @param {Message} message
      */
     @action removeMessage(message) {
@@ -884,9 +879,6 @@ class Chat {
         }, null, 'title_error');
     }
 
-    /**
-     * @function toggleFavoriteState
-     */
     toggleFavoriteState = () => {
         this.changingFavState = true;
         const { myChats } = this.store;
@@ -902,9 +894,6 @@ class Chat {
             .finally(() => { this.changingFavState = false; });
     }
 
-    /**
-     * @function hide
-     */
     hide = () => {
         this.store.unloadChat(this);
         this.store.hidingChat = true;
@@ -913,9 +902,6 @@ class Chat {
         }).finally(() => { this.store.hidingChat = false; });
     };
 
-    /**
-     * @function unhide
-     */
     unhide = () => {
         return this.store.myChats.save(() => {
             this.store.myChats.removeHidden(this.id);

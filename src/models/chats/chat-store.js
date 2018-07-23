@@ -385,7 +385,7 @@ class ChatStore {
             chatsLeft--;
         }
 
-        // 7. waiting for most chats to load but up to a reasonable time
+        // waiting for most chats to load but up to a reasonable time
         await Promise.map(this.chats, chat => asPromise(chat, 'headLoaded', true))
             .timeout(5000)
             .catch(() => { /* well, the rest will trigger re-render */ })
@@ -401,6 +401,10 @@ class ChatStore {
 
         this.loading = false;
         this.loaded = true;
+
+        // TODO: remove when kegdb add/remove will make it's way to digest
+        dbListProvider.onDbAdded(this.addChat);
+        dbListProvider.onDbRemoved(this.unloadChat);
     }
 
     getSelflessParticipants(participants) {
@@ -554,7 +558,11 @@ class ChatStore {
      * Removes chat from working set.
      * @param {Chat} chat
      */
-    @action unloadChat(chat) {
+    @action.bound unloadChat(chat) {
+        if (typeof chat === 'string') {
+            chat = this.chatMap[chat]; // eslint-disable-line no-param-reassign
+            if (!chat) return;
+        }
         if (chat.active) {
             this.deactivateCurrentChat();
         }

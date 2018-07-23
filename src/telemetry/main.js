@@ -2,15 +2,12 @@
 const config = require('../config');
 const TinyDb = require('../db/tiny-db');
 const { cryptoUtil } = require('../crypto');
-const os = require('os');
 
 const baseUrl = 'https://api.mixpanel.com/track/?data=';
 const baseObj = {
     properties: {
         token: '05ee93d5cdb68e0de0709b6c85200c44', // TODO: this is for "Test setup". remember to replace it. env var?
         Device: config.isMobile ? 'Mobile' : 'Desktop',
-        'Operating System': os.type(),
-        'OS Version': os.release(),
         'App Version': config.appVersion,
         'Version Number': 1 // refers to our own tracker library versioning
     }

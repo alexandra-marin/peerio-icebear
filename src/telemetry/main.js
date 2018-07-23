@@ -64,7 +64,7 @@ function send(eventObj) {
 
     window.fetch(url, {
         method: 'POST'
-    }).then(response => console.log(response.json()));
+    });
 }
 
 module.exports = {

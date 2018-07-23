@@ -62,7 +62,6 @@ class VolumeStore {
      * - see if digest contains some new volumes that are not hidden
      *
      * ORDER OF THE STEPS IS IMPORTANT ON MANY LEVELS
-     * @function loadAllVolumes
      * @returns {Promise}
      */
     @action.bound async loadAllVolumes() {

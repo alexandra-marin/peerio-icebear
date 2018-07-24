@@ -585,7 +585,7 @@
   "title_roomParticipants": "this Room's participants ",
   "title_allYourContacts": "All your contacts ( {found} )",
   "title_contactsNumber": "Contacts ({found})",
-  "title_allYourInvited": "All your invites ( {found} )",
+  "title_allYourInvited": "Invited ({found})",
   "title_allContacts": "All Contacts",
   "title_exactMatch": "Exact match",
   "title_findAContact": "Search your contacts",

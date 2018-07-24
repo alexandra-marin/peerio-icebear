@@ -198,7 +198,7 @@ class ContactStore {
             () => this.invites.loaded && tofuStore.loaded && getChatStore().loaded,
             () => {
                 try {
-                    this.pendingContacts.forEach(c => {
+                    this.pendingContacts.forEach(async c => {
                         if (c.username) {
                             // If c.username exists, then invited user has indeed joined Peerio & confirmed email.
                             // But, if same username isn't in tofuStore, current user doesn't yet know this,

@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.11.0"></a>
+# [5.11.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.10.0...v5.11.0) (2018-07-24)
+
+
+### Bug Fixes
+
+* refresh kegdb list on reconnect ([d0947d9](https://github.com/PeerioTechnologies/peerio-icebear/commit/d0947d9))
+* **chat:** don't report initial page load until we added messages ([77a36a0](https://github.com/PeerioTechnologies/peerio-icebear/commit/77a36a0))
+
+
+### Features
+
+* add isAutoImport to pending dms ([#246](https://github.com/PeerioTechnologies/peerio-icebear/issues/246)) ([2bf3191](https://github.com/PeerioTechnologies/peerio-icebear/commit/2bf3191))
+
+
+
 <a name="5.10.0"></a>
 # [5.10.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.9.0...v5.10.0) (2018-07-23)
 

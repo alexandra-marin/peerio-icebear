@@ -49,10 +49,18 @@ class ContactStore {
     }
 
     /**
-     * Invited contacts.
-     * @type {ObservableArray<InvitedContacts>}
+     * Contacts pending to be added (invited manually or synced)
+     * @type {ObservableArray<InvitedContact>}
      */
-    @observable.shallow invitedContacts = [];
+    @observable.shallow pendingContacts = [];
+
+    /**
+     * Contacts pending to be added (invited manually or synced)
+     * @type {ObservableArray<InvitedContact>}
+     */
+    @computed get invitedContacts() {
+        return this.pendingContacts.filter(c => !c.isAutoImport);
+    }
 
     @computed get invitedNotJoinedContacts() {
         return this.invitedContacts.filter(c => !c.username);
@@ -185,12 +193,12 @@ class ContactStore {
     });
 
     applyInvitesData = action(() => {
-        this.invitedContacts = this.invites.issued;
+        this.pendingContacts = this.invites.issued;
         when(
             () => this.invites.loaded && tofuStore.loaded && getChatStore().loaded,
             () => {
                 try {
-                    this.invitedContacts.forEach(async c => {
+                    this.pendingContacts.forEach(c => {
                         if (c.username) {
                             // If c.username exists, then invited user has indeed joined Peerio & confirmed email.
                             // But, if same username isn't in tofuStore, current user doesn't yet know this,
@@ -200,7 +208,7 @@ class ContactStore {
                             }
 
                             this.getContactAndSave(c.username);
-                            getChatStore().pending.add(c.username, c.email);
+                            getChatStore().pending.add(c.username, c.email, false, c.isAutoImport);
                         }
                         return null;
                     });

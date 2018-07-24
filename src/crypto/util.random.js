@@ -5,7 +5,7 @@
 const { InvalidArgumentError } = require('../errors');
 const convert = require('./util.conversion');
 const hashing = require('./util.hashing');
-
+const globalContext = require('../helpers/global-context');
 /**
  * Generates random bytes suitable for crypto use
  * @param {number} num - byte count to return
@@ -14,28 +14,30 @@ const hashing = require('./util.hashing');
 let getRandomBytes;
 
 // do we have crypto shim?
-if (global && global.cryptoShim) {
+if (globalContext.cryptoShim) {
     getRandomBytes = function(num) {
-        return global.cryptoShim.randomBytes(num);
+        return globalContext.cryptoShim.randomBytes(num);
     };
 }
 
 // node crypto?
-if (!getRandomBytes && global) {
+if (!getRandomBytes) {
     try {
         const crypto = require('crypto'); //eslint-disable-line
-        getRandomBytes = function(num) {
-            return crypto.randomBytes(num);
-        };
+        if (typeof crypto.randomBytes === 'function') {
+            getRandomBytes = function(num) {
+                return crypto.randomBytes(num);
+            };
+        }
     } catch (err) {
         // we don't care, this is a way to detect if module exists
     }
 }
 
 // browser crypto?
-if (!getRandomBytes && window) {
+if (!getRandomBytes) {
     getRandomBytes = function(num) {
-        return window.crypto.getRandomValues(new Uint8Array(num));
+        return globalContext.crypto.getRandomValues(new Uint8Array(num));
     };
 }
 

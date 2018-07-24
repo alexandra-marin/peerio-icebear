@@ -16,6 +16,7 @@ class PeerioAppWorld {
         this.parameters = parameters;
         this.filesToCleanup = [];
         this.contactsHelper = new ContactsHelper(this);
+        this.cacheStorage = {}; // for MemoryCacheEngine
     }
 
     /**

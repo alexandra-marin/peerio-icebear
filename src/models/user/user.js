@@ -508,6 +508,7 @@ class User {
      */
     login = () => {
         console.log('Starting login sequence');
+        performance.mark('Login start');
         return this._preAuth()
             .then(() => this._authenticateConnection())
             .then(() => this.kegDb.loadBootKeg(this.bootKey))
@@ -516,6 +517,10 @@ class User {
                 this.signKeys = this.kegDb.boot.signKeys;
             })
             .then(() => this._postAuth())
+            .then(() => {
+                performance.mark('Login end');
+                performance.measure('Login', 'Login start', 'Login end');
+            })
             .catch(e => {
                 if (!socket.authenticated && !clientApp.clientVersionDeprecated && !clientApp.clientSessionExpired) {
                     socket.reset();

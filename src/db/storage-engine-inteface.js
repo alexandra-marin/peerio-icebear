@@ -41,6 +41,7 @@ class StorageEngineInterface {
      */
     getAllKeys() { }
 
+
     /**
      * Removes all data from current namespace.
      */

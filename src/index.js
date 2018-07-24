@@ -25,10 +25,6 @@ Promise.config({ warnings: { wForgottenReturn: false } });
 // extending native classes
 require('./extensions/uint8array');
 
-// @ts-ignore
-// for JSDoc's sake
-require('./typedefs');
-
 // exporting Icebear Library Interface
 const socket = require('./network/socket');
 const User = require('./models/user/user');
@@ -60,7 +56,7 @@ const chatInviteStore = require('./models/chats/chat-invite-store');
 const Contact = require('./models/contacts/contact');
 const prombservable = require('./helpers/prombservable');
 const tracker = require('./models/update-tracker');
-
+const CacheEngineBase = require('./db/cache-engine-base');
 
 // MEMO: Do NOT export NodeJsonStorage and NodeFileStream here for compatibility reasons
 module.exports = {
@@ -93,6 +89,7 @@ module.exports = {
     serverSettings,
     Contact, // mostly for its utility static functions
     prombservable,
+    CacheEngineBase,
     __: {
         tracker
     }

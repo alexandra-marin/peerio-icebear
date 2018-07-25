@@ -11,7 +11,6 @@ When('I upload a {int} byte file', async function(int) {
 });
 
 When('I rename uploaded file to {string}', async function(string) {
-    this.filesToCleanup.push(string);
     await ice.fileStore.getById(this.uploadedFile.fileId).rename(string);
 });
 

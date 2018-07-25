@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.12.0"></a>
+# [5.12.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.11.0...v5.12.0) (2018-07-25)
+
+
+### Bug Fixes
+
+* add async ([5478aea](https://github.com/PeerioTechnologies/peerio-icebear/commit/5478aea))
+* boot keg caching fail race ([08c3f77](https://github.com/PeerioTechnologies/peerio-icebear/commit/08c3f77))
+* bring back paged file load ([1b57d0d](https://github.com/PeerioTechnologies/peerio-icebear/commit/1b57d0d))
+* compensate for cache by loading more digest ([2143345](https://github.com/PeerioTechnologies/peerio-icebear/commit/2143345))
+* trying to fix mobile ([abba6f5](https://github.com/PeerioTechnologies/peerio-icebear/commit/abba6f5))
+
+
+### Features
+
+* chat caching ([9c13812](https://github.com/PeerioTechnologies/peerio-icebear/commit/9c13812))
+* file caching ([4e5f95b](https://github.com/PeerioTechnologies/peerio-icebear/commit/4e5f95b))
+* file keg caching ([80babf5](https://github.com/PeerioTechnologies/peerio-icebear/commit/80babf5))
+* support clients without persistent cache ([aa66e29](https://github.com/PeerioTechnologies/peerio-icebear/commit/aa66e29))
+* tofu cache ([254a33e](https://github.com/PeerioTechnologies/peerio-icebear/commit/254a33e))
+
+
+### Performance Improvements
+
+* defer signature verification for kegs ([2297527](https://github.com/PeerioTechnologies/peerio-icebear/commit/2297527))
+* login measures ([0bdba23](https://github.com/PeerioTechnologies/peerio-icebear/commit/0bdba23))
+
+
+
 <a name="5.11.0"></a>
 # [5.11.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.10.0...v5.11.0) (2018-07-24)
 

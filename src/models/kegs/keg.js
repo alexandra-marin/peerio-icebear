@@ -329,8 +329,8 @@ class Keg {
      * after creating appropriate keg instance.
      * @param {Object} keg data as received from server
      * @param {bool} noVerify - prevents signature verification (for example, when loading cached keg)
-     * @returns {Promise<Keg|boolean>} - returns false if keg data could not have been loaded. This function doesn't throw,
-     * you have to check error flags if you received false return value.
+     * @returns {Promise<Keg|boolean>} - returns false if keg data could not have been loaded.
+     * This function doesn't throw, you have to check error flags if you received false return value.
      */
     @action async loadFromKeg(keg, noVerify = false) {
         try {

@@ -2,8 +2,6 @@
  * String helpers
  */
 
-// jsdoc hack..
-let a; //eslint-disable-line
 
 /**
  * Returns first unicode character of a string.

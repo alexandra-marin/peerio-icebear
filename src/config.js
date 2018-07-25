@@ -1,4 +1,5 @@
 const _sdkVersion = require('./__sdk');
+const MemoryCacheEngine = require('./db/memory-cache-engine');
 
 const SERVER_PLAN_PREMIUM_MONTHLY = 'icebear_premium_monthly';
 const SERVER_PLAN_PREMIUM_YEARLY = 'icebear_premium_yearly';
@@ -204,6 +205,13 @@ const config = new class {
      * @type {StorageEngineInterface}
      */
     StorageEngine = null;
+    /**
+     * Storage engine implementation class.
+     *
+     * **Client app is required to set this property before using Icebear SDK.**
+     * @type {StorageEngineInterface}
+     */
+    CacheEngine = MemoryCacheEngine;
     /**
      * Frequency (seconds) at which default observable clock will be changing its value.
      * Default clock can be used for refreshing timestamps and other time counters.

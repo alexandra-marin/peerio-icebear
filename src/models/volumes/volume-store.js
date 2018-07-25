@@ -48,7 +48,7 @@ class VolumeStore {
         this.volumeMap[v.id] = v;
         this.volumes.push(v);
         v.added = true;
-        v.loadMetadata().then(() => v.store.loadAllFiles());
+        v.loadMetadata().then(() => v.store.updateFiles());
         return v;
     }
 
@@ -92,7 +92,7 @@ class VolumeStore {
             // in case instance has changed. otherwise it will immediately resolve
             await volume.loadMetadata();
             await volume.rename(name);
-            await volume.store.loadAllFiles();
+            await volume.store.updateFiles();
             await volume.addParticipants(participants.filter(p => !p.isMe));
             return volume;
         } catch (err) {

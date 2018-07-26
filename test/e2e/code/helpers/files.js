@@ -24,7 +24,10 @@ const deleteFile = filename => {
  * @returns {string}
  */
 const getTempFileName = (suffix = '.tmp') => {
-    return path.join(os.tmpdir(), crypto.randomBytes(10).toString('hex') + suffix);
+    return path.join(
+        os.tmpdir(),
+        crypto.randomBytes(10).toString('hex') + suffix
+    );
 };
 
 /**
@@ -120,14 +123,16 @@ const filesEqual = async (filename1, filename2) => {
 const downloadFile = (filename, url) => {
     return new Promise((resolve, reject) => {
         const file = fs.createWriteStream(filename);
-        https.get(url, (response) => {
-            response.pipe(file);
-            return file.on('finish', () => {
-                file.close();
-                console.log('Test helper downloaded file', file);
-                resolve(file);
-            });
-        }).on('error', reject);
+        https
+            .get(url, response => {
+                response.pipe(file);
+                return file.on('finish', () => {
+                    file.close();
+                    console.log('Test helper downloaded file', file);
+                    resolve(file);
+                });
+            })
+            .on('error', reject);
     });
 };
 

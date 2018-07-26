@@ -18,7 +18,9 @@ class FileUploader extends FileProcessor {
         // amount of bytes to read and to send
         this.file.progressMax = file.size;
         if (startFromChunk != null) {
-            console.log(`Resuming upload. Starting with chunk ${startFromChunk}`);
+            console.log(
+                `Resuming upload. Starting with chunk ${startFromChunk}`
+            );
             nonceGenerator.chunkId = startFromChunk;
             this.lastReadChunkId = startFromChunk - 1;
             this.file.progress = startFromChunk * file.chunkSize;
@@ -64,19 +66,32 @@ class FileUploader extends FileProcessor {
     }
 
     get _isEncryptQueueFull() {
-        return (this.encryptQueue.length + 1) * this.file.chunkSize > config.upload.encryptBufferSize;
+        return (
+            (this.encryptQueue.length + 1) * this.file.chunkSize >
+            config.upload.encryptBufferSize
+        );
     }
 
     get _isUploadQueueFull() {
         // chunk overhead neglecting is ok, too small
-        return (this.uploadQueue.length + 1) * this.file.chunkSize > config.upload.uploadBufferSize;
+        return (
+            (this.uploadQueue.length + 1) * this.file.chunkSize >
+            config.upload.uploadBufferSize
+        );
     }
 
     // reads chunk from fs and puts it in encryption queue
     _readChunk() {
-        if (this.readingChunk || this.stopped || this.eofReached || this._isEncryptQueueFull) return;
+        if (
+            this.readingChunk ||
+            this.stopped ||
+            this.eofReached ||
+            this._isEncryptQueueFull
+        )
+            return;
         this.readingChunk = true;
-        this.stream.read(this.file.chunkSize)
+        this.stream
+            .read(this.file.chunkSize)
             .then(this._processReadChunk)
             .catch(this._error);
     }
@@ -94,11 +109,22 @@ class FileUploader extends FileProcessor {
     };
 
     _encryptChunk = () => {
-        if (this.stopped || this._isUploadQueueFull || !this.encryptQueue.length) return;
+        if (
+            this.stopped ||
+            this._isUploadQueueFull ||
+            !this.encryptQueue.length
+        )
+            return;
         try {
             const chunk = this.encryptQueue.shift();
             const nonce = this.nonceGenerator.getNextNonce();
-            chunk.buffer = secret.encrypt(chunk.buffer, this.fileKey, nonce, false, false);
+            chunk.buffer = secret.encrypt(
+                chunk.buffer,
+                this.fileKey,
+                nonce,
+                false,
+                false
+            );
             this.uploadQueue.push(chunk);
             this._tick();
         } catch (err) {
@@ -107,18 +133,27 @@ class FileUploader extends FileProcessor {
     };
 
     _uploadChunk() {
-        if (this.stopped || !this.uploadQueue.length
-            || this.chunksWaitingForResponse >= config.upload.maxResponseQueue) return;
+        if (
+            this.stopped ||
+            !this.uploadQueue.length ||
+            this.chunksWaitingForResponse >= config.upload.maxResponseQueue
+        )
+            return;
 
         const chunk = this.uploadQueue.shift();
         this.chunksWaitingForResponse++;
         // console.log(`sending chunk ${chunk.id}`);
-        socket.send('/auth/file/chunk/upload', {
-            fileId: this.file.fileId,
-            chunkNum: chunk.id,
-            chunk: chunk.buffer.buffer,
-            last: !this.uploadQueue.length && this.nonceGenerator.eof
-        }, true)
+        socket
+            .send(
+                '/auth/file/chunk/upload',
+                {
+                    fileId: this.file.fileId,
+                    chunkNum: chunk.id,
+                    chunk: chunk.buffer.buffer,
+                    last: !this.uploadQueue.length && this.nonceGenerator.eof
+                },
+                true
+            )
             .then(() => {
                 this.chunksWaitingForResponse--;
                 // console.log(`chunk ${chunk.id} sent`);
@@ -132,8 +167,12 @@ class FileUploader extends FileProcessor {
     }
 
     _checkIfFinished() {
-        if (this.eofReached && !this.encryptQueue.length
-            && !this.uploadQueue.length && !this.chunksWaitingForResponse) {
+        if (
+            this.eofReached &&
+            !this.encryptQueue.length &&
+            !this.uploadQueue.length &&
+            !this.chunksWaitingForResponse
+        ) {
             this._finishProcess();
             return true;
         }
@@ -164,8 +203,7 @@ class FileUploader extends FileProcessor {
                 this._finishProcess(errors.normalize(err));
             }
         });
-    }
+    };
 }
-
 
 module.exports = FileUploader;

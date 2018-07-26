@@ -37,7 +37,6 @@
 const { getUrl, deleteRequest } = require('./https');
 const quotedPrintable = require('quoted-printable');
 
-
 /**
  * Retrieves inbox items
  * @param {string} name - mailbox name
@@ -45,8 +44,9 @@ const quotedPrintable = require('quoted-printable');
  */
 function getInbox(name) {
     console.log(`maildrop: requesting inbox ${name}`);
-    return getUrl(`https://maildrop.peerio.com/api/inbox/${name}`)
-        .then(JSON.parse);
+    return getUrl(`https://maildrop.peerio.com/api/inbox/${name}`).then(
+        JSON.parse
+    );
 }
 
 /**
@@ -102,9 +102,11 @@ function waitForEmail(name, subject, timeout = 360000) {
     const start = Date.now();
     return new Promise((resolve, reject) => {
         function makeAttempt() {
-            console.log(`Attempting to find an email with subject: '${subject}' in mailbox '${name}'`);
+            console.log(
+                `Attempting to find an email with subject: '${subject}' in mailbox '${name}'`
+            );
             findEmailWithSubject(name, subject)
-                .then((id) => {
+                .then(id => {
                     if (id) return getEmail(name, id).then(resolve);
                     if (Date.now() - start > timeout) {
                         console.log('Email not arrived. Giving up.');

@@ -56,7 +56,7 @@ class Clock {
     _stopTicking = () => {
         clearInterval(this._intervalHandler);
         this._intervalHandler = null;
-    }
+    };
 }
 
 Clock.default = new Clock(config.observableClockEventFrequency);

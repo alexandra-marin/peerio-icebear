@@ -1,6 +1,6 @@
 /**
-* All kinds of unfurl helpers
-*/
+ * All kinds of unfurl helpers
+ */
 
 const urlRegex = require('url-regex')();
 const config = require('../config');
@@ -19,7 +19,6 @@ function getUrls(str) {
     return str.match(urlRegex) || [];
 }
 
-
 function getContentHeaders(url) {
     if (urlCache[url]) return Promise.resolve(urlCache[url]);
     if (urlsInProgress[url]) return urlsInProgress[url];
@@ -35,7 +34,9 @@ function getContentHeaders(url) {
                     break;
                 case 2:
                     resolved = true;
-                    const res = parseResponseHeaders(req.getAllResponseHeaders());
+                    const res = parseResponseHeaders(
+                        req.getAllResponseHeaders()
+                    );
                     req.abort();
                     urlCache[url] = res;
                     resolve(res);
@@ -44,7 +45,8 @@ function getContentHeaders(url) {
                     // in case we got to DONE(4) without receiving headers
                     if (!resolved) reject(new Error(`${url} request failed`));
                     break;
-                default: break;
+                default:
+                    break;
             }
             /* eslint-enable no-case-declarations */
         };

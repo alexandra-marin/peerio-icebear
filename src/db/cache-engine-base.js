@@ -22,7 +22,10 @@ class CacheEngineBase {
      */
     constructor(shortName, keyPath) {
         if (!shortName || !keyPath) throw new Error('Invalid arguments');
-        this.name = shortName === META_DB_NAME ? META_DB_NAME : CacheEngineBase.getCacheDbFullName(shortName);
+        this.name =
+            shortName === META_DB_NAME
+                ? META_DB_NAME
+                : CacheEngineBase.getCacheDbFullName(shortName);
         this.keyPath = keyPath;
 
         if (shortName !== META_DB_NAME) CacheEngineBase.saveDbName(this.name);
@@ -48,7 +51,10 @@ class CacheEngineBase {
 
     static async openMetaDatabase() {
         if (!CacheEngineBase.metaDb) {
-            CacheEngineBase.metaDb = new config.CacheEngine(META_DB_NAME, 'name');
+            CacheEngineBase.metaDb = new config.CacheEngine(
+                META_DB_NAME,
+                'name'
+            );
             return CacheEngineBase.metaDb.open();
         }
         if (!CacheEngineBase.metaDb.isOpen) {
@@ -59,7 +65,10 @@ class CacheEngineBase {
 
     static async saveDbName(name) {
         await CacheEngineBase.openMetaDatabase();
-        return CacheEngineBase.metaDb.setValue(name, { name, owner: getUser().username });
+        return CacheEngineBase.metaDb.setValue(name, {
+            name,
+            owner: getUser().username
+        });
     }
 
     static async removeDbName(name) {

@@ -43,23 +43,26 @@ Given('I create a Medcryptor admin account', async function() {
     await createRole(adminNumber, this);
 });
 
-Then('I can edit specialization, medical ID, country and role', async function() {
-    const medcryptorData = {
-        mcrCountry: 'Australia',
-        mcrSpecialty: 'surgery',
-        mcrRoles: ['doctor'],
-        mcrAHPRA: getRandomUsername()
-    };
+Then(
+    'I can edit specialization, medical ID, country and role',
+    async function() {
+        const medcryptorData = {
+            mcrCountry: 'Australia',
+            mcrSpecialty: 'surgery',
+            mcrRoles: ['doctor'],
+            mcrAHPRA: getRandomUsername()
+        };
 
-    this.ice.User.current.props = medcryptorData;
-    await this.ice.User.current.saveProfile();
+        this.ice.User.current.props = medcryptorData;
+        await this.ice.User.current.saveProfile();
 
-    await this.app.restart();
-    this.app.startMedcryptor();
-    await this.login();
+        await this.app.restart();
+        this.app.startMedcryptor();
+        await this.login();
 
-    this.ice.User.current.props.should.deep.contain(medcryptorData);
-});
+        this.ice.User.current.props.should.deep.contain(medcryptorData);
+    }
+);
 
 Then('I can not register another user with same AHPRA', async function() {
     await this.app.restart();
@@ -73,7 +76,12 @@ Then('I can not register another user with same AHPRA', async function() {
         mcrAHPRA: this.medicalId
     };
 
-    await this.createAccount(null, null, false, medcryptorData).should.be.rejected;
+    await this.createAccount(
+        null,
+        null,
+        false,
+        medcryptorData
+    ).should.be.rejected;
 });
 
 Then('I create a patient space', async function() {
@@ -87,17 +95,44 @@ Then('I create a patient space', async function() {
 
 Then('I create two internal rooms', async function() {
     this.space.spaceRoomType = 'internal';
-    this.internalRoom1 = await ice.chatStore.startChat([], true, 'test-internal1', 'test', null, this.space);
-    await this.waitFor(() => this.internalRoom1.metaLoaded && ice.chatStore.activeChat);
+    this.internalRoom1 = await ice.chatStore.startChat(
+        [],
+        true,
+        'test-internal1',
+        'test',
+        null,
+        this.space
+    );
+    await this.waitFor(
+        () => this.internalRoom1.metaLoaded && ice.chatStore.activeChat
+    );
 
-    this.internalRoom2 = await ice.chatStore.startChat([], true, 'test-internal2', 'test', null, this.space);
-    await this.waitFor(() => this.internalRoom2.metaLoaded && ice.chatStore.activeChat);
+    this.internalRoom2 = await ice.chatStore.startChat(
+        [],
+        true,
+        'test-internal2',
+        'test',
+        null,
+        this.space
+    );
+    await this.waitFor(
+        () => this.internalRoom2.metaLoaded && ice.chatStore.activeChat
+    );
 });
 
 Then('I create a patient room', async function() {
     this.space.spaceRoomType = 'patient';
-    this.patientRoom = await ice.chatStore.startChat([], true, 'test-patient', 'test', null, this.space);
-    await this.waitFor(() => this.patientRoom.metaLoaded && ice.chatStore.activeChat);
+    this.patientRoom = await ice.chatStore.startChat(
+        [],
+        true,
+        'test-patient',
+        'test',
+        null,
+        this.space
+    );
+    await this.waitFor(
+        () => this.patientRoom.metaLoaded && ice.chatStore.activeChat
+    );
 });
 
 Then('I can view the patient space', async function() {
@@ -111,14 +146,18 @@ Then('I can view the patient space', async function() {
     returnedSpace.unreadCount.should.equal(0);
 
     returnedSpace.internalRooms.length.should.equal(2);
-    returnedSpace.internalRooms.should.deep.equal([this.internalRoom1, this.internalRoom2]);
+    returnedSpace.internalRooms.should.deep.equal([
+        this.internalRoom1,
+        this.internalRoom2
+    ]);
 
     returnedSpace.patientRooms.length.should.equal(1);
     returnedSpace.patientRooms.should.deep.equal([this.patientRoom]);
 });
 
 Then('I get notified of unread messages', async function() {
-    const allUnread = this.internalRoom1.unreadCount +
+    const allUnread =
+        this.internalRoom1.unreadCount +
         this.internalRoom2.unreadCount +
         this.patientRoom.unreadCount;
 
@@ -134,26 +173,47 @@ Then('I create another patient space', async function() {
         spaceRoomType: 'patient',
         nameInSpace: 'general'
     };
-    const room = await ice.chatStore.startChat([], true, 'test-space-2', 'test', null, this.anotherSpace);
+    const room = await ice.chatStore.startChat(
+        [],
+        true,
+        'test-space-2',
+        'test',
+        null,
+        this.anotherSpace
+    );
     await this.waitFor(() => room.metaLoaded && ice.chatStore.activeChat);
 
     ice.chatStore.spaces.spacesList.length.should.equal(2);
-    ice.chatStore.spaces.spacesList[0].spaceName.should.equal(this.space.spaceName);
-    ice.chatStore.spaces.spacesList[1].spaceName.should.equal(this.anotherSpace.spaceName);
+    ice.chatStore.spaces.spacesList[0].spaceName.should.equal(
+        this.space.spaceName
+    );
+    ice.chatStore.spaces.spacesList[1].spaceName.should.equal(
+        this.anotherSpace.spaceName
+    );
 });
 
 Then('I can see their role in the contact details', async function() {
-    const contact = await this.contactsHelper.findContact(this.testAccount.username);
+    const contact = await this.contactsHelper.findContact(
+        this.testAccount.username
+    );
     contact.mcrRoles.should.be.an('array');
     contact.mcrRoles[0].should.equal(this.role);
 
     if (this.role === 'doctor') {
-        ice.contactStore.whitelabel.checkMCAdmin(this.testAccount.username).should.equal(false);
-        ice.contactStore.whitelabel.checkMCDoctor(this.testAccount.username).should.equal(true);
+        ice.contactStore.whitelabel
+            .checkMCAdmin(this.testAccount.username)
+            .should.equal(false);
+        ice.contactStore.whitelabel
+            .checkMCDoctor(this.testAccount.username)
+            .should.equal(true);
     }
 
     if (this.role.startsWith('admin')) {
-        ice.contactStore.whitelabel.checkMCAdmin(this.testAccount.username).should.equal(true);
-        ice.contactStore.whitelabel.checkMCDoctor(this.testAccount.username).should.equal(false);
+        ice.contactStore.whitelabel
+            .checkMCAdmin(this.testAccount.username)
+            .should.equal(true);
+        ice.contactStore.whitelabel
+            .checkMCDoctor(this.testAccount.username)
+            .should.equal(false);
     }
 });

@@ -88,7 +88,8 @@ function encryptString(msg, key) {
 function decrypt(cipher, key, nonce, containsLength) {
     let start = 0, end;
     if (!nonce) {
-        nonce = cipher.subarray(-NONCE_SIZE); //eslint-disable-line
+        // eslint-disable-next-line no-param-reassign
+        nonce = cipher.subarray(-NONCE_SIZE);
         end = -NONCE_SIZE;
     }
     if (containsLength) {

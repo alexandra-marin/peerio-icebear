@@ -68,7 +68,7 @@ class ChatStoreSpaces {
     }
 
     getSpaceFrom = (chat) => {
-        const space = new Space(this.store); // eslint-disable-line
+        const space = new Space(this.store);
         space.spaceId = chat.chatHead.spaceId;
         space.spaceName = chat.chatHead.spaceName;
         space.spaceDescription = chat.chatHead.spaceDescription;

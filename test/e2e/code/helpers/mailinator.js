@@ -9,7 +9,7 @@
 //     return new Promise((resolve) => {
 //         const inbox =
 // `http://api.mailinator.com/api/inbox?to=${process.env.PEERIO_ADMIN_EMAIL}
-// &token=${process.env.MAILINATOR_KEY}`; // eslint-disable-line
+// &token=${process.env.MAILINATOR_KEY}`;
 //         http.get(inbox, (response) => {
 //             let emails = '';
 //             response.on('data', (chunk) => { emails += chunk; });
@@ -64,7 +64,7 @@
 // function getConfirmationEmail(confirmationEmailId) {
 //     return new Promise((resolve) => {
 //         const emailUrl = `http://api.mailinator.com/api/email
-// ?id=${confirmationEmailId}&token=${process.env.MAILINATOR_KEY}`; // eslint-disable-line
+// ?id=${confirmationEmailId}&token=${process.env.MAILINATOR_KEY}`;
 
 //         http.get(emailUrl, (res) => {
 //             let body = '';

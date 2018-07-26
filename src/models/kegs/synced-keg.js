@@ -82,7 +82,7 @@ class SyncedKeg extends Keg {
                     // implementing default restore logic
                     const payload = this.serializeKegPayload();
                     const props = this.serializeProps();
-                    // eslint-disable-next-line
+                    // eslint-disable-next-line no-param-reassign
                     dataRestoreFn = () => {
                         this.deserializeProps(props);
                         this.deserializeKegPayload(payload);

@@ -283,7 +283,8 @@ class ChatMessageHandler {
                     this.setDownloadedUpdateId(resp.kegs);
                     this.markAllAsSeen();
                 }
-                return this.chat.addMessages(resp.kegs, pagingUp); // eslint-disable-line consistent-return
+                // eslint-disable-next-line consistent-return
+                return this.chat.addMessages(resp.kegs, pagingUp);
                 // in case we paged to the most recent or new to us messages
             })).finally(() => {
                 if (pagingUp) {

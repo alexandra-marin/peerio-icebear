@@ -47,17 +47,21 @@ try {
                 };
                 _entries.push(mark);
                 _marksIndex[name] = mark;
-            };
+                };
         }
 
 
         if (!performance.measure) {
-            performance.measure = performance.webkitMeasure || function(name, startMark, endMark) {
-                startMark = _marksIndex[startMark].startTime; // eslint-disable-line no-param-reassign
-                endMark = _marksIndex[endMark].startTime; // eslint-disable-line no-param-reassign
+            performance.measure =
+                performance.webkitMeasure ||
+                function(name, startMark, endMark) {
+                    /* eslint-disable no-param-reassign */
+                    startMark = _marksIndex[startMark].startTime;
+                    endMark = _marksIndex[endMark].startTime;
+                    /* eslint-enable no-param-reassign */
 
-                _entries.push({
-                    name,
+                    _entries.push({
+                        name,
                     entryType: 'measure',
                     startTime: startMark,
                     duration: endMark - startMark

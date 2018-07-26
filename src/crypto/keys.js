@@ -41,7 +41,8 @@ function scryptPromise(value, salt, options) {
  */
 function prehashPass(value, personalization) {
     if (personalization) {
-        personalization = { personalization: util.strToBytes(personalization) }; // eslint-disable-line
+        // eslint-disable-next-line no-param-reassign
+        personalization = { personalization: util.strToBytes(personalization) };
     }
     const prehashedPass = new BLAKE2s(32, personalization);
     prehashedPass.update(util.strToBytes(value));

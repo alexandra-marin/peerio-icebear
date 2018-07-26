@@ -1,6 +1,4 @@
-/* eslint-disable no-unused-vars */
-
-const { observable, when } = require('mobx');
+const { observable } = require('mobx');
 const { asPromise } = require('../helpers/prombservable');
 const { simpleHash } = require('../util');
 const config = require('../config');
@@ -88,6 +86,7 @@ class CacheEngineBase {
      * @param {string} key
      * @returns {Promise<Object>}
      */
+    // eslint-disable-next-line no-unused-vars
     getValue(key) {
         throw new Error('Method not implemented');
     }
@@ -100,6 +99,7 @@ class CacheEngineBase {
      *                                             read and write should be done in atomic/transactional way.
      * @returns {Promise}
      */
+    // eslint-disable-next-line no-unused-vars
     setValue(key, value, confirmUpdate) {
         throw new Error('Method not implemented');
     }
@@ -109,6 +109,7 @@ class CacheEngineBase {
      * @param {string} key - if key doesn't exist, just resolve promise.
      * @returns {Promise}
      */
+    // eslint-disable-next-line no-unused-vars
     removeValue(key) {
         throw new Error('Method not implemented');
     }
@@ -141,6 +142,7 @@ class CacheEngineBase {
      * Deletes any database by name
      * @param {string} fullName
      */
+    // eslint-disable-next-line no-unused-vars
     deleteDatabase(fullName) {
         throw new Error('Method not implemented');
     }

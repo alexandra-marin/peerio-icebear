@@ -25,7 +25,7 @@ class CucumbotClient extends CucumbotBase {
                 './node_modules/.bin/cucumber-js',
                 'test/e2e/spec',
                 '-r', 'test/e2e/code',
-                '--require-module', '@babel/register',
+                '--require-module', '"@babel/register"',
                 '--format', 'node_modules/cucumber-pretty',
                 '--format', `json:./test-results/e2e/${this.name}_result.json`,
                 '--tags', `@${this.name}`,

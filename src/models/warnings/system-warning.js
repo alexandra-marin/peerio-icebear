@@ -13,18 +13,13 @@ class SystemWarning {
     /**
      * Warning life cycle states.
      */
-    static STATES = {
-        QUEUED: 0,
-        /* WILL_SHOW: 1, */ SHOWING: 2,
-        WILL_DISMISS: 3,
-        DISMISSED: 4
-    };
+    static STATES = { QUEUED: 0, /* WILL_SHOW: 1, */ SHOWING: 2, WILL_DISMISS: 3, DISMISSED: 4 };
 
     /**
      * Observable current life cycle state.
      * @type {number}
      */
-    @observable state = SystemWarning.STATES.QUEUED;
+    @observable state = SystemWarning.STATES.QUEUED
 
     constructor(content, title, data, level = 'medium', callback) {
         this.content = content;
@@ -84,7 +79,7 @@ class SystemWarning {
      *  Will get called after warning dismiss.
      *  @protected
      */
-    dispose() {}
+    dispose() { }
 }
 
 module.exports = SystemWarning;

@@ -22,11 +22,13 @@ class KegDbListProvider {
     async cacheList() {
         if (this.loadingPromise) return this.loadingPromise;
         if (this.cachedList) return this.cachedList;
-        this.loadingPromise = socket.send('/auth/kegs/user/dbs').then(list => {
-            this.loadingPromise = null;
-            this.cachedList = list;
-            this.compareChanges();
-        });
+        this.loadingPromise =
+            socket.send('/auth/kegs/user/dbs')
+                .then(list => {
+                    this.loadingPromise = null;
+                    this.cachedList = list;
+                    this.compareChanges();
+                });
 
         return this.loadingPromise;
     }

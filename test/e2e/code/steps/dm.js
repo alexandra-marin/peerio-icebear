@@ -1,10 +1,5 @@
 const { When, Then } = require('cucumber');
-const {
-    startDmWithCucumbot,
-    sendMessage,
-    findIncomingMessage,
-    findAnyMessage
-} = require('./dm.helpers');
+const { startDmWithCucumbot, sendMessage, findIncomingMessage, findAnyMessage } = require('./dm.helpers');
 
 When('I start a DM with Cucumbot', startDmWithCucumbot);
 When('Cucumbot starts a DM with me', startDmWithCucumbot);

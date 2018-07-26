@@ -22,13 +22,12 @@ class CucumbotBase extends EventEmitter {
     }
 
     onceHaveControl(fn) {
-        if (this.controlAwaitingFn)
-            throw new Error('Can not have more then 1 step awaiting control');
+        if (this.controlAwaitingFn) throw new Error('Can not have more then 1 step awaiting control');
         if (this.hasControl) {
             this.hasControl--;
             return fn();
         }
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
             this.controlAwaitingFn = () => {
                 this.hasControl--;
                 const res = fn();
@@ -94,7 +93,7 @@ class CucumbotBase extends EventEmitter {
         (this.botProcess || process).send({ type: 'takeControl' });
     }
 
-    processMessage = msg => {
+    processMessage = (msg) => {
         const handler = this.messageHandlers[msg.type];
         if (!handler) console.error('Unknown Cucumbot IPC message.', msg);
         else handler.call(this, msg);

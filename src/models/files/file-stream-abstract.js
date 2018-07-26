@@ -40,16 +40,14 @@ class FileStreamAbstract {
      * @param {number} size - amount of bytes to read (if possible)
      * @return {Promise<Uint8Array>} - resolves with a number of bytes written to buffer
      */
-    read = size => {
+    read = (size) => {
         if (this.mode !== 'read') {
-            return Promise.reject(
-                new Error('Attempt to read from write stream.')
-            );
+            return Promise.reject(new Error('Attempt to read from write stream.'));
         }
         return this.readInternal(size).then(this._increasePosition);
     };
 
-    _increasePosition = buf => {
+    _increasePosition = (buf) => {
         this.pos += buf.length;
         return buf;
     };
@@ -69,15 +67,9 @@ class FileStreamAbstract {
      * @param {Uint8Array} buffer
      * @returns {Promise} - resolves when chunk is written out
      */
-    write = buffer => {
+    write = (buffer) => {
         if (this.mode !== 'write' && this.mode !== 'append') {
-            return Promise.reject(
-                new Error(
-                    `file-stream.js: Attempt to write to read stream. ${
-                        this.mode
-                    }`
-                )
-            );
+            return Promise.reject(new Error(`file-stream.js: Attempt to write to read stream. ${this.mode}`));
         }
         this._increasePosition(buffer);
         if (!buffer || !buffer.length) return Promise.resolve();
@@ -99,7 +91,7 @@ class FileStreamAbstract {
      * @param {number} pos
      * @returns {number} new position
      */
-    seek = pos => {
+    seek = (pos) => {
         if (this.mode !== 'read') throw new Error('Seek only on read streams');
         return this.seekInternal(pos);
     };
@@ -112,6 +104,7 @@ class FileStreamAbstract {
     seekInternal(pos) {
         throw new AbstractCallError();
     }
+
 
     /**
      * Override. This function has to set 'size' property.

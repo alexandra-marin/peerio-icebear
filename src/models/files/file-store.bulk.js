@@ -26,44 +26,30 @@ class FileStoreBulk {
         this.fileStore = fileStore;
     }
 
-    @computed
-    get canMove() {
-        return !getFileStore().selectedFilesOrFolders.some(
-            f => f.isFolder && f.isShared
-        );
+    @computed get canMove() {
+        return !getFileStore().selectedFilesOrFolders.some(f => f.isFolder && f.isShared);
     }
-    @computed
-    get canShare() {
-        return !getFileStore().selectedFilesOrFolders.some(
-            f => (f.isFolder && !f.canShare) || f.isLegacy
-        );
+    @computed get canShare() {
+        return !getFileStore().selectedFilesOrFolders
+            .some(f => f.isFolder && !f.canShare || f.isLegacy);
     }
-    @computed
-    get hasLegacyObjectsSelected() {
-        return getFileStore().selectedFilesOrFolders.some(
-            f => f.isLegacy || (f.isFolder && f.hasLegacyFiles)
-        );
+    @computed get hasLegacyObjectsSelected() {
+        return getFileStore().selectedFilesOrFolders.some(f => f.isLegacy || (f.isFolder && f.hasLegacyFiles));
     }
 
     async removeOne(i, batch) {
         if (i.isFolder && this.deleteFolderConfirmator) {
-            if (!(await this.deleteFolderConfirmator(i)))
-                return Promise.reject();
+            if (!await this.deleteFolderConfirmator(i)) return Promise.reject();
         }
         return i.remove(batch);
     }
 
-    @action.bound
-    async remove() {
+    @action.bound async remove() {
         const items = getFileStore().selectedFilesOrFolders;
         if (this.deleteFilesConfirmator) {
             const files = items.filter(i => !i.isFolder);
             const sharedFiles = items.filter(i => i.shared);
-            if (
-                files.length &&
-                !(await this.deleteFilesConfirmator(files, sharedFiles))
-            )
-                return;
+            if (files.length && !await this.deleteFilesConfirmator(files, sharedFiles)) return;
         }
         let promise = Promise.resolve();
         items.forEach(i => {
@@ -74,8 +60,7 @@ class FileStoreBulk {
         getFileStore().clearSelection();
     }
 
-    @action.bound
-    async share() {
+    @action.bound async share() {
         if (!this.shareWithSelector) {
             console.error(`shareWithSelector has not been set`);
             return;
@@ -92,18 +77,14 @@ class FileStoreBulk {
         }
         let promise = Promise.resolve();
         items.forEach(i => {
-            promise = promise.then(() => {
-                i.selected = false;
-            });
+            promise = promise.then(() => { i.selected = false; });
             if (i.isFolder) {
-                promise = promise.then(() =>
-                    getVolumeStore().shareFolder(i, usernamesAccessList)
-                );
+                promise = promise.then(
+                    () => getVolumeStore().shareFolder(i, usernamesAccessList));
             } else {
                 usernamesAccessList.forEach(contact => {
-                    promise = promise.then(async () =>
-                        getChatStore().startChatAndShareFiles([contact], [i])
-                    );
+                    promise = promise.then(
+                        async () => getChatStore().startChatAndShareFiles([contact], [i]));
                 });
             }
         });
@@ -111,25 +92,20 @@ class FileStoreBulk {
         getFileStore().clearSelection();
     }
 
-    @action.bound
-    moveOne(item, folder, bulk) {
+    @action.bound moveOne(item, folder, bulk) {
         item.selected = false;
         if (item.folderId === folder.id) return;
         if (item.isShared) return;
         folder.attach(item);
         if (!bulk) {
             if (folder.isShared) {
-                warnings.add('title_itemMovedToFolder', null, {
-                    item: item.name,
-                    folder: folder.name
-                });
+                warnings.add('title_itemMovedToFolder', null, { item: item.name, folder: folder.name });
             }
             this.fileStore.folderStore.save();
         }
     }
 
-    @action.bound
-    async move(targetFolder) {
+    @action.bound async move(targetFolder) {
         const items = getFileStore().selectedFilesOrFolders;
         // currently progress is too quick, but in the future
         // it may make sense to show progress bar
@@ -154,28 +130,21 @@ class FileStoreBulk {
         await this.fileStore.folderStore.save();
     }
 
-    @action.bound
-    async downloadOne(item, path, suppressSnackbar) {
+    @action.bound async downloadOne(item, path, suppressSnackbar) {
         item.selected = false;
         const downloadPath = await this.pickPathSelector(
             path,
             item.nameWithoutExtension || item.name,
-            item.ext || ''
-        );
+            item.ext || '');
         // TODO: maybe run in parallel?
         if (item.isFolder) {
-            await item.download(
-                path,
-                this.pickPathSelector,
-                config.FileStream.createDir
-            );
+            await item.download(path, this.pickPathSelector, config.FileStream.createDir);
         } else {
             await item.download(downloadPath, false, false, suppressSnackbar);
         }
     }
 
-    @action.bound
-    async download() {
+    @action.bound async download() {
         if (!this.downloadFolderSelector) {
             console.error(`downloadFolderSelector has not been set`);
             return;

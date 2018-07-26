@@ -53,20 +53,14 @@ class SharedKegDb {
         this.id = id;
         const usernames = _.uniq(participants.map(p => p.username));
         if (usernames.length !== participants.length) {
-            console.warn(
-                'ChatKegDb constructor received participant list containing duplicates.'
-            );
+            console.warn('ChatKegDb constructor received participant list containing duplicates.');
         }
         const ind = usernames.indexOf(User.current.username);
         if (ind >= 0) {
             usernames.splice(ind, 1);
-            console.warn(
-                'ChatKegDb constructor received participant list containing current user.'
-            );
+            console.warn('ChatKegDb constructor received participant list containing current user.');
         }
-        this.participantsToCreateWith = usernames.map(p =>
-            contactStore.getContactAndSave(p)
-        );
+        this.participantsToCreateWith = usernames.map(p => contactStore.getContactAndSave(p));
 
         this.isChannel = isChannel;
         // Just to prevent parallel load routines. We can't use chat id because we don't always have it.
@@ -111,18 +105,16 @@ class SharedKegDb {
      * Just a mirror of this.boot.participants
      * @type {ObservableArray<Contact>}
      */
-    @computed
-    get participants() {
-        return (this.boot && this.boot.participants) || [];
+    @computed get participants() {
+        return this.boot && this.boot.participants || [];
     }
 
     /**
      * Just a mirror of this.boot.admins
      * @type {ObservableArray<Contact>}
      */
-    @computed
-    get admins() {
-        return (this.boot && this.boot.admins) || [];
+    @computed get admins() {
+        return this.boot && this.boot.admins || [];
     }
 
     /**
@@ -160,40 +152,35 @@ class SharedKegDb {
     }
 
     _loadExistingMeta() {
-        return socket
-            .send('/auth/kegs/db/meta', { kegDbId: this.id }, false)
+        return socket.send('/auth/kegs/db/meta', { kegDbId: this.id }, false)
             .then(this._parseMeta)
             .then(this._resolveBootKeg);
     }
 
     _createMeta() {
         if (this.isChannel) {
-            return socket
-                .send(`/auth/kegs/db/create-${this.urlName}`)
+            return socket.send(`/auth/kegs/db/create-${this.urlName}`)
                 .then(this._parseMeta)
                 .then(this._resolveBootKeg);
         }
-        const arg = {
-            participants: this.participantsToCreateWith.map(p => p.username)
-        };
+        const arg = { participants: this.participantsToCreateWith.map(p => p.username) };
         arg.participants.push(User.current.username);
         // server will return existing chat if it does already exist
         // the logic below takes care of rare collision cases, like when users create chat or boot keg at the same time
-        return socket
-            .send(`/auth/kegs/db/create-${this.urlName}`, arg)
+        return socket.send(`/auth/kegs/db/create-${this.urlName}`, arg)
             .then(this._parseMeta)
             .then(this._resolveBootKeg);
     }
 
+
     // fills current object properties from raw keg metadata
-    _parseMeta = meta => {
+    _parseMeta = (meta) => {
         this.id = meta.id;
         if (!this.isChannel && meta.permissions && meta.permissions.users) {
-            this._metaParticipants = Object.keys(meta.permissions.users).map(
-                username => contactStore.getContactAndSave(username)
-            );
+            this._metaParticipants = Object.keys(meta.permissions.users)
+                .map(username => contactStore.getContactAndSave(username));
         }
-    };
+    }
 
     // figures out if we need to load/create boot keg and does it
     _resolveBootKeg = () => {
@@ -223,33 +210,30 @@ class SharedKegDb {
                 return justCreated;
             })
             .tapCatch(err => console.error(err));
-    };
+    }
 
     /**
      * Create boot keg for this database
      */
     createBootKeg() {
-        console.log(
-            `Creating ${this.urlName} boot keg for ${this.id}, isChannel:${
-                this.isChannel
-            }`
-        );
+        console.log(`Creating ${this.urlName} boot keg for ${this.id}, isChannel:${this.isChannel}`);
         const participants = this.participantsToCreateWith.slice();
         participants.push(contactStore.currentUser);
-        return Contact.ensureAllLoaded(participants).then(() => {
-            // keg key for this db
-            const boot = new SharedDbBootKeg(this, User.current);
-            boot.addKey();
-            participants.forEach(p => {
-                boot.addParticipant(p);
-            });
-            if (this.isChannel) {
-                boot.assignRole(contactStore.currentUser, 'admin');
-            }
+        return Contact.ensureAllLoaded(participants)
+            .then(() => {
+                // keg key for this db
+                const boot = new SharedDbBootKeg(this, User.current);
+                boot.addKey();
+                participants.forEach(p => {
+                    boot.addParticipant(p);
+                });
+                if (this.isChannel) {
+                    boot.assignRole(contactStore.currentUser, 'admin');
+                }
 
-            // saving bootkeg
-            return boot.saveToServer().return([boot, true]);
-        });
+                // saving bootkeg
+                return boot.saveToServer().return([boot, true]);
+            });
     }
 
     /**

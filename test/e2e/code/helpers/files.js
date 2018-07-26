@@ -24,10 +24,7 @@ const deleteFile = filename => {
  * @returns {string}
  */
 const getTempFileName = (suffix = '.tmp') => {
-    return path.join(
-        os.tmpdir(),
-        crypto.randomBytes(10).toString('hex') + suffix
-    );
+    return path.join(os.tmpdir(), crypto.randomBytes(10).toString('hex') + suffix);
 };
 
 /**
@@ -63,9 +60,9 @@ async function readAll(fd, buffer) {
     let pos = 0;
     let left = buffer.length;
     while (left > 0) {
-        const bytesRead = fs.readSync(fd, buffer, pos, buffer.length - pos);
+        const bytesRead = fs.readSync(fd, buffer, pos, buffer.length - pos); // eslint-disable-line
         // XXX: readAsync freezes ¯\_(ツ)_/¯
-        // const bytesRead = await fs.readAsync(fd, buffer, pos, buffer.length - pos);
+        // const bytesRead = await fs.readAsync(fd, buffer, pos, buffer.length - pos); // eslint-disable-line
         if (bytesRead === 0) {
             throw new Error('Unexpected end of file');
         }
@@ -123,16 +120,14 @@ const filesEqual = async (filename1, filename2) => {
 const downloadFile = (filename, url) => {
     return new Promise((resolve, reject) => {
         const file = fs.createWriteStream(filename);
-        https
-            .get(url, response => {
-                response.pipe(file);
-                return file.on('finish', () => {
-                    file.close();
-                    console.log('Test helper downloaded file', file);
-                    resolve(file);
-                });
-            })
-            .on('error', reject);
+        https.get(url, (response) => {
+            response.pipe(file);
+            return file.on('finish', () => {
+                file.close();
+                console.log('Test helper downloaded file', file);
+                resolve(file);
+            });
+        }).on('error', reject);
     });
 };
 

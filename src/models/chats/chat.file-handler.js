@@ -25,8 +25,7 @@ class ChatFileHandler {
     onFileDigestUpdate = async (kegDbId, digestEnsured) => {
         const msgDigest = tracker.getDigest(this.chat.id, 'file');
         this.maxUpdateId = msgDigest.maxUpdateId;
-        if (this.knownUpdateId < msgDigest.knownUpdateId)
-            this.knownUpdateId = msgDigest.knownUpdateId;
+        if (this.knownUpdateId < msgDigest.knownUpdateId) this.knownUpdateId = msgDigest.knownUpdateId;
         if (!this.maxUpdateId) return;
         if (!this.knownUpdateId && !digestEnsured) {
             await this.chat.ensureDigestLoaded();
@@ -34,28 +33,18 @@ class ChatFileHandler {
             return;
         }
         this.copyFileKegs();
-    };
+    }
 
     copyFileKegs() {
-        if (
-            !this.maxUpdateId ||
-            this.maxUpdateId === this.knownUpdateId ||
-            this.copyingFiles
-        )
-            return;
+        if (!this.maxUpdateId || this.maxUpdateId === this.knownUpdateId || this.copyingFiles) return;
         this.copyingFiles = true;
-        socket
-            .send(
-                '/auth/kegs/db/query',
-                {
-                    kegDbId: this.chat.db.id,
-                    type: 'file',
-                    filter: {
-                        collectionVersion: { $gt: this.knownUpdateId }
-                    }
-                },
-                false
-            )
+        socket.send('/auth/kegs/db/query', {
+            kegDbId: this.chat.db.id,
+            type: 'file',
+            filter: {
+                collectionVersion: { $gt: this.knownUpdateId }
+            }
+        }, false)
             .then(resp => {
                 if (!resp.kegs || !resp.kegs.length) return;
 
@@ -75,11 +64,7 @@ class ChatFileHandler {
                                 return;
                             }
                             // it's our own file, no need to copy to SELF
-                            if (
-                                keg.props.descriptor.owner ===
-                                getUser().username
-                            )
-                                return;
+                            if (keg.props.descriptor.owner === getUser().username) return;
                             // Not waiting for this to resolve. Internally it will do retries,
                             // but on larger scale it's too complicated to handle recovery
                             // from non-connection related errors
@@ -119,23 +104,21 @@ class ChatFileHandler {
         this.chat.uploadQueue.push(file);
         const removeFileFromQueue = () => this.chat.uploadQueue.remove(file);
         const deletedDisposer = when(() => file.deleted, removeFileFromQueue);
-        when(
-            () => file.readyForDownload,
-            async () => {
-                try {
-                    await this.share([file], message);
-                    if (deleteAfterUpload) {
-                        config.FileStream.delete(path);
-                    }
-                } catch (e) {
-                    console.error(e);
+        when(() => file.readyForDownload, async () => {
+            try {
+                await this.share([file], message);
+                if (deleteAfterUpload) {
+                    config.FileStream.delete(path);
                 }
-                removeFileFromQueue();
-                deletedDisposer();
+            } catch (e) {
+                console.error(e);
             }
-        );
+            removeFileFromQueue();
+            deletedDisposer();
+        });
         return file;
     }
+
 
     /**
      * Shares previously uploaded files to chat.
@@ -162,9 +145,7 @@ class ChatFileHandler {
         }
         if (file.db.id !== this.chat.id) {
             return Promise.reject(
-                new Error(
-                    'Attempt to unshare file from kegdb it does not belong to.'
-                )
+                new Error('Attempt to unshare file from kegdb it does not belong to.')
             );
         }
         return file.remove();

@@ -20,6 +20,7 @@ class ChatHead extends SyncedKeg {
      */
     @observable purpose = '';
 
+
     /** SPACE PROPERTIES */
     /**
      * @type {string}
@@ -46,6 +47,7 @@ class ChatHead extends SyncedKeg {
      */
     @observable spaceRoomType = null;
 
+
     serializeKegPayload() {
         return {
             chatName: this.chatName,
@@ -68,5 +70,6 @@ class ChatHead extends SyncedKeg {
         this.spaceRoomType = payload.spaceRoomType;
     }
 }
+
 
 module.exports = ChatHead;

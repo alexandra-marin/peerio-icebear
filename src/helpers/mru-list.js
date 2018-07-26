@@ -37,12 +37,12 @@ class MRUList {
         return TinyDb.user.setValue(this._name, this.list.peek());
     }, 3000);
 
+
     /**
      * Adds item usage fact to the list. Saves it to TinyDb in a throttled manner.
      * @param {string} item
      */
-    @action
-    addItem(item) {
+    @action addItem(item) {
         this.list.remove(item);
         this.list.unshift(item);
         this.list.splice(this._limit);

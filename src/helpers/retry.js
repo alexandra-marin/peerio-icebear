@@ -21,95 +21,58 @@ const callsInProgress = {};
  * @param {bool} [thisIsRetry] - for internal use only
  * @returns {Promise} - resolves when action is finally executed, rejects after all attempts exhausted
  */
-function retryUntilSuccess(
-    fn,
-    id = Math.random(),
-    maxRetries = maxRetryCount,
-    errorHandler,
-    thisIsRetry
-) {
+function retryUntilSuccess(fn, id = Math.random(), maxRetries = maxRetryCount, errorHandler, thisIsRetry) {
     let callInfo = callsInProgress[id];
     // don't make parallel calls
     if (!thisIsRetry && callInfo) return callInfo.promise;
     if (!callInfo) {
-        callInfo = {
-            retryCount: 0,
-            maxRetries,
-            errorHandler,
-            fatalErrorCount: 0
-        };
+        callInfo = { retryCount: 0, maxRetries, errorHandler, fatalErrorCount: 0 };
         callInfo.promise = new Promise((resolve, reject) => {
             callInfo.resolve = resolve;
             callInfo.reject = reject;
         });
         callsInProgress[id] = callInfo;
     }
-    fn()
-        .tap(res => {
-            callInfo.resolve(res);
-            delete callsInProgress[id];
-        })
-        .catch(err => {
-            console.error(err);
-            callInfo.lastError = err;
-            if (err) {
-                if (err.code === errors.ServerError.codes.notFound) {
-                    callInfo.fatalErrorCount++;
-                }
-                if (
-                    errorHandler &&
-                    err.code === errors.ServerError.codes.malformedRequest
-                ) {
-                    try {
-                        const res = errorHandler();
-                        if (res && res.then) {
-                            res.finally(() => scheduleRetry(fn, id));
-                            return;
-                        }
-                    } catch (err2) {
-                        console.error(err2);
+    fn().tap((res) => {
+        callInfo.resolve(res);
+        delete callsInProgress[id];
+    }).catch(err => {
+        console.error(err);
+        callInfo.lastError = err;
+        if (err) {
+            if (err.code === errors.ServerError.codes.notFound) {
+                callInfo.fatalErrorCount++;
+            }
+            if (errorHandler && err.code === errors.ServerError.codes.malformedRequest) {
+                try {
+                    const res = errorHandler();
+                    if (res && res.then) {
+                        res.finally(() => scheduleRetry(fn, id));
+                        return;
                     }
+                } catch (err2) {
+                    console.error(err2);
                 }
             }
-            scheduleRetry(fn, id);
-        });
+        }
+        scheduleRetry(fn, id);
+    });
 
     return callInfo.promise;
 }
 // todo: don't retry if throttled
 function scheduleRetry(fn, id) {
     const callInfo = callsInProgress[id];
-    if (
-        ++callInfo.retryCount > callInfo.maxRetries ||
-        callInfo.fatalErrorCount > 2
-    ) {
-        console.error(
-            `Maximum retry count reached for action id ${id}. Giving up, rejecting promise.`
-        );
+    if (++callInfo.retryCount > callInfo.maxRetries || callInfo.fatalErrorCount > 2) {
+        console.error(`Maximum retry count reached for action id ${id}. Giving up, rejecting promise.`);
         console.debug(fn);
         callInfo.reject(errors.normalize(callInfo.lastError));
         return;
     }
-    const delay =
-        minRetryInterval +
-        Math.min(
-            maxRetryInterval,
-            callInfo.retryCount * retryIntervalMultFactor
-        );
+    const delay = minRetryInterval + Math.min(maxRetryInterval, (callInfo.retryCount * retryIntervalMultFactor));
     console.debug(`Retrying ${id} in ${delay} second`);
-    setTimeout(
-        () =>
-            tracker.onceUpdated(() =>
-                retryUntilSuccess(
-                    fn,
-                    id,
-                    callInfo.maxRetries,
-                    callInfo.errorHandler,
-                    true
-                )
-            ),
-        delay
-    );
+    setTimeout(() => tracker.onceUpdated(
+        () => retryUntilSuccess(fn, id, callInfo.maxRetries, callInfo.errorHandler, true)), delay);
 }
 
 function isRunning(id) {

@@ -18,12 +18,8 @@ const ghostAPI = {};
  * @returns {Promise}
  */
 ghostAPI.deriveKeys = function(ghost) {
-    return keys
-        .deriveEphemeralKeys(
-            cryptoUtil.hexToBytes(ghost.ghostId),
-            ghost.passphrase
-        )
-        .then(kp => {
+    return keys.deriveEphemeralKeys(cryptoUtil.hexToBytes(ghost.ghostId), ghost.passphrase)
+        .then((kp) => {
             ghost.ephemeralKeypair = kp;
         });
 };
@@ -46,17 +42,14 @@ ghostAPI.serialize = function(ghost, user) {
         signingPublicKey: cryptoUtil.bytesToB64(user.signKeys.publicKey),
         version: 2,
         body: ghost.body,
-        files: _.map(ghost.files, fileId => {
+        files: _.map(ghost.files, (fileId) => {
             const file = fileStore.getById(fileId);
-            return _.assign(
-                {},
-                file.serializeProps(),
-                file.serializeKegPayload()
-            );
+            return _.assign({}, file.serializeProps(), file.serializeKegPayload());
         }),
         timestamp: ghost.timestamp
     });
 };
+
 
 /*
  * Encrypt for the ephemeral keypair and signs the ciphertext.
@@ -73,8 +66,7 @@ ghostAPI.encrypt = function(ghost, user, serializedGhost) {
             body,
             user.getSharedKey(ghost.ephemeralKeypair.publicKey)
         );
-        return sign
-            .signDetached(res.body, user.signKeys.secretKey)
+        return sign.signDetached(res.body, user.signKeys.secretKey)
             .then(cryptoUtil.bytesToB64)
             .then(signature => {
                 res.signature = signature;
@@ -112,8 +104,7 @@ ghostAPI.send = function(ghost, asymEncryptionRes) {
  * @returns {Promise}
  */
 ghostAPI.revoke = function(ghost) {
-    return socket
-        .send('/auth/ghost/delete', { ghostId: ghost.ghostId })
+    return socket.send('/auth/ghost/delete', { ghostId: ghost.ghostId })
         .then(() => {
             ghost.revoked = true;
         });

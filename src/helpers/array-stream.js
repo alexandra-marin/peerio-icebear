@@ -1,6 +1,7 @@
 // ArrayStream is not currently used anywhere, but I don't want to delete it, might get handy (Anri)
 // todo: Add unit tests if you decide to use this class
 
+
 // /**
 //  * Provides access to array of Uint8Array chunks of data in a stream fashion.
 //  * Currently supports only reading from stream.

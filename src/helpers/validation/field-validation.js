@@ -34,28 +34,20 @@ function addValidation(store, fName, validatorOrArray, positionInForm) {
     const fDirty = `${fName}Dirty`;
     const fOnChange = `${fName}OnChange`;
     const fOnBlur = `${fName}OnBlur`;
-    const fieldValidators = Array.isArray(validatorOrArray)
-        ? validatorOrArray
-        : [validatorOrArray];
+    const fieldValidators = Array.isArray(validatorOrArray) ? validatorOrArray : [validatorOrArray];
 
     store.validatedFields = store.validatedFields || [];
     store.validatedFields.push(fName);
 
-    store.isValid =
-        store.isValid ||
-        (() =>
-            store.validatedFields.reduce(
-                (acc, field) => acc && !!store[`${field}Valid`],
-                true
-            ));
+    store.isValid = store.isValid || (
+        () => store.validatedFields.reduce((acc, field) => acc && !!store[`${field}Valid`], true)
+    );
 
-    store.resetValidationState =
-        store.resetValidationState ||
-        (() =>
-            store.validatedFields.forEach(field => {
-                store[`${field}Dirty`] = undefined;
-                store[`${field}ValidationMessageText`] = undefined;
-            }));
+    store.resetValidationState = store.resetValidationState || (
+        () => store.validatedFields.forEach(field => {
+            store[`${field}Dirty`] = undefined;
+            store[`${field}ValidationMessageText`] = undefined;
+        }));
 
     const extend = {};
 
@@ -95,42 +87,37 @@ function addValidation(store, fName, validatorOrArray, positionInForm) {
     };
 
     // when field changes, reaction is triggered
-    reaction(
-        () => store[fName],
-        async value => {
-            store[fValid] = false;
-            store[fieldValidationMessageText] = '';
-            const validationPromises = [];
-            fieldValidators.forEach(v => {
-                const { action, message } = v;
-                const executor = async () => {
-                    const result = await action(value, fName);
-                    if (result === true) return true;
-                    const errorMessage =
-                        result === false
-                            ? message
-                            : result && (result.message || result);
-                    throw new Error(errorMessage);
-                };
-                validationPromises.push(executor());
-            });
-            let valid = true;
-            let message = '';
-            try {
-                await Promise.all(validationPromises);
-            } catch (error) {
-                valid = false;
-                ({ message } = error);
-            }
+    reaction(() => store[fName], async value => {
+        store[fValid] = false;
+        store[fieldValidationMessageText] = '';
+        const validationPromises = [];
+        fieldValidators.forEach(v => {
+            const { action, message } = v;
+            const executor = async () => {
+                const result = await action(value, fName);
+                if (result === true) return true;
+                const errorMessage = result === false ?
+                    message : result && (result.message || result);
+                throw new Error(errorMessage);
+            };
+            validationPromises.push(executor());
+        });
+        let valid = true;
+        let message = '';
+        try {
+            await Promise.all(validationPromises);
+        } catch (error) {
+            valid = false;
+            ({ message } = error);
+        }
 
-            // if the state changed during evaluation, abort
-            if (store[fName] !== value) return;
-            store[fValid] = valid;
-            store[fieldValidationMessageText] = message;
-        },
-        true
-    );
+        // if the state changed during evaluation, abort
+        if (store[fName] !== value) return;
+        store[fValid] = valid;
+        store[fieldValidationMessageText] = message;
+    }, true);
 }
+
 
 const validation = {
     validators: userValidators,

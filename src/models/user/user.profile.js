@@ -19,14 +19,11 @@ module.exports = function mixUserProfileModule() {
     this.accountVersionKeg = new AccountVersion(this);
     this.settings = new Settings(this);
 
-    when(
-        () => this.accountVersionKeg.loaded,
-        () => {
-            // already migrated?
-            if (this.accountVersionKeg.accountVersion === 1) return;
-            getFileStore().migration.migrateToAccountVersion1();
-        }
-    );
+    when(() => this.accountVersionKeg.loaded, () => {
+        // already migrated?
+        if (this.accountVersionKeg.accountVersion === 1) return;
+        getFileStore().migration.migrateToAccountVersion1();
+    });
 
     this.loadSettings = () => {
         loadSimpleKeg(this.settings);
@@ -57,10 +54,7 @@ module.exports = function mixUserProfileModule() {
             }
         }
         console.log(`Loading ${keg.type} keg`);
-        retryUntilSuccess(
-            () => keg.load().then(() => loadSimpleKeg(keg)),
-            `${keg.type} Load`
-        );
+        retryUntilSuccess(() => keg.load().then(() => loadSimpleKeg(keg)), `${keg.type} Load`);
     }
 
     // will be triggered first time after login
@@ -86,13 +80,12 @@ module.exports = function mixUserProfileModule() {
      * @returns {Promise}
      */
     this.resendEmailConfirmation = function(email) {
-        return socket
-            .send('/auth/address/resend-confirmation', {
-                address: {
-                    type: 'email',
-                    value: email
-                }
-            })
+        return socket.send('/auth/address/resend-confirmation', {
+            address: {
+                type: 'email',
+                value: email
+            }
+        })
             .then(() => {
                 warnings.add('warning_emailConfirmationResent');
             })
@@ -107,17 +100,15 @@ module.exports = function mixUserProfileModule() {
      * @returns {Promise}
      */
     this.removeEmail = function(email) {
-        return socket
-            .send('/auth/address/remove', {
-                address: {
-                    type: 'email',
-                    value: email
-                }
-            })
-            .tapCatch(err => {
-                console.error(err);
-                warnings.add('error_saveSettings');
-            });
+        return socket.send('/auth/address/remove', {
+            address: {
+                type: 'email',
+                value: email
+            }
+        }).tapCatch(err => {
+            console.error(err);
+            warnings.add('error_saveSettings');
+        });
     };
 
     /**
@@ -128,24 +119,19 @@ module.exports = function mixUserProfileModule() {
         return validators.emailAvailability.action(email).then(available => {
             if (!available) {
                 warnings.addSevere('error_emailTaken', 'title_error');
-                return Promise.reject(
-                    new Error(`Email ${email} already taken`)
-                );
+                return Promise.reject(new Error(`Email ${email} already taken`));
             }
-            return socket
-                .send('/auth/address/add', {
-                    address: {
-                        type: 'email',
-                        value: email
-                    }
-                })
-                .then(() => {
-                    warnings.add('warning_emailConfirmationSent');
-                })
-                .tapCatch(err => {
-                    console.error(err);
-                    warnings.add('error_saveSettings');
-                });
+            return socket.send('/auth/address/add', {
+                address: {
+                    type: 'email',
+                    value: email
+                }
+            }).then(() => {
+                warnings.add('warning_emailConfirmationSent');
+            }).tapCatch(err => {
+                console.error(err);
+                warnings.add('error_saveSettings');
+            });
         });
     };
 
@@ -154,17 +140,15 @@ module.exports = function mixUserProfileModule() {
      * @returns {Promise}
      */
     this.makeEmailPrimary = function(email) {
-        return socket
-            .send('/auth/address/make-primary', {
-                address: {
-                    type: 'email',
-                    value: email
-                }
-            })
-            .tapCatch(err => {
-                console.error(err);
-                warnings.add('error_saveSettings');
-            });
+        return socket.send('/auth/address/make-primary', {
+            address: {
+                type: 'email',
+                value: email
+            }
+        }).tapCatch(err => {
+            console.error(err);
+            warnings.add('error_saveSettings');
+        });
     };
 
     // todo: move to quota keg, make computed
@@ -184,21 +168,13 @@ module.exports = function mixUserProfileModule() {
      * @returns {Promise}
      */
     this.saveAvatar = function(blobs) {
-        if (this.savingAvatar)
-            return Promise.reject(
-                new Error('Already saving avatar, wait for it to finish.')
-            );
+        if (this.savingAvatar) return Promise.reject(new Error('Already saving avatar, wait for it to finish.'));
 
         if (blobs) {
-            if (blobs.length !== 2)
-                return Promise.reject(
-                    new Error('Blobs array length should be 2.')
-                );
+            if (blobs.length !== 2) return Promise.reject(new Error('Blobs array length should be 2.'));
             for (let i = 0; i < blobs.length; i++) {
                 if (blobs[i] instanceof ArrayBuffer) continue;
-                return Promise.reject(
-                    new Error('Blobs should be of ArrayBuffer type')
-                );
+                return Promise.reject(new Error('Blobs should be of ArrayBuffer type'));
             }
         }
         this.savingAvatar = true;
@@ -227,8 +203,6 @@ module.exports = function mixUserProfileModule() {
      * @returns {Promise}
      */
     this.setAccountKeyBackedUp = function() {
-        return retryUntilSuccess(() =>
-            socket.send('/auth/account-key/backed-up')
-        );
+        return retryUntilSuccess(() => socket.send('/auth/account-key/backed-up'));
     };
 };

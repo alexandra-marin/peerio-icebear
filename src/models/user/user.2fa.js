@@ -12,13 +12,11 @@ module.exports = function mixUser2faModule() {
      */
     this.setup2fa = () => {
         console.log('Starting 2fa setup.');
-        if (this.twoFAEnabled)
-            return Promise.reject(
-                new Error('2fa already enabled on this account.')
-            );
-        return socket.send('/auth/2fa/enable').then(res => {
-            return res.TOTPSecret;
-        });
+        if (this.twoFAEnabled) return Promise.reject(new Error('2fa already enabled on this account.'));
+        return socket.send('/auth/2fa/enable')
+            .then(res => {
+                return res.TOTPSecret;
+            });
     };
 
     /**
@@ -28,14 +26,12 @@ module.exports = function mixUser2faModule() {
      * @returns {Promise<Array<string>>} backup codes
      */
     this.confirm2faSetup = (code, trust = false) => {
-        // eslint-disable-next-line no-param-reassign
-        code = sanitizeCode(code);
+        code = sanitizeCode(code); //eslint-disable-line
         console.log('Confirming 2fa setup.');
-        return socket
-            .send('/auth/2fa/confirm', {
-                TOTPCode: code,
-                trustDevice: trust
-            })
+        return socket.send('/auth/2fa/confirm', {
+            TOTPCode: code,
+            trustDevice: trust
+        })
             .then(res => {
                 this.twoFAEnabled = true; // just to speed up UI refresh, actual profile keg reload can take a few sec
                 return res.backupCodes;
@@ -81,7 +77,7 @@ module.exports = function mixUser2faModule() {
      * @param {{cookie, trusted}} data
      * @returns {Promise<void>}
      */
-    this._set2faCookieData = data => {
+    this._set2faCookieData = (data) => {
         return TinyDb.system.setValue(`${this.username}:twoFACookie`, data);
     };
 
@@ -114,8 +110,7 @@ module.exports = function mixUser2faModule() {
             if (deviceId) return deviceId;
 
             // Not found, generate a new one and save it.
-            // eslint-disable-next-line no-param-reassign
-            deviceId = cryptoUtil.getDeviceId(this.username, config.deviceUID);
+            deviceId = cryptoUtil.getDeviceId(this.username, config.deviceUID); // eslint-disable-line no-param-reassign
             return TinyDb.system.setValue(key, deviceId).return(deviceId);
         });
     };
@@ -126,32 +121,31 @@ module.exports = function mixUser2faModule() {
      */
     this._handle2faOnLogin = () => {
         return new Promise((resolve, reject) => {
-            clientApp.create2FARequest('login', (code, trustDevice = false) => {
-                this._getDeviceId()
-                    .then(deviceId => {
-                        // eslint-disable-next-line no-param-reassign
-                        code = sanitizeCode(code);
-                        const req = {
-                            username: this.username,
-                            deviceId,
-                            [code.length === 6
-                                ? 'TOTPCode'
-                                : 'backupCode']: code,
-                            trustDevice
-                        };
-                        return socket
-                            .send('/noauth/2fa/authenticate', req)
-                            .then(resp => {
-                                if (!resp.twoFACookie) return null;
-                                return this._set2faCookieData({
-                                    cookie: resp.twoFACookie,
-                                    trusted: trustDevice
+            clientApp.create2FARequest(
+                'login',
+                (code, trustDevice = false) => {
+                    this._getDeviceId()
+                        .then(deviceId => {
+                            code = sanitizeCode(code); //eslint-disable-line
+                            const req = {
+                                username: this.username,
+                                deviceId,
+                                [code.length === 6 ? 'TOTPCode' : 'backupCode']: code,
+                                trustDevice
+                            };
+                            return socket.send('/noauth/2fa/authenticate', req)
+                                .then(resp => {
+                                    if (!resp.twoFACookie) return null;
+                                    return this._set2faCookieData({
+                                        cookie: resp.twoFACookie,
+                                        trusted: trustDevice
+                                    });
                                 });
-                            });
-                    })
-                    .then(resolve)
-                    .catch(reject);
-            });
+                        })
+                        .then(resolve)
+                        .catch(reject);
+                }
+            );
         });
     };
 
@@ -159,22 +153,15 @@ module.exports = function mixUser2faModule() {
         return new Promise((resolve, reject) => {
             clientApp.create2FARequest(
                 type,
-                code => {
-                    // eslint-disable-next-line no-param-reassign
-                    code = sanitizeCode(code);
-                    const req = {
-                        [code.length === 6 ? 'TOTPCode' : 'backupCode']: code
-                    };
-                    socket
-                        .send('/auth/2fa/verify', req)
+                (code) => {
+                    code = sanitizeCode(code); //eslint-disable-line
+                    const req = { [code.length === 6 ? 'TOTPCode' : 'backupCode']: code };
+                    socket.send('/auth/2fa/verify', req)
                         .then(resolve)
                         .catch(reject);
                 },
                 () => {
-                    console.log(
-                        'User cancelled protected 2fa operation:',
-                        type
-                    );
+                    console.log('User cancelled protected 2fa operation:', type);
                 }
             );
         });

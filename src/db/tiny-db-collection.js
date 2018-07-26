@@ -19,7 +19,7 @@ class TinyDbCollection {
      * @param {string} valueString
      * @returns {string} ciphertext
      */
-    encrypt = valueString => {
+    encrypt = (valueString) => {
         if (!this.encryptionKey) return valueString;
         const buf = secret.encryptString(valueString, this.encryptionKey);
         return util.bytesToB64(buf);
@@ -29,7 +29,7 @@ class TinyDbCollection {
      * @param {string} ciphertext
      * @returns {string}
      */
-    decrypt = ciphertext => {
+    decrypt = (ciphertext) => {
         if (ciphertext == null) return null;
         if (!this.encryptionKey) return ciphertext;
         const buf = util.b64ToBytes(ciphertext);
@@ -43,8 +43,7 @@ class TinyDbCollection {
      */
     getValue(key) {
         if (!key) return Promise.reject(new Error('Invalid TinyDb key'));
-        return this.engine
-            .getValue(key)
+        return this.engine.getValue(key)
             .then(this.decrypt)
             .then(JSON.parse)
             .catch(err => {

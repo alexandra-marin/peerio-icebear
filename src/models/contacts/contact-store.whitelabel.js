@@ -18,10 +18,7 @@ function medcryptorContactFilter(contact, context) {
         case 'patientroom':
         case 'addcontact':
         case 'sharefiles':
-            return (
-                contact.appLabel === 'peerio' ||
-                contact.appLabel === 'medcryptor'
-            );
+            return contact.appLabel === 'peerio' || contact.appLabel === 'medcryptor';
 
         case 'newpatientspace':
             return contact.appLabel === 'peerio';
@@ -58,16 +55,13 @@ class ContactStoreWhitelabel {
         const c = this.store.getContact(usernameOrEmail);
         return new Promise(resolve => {
             // when our request is complete, check and apply filter
-            when(
-                () => !c.loading,
-                () => {
-                    const filter = getContactFilter();
-                    if (!filter(c, context)) {
-                        c.isHidden = true;
-                    }
-                    resolve(c);
+            when(() => !c.loading, () => {
+                const filter = getContactFilter();
+                if (!filter(c, context)) {
+                    c.isHidden = true;
                 }
-            );
+                resolve(c);
+            });
         });
     }
 

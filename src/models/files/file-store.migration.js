@@ -27,8 +27,7 @@ class FileStoreMigration {
     @observable performedByAnotherClient = false;
     @observable.shallow legacySharedFiles = null;
 
-    @computed
-    get hasLegacySharedFiles() {
+    @computed get hasLegacySharedFiles() {
         return !!(this.legacySharedFiles && this.legacySharedFiles.length);
     }
 
@@ -48,12 +47,7 @@ class FileStoreMigration {
      * migration will auto-start next time, if interrupted.
      */
     confirmMigration = async () => {
-        if (
-            this.started ||
-            this.performedByAnotherClient ||
-            this.migrationKeg.accountVersion === 1
-        )
-            return;
+        if (this.started || this.performedByAnotherClient || this.migrationKeg.accountVersion === 1) return;
         this.started = true;
         await this.waitForStores();
         // in case another client has migrated while were waiting for stores
@@ -63,16 +57,13 @@ class FileStoreMigration {
         await retryUntilSuccess(() =>
             this.migrationKeg
                 .save(() => {
-                    this.migrationKeg.migration = {
-                        files: this.legacySharedFiles
-                    };
+                    this.migrationKeg.migration = { files: this.legacySharedFiles };
                 })
                 .catch(err => {
                     console.error(err);
                     // concurrency issue, other client managed to save first
                     if (err && err.error === errorCodes.malformedRequest) {
-                        if (this.migrationKeg.accountVersion === 1)
-                            return Promise.resolve();
+                        if (this.migrationKeg.accountVersion === 1) return Promise.resolve();
                         this.legacySharedFiles = this.migrationKeg.migration.files;
                         return Promise.resolve();
                     }
@@ -80,7 +71,7 @@ class FileStoreMigration {
                 })
         );
         this.doMigrate();
-    };
+    }
 
     /**
      * Prepares migration data and flags and starts migration OR waits for UI to confirm start.
@@ -90,51 +81,40 @@ class FileStoreMigration {
         this.performedByAnotherClient = false;
 
         // trying to acquire lock
-        if (!(await this.canStartMigration())) {
+        if (!await this.canStartMigration()) {
             console.log('Migration is performed by another client');
             this.performedByAnotherClient = true;
             this.pending = true;
             this.started = false;
 
             // Handle the case when another client disconnects during migration.
-            const unsubscribe = socket.subscribe(
-                socket.APP_EVENTS.fileMigrationUnlocked,
-                async () => {
-                    unsubscribe();
-                    console.log(
-                        'Received file migration unlocked event from server'
-                    );
-                    // Migrated?
-                    try {
-                        await this.migrationKeg.reload();
-                    } catch (ex) {
-                        // ignore error
-                    }
+            const unsubscribe = socket.subscribe(socket.APP_EVENTS.fileMigrationUnlocked, async () => {
+                unsubscribe();
+                console.log('Received file migration unlocked event from server');
+                // Migrated?
+                try {
+                    await this.migrationKeg.reload();
+                } catch (ex) {
+                    // ignore error
+                }
 
-                    if (this.migrationKeg.accountVersion === 1) {
-                        this.finishMigration();
-                        return;
-                    }
-                    // Not migrated, try to take over the migration.
-                    console.log('Taking over migration');
-                    this.migrateToAccountVersion1();
-                }
-            );
-            // Handle the case when another client finishes migration.
-            when(
-                () => this.migrationKeg.accountVersion === 1,
-                () => {
-                    unsubscribe();
+                if (this.migrationKeg.accountVersion === 1) {
                     this.finishMigration();
+                    return;
                 }
-            );
+                // Not migrated, try to take over the migration.
+                console.log('Taking over migration');
+                this.migrateToAccountVersion1();
+            });
+            // Handle the case when another client finishes migration.
+            when(() => this.migrationKeg.accountVersion === 1, () => {
+                unsubscribe();
+                this.finishMigration();
+            });
             return;
         }
 
-        when(
-            () => this.migrationKeg.accountVersion === 1,
-            this.finishMigration
-        );
+        when(() => this.migrationKeg.accountVersion === 1, this.finishMigration);
 
         // in case we already have file list stored - no confirmation is needed
         if (this.migrationKeg.migration.files) {
@@ -153,8 +133,7 @@ class FileStoreMigration {
         }
     }
 
-    @action.bound
-    async finishMigration() {
+    @action.bound async finishMigration() {
         if (!this.performedByAnotherClient) {
             console.log('Sending /auth/file/migration/finish');
             retryUntilSuccess(() => socket.send('/auth/file/migration/finish'));
@@ -171,9 +150,8 @@ class FileStoreMigration {
      * @returns {Promise<boolean>}
      */
     canStartMigration() {
-        return retryUntilSuccess(() =>
-            socket.send('/auth/file/migration/start')
-        ).then(res => res.success);
+        return retryUntilSuccess(() => socket.send('/auth/file/migration/start'))
+            .then(res => res.success);
     }
 
     async doMigrate() {
@@ -182,9 +160,7 @@ class FileStoreMigration {
         /* eslint-disable no-await-in-loop */
         for (let i = 0; i < this.legacySharedFiles.length; i++) {
             if (!this.pending) return; // it was ended externally
-            this.progress = Math.floor(
-                i / (this.legacySharedFiles.length / 100)
-            );
+            this.progress = Math.floor(i / (this.legacySharedFiles.length / 100));
             const item = this.legacySharedFiles[i];
             console.log('migrating', item);
             // verify file
@@ -206,43 +182,22 @@ class FileStoreMigration {
                 const contact = getContactStore().getContact(item.username);
                 await contact.ensureLoaded();
                 if (contact.notFound) {
-                    console.error(
-                        `Contact ${item.username} not found can't share ${
-                            item.fileId
-                        }`
-                    );
+                    console.error(`Contact ${item.username} not found can't share ${item.fileId}`);
                     continue;
                 }
                 if (contact.isDeleted) {
-                    console.error(
-                        `Contact ${item.username} deleted can't share ${
-                            item.fileId
-                        }`
-                    );
+                    console.error(`Contact ${item.username} deleted can't share ${item.fileId}`);
                     continue;
                 }
                 // load and verify DM
                 let chat = null;
-                await retryUntilSuccess(
-                    async () => {
-                        chat = await getChatStore().startChat(
-                            [contact],
-                            false,
-                            '',
-                            '',
-                            true
-                        );
-                        return chat.loadMetadata();
-                    },
-                    null,
-                    10
-                ).catch(() => {
-                    console.error(
-                        `Can't create DM with ${item.username} to share ${
-                            item.fileId
-                        }`
-                    );
-                });
+                await retryUntilSuccess(async () => {
+                    chat = await getChatStore().startChat([contact], false, '', '', true);
+                    return chat.loadMetadata();
+                }, null, 10)
+                    .catch(() => {
+                        console.error(`Can't create DM with ${item.username} to share ${item.fileId}`);
+                    });
                 if (!chat || !chat.metaLoaded) {
                     continue;
                 }
@@ -278,54 +233,43 @@ class FileStoreMigration {
             this.migrationKeg.migration.files = [];
             this.migrationKeg.accountVersion = 1;
         });
-        if (this.legacySharedFiles.length)
-            warnings.add('title_fileUpdateComplete');
+        if (this.legacySharedFiles.length) warnings.add('title_fileUpdateComplete');
     }
 
     // [ { kegDbId: string, fileId: string }, ... ]
     getLegacySharedFiles() {
-        if (this.legacySharedFiles)
-            return Promise.resolve(this.legacySharedFiles);
-        return retryUntilSuccess(() =>
-            socket.send('/auth/file/legacy/channel/list').then(res => {
+        if (this.legacySharedFiles) return Promise.resolve(this.legacySharedFiles);
+        return retryUntilSuccess(() => socket.send('/auth/file/legacy/channel/list')
+            .then(res => {
                 this.legacySharedFiles = [];
                 if (res) {
                     if (res.sharedInChannels) {
                         Object.keys(res.sharedInChannels).forEach(kegDbId => {
                             res.sharedInChannels[kegDbId].forEach(fileId => {
-                                this.legacySharedFiles.push({
-                                    kegDbId,
-                                    fileId
-                                });
+                                this.legacySharedFiles.push({ kegDbId, fileId });
                             });
                         });
                     }
                     if (res.sharedWithUsers) {
                         Object.keys(res.sharedWithUsers).forEach(fileId => {
                             res.sharedWithUsers[fileId].forEach(username => {
-                                this.legacySharedFiles.push({
-                                    username,
-                                    fileId
-                                });
+                                this.legacySharedFiles.push({ username, fileId });
                             });
                         });
                     }
                 }
                 return this.legacySharedFiles;
-            })
-        );
+            }));
     }
 
     async getLegacySharedFilesText() {
         await this.waitForStores();
         await this.getLegacySharedFiles();
 
-        const eol =
-            typeof navigator === 'undefined' ||
-            !navigator.platform || // eslint-disable-line no-undef
-            !navigator.platform.startsWith('Win') // eslint-disable-line no-undef
-                ? '\n'
-                : '\r\n';
+        const eol = typeof navigator === 'undefined'
+            || !navigator.platform // eslint-disable-line no-undef
+            || !navigator.platform.startsWith('Win') // eslint-disable-line no-undef
+            ? '\n' : '\r\n';
 
         let ret = '';
         for (const item of this.legacySharedFiles) {
@@ -338,7 +282,7 @@ class FileStoreMigration {
             if (!recipient) {
                 const chat = getChatStore().chatMap[item.kegDbId];
                 if (chat) {
-                    await asPromise(chat, 'headLoaded', true);
+                    await asPromise(chat, 'headLoaded', true); //eslint-disable-line
                     recipient = chat.name;
                 } else {
                     recipient = item.kegDbId;

@@ -41,32 +41,24 @@ module.exports = function mixUserRegisterModule() {
             .then(this._handleAccountCreationChallenge);
     };
 
-    this._handleAccountCreationChallenge = cng => {
+    this._handleAccountCreationChallenge = (cng) => {
         console.log('Processing account creation challenge.');
         // validating challenge, paranoid mode on
-        if (
-            typeof cng.username !== 'string' ||
-            !(cng.ephemeralServerPK instanceof ArrayBuffer) ||
-            !(cng.signingKey.token instanceof ArrayBuffer) ||
-            !(cng.authKey.token instanceof ArrayBuffer) ||
-            !(cng.authKey.nonce instanceof ArrayBuffer) ||
-            !(cng.encryptionKey.token instanceof ArrayBuffer) ||
-            !(cng.encryptionKey.nonce instanceof ArrayBuffer)
+        if (typeof (cng.username) !== 'string'
+            || !(cng.ephemeralServerPK instanceof ArrayBuffer)
+            || !(cng.signingKey.token instanceof ArrayBuffer)
+            || !(cng.authKey.token instanceof ArrayBuffer)
+            || !(cng.authKey.nonce instanceof ArrayBuffer)
+            || !(cng.encryptionKey.token instanceof ArrayBuffer)
+            || !(cng.encryptionKey.nonce instanceof ArrayBuffer)
         ) {
-            throw new Error(
-                'Invalid account creation challenge received from server',
-                cng
-            );
+            throw new Error('Invalid account creation challenge received from server', cng);
         }
 
         util.convertBuffers(cng);
 
         if (cng.username !== this.username) {
-            return Promise.reject(
-                new Error(
-                    'User.username and account creation challenge username do not match.'
-                )
-            );
+            return Promise.reject(new Error('User.username and account creation challenge username do not match.'));
         }
 
         const activationRequest = {
@@ -93,11 +85,8 @@ module.exports = function mixUserRegisterModule() {
             }
         };
 
-        return signCrypto
-            .signDetached(cng.signingKey.token, this.signKeys.secretKey)
-            .then(signature => {
-                activationRequest.signing.signature = signature.buffer;
-            })
+        return signCrypto.signDetached(cng.signingKey.token, this.signKeys.secretKey)
+            .then(signature => { activationRequest.signing.signature = signature.buffer; })
             .then(() => socket.send('/noauth/activate', activationRequest));
     };
 };

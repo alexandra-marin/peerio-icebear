@@ -24,6 +24,7 @@
 //         store.files.should.contain(x => x.name === testDocument);
 //     });
 
+
 //     // Scenario: Download
 //     When('I download the file', (done) => {
 //         fileInStore()
@@ -41,6 +42,7 @@
 //         });
 //     });
 
+
 //     // Scenario: Delete
 //     Then('I delete the file', () => {
 //         numberOfFilesUploaded = store.files.length;
@@ -51,6 +53,7 @@
 //         fileInStore().deleted.should.be.true;
 //         return asPromise(store.files, 'length', numberOfFilesUploaded - 1);
 //     });
+
 
 //     // Scenario: Share
 //     When('I share it with a receiver', () => {
@@ -68,6 +71,7 @@
 //     Then('I should the shared file', () => {
 //         store.files.should.contain(x => x.name === testDocument);
 //     });
+
 
 //     // Scenario: Delete after sharing
 //     Then('it should be removed from receivers files', () => {

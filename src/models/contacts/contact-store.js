@@ -1,11 +1,5 @@
-const {
-    observable,
-    when,
-    action,
-    computed,
-    intercept,
-    isObservableArray
-} = require('mobx');
+
+const { observable, when, action, computed, intercept, isObservableArray } = require('mobx');
 const socket = require('../../network/socket');
 const Contact = require('./contact');
 const { setContactStore } = require('../../helpers/di-contact-store');
@@ -50,8 +44,7 @@ class ContactStore {
      * Favorite Contacts.
      * @type {ObservableArray<Contact>}
      */
-    @computed
-    get addedContacts() {
+    @computed get addedContacts() {
         return this.contacts.filter(c => c.isAdded);
     }
 
@@ -61,8 +54,7 @@ class ContactStore {
      */
     @observable.shallow invitedContacts = [];
 
-    @computed
-    get invitedNotJoinedContacts() {
+    @computed get invitedNotJoinedContacts() {
         return this.invitedContacts.filter(c => !c.username);
     }
 
@@ -105,10 +97,7 @@ class ContactStore {
             case 'username':
                 return change;
             default:
-                console.error(
-                    'Invalid contact sorting property:',
-                    change.newValue
-                );
+                console.error('Invalid contact sorting property:', change.newValue);
                 return null;
         }
     }
@@ -119,10 +108,7 @@ class ContactStore {
             case 'all':
                 return change;
             default:
-                console.error(
-                    'Invalid contact filter property:',
-                    change.newValue
-                );
+                console.error('Invalid contact filter property:', change.newValue);
                 return null;
         }
     }
@@ -131,8 +117,7 @@ class ContactStore {
      * Helper data view to simplify sorting and filtering.
      * @type {Array<{letter:string, items:Array<Contact>}>}
      */
-    @computed
-    get uiView() {
+    @computed get uiView() {
         let ret;
         switch (this.uiViewFilter) {
             case 'all':
@@ -141,15 +126,13 @@ class ContactStore {
             case 'added':
                 ret = this.addedContacts;
                 break;
-            default:
-                ret = [];
+            default: ret = [];
         }
         if (this.uiViewSearchQuery) {
             ret = this.filter(this.uiViewSearchQuery, ret, true);
         }
         ret = ret.sort((c1, c2) => {
-            const val1 = c1[this.uiViewSortBy] || '',
-                val2 = c2[this.uiViewSortBy] || '';
+            const val1 = c1[this.uiViewSortBy] || '', val2 = c2[this.uiViewSortBy] || '';
             return val1.localeCompare(val2);
         });
         ret = this.segmentizeByFirstLetter(ret, this.uiViewSortBy);
@@ -204,10 +187,7 @@ class ContactStore {
     applyInvitesData = action(() => {
         this.invitedContacts = this.invites.issued;
         when(
-            () =>
-                this.invites.loaded &&
-                tofuStore.loaded &&
-                getChatStore().loaded,
+            () => this.invites.loaded && tofuStore.loaded && getChatStore().loaded,
             () => {
                 try {
                     this.invitedContacts.forEach(c => {
@@ -216,9 +196,7 @@ class ContactStore {
                             // But, if same username isn't in tofuStore, current user doesn't yet know this,
                             // so emit `onInviteAccepted` event (on desktop this shows a notification).
                             if (!tofuStore.cache[c.username]) {
-                                setTimeout(() =>
-                                    this.onInviteAccepted({ contact: c })
-                                );
+                                setTimeout(() => this.onInviteAccepted({ contact: c }));
                             }
 
                             this.getContactAndSave(c.username);
@@ -237,7 +215,7 @@ class ContactStore {
         );
     });
 
-    onInviteAccepted = props => {
+    onInviteAccepted = (props) => {
         this.events.emit(this.EVENT_TYPES.inviteAccepted, props);
     };
 
@@ -249,33 +227,27 @@ class ContactStore {
     addContact(val) {
         const c = typeof val === 'string' ? this.getContactAndSave(val) : val;
         return new Promise((resolve, reject) => {
-            when(
-                () => !c.loading,
-                () => {
-                    if (c.notFound) {
-                        resolve(false);
-                    } else {
-                        // we do it here bcs it has to be as close as possible to saving my_contacts keg
-                        if (this.myContacts.contacts[c.username]) {
-                            resolve(true);
-                            return;
-                        }
-                        this.myContacts
-                            .save(
-                                () => this.myContacts.addContact(c),
-                                () => this.myContacts.removeContact(c),
-                                'error_contactAddFail'
-                            )
-                            .then(() => {
-                                // because own keg writes don't trigger digest update
-                                c.isAdded = true;
-                                this.applyMyContactsData();
-                                resolve(true);
-                            })
-                            .catch(reject);
+            when(() => !c.loading, () => {
+                if (c.notFound) {
+                    resolve(false);
+                } else {
+                    // we do it here bcs it has to be as close as possible to saving my_contacts keg
+                    if (this.myContacts.contacts[c.username]) {
+                        resolve(true);
+                        return;
                     }
+                    this.myContacts.save(
+                        () => this.myContacts.addContact(c),
+                        () => this.myContacts.removeContact(c),
+                        'error_contactAddFail'
+                    ).then(() => {
+                        // because own keg writes don't trigger digest update
+                        c.isAdded = true;
+                        this.applyMyContactsData();
+                        resolve(true);
+                    }).catch(reject);
                 }
-            );
+            });
         });
     }
 
@@ -302,11 +274,7 @@ class ContactStore {
      */
     importContacts(emails) {
         if (!Array.isArray(emails) && !isObservableArray(emails)) {
-            return Promise.reject(
-                new Error(
-                    `importContact(emails) argument should be an Array<string>`
-                )
-            );
+            return Promise.reject(new Error(`importContact(emails) argument should be an Array<string>`));
         }
         return new Promise((resolve, reject) => {
             const ret = { imported: [], notFound: [] };
@@ -325,10 +293,7 @@ class ContactStore {
                                 ret.notFound.push(emails[pos + i]);
                                 continue;
                             }
-                            const c = this.getContact(
-                                item[0].profile.username,
-                                [item]
-                            );
+                            const c = this.getContact(item[0].profile.username, [item]);
                             toAdd.push(c);
                         }
                         pos += res.length;
@@ -346,11 +311,7 @@ class ContactStore {
 
     _getBatchPage(emails, pos) {
         if (pos >= emails.length) return Promise.resolve([]);
-        return socket.send(
-            '/auth/user/lookup',
-            { string: emails.slice(pos, pos + 15) },
-            false
-        );
+        return socket.send('/auth/user/lookup', { string: emails.slice(pos, pos + 15) }, false);
     }
 
     /**
@@ -358,27 +319,23 @@ class ContactStore {
      * @param {string|Contact} usernameOrContact
      */
     removeContact(usernameOrContact) {
-        const c =
-            typeof usernameOrContact === 'string'
-                ? this.getContact(usernameOrContact)
-                : usernameOrContact;
+        const c = typeof usernameOrContact === 'string' ? this.getContact(usernameOrContact) : usernameOrContact;
         if (!this.myContacts.contacts[c.username]) return Promise.resolve();
-        return asPromise(c, 'loading', false).then(() => {
-            if (c.notFound) {
-                warnings.add('error_contactRemoveFail');
-                return Promise.reject();
-            }
-            return this.myContacts
-                .save(
+        return asPromise(c, 'loading', false)
+            .then(() => {
+                if (c.notFound) {
+                    warnings.add('error_contactRemoveFail');
+                    return Promise.reject();
+                }
+                return this.myContacts.save(
                     () => this.myContacts.removeContact(c),
                     () => this.myContacts.addContact(c),
                     'error_contactRemoveFail'
-                )
-                .then(() => {
+                ).then(() => {
                     // because own keg writes don't trigger digest update
                     this.applyMyContactsData();
                 });
-        });
+            });
     }
 
     /**
@@ -388,11 +345,9 @@ class ContactStore {
      */
     removeInvite(email) {
         return retryUntilSuccess(
-            () =>
-                socket.send('/auth/contacts/issued-invites/remove', { email }),
+            () => socket.send('/auth/contacts/issued-invites/remove', { email }),
             Math.random(),
-            10
-        );
+            10);
     }
 
     /**
@@ -403,13 +358,9 @@ class ContactStore {
      */
     removeReceivedInvite(username) {
         return retryUntilSuccess(
-            () =>
-                socket.send('/auth/contacts/received-invites/remove', {
-                    username
-                }),
+            () => socket.send('/auth/contacts/received-invites/remove', { username }),
             Math.random(),
-            10
-        );
+            10);
     }
 
     /**
@@ -421,29 +372,21 @@ class ContactStore {
      * @returns {Contact}
      */
     getContact(usernameOrEmail, prefetchedData) {
-        const existing =
-            this._contactMap[usernameOrEmail] ||
-            this._requestMap[usernameOrEmail] ||
-            this._cachedContacts[usernameOrEmail];
+        const existing = this._contactMap[usernameOrEmail]
+            || this._requestMap[usernameOrEmail]
+            || this._cachedContacts[usernameOrEmail];
         if (existing) return existing;
 
         const c = new Contact(usernameOrEmail, prefetchedData);
         // is deleted when contact is added to _contactMap only
         // see getContactAndSave
         this._requestMap[usernameOrEmail] = c;
-        when(
-            () => !c.loading,
-            () => {
-                delete this._requestMap[usernameOrEmail];
-                if (c.notFound) return;
-                if (
-                    this._contactMap[c.username] ||
-                    this._cachedContacts[c.username]
-                )
-                    return;
-                this._cachedContacts[c.username] = c;
-            }
-        );
+        when(() => !c.loading, () => {
+            delete this._requestMap[usernameOrEmail];
+            if (c.notFound) return;
+            if (this._contactMap[c.username] || this._cachedContacts[c.username]) return;
+            this._cachedContacts[c.username] = c;
+        });
         return c;
     }
 
@@ -454,25 +397,18 @@ class ContactStore {
      */
     getContactAndSave(usernameOrEmail) {
         let c = this.getContact(usernameOrEmail);
-        when(
-            () => !c.loading,
-            () => {
-                c = this._cachedContacts[c.username] || c;
-                delete this._cachedContacts[c.username];
-                if (c.notFound || this._contactMap[c.username]) return;
-                this.contacts.unshift(c);
-                this._contactMap[c.username] = c;
-                if (
-                    this.myContacts &&
-                    this.myContacts.loaded &&
-                    this.myContacts.contacts[c.username]
-                ) {
-                    c.isAdded = true;
-                }
-                // forcing loadTofu creates a tofu keg, effectively adding the contact to contact list
-                c.loadTofu();
+        when(() => !c.loading, () => {
+            c = this._cachedContacts[c.username] || c;
+            delete this._cachedContacts[c.username];
+            if (c.notFound || this._contactMap[c.username]) return;
+            this.contacts.unshift(c);
+            this._contactMap[c.username] = c;
+            if (this.myContacts && this.myContacts.loaded && this.myContacts.contacts[c.username]) {
+                c.isAdded = true;
             }
-        );
+            // forcing loadTofu creates a tofu keg, effectively adding the contact to contact list
+            c.loadTofu();
+        });
         return c;
     }
 
@@ -497,11 +433,7 @@ class ContactStore {
      * @returns {Promise}
      */
     inviteNoWarning(email, context, isAutoImport) {
-        return socket.send('/auth/contacts/invite', {
-            email,
-            context,
-            isAutoImport
-        });
+        return socket.send('/auth/contacts/invite', { email, context, isAutoImport });
     }
 
     _merge(usernames) {
@@ -513,15 +445,10 @@ class ContactStore {
      * Any contact that your app ever encountered has a tofu keg.
      */
     loadContactsFromTOFUKegs() {
-        when(
-            () => tofuStore.loaded,
-            () => {
-                tofuStore.usernames.forEach(username =>
-                    this.getContactAndSave(username)
-                );
-                console.log('Loaded contacts from tofu kegs');
-            }
-        );
+        when(() => tofuStore.loaded, () => {
+            tofuStore.usernames.forEach(username => this.getContactAndSave(username));
+            console.log('Loaded contacts from tofu kegs');
+        });
     }
     /**
      * Filters contacts by username and First Last name based on passed token
@@ -530,22 +457,19 @@ class ContactStore {
      * @returns {Array<Contact>}
      */
     filter(token, list, nosort = false) {
-        // eslint-disable-next-line no-param-reassign
-        token = token.toLocaleLowerCase();
+        token = token.toLocaleLowerCase(); // eslint-disable-line
         let removeUnavailable = false;
         if (!list) {
-            // eslint-disable-next-line no-param-reassign
-            list = this.contacts;
+            list = this.contacts; // eslint-disable-line
             removeUnavailable = true;
         }
-        const ret = list.filter(c => {
-            if (removeUnavailable) {
-                if (c.loading || c.notFound) return false;
-            }
-            return (
-                c.username.includes(token) || c.fullNameLower.includes(token)
-            );
-        });
+        const ret = list
+            .filter((c) => {
+                if (removeUnavailable) {
+                    if (c.loading || c.notFound) return false;
+                }
+                return c.username.includes(token) || c.fullNameLower.includes(token);
+            });
         if (nosort) return ret;
         return ret.sort((c1, c2) => {
             if (c1.isAdded && !c2.isAdded) return -1;

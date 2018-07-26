@@ -55,9 +55,7 @@ class UploadConfig {
             if (fileSize > row.maxFileSize) continue;
             return row.chunkSize;
         }
-        throw new Error(
-            'Ups. This should not have ever happen. We could not detect chunk size to use for upload.'
-        );
+        throw new Error('Ups. This should not have ever happen. We could not detect chunk size to use for upload.');
     }
 
     /**
@@ -163,9 +161,7 @@ const config = new class {
      * DO NOT change this value unless you really know what you're doing.
      * @returns {number} 32
      */
-    get CHUNK_OVERHEAD() {
-        return 32;
-    }
+    get CHUNK_OVERHEAD() { return 32; }
 
     upload = new UploadConfig();
 
@@ -231,10 +227,7 @@ const config = new class {
      * Server premium plans ids
      * @type {Array<string>}
      */
-    serverPlansPremium = [
-        SERVER_PLAN_PREMIUM_MONTHLY,
-        SERVER_PLAN_PREMIUM_YEARLY
-    ];
+    serverPlansPremium = [SERVER_PLAN_PREMIUM_MONTHLY, SERVER_PLAN_PREMIUM_YEARLY];
 
     /**
      * Server pro plans ids
@@ -323,5 +316,6 @@ const config = new class {
      */
     temporaryCacheLimit = 1000 * 1024 * 1024;
 }();
+
 
 module.exports = config;

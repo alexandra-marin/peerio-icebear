@@ -8,14 +8,8 @@ class ChatStorePending {
     add(username, email, received) {
         // edge case: if the chat list loaded before invites
         // and there was already a DM created
-        if (
-            this.store.directMessages.find(
-                s => s.dmPartnerUsername === username
-            )
-        ) {
-            console.error(
-                `user invitation ${username} already has a created DM`
-            );
+        if (this.store.directMessages.find(s => s.dmPartnerUsername === username)) {
+            console.error(`user invitation ${username} already has a created DM`);
             return;
         }
         const pendingDM = new ChatPendingDM(username, email, received);
@@ -30,9 +24,7 @@ class ChatStorePending {
             return;
         }
         const username = chat.dmPartnerUsername;
-        const existing = this.store.directMessages.find(
-            s => s.isInvite && s.username === username
-        );
+        const existing = this.store.directMessages.find(s => s.isInvite && s.username === username);
         if (existing && existing.isInvite) {
             existing.dismiss();
         }

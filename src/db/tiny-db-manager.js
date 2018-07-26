@@ -45,9 +45,9 @@ class TinyDbManager {
     }
 
     /**
-     * Creates system collection instance and assigns it to {@link system} property
-     * @returns {TinyDbCollection} system collection
-     */
+    * Creates system collection instance and assigns it to {@link system} property
+    * @returns {TinyDbCollection} system collection
+    */
     openSystem() {
         this.systemCollection = this.open('$system$');
         return this.systemCollection;

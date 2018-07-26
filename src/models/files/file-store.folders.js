@@ -13,16 +13,11 @@ class FileStoreFolders {
 
         tracker.onceUpdated(() => {
             this.keg = new FileFoldersKeg(fileStore.kegDb);
-            this.keg.onUpdated = () => {
-                this.sync();
-            };
+            this.keg.onUpdated = () => { this.sync(); };
         });
-        reaction(
-            () => this.currentFolder.isDeleted,
-            deleted => {
-                if (deleted) this.currentFolder = this.root;
-            }
-        );
+        reaction(() => this.currentFolder.isDeleted, deleted => {
+            if (deleted) this.currentFolder = this.root;
+        });
         const map = createMap(this.folders, 'id');
         this.foldersMap = map.observableMap;
     }
@@ -44,30 +39,27 @@ class FileStoreFolders {
         return this.foldersMap.get(id);
     }
 
-    @computed
-    get selectedFolders() {
+    @computed get selectedFolders() {
         let ret = this.folders.filter(f => f.selected);
         if (!this.fileStore.isMainStore) return ret;
-        this.fileStore.getFileStoreInstances().forEach(store => {
-            ret = ret.concat(store.folderStore.folders.filter(f => f.selected));
-        });
+        this.fileStore.getFileStoreInstances()
+            .forEach(store => {
+                ret = ret.concat(store.folderStore.folders.filter(f => f.selected));
+            });
         return ret;
     }
 
     // saves folder structure to keg
     save() {
         return retryUntilSuccess(
-            () =>
-                this.keg.save(
-                    () => {
-                        this.keg.folders = this.root.folders
-                            .filter(f => !f.isShared)
-                            .map(f => f.serialize());
-                        return true;
-                    },
-                    null,
-                    'error_savingFileFolders'
-                ),
+            () => this.keg.save(
+                () => {
+                    this.keg.folders = this.root.folders.filter(f => !f.isShared).map(f => f.serialize());
+                    return true;
+                },
+                null,
+                'error_savingFileFolders'
+            ),
             `saving file folders keg for ${this.fileStore.id}`,
             5
         ).catch(() => this.sync());
@@ -84,20 +76,15 @@ class FileStoreFolders {
             folder.deserialize(folderData, parentId);
             this.folders.push(folder);
         }
-        folderData.folders.forEach(child =>
-            this._syncFolder(child, folderData.folderId, newTreeMap)
-        );
+        folderData.folders.forEach((child) => this._syncFolder(child, folderData.folderId, newTreeMap));
     };
 
     // reconstructs folder structure from keg data
-    @action.bound
-    sync() {
+    @action.bound sync() {
         // we will collect all id from keg data in here during sync
         // so we can detect removed folders afterwards
         const newTreeMap = {};
-        this.keg.folders.forEach(folderData =>
-            this._syncFolder(folderData, null, newTreeMap)
-        );
+        this.keg.folders.forEach((folderData) => this._syncFolder(folderData, null, newTreeMap));
         const toRemove = [];
         this.folders.forEach(folder => {
             if (!folder.isRoot && !newTreeMap[folder.id]) {

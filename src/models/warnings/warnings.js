@@ -1,3 +1,4 @@
+
 const { observable, action, when, reaction } = require('mobx');
 const socket = require('../../network/socket');
 const SystemWarning = require('./system-warning');
@@ -29,17 +30,14 @@ class Warnings {
     sessionCache = {};
 
     constructor() {
-        reaction(
-            () => clientApp.isFocused,
-            isFocused => {
-                if (!this.current || this.current.level !== 'medium') return;
-                if (isFocused) {
-                    this.current.autoDismiss();
-                } else {
-                    this.current.cancelAutoDismiss();
-                }
+        reaction(() => clientApp.isFocused, isFocused => {
+            if (!this.current || this.current.level !== 'medium') return;
+            if (isFocused) {
+                this.current.autoDismiss();
+            } else {
+                this.current.cancelAutoDismiss();
             }
-        );
+        });
     }
 
     /**
@@ -62,14 +60,10 @@ class Warnings {
     assignNextItem = () => {
         this.current = this.queue.shift();
         if (!this.current) return;
-        when(
-            () => this.current.state === SystemWarning.STATES.DISMISSED,
-            () => setTimeout(this.assignNextItem)
-        );
-        if (this.current.level === 'medium' && clientApp.isFocused)
-            this.current.autoDismiss();
+        when(() => this.current.state === SystemWarning.STATES.DISMISSED, () => setTimeout(this.assignNextItem));
+        if (this.current.level === 'medium' && clientApp.isFocused) this.current.autoDismiss();
         this.current.show();
-    };
+    }
 
     /**
      * General method to add warnings. More specialized shortcuts are available.
@@ -80,11 +74,8 @@ class Warnings {
      * @param {string} [level='medium'] - severity level.
      * @param {function} [callback] - executes when warning is dismissed
      */
-    @action
-    add(content, title, data, level = 'medium', callback) {
-        this.queueItem(
-            new SystemWarning(content, title, data, level, callback)
-        );
+    @action add(content, title, data, level = 'medium', callback) {
+        this.queueItem(new SystemWarning(content, title, data, level, callback));
     }
 
     /**
@@ -95,8 +86,7 @@ class Warnings {
      * @param {Object} [data] - variables to pass to translator.
      * @param {function} [callback] - executes when warning is dismissed
      */
-    @action
-    addSevere(content, title, data, callback) {
+    @action addSevere(content, title, data, callback) {
         this.add(content, title, data, 'severe', callback);
     }
 
@@ -104,15 +94,12 @@ class Warnings {
      * Adds server warning to the queue.
      * @param {Object} serverObj - as received from server
      */
-    @action.bound
-    addServerWarning(serverObj) {
+    @action.bound addServerWarning(serverObj) {
         if (serverObj.msg === 'serverWarning_promoConsentRequest') return;
         if (this.sessionCache[serverObj.token]) return;
         this.sessionCache[serverObj.token] = true;
         try {
-            const w = new ServerWarning(serverObj, () => {
-                delete this.sessionCache[serverObj.token];
-            });
+            const w = new ServerWarning(serverObj, () => { delete this.sessionCache[serverObj.token]; });
             this.queueItem(w);
         } catch (e) {
             console.error(e); // try/catch protects from invalid data sent from server
@@ -122,8 +109,6 @@ class Warnings {
 
 const w = new Warnings();
 
-socket.onceStarted(() =>
-    socket.subscribe(socket.APP_EVENTS.serverWarning, w.addServerWarning)
-);
+socket.onceStarted(() => socket.subscribe(socket.APP_EVENTS.serverWarning, w.addServerWarning));
 
 module.exports = w;

@@ -19,15 +19,9 @@ class ReadReceipt extends Keg {
      */
     receiptError;
 
+
     constructor(username, db) {
-        super(
-            username ? `read_receipt-${username}` : null,
-            'read_receipt',
-            db,
-            false,
-            false,
-            true
-        );
+        super(username ? `read_receipt-${username}` : null, 'read_receipt', db, false, false, true);
     }
 
     serializeKegPayload() {

@@ -1,9 +1,4 @@
-const {
-    setDefaultTimeout,
-    Before,
-    After,
-    setDefinitionFunctionWrapper
-} = require('cucumber');
+const { setDefaultTimeout, Before, After, setDefinitionFunctionWrapper } = require('cucumber');
 const App = require('./app');
 const { deleteFile } = require('./helpers/files');
 const CucumbotClient = require('./helpers/cucumbot-client');
@@ -33,8 +28,7 @@ After({ wrapperOptions: { noWrap: true }, timeout: -1 }, async function() {
     this.attach(scenarioLog);
     delete this.app;
     this.filesToCleanup.forEach(f => deleteFile(f));
-    if (!cucumbotSuccess)
-        return Promise.reject(new Error('Cucumbot scenario failed'));
+    if (!cucumbotSuccess) return Promise.reject(new Error('Cucumbot scenario failed'));
     return Promise.resolve();
 });
 
@@ -48,15 +42,10 @@ setDefinitionFunctionWrapper(function(fn, opts) {
         if (!cucumbot) return fn.apply(this, args);
 
         // where is current step supposed to run?
-        const isServerStep = this.pickle.steps[
-            this.currentStep
-        ].text.startsWith('Cucumbot');
+        const isServerStep = this.pickle.steps[this.currentStep].text.startsWith('Cucumbot');
 
         // run the step or pass control
-        if (
-            (this.cucumbotServer && isServerStep) ||
-            (this.cucumbotClient && !isServerStep)
-        ) {
+        if (this.cucumbotServer && isServerStep || this.cucumbotClient && !isServerStep) {
             return cucumbot.onceHaveControl(() => fn.apply(this, args));
         }
 
@@ -83,13 +72,8 @@ function startCucumbotBeforeScenario(world) {
     for (let i = 0; i < tags.length; i++) {
         if (tags[i].name.startsWith('@BOT_')) {
             // need to spawn a bot
-            world.cucumbotClient = new CucumbotClient(
-                tags[i].name.substring(1),
-                world
-            );
-            return world.cucumbotClient.start(
-                tags[i].name.startsWith('@BOT_NO_ACCOUNT_')
-            );
+            world.cucumbotClient = new CucumbotClient(tags[i].name.substring(1), world);
+            return world.cucumbotClient.start(tags[i].name.startsWith('@BOT_NO_ACCOUNT_'));
         }
     }
     //= = 3. Or we don't need Cucumbot in this scenario
@@ -112,8 +96,6 @@ function checkCucumbotRunResult(world) {
         return Promise.resolve(true);
     }
     return new Promise(resolve => {
-        world.cucumbotClient.once('finished', () =>
-            checkCucumbotRunResult(world).then(resolve)
-        );
+        world.cucumbotClient.once('finished', () => checkCucumbotRunResult(world).then(resolve));
     });
 }

@@ -17,6 +17,7 @@ class MyChats extends SyncedKeg {
      */
     hidden = [];
 
+
     constructor() {
         super('my_chats', getUser().kegDb);
     }
@@ -91,5 +92,6 @@ class MyChats extends SyncedKeg {
         return this._remove(this.hidden, chatId);
     }
 }
+
 
 module.exports = MyChats;

@@ -29,7 +29,7 @@ class FileFolder {
     // to be able to filter easier when files and folders are in the same list
     isFolder = true;
     // to indicate root folder or volume root
-    isRoot = false;
+    isRoot = false
     // this folder is a volume root
     // isShared = false;
 
@@ -48,8 +48,7 @@ class FileFolder {
     }
 
     // array of files in the root of this folder
-    @computed
-    get files() {
+    @computed get files() {
         return this.store.files.filter(f => {
             if (f.hidden) return false;
             if (this.isRoot) {
@@ -63,8 +62,7 @@ class FileFolder {
     }
 
     // array of folders in the root of this folder
-    @computed
-    get folders() {
+    @computed get folders() {
         return this.store.folderStore.folders.filter(f => {
             if (this.isRoot) {
                 // orphaned folders belong to root
@@ -74,10 +72,7 @@ class FileFolder {
                     return true;
                 }
                 // items with deleted or unmounted parents also go to the root (this)
-                if (
-                    f.parent.isDeleted ||
-                    !this.store.folderStore.getById(f.parent.id)
-                ) {
+                if (f.parent.isDeleted || !this.store.folderStore.getById(f.parent.id)) {
                     return true;
                 }
                 return false;
@@ -87,19 +82,16 @@ class FileFolder {
     }
 
     // parent folder instance
-    @computed
-    get parent() {
+    @computed get parent() {
         if (this.isRoot) {
-            if (this.isShared && this.folderId === 'root')
-                return getFileStore().folderStore.root;
+            if (this.isShared && this.folderId === 'root') return getFileStore().folderStore.root;
             return null;
         }
         const p = this.store.folderStore.getById(this.folderId);
         return p || this.root;
     }
 
-    @computed
-    get owner() {
+    @computed get owner() {
         if (!this.isShared && !this.root.isShared) return getUser().username;
         // store and kegDb already exist and never change.
         // boot is observable
@@ -123,31 +115,24 @@ class FileFolder {
         return Math.round(this.progress / (this.progressMax * 0.01 || 1));
     }
 
-    @computed
-    get normalizedName() {
+    @computed get normalizedName() {
         return this.name ? this.name.toUpperCase() : '';
     }
 
-    @computed
-    get foldersSortedByName() {
-        return this.folders.sort(
-            (f1, f2) => f1.normalizedName > f2.normalizedName
-        );
+    @computed get foldersSortedByName() {
+        return this.folders.sort((f1, f2) => f1.normalizedName > f2.normalizedName);
     }
 
-    @computed
-    get filesSortedByDate() {
+    @computed get filesSortedByDate() {
         return this.files.sort((f1, f2) => f2.uploadedAt - f1.uploadedAt);
     }
 
-    @computed
-    get filesAndFoldersDefaultSorting() {
+    @computed get filesAndFoldersDefaultSorting() {
         return this.foldersSortedByName.concat(this.filesSortedByDate);
     }
 
     // number of bytes, total size of all files in this folder tree
-    @computed
-    get size() {
+    @computed get size() {
         let currentSize = 0;
         for (const folder of this.folders) {
             currentSize += folder.size;
@@ -158,13 +143,11 @@ class FileFolder {
         return currentSize;
     }
     // string
-    @computed
-    get sizeFormatted() {
+    @computed get sizeFormatted() {
         return util.formatBytes(this.size);
     }
     // number, total file count in this folder tree
-    @computed
-    get totalFileCount() {
+    @computed get totalFileCount() {
         let count = 0;
         for (const folder of this.folders) {
             count += folder.totalFileCount;
@@ -174,8 +157,7 @@ class FileFolder {
     }
 
     // array of all files in this folder tree
-    @computed
-    get allFiles() {
+    @computed get allFiles() {
         let ret = this.files;
         this.folders.forEach(f => {
             ret = ret.concat(f.allFiles);
@@ -183,8 +165,7 @@ class FileFolder {
         return ret;
     }
 
-    @computed
-    get allFolders() {
+    @computed get allFolders() {
         let ret = this.folders;
         this.folders.forEach(f => {
             ret = ret.concat(f.allFolders);
@@ -212,23 +193,13 @@ class FileFolder {
         let promise = Promise.resolve();
         this.folders.forEach(folder => {
             promise = promise.then(async () => {
-                await folder.download(
-                    downloadPath,
-                    pickPathSelector,
-                    createDirFunctor
-                );
+                await folder.download(downloadPath, pickPathSelector, createDirFunctor);
                 this.progress++;
             });
         });
         this.files.forEach(file => {
             promise = promise.then(async () => {
-                await file.download(
-                    pickPathSelector(
-                        downloadPath,
-                        file.nameWithoutExtension,
-                        file.ext
-                    )
-                );
+                await file.download(pickPathSelector(downloadPath, file.nameWithoutExtension, file.ext));
                 this.progress++;
             });
         });
@@ -237,12 +208,9 @@ class FileFolder {
         this.progress = 0;
     }
 
-    @computed
-    get hasLegacyFiles() {
-        return !!(
-            this.folders.find(hasLegacyFilesPredicate) ||
-            this.files.find(isLegacyFilePredicate)
-        );
+
+    @computed get hasLegacyFiles() {
+        return !!(this.folders.find(hasLegacyFilesPredicate) || this.files.find(isLegacyFilePredicate));
     }
 
     // move file or folder
@@ -254,8 +222,7 @@ class FileFolder {
     }
 
     // move file to this folder
-    @action.bound
-    async attachFile(file) {
+    @action.bound async attachFile(file) {
         if (file.store !== this.store) {
             if (file.isLegacy) {
                 console.error('can not share legacy file', file.fileId);
@@ -264,11 +231,7 @@ class FileFolder {
                 return Promise.resolve();
             }
             // this is an inter-volume operation!
-            await file.copyTo(
-                this.store.kegDb,
-                this.store,
-                this.isRoot ? null : this.id
-            );
+            await file.copyTo(this.store.kegDb, this.store, this.isRoot ? null : this.id);
             // if file was shared not from SELF - remove it
             // file kegs in SELF will get hidden by server
             if (!file.store.isMainStore) {
@@ -292,15 +255,11 @@ class FileFolder {
     }
 
     // adds exiting folder instance to this folder
-    @action.bound
-    async attachFolder(folder, skipSave, skipRootFolder) {
+    @action.bound async attachFolder(folder, skipSave, skipRootFolder) {
         if (folder === this) return Promise.resolve();
         if (folder.store !== this.store) {
             // 1. we copy folder structure to another kegdb
-            const map = await folder.copyFolderStructureTo(
-                this,
-                skipRootFolder
-            );
+            const map = await folder.copyFolderStructureTo(this, skipRootFolder);
             // 2. we copy files
             await folder.copyFilesTo(this, map);
             // 3. we remove original folders, files have been removed individually already
@@ -316,29 +275,21 @@ class FileFolder {
     }
 
     // private api, copies files from one db to another, preserving folder ids
-    @action
-    async copyFilesTo(dst, folderIdMap) {
+    @action async copyFilesTo(dst, folderIdMap) {
         const src = this;
         src.progress = dst.progress = 0;
         src.progressMax = dst.progressMax = src.allFiles.length;
-        await Promise.map(
-            src.allFiles,
-            file => {
-                src.progress = ++dst.progress;
-                const dstFolder =
-                    dst.store.folderStore.getById(folderIdMap[file.folderId]) ||
-                    dst;
-                return dstFolder.attachFile(file);
-            },
-            { concurrency: 1 }
-        );
+        await Promise.map(src.allFiles, file => {
+            src.progress = ++dst.progress;
+            const dstFolder = dst.store.folderStore.getById(folderIdMap[file.folderId]) || dst;
+            return dstFolder.attachFile(file);
+        }, { concurrency: 1 });
         src.progress = dst.progress = 0;
         src.progressMax = dst.progressMax = 0;
     }
 
     // private api
-    @action
-    async copyFolderStructureTo(dst, skipRootFolder) {
+    @action async copyFolderStructureTo(dst, skipRootFolder) {
         const src = this;
         const folderIdMap = {}; // mapping between source folder ids and destination
         const copyFolders = (parentSrc, parentDst) => {
@@ -383,6 +334,7 @@ class FileFolder {
         this.store.folderStore.save(); // retry handled inside
     }
 
+
     rename(name) {
         if (this.parent.findFolderByName(name)) {
             warnings.addSevere('error_folderAlreadyExists');
@@ -392,20 +344,17 @@ class FileFolder {
         this.store.folderStore.save();
     }
 
+
     serialize() {
         // folderId is same as this.id, due to historical reasons.
         const { name, id, createdAt } = this;
-        const folders = this.folders
-            .filter(f => !f.isShared)
-            .map(f => f.serialize());
+        const folders = this.folders.filter(f => !f.isShared).map(f => f.serialize());
         return { name, folderId: id, createdAt, folders };
     }
 
     deserialize(data, parentId) {
         if (this.id && data.folderId !== this.id) {
-            throw new Error(
-                'Trying to deserialize folder from a different folder data'
-            );
+            throw new Error('Trying to deserialize folder from a different folder data');
         }
         this.id = data.folderId; // 'folderId' is legacy name, don't want to migrate
         this.name = data.name;

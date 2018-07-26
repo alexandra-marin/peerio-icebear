@@ -1,3 +1,4 @@
+
 const { observable, computed, action } = require('mobx');
 const moment = require('moment');
 const Keg = require('../kegs/keg');
@@ -24,41 +25,29 @@ class Ghost extends Keg {
     @observable revoked = false;
     @observable body = '';
 
-    @computed
-    get date() {
+    @computed get date() {
         return moment(this.timestamp);
     }
 
-    @computed
-    get preview() {
-        return this.body && this.body.length > 0
-            ? this.body
-                  .substring(0, 120)
-                  .replace(/^[\r\n]*/g, '')
-                  .replace(/\r*\n/g, ' ')
-            : '...';
+    @computed get preview() {
+        return this.body && this.body.length > 0 ?
+            this.body.substring(0, 120).replace(/^[\r\n]*/g, '').replace(/\r*\n/g, ' ') : '...';
     }
 
-    @computed
-    get url() {
+    @computed get url() {
         return `${config.ghostFrontendUrl}/?${this.ghostId}`;
     }
 
-    @computed
-    get expiryDate() {
-        return new Date(this.timestamp + this.lifeSpanInSeconds * 1000);
+    @computed get expiryDate() {
+        return new Date(this.timestamp + (this.lifeSpanInSeconds * 1000));
     }
 
-    @computed
-    get fileCounter() {
+    @computed get fileCounter() {
         return this.files.length;
     }
 
-    @computed
-    get expired() {
-        return (
-            this.timestamp + this.lifeSpanInSeconds * 1000 < defaultClock.now
-        );
+    @computed get expired() {
+        return this.timestamp + (this.lifeSpanInSeconds * 1000) < defaultClock.now;
     }
 
     get ephemeralKeypair() {
@@ -78,13 +67,9 @@ class Ghost extends Keg {
         super(null, 'ghost', db);
         this.revoke = this.revoke.bind(this);
         this.version = 2;
-        this.passphrase = PhraseDictionary.current.getPassphrase(
-            this.DEFAULT_GHOST_PASSPHRASE_LENGTH
-        );
+        this.passphrase = PhraseDictionary.current.getPassphrase(this.DEFAULT_GHOST_PASSPHRASE_LENGTH);
         // encode user-specific ID in hex
-        this.ghostId = cryptoUtil.getRandomUserSpecificIdHex(
-            User.current.username
-        );
+        this.ghostId = cryptoUtil.getRandomUserSpecificIdHex(User.current.username);
     }
 
     /*
@@ -114,8 +99,7 @@ class Ghost extends Keg {
         };
     }
 
-    @action
-    deserializeProps(props) {
+    @action deserializeProps(props) {
         this.ghostId = props.ghostId;
     }
 
@@ -124,8 +108,7 @@ class Ghost extends Keg {
      *
      * @param {Object} data
      */
-    @action
-    deserializeKegPayload(data) {
+    @action deserializeKegPayload(data) {
         this.body = data.body;
         this.subject = data.subject;
         this.passphrase = data.passphrase;
@@ -148,13 +131,10 @@ class Ghost extends Keg {
         this.timestamp = Date.now();
         this.lifeSpanInSeconds = this.DEFAULT_GHOST_LIFESPAN;
 
-        return ghostAPI
-            .deriveKeys(this)
+        return ghostAPI.deriveKeys(this)
             .then(() => ghostAPI.serialize(this, User.current))
-            .then(serializedGhost =>
-                ghostAPI.encrypt(this, User.current, serializedGhost)
-            )
-            .then(res => ghostAPI.send(this, res))
+            .then((serializedGhost) => ghostAPI.encrypt(this, User.current, serializedGhost))
+            .then((res) => ghostAPI.send(this, res))
             .then(() => this.saveToServer())
             .then(() => {
                 this.sent = true;
@@ -177,7 +157,7 @@ class Ghost extends Keg {
     attachFiles(files) {
         this.files.clear();
         if (!files || !files.length) return null;
-        files.forEach(file => {
+        files.forEach((file) => {
             this.files.push(file.fileId);
         });
         return files.slice();
@@ -188,7 +168,8 @@ class Ghost extends Keg {
      * @returns {Promise}
      */
     revoke() {
-        return ghostAPI.revoke(this).then(() => this.saveToServer());
+        return ghostAPI.revoke(this)
+            .then(() => this.saveToServer());
     }
 }
 

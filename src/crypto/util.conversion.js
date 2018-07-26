@@ -3,8 +3,7 @@
 //
 const { Buffer } = require('buffer/');
 
-const HAS_TEXT_ENCODER =
-    typeof TextEncoder !== 'undefined' && typeof TextDecoder !== 'undefined';
+const HAS_TEXT_ENCODER = (typeof TextEncoder !== 'undefined') && (typeof TextDecoder !== 'undefined');
 const textEncoder = HAS_TEXT_ENCODER ? new TextEncoder('utf-8') : null;
 const textDecoder = HAS_TEXT_ENCODER ? new TextDecoder('utf-8') : null;
 
@@ -32,11 +31,7 @@ function bytesToStr(bytes) {
     if (HAS_TEXT_ENCODER) {
         return textDecoder.decode(bytes);
     }
-    return Buffer.from(
-        bytes.buffer,
-        bytes.byteOffset,
-        bytes.byteLength
-    ).toString('utf-8');
+    return Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength).toString('utf-8');
 }
 
 /**
@@ -54,11 +49,7 @@ function b64ToBytes(str) {
  * @returns {string} B64 string encoded bytes
  */
 function bytesToB64(bytes) {
-    return Buffer.from(
-        bytes.buffer || bytes,
-        bytes.byteOffset || 0,
-        bytes.byteLength
-    ).toString('base64');
+    return Buffer.from(bytes.buffer || bytes, bytes.byteOffset || 0, bytes.byteLength).toString('base64');
 }
 
 /**
@@ -67,11 +58,7 @@ function bytesToB64(bytes) {
  * @returns {string} B64 string encoded bytes (no 0x or other prefix, just data)
  */
 function bytesToHex(bytes) {
-    return Buffer.from(
-        bytes.buffer || bytes,
-        bytes.byteOffset || 0,
-        bytes.byteLength
-    ).toString('hex');
+    return Buffer.from(bytes.buffer || bytes, bytes.byteOffset || 0, bytes.byteLength).toString('hex');
 }
 
 /**
@@ -82,6 +69,7 @@ function bytesToHex(bytes) {
 function hexToBytes(str) {
     return new Uint8Array(Buffer.from(str, 'hex').buffer);
 }
+
 
 const converterDataView = new DataView(new ArrayBuffer(4));
 /**
@@ -101,11 +89,7 @@ function numberToByteArray(num) {
  */
 function byteArrayToNumber(arr, offset, length) {
     // safari doesn't like undefined params
-    return new DataView(
-        arr.buffer || arr,
-        offset || 0,
-        length || arr.byteLength
-    ).getUint32(0);
+    return new DataView(arr.buffer || arr, offset || 0, length || arr.byteLength).getUint32(0);
 }
 
 module.exports = {

@@ -1,3 +1,4 @@
+
 const { observable, computed } = require('mobx');
 const socket = require('../network/socket');
 const { getChatStore } = require('../helpers/di-chat-store');
@@ -69,15 +70,11 @@ class ClientApp {
      * UI should listen to this and request entering of 2fa code from user and then pass ot back to icebear.
      * @type {TwoFARequest}
      */
-    @computed
-    get updatingAfterReconnect() {
-        return (
-            socket.connected &&
-            !(
-                getChatStore().updatedAfterReconnect &&
-                getFileStore().updatedAfterReconnect &&
-                tracker.updated
-            )
+    @computed get updatingAfterReconnect() {
+        return socket.connected && !(
+            getChatStore().updatedAfterReconnect
+            && getFileStore().updatedAfterReconnect
+            && tracker.updated
         );
     }
 
@@ -103,6 +100,7 @@ class ClientApp {
                 this.active2FARequest = null;
                 cancelCallback();
             }
+
         };
     }
 }

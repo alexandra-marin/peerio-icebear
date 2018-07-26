@@ -1,3 +1,4 @@
+
 const util = require('../crypto/util');
 
 /**
@@ -65,5 +66,6 @@ class PhraseDictionary {
         PhraseDictionary.current = new PhraseDictionary(localeCode, rawData);
     }
 }
+
 
 module.exports = PhraseDictionary;

@@ -22,9 +22,7 @@ function getSystemMessageText(msg) {
                 : t('title_chatNameRemoved');
         case 'purposeChange':
             return msg.systemData.newPurpose
-                ? t('title_chatPurposeChanged', {
-                      purpose: msg.systemData.newPurpose
-                  })
+                ? t('title_chatPurposeChanged', { purpose: msg.systemData.newPurpose })
                 : t('title_chatPurposeRemoved');
         case 'create':
             return t('title_chatCreated', { fullName: msg.sender.fullName });
@@ -37,15 +35,9 @@ function getSystemMessageText(msg) {
         case 'kick':
             return t('title_userKicked', { fullName: getFullName(msg) });
         case 'assignRole':
-            return t('title_roleAssigned', {
-                fullName: getFullName(msg),
-                role: getRoleName(msg.systemData.role)
-            });
+            return t('title_roleAssigned', { fullName: getFullName(msg), role: getRoleName(msg.systemData.role) });
         case 'unassignRole':
-            return t('title_roleUnassigned', {
-                fullName: getFullName(msg),
-                role: getRoleName(msg.systemData.role)
-            });
+            return t('title_roleUnassigned', { fullName: getFullName(msg), role: getRoleName(msg.systemData.role) });
         case 'videoCall':
             return t('title_videoCallLink', { fullName: msg.sender.fullName });
         default:
@@ -55,20 +47,16 @@ function getSystemMessageText(msg) {
 
 function getFullName(msg) {
     if (msg.systemData.usernames) {
-        return msg.systemData.usernames
-            .map(u => contactStore.getContact(u))
-            .map(c => c.fullNameAndUsername)
-            .join(', ');
+        return msg.systemData.usernames.map(u => contactStore.getContact(u)).map(c => c.fullNameAndUsername).join(', ');
     }
     return contactStore.getContact(msg.systemData.username).fullName;
 }
 
+
 function getRoleName(role) {
     switch (role) {
-        case 'admin':
-            return t('title_admin');
-        default:
-            return '';
+        case 'admin': return t('title_admin');
+        default: return '';
     }
 }
 

@@ -36,3 +36,4 @@ describe('MRU list helper should', () => {
         actual.should.deep.equal(expected);
     });
 });
+

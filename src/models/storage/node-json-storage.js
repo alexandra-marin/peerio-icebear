@@ -1,3 +1,4 @@
+
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
@@ -9,7 +10,7 @@ const fileOptions = { encoding: 'utf8' };
  * This is a StorageEngine implementation that can be used in any nodejs-based apps (cli, electron).
  *
  * It uses os.homedir() or NodeJsonStorage.storageFolder to store JSON files.
- */
+*/
 class NodeJsonStorage {
     constructor(name) {
         this.name = name;
@@ -73,12 +74,11 @@ class NodeJsonStorage {
             }
             this._createDbFile();
         } catch (err) {
-            return Promise.reject(
-                errors.normalize(err, 'Failed to delete database')
-            );
+            return Promise.reject(errors.normalize(err, 'Failed to delete database'));
         }
         return Promise.resolve();
     }
 }
+
 
 module.exports = NodeJsonStorage;

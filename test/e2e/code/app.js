@@ -4,6 +4,7 @@ global.WebSocket = require('websocket').w3cwebsocket;
 const safeJsonStringify = require('safe-json-stringify');
 const testConfig = require('./test-config');
 
+
 /**
  * App class is supposed to emulate real-world application (sdk consumer).
  * It is able to reset current js environment, emulating application restart.
@@ -55,18 +56,11 @@ class App {
         cfg.os = os.type();
         cfg.FileStream = FileStream;
         cfg.StorageEngine = StorageEngine;
-        cfg.StorageEngine.storageFolder = path.join(
-            os.homedir(),
-            process.env.CUCUMBOT
-                ? '.peerio-icebear-tests-cucumbot'
-                : '.peerio-icebear-tests'
-        );
+        cfg.StorageEngine.storageFolder = path.join(os.homedir(),
+            process.env.CUCUMBOT ? '.peerio-icebear-tests-cucumbot' : '.peerio-icebear-tests');
         cfg.socketServerUrl = testConfig.socketServerUrl;
         if (testConfig.logSocketMessages) {
-            cfg.debug = {
-                trafficReportInterval: 15000,
-                socketLogEnabled: true
-            };
+            cfg.debug = { trafficReportInterval: 15000, socketLogEnabled: true };
         }
     }
 
@@ -92,11 +86,10 @@ class App {
             // out disconnection event from socket client log.
             // Sometimes it goes through console.log or warn in the app so we
             // have to catch it in here.
-            if (
-                (args && (args[0] && args[0].name === 'DisconnectedError')) ||
-                (args[1] && args[1].name === 'DisconnectedError')
-            )
-                return;
+            if (args &&
+                (args[0] && args[0].name === 'DisconnectedError')
+                || (args[1] && args[1].name === 'DisconnectedError')
+            ) return;
             const d = new Date();
             let line = `${type}${d.getMinutes()}:${d.getSeconds()}.${d.getMilliseconds()}: `;
             for (let i = 0; i < args.length; i++) {
@@ -107,8 +100,7 @@ class App {
                 }
             }
             this.logs.push(line);
-            if (testConfig.showAppLogs)
-                this._consoleBackup.log.call(console, line);
+            if (testConfig.showAppLogs) this._consoleBackup.log.call(console, line);
         };
         console.log = function(...args) {
             write('LOG:', args);
@@ -170,25 +162,21 @@ class App {
         // closing connections
         console.log('closing connection');
         this.world.ice.socket.close();
-        return new Promise(resolve => {
-            when(
-                () => !this.world.ice.socket.connected,
-                async () => {
-                    this.world.ice.socket.dispose();
-                    console.log('clearing tinydb');
-                    // delete TinyDbs
-                    if (this.world.ice.TinyDb.user)
-                        await this.world.ice.TinyDb.user.clear();
-                    await this.world.ice.TinyDb.system.clear();
-                    console.log('clearing modules');
-                    this._clearModuleCache();
-                    console.log('invoking GC');
-                    // hell, yeah
-                    if (global.gc) global.gc();
-                    this.started = false;
-                    resolve();
-                }
-            );
+        return new Promise((resolve) => {
+            when(() => !this.world.ice.socket.connected, async () => {
+                this.world.ice.socket.dispose();
+                console.log('clearing tinydb');
+                // delete TinyDbs
+                if (this.world.ice.TinyDb.user) await this.world.ice.TinyDb.user.clear();
+                await this.world.ice.TinyDb.system.clear();
+                console.log('clearing modules');
+                this._clearModuleCache();
+                console.log('invoking GC');
+                // hell, yeah
+                if (global.gc) global.gc();
+                this.started = false;
+                resolve();
+            });
         });
     }
 

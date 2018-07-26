@@ -4,6 +4,6 @@ if (typeof window !== 'undefined') {
 } else if (typeof global !== 'undefined') {
     g = global;
 } else {
-    g = self; // eslint-disable-line no-undef
+    g = self; //eslint-disable-line
 }
 module.exports = g;

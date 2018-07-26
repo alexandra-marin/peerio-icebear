@@ -47,42 +47,36 @@ class FileStoreBase {
     @observable.shallow files = [];
 
     // all files currently loaded in RAM, including volumes, excluding chats
-    @computed
-    get allFiles() {
+    @computed get allFiles() {
         let ret = this.files;
         if (this.isMainStore) {
-            FileStoreBase.instances.forEach(store => {
-                ret = ret.concat(store.files.slice());
-            });
+            FileStoreBase.instances.forEach(store => { ret = ret.concat(store.files.slice()); });
         }
         return ret;
     }
 
     // Subset of files not currently hidden by any applied filters
-    @computed
-    get filesSearchResult() {
+    @computed get filesSearchResult() {
         if (!this.searchQuery) return [];
         const q = this.searchQuery.toUpperCase();
-        return this.allFiles.filter(f => f.normalizedName.includes(q));
+        return this.allFiles
+            .filter(f => f.normalizedName.includes(q));
     }
 
     // Subset of folders not currently hidden by any applied filters
-    @computed
-    get foldersSearchResult() {
+    @computed get foldersSearchResult() {
         if (!this.searchQuery) return [];
         return this.foldersFiltered(this.searchQuery);
     }
 
-    foldersFiltered = query => {
+    foldersFiltered = (query) => {
         const q = query.toUpperCase();
-        return this.folderStore.root.allFolders.filter(f =>
-            f.normalizedName.includes(q)
-        );
-    };
+        return this.folderStore.root.allFolders
+            .filter(f => f.normalizedName.includes(q));
+    }
 
     // Subset of files and folders not currently hidden by any applied filters
-    @computed
-    get filesAndFoldersSearchResult() {
+    @computed get filesAndFoldersSearchResult() {
         return this.foldersSearchResult.concat(this.filesSearchResult);
     }
 
@@ -118,30 +112,23 @@ class FileStoreBase {
         return file.canShare;
     }
 
-    @computed
-    get hasSelectedFiles() {
+    @computed get hasSelectedFiles() {
         return this.allFiles.some(FileStoreBase.isFileSelected);
     }
 
-    @computed
-    get hasSelectedFilesOrFolders() {
+    @computed get hasSelectedFilesOrFolders() {
         return this.selectedFilesOrFolders.length;
     }
 
-    @computed
-    get canShareSelectedFiles() {
-        return (
-            this.hasSelectedFiles &&
-            this.allFiles.every(FileStoreBase.isSelectedFileShareable)
-        );
+    @computed get canShareSelectedFiles() {
+        return this.hasSelectedFiles && this.allFiles.every(FileStoreBase.isSelectedFileShareable);
     }
 
     getFilesSharedBy(username) {
         return this.files.filter(f => f.owner === username);
     }
     // Returns currently selected files (file.selected == true)
-    @computed
-    get selectedFiles() {
+    @computed get selectedFiles() {
         return this.allFiles.filter(FileStoreBase.isFileSelected);
     }
 
@@ -155,152 +142,112 @@ class FileStoreBase {
         return getFileStore().folderStore.selectedFolders;
     }
 
-    @computed
-    get selectedFilesOrFolders() {
+    @computed get selectedFilesOrFolders() {
         return this.selectedFolders.concat(this.selectedFiles);
     }
 
     // Deselects all files and folders
-    @action
-    clearSelection() {
-        this.selectedFilesOrFolders.forEach(f => {
-            f.selected = false;
-        });
+    @action clearSelection() {
+        this.selectedFilesOrFolders.forEach(f => { f.selected = false; });
     }
 
     // Deselects unshareable files
-    @action
-    deselectUnshareableFiles() {
+    @action deselectUnshareableFiles() {
         this.selectedFilesOrFolders.forEach(f => {
             if (f.canShare) return;
             f.selected = false;
         });
     }
 
-    onFileDigestUpdate = _.debounce(
-        () => {
-            const digest = tracker.getDigest(this.kegDb.id, 'file');
-            // this.unreadFiles = digest.newKegsCount;
-            if (this.loaded && digest.maxUpdateId === this.maxUpdateId) {
-                this.updatedAfterReconnect = true;
-                return;
-            }
-            this.maxUpdateId = digest.maxUpdateId;
-            this.updateFiles();
-        },
-        1500,
-        { leading: true, maxWait: 3000 }
-    );
+    onFileDigestUpdate = _.debounce(() => {
+        const digest = tracker.getDigest(this.kegDb.id, 'file');
+        // this.unreadFiles = digest.newKegsCount;
+        if (this.loaded && digest.maxUpdateId === this.maxUpdateId) {
+            this.updatedAfterReconnect = true;
+            return;
+        }
+        this.maxUpdateId = digest.maxUpdateId;
+        this.updateFiles();
+    }, 1500, { leading: true, maxWait: 3000 });
 
     _getFiles() {
-        const filter = this.knownUpdateId
-            ? { minCollectionVersion: this.knownUpdateId }
-            : {};
+        const filter = this.knownUpdateId ? { minCollectionVersion: this.knownUpdateId } : {};
         // this is naturally paged because every update calls another update in the end
         // until all update pages are loaded
-        return socket.send(
-            '/auth/kegs/db/list-ext',
-            {
+        return socket.send('/auth/kegs/db/list-ext', {
+            kegDbId: this.kegDb.id,
+            options: {
+                type: 'file',
+                reverse: false,
+                count: 50
+            },
+            filter
+        }, false);
+    }
+
+    @action _loadPage(fromKegId) {
+        return retryUntilSuccess(
+            () => socket.send('/auth/kegs/db/list-ext', {
                 kegDbId: this.kegDb.id,
                 options: {
                     type: 'file',
                     reverse: false,
+                    fromKegId,
                     count: 50
                 },
-                filter
-            },
-            false
-        );
-    }
-
-    @action
-    _loadPage(fromKegId) {
-        return retryUntilSuccess(
-            () =>
-                socket.send(
-                    '/auth/kegs/db/list-ext',
-                    {
-                        kegDbId: this.kegDb.id,
-                        options: {
-                            type: 'file',
-                            reverse: false,
-                            fromKegId,
-                            count: 50
-                        },
-                        filter: {
-                            deleted: false,
-                            hidden: false
-                        }
-                    },
-                    false
-                ),
-            `Initial file list loading for ${this.kegDb.id}`
-        ).then(
-            action(kegs => {
-                for (const keg of kegs.kegs) {
-                    if (keg.deleted || keg.hidden) {
-                        console.log(
-                            'Hidden or deleted file kegs should not have been returned by server.',
-                            keg.kegId
-                        );
-                        continue;
-                    }
-                    const file = new File(this.kegDb, this);
-                    if (keg.collectionVersion > this.maxUpdateId) {
-                        this.maxUpdateId = keg.collectionVersion;
-                    }
-                    if (keg.collectionVersion > this.knownUpdateId) {
-                        this.knownUpdateId = keg.collectionVersion;
-                    }
-                    if (file.loadFromKeg(keg)) {
-                        if (!file.fileId) {
-                            if (file.version > 1)
-                                console.error(
-                                    'File keg missing fileId',
-                                    file.id
-                                );
-                            // we can get a freshly created keg, it's not a big deal
-                            continue;
-                        }
-                        if (this.fileMap[file.fileId]) {
-                            console.error(
-                                'File keg has duplicate fileId',
-                                file.id
-                            );
-                            continue;
-                        }
-                        this.files.unshift(file);
-                        if (!this.loaded && this.onInitialFileAdded) {
-                            this.onInitialFileAdded(keg, file);
-                        }
-                    } else {
-                        console.error('Failed to load file keg.', keg.kegId);
-                        // trying to be safe performing destructive operation of deleting a corrupted file keg
-                        // (old file system had some)
-                        if (
-                            file.decryptionError &&
-                            keg.type === 'file' &&
-                            !keg.format
-                        ) {
-                            console.log('Removing invalid file keg', keg.id);
-                            file.remove();
-                        }
-                        continue;
-                    }
+                filter: {
+                    deleted: false,
+                    hidden: false
                 }
-                const size = kegs.kegs.length;
-                return { size, maxId: size > 0 ? kegs.kegs[0].kegId : 0 };
-            })
-        );
+            }, false),
+            `Initial file list loading for ${this.kegDb.id}`
+        ).then(action(kegs => {
+            for (const keg of kegs.kegs) {
+                if (keg.deleted || keg.hidden) {
+                    console.log('Hidden or deleted file kegs should not have been returned by server.', keg.kegId);
+                    continue;
+                }
+                const file = new File(this.kegDb, this);
+                if (keg.collectionVersion > this.maxUpdateId) {
+                    this.maxUpdateId = keg.collectionVersion;
+                }
+                if (keg.collectionVersion > this.knownUpdateId) {
+                    this.knownUpdateId = keg.collectionVersion;
+                }
+                if (file.loadFromKeg(keg)) {
+                    if (!file.fileId) {
+                        if (file.version > 1) console.error('File keg missing fileId', file.id);
+                        // we can get a freshly created keg, it's not a big deal
+                        continue;
+                    }
+                    if (this.fileMap[file.fileId]) {
+                        console.error('File keg has duplicate fileId', file.id);
+                        continue;
+                    }
+                    this.files.unshift(file);
+                    if (!this.loaded && this.onInitialFileAdded) {
+                        this.onInitialFileAdded(keg, file);
+                    }
+                } else {
+                    console.error('Failed to load file keg.', keg.kegId);
+                    // trying to be safe performing destructive operation of deleting a corrupted file keg
+                    // (old file system had some)
+                    if (file.decryptionError && keg.type === 'file' && !keg.format) {
+                        console.log('Removing invalid file keg', keg.id);
+                        file.remove();
+                    }
+                    continue;
+                }
+            }
+            const size = kegs.kegs.length;
+            return { size, maxId: size > 0 ? kegs.kegs[0].kegId : 0 };
+        }));
     }
 
-    @action
-    _finishLoading() {
+    @action _finishLoading() {
         this.loading = false;
         this.loaded = true;
-        socket.onDisconnect(() => {
-            this.updatedAfterReconnect = false;
-        });
+        socket.onDisconnect(() => { this.updatedAfterReconnect = false; });
         tracker.onUpdated(this.onFileDigestUpdate);
         setTimeout(this.onFileDigestUpdate);
         tracker.seenThis(this.kegDb.id, 'file', this.knownUpdateId);
@@ -322,38 +269,23 @@ class FileStoreBase {
     // this essentially does the same as loadAllFiles but with filter,
     // we reserve this way of updating anyway for future, when we'll not gonna load entire file list on start
     updateFiles = () => {
-        if (
-            !this.loaded ||
-            this.updating ||
-            this.knownUpdateId === this.maxUpdateId
-        )
-            return;
-        const maxId = this.maxUpdateId;
-        console.log(
-            `Proceeding to file update. Known collection version: ${
-                this.knownUpdateId
-            }`
-        );
+        if (!this.loaded || this.updating || this.knownUpdateId === this.maxUpdateId) return;
+        const maxId = this.maxUpdateId; // eslint-disable-line
+        console.log(`Proceeding to file update. Known collection version: ${this.knownUpdateId}`);
         this.updating = true;
         let dirty = false;
-        retryUntilSuccess(
-            () => this._getFiles(),
-            `Updating file list for ${this.kegDb.id}`
-        ).then(
-            action(resp => {
+        retryUntilSuccess(() => this._getFiles(), `Updating file list for ${this.kegDb.id}`)
+            .then(action(resp => {
                 const { kegs } = resp;
                 for (const keg of kegs) {
                     if (keg.collectionVersion > this.knownUpdateId) {
                         this.knownUpdateId = keg.collectionVersion;
                     }
                     if (!keg.props.fileId && !keg.deleted) {
-                        if (keg.version > 1)
-                            console.error('File keg missing fileId', keg.kegId);
+                        if (keg.version > 1) console.error('File keg missing fileId', keg.kegId);
                         continue;
                     }
-                    const existing =
-                        this.getById(keg.props.fileId) ||
-                        this.getByKegId(keg.kegId);
+                    const existing = this.getById(keg.props.fileId) || this.getByKegId(keg.kegId);
                     const file = existing || new File(this.kegDb, this);
                     if (keg.deleted || keg.hidden) {
                         if (existing) this.files.remove(existing);
@@ -376,8 +308,7 @@ class FileStoreBase {
                 if (this.onAfterUpdate) {
                     this.onAfterUpdate(dirty);
                 }
-            })
-        );
+            }));
     };
 
     /**

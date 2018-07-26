@@ -1,3 +1,4 @@
+
 const socket = require('../network/socket');
 const { observable, when, reaction } = require('mobx');
 const { asPromise } = require('../helpers/prombservable');
@@ -17,7 +18,7 @@ const { asPromise } = require('../helpers/prombservable');
  * @namespace UpdateTracker
  */
 class UpdateTracker {
-    DESCRIPTOR_PATH = 'global:fileDescriptor:updated';
+    DESCRIPTOR_PATH = 'global:fileDescriptor:updated'
     /**
      * listeners to new keg db added event
      * @type {Array<function>}
@@ -76,19 +77,10 @@ class UpdateTracker {
             socket.subscribe(socket.APP_EVENTS.digestUpdate, data => {
                 this.processDigestEvent(
                     data.kegDbId || data.path,
-                    [
-                        data.type,
-                        data.maxUpdateId,
-                        data.knownUpdateId,
-                        data.newKegsCount
-                    ],
-                    true
-                );
+                    [data.type, data.maxUpdateId, data.knownUpdateId, data.newKegsCount],
+                    true);
             });
-            socket.subscribe(
-                socket.APP_EVENTS.channelDeleted,
-                this.processChannelDeletedEvent.bind(this)
-            );
+            socket.subscribe(socket.APP_EVENTS.channelDeleted, this.processChannelDeletedEvent.bind(this));
             socket.onAuthenticated(this.loadDigest);
             socket.onDisconnect(() => {
                 this.updated = false;
@@ -123,9 +115,7 @@ class UpdateTracker {
      */
     subscribeToKegDbAdded(handler) {
         if (this.dbAddedHandlers.includes(handler)) {
-            console.error(
-                'This handler already subscribed to subscribeToKegDbAdded'
-            );
+            console.error('This handler already subscribed to subscribeToKegDbAdded');
             return;
         }
         this.dbAddedHandlers.push(handler);
@@ -146,9 +136,7 @@ class UpdateTracker {
             this.updateHandlers[kegDbId][kegType] = [];
         }
         if (this.updateHandlers[kegDbId][kegType].includes(handler)) {
-            console.error(
-                'This handler already subscribed to subscribeToKegUpdates'
-            );
+            console.error('This handler already subscribed to subscribeToKegUpdates');
             return;
         }
         this.updateHandlers[kegDbId][kegType].push(handler);
@@ -206,6 +194,7 @@ class UpdateTracker {
             }
             typeDigest.newKegsCount = newKegsCount;
 
+
             if (isFromEvent) this.emitKegTypeUpdatedEvent(kegDbId, kegType);
         } else {
             const d = this.globalDigest[kegDbId];
@@ -240,10 +229,7 @@ class UpdateTracker {
      */
     emitKegTypeUpdatedEvent(id, type) {
         if (!this.loadedOnce) {
-            when(
-                () => this.loadedOnce,
-                () => this.emitKegDbAddedEvent(id, type)
-            );
+            when(() => this.loadedOnce, () => this.emitKegDbAddedEvent(id, type));
             return;
         }
         if (!this.updateHandlers[id] || !this.updateHandlers[id][type]) return;
@@ -284,17 +270,9 @@ class UpdateTracker {
     loadDigest = async () => {
         console.log('Requesting full digest');
         try {
-            let resp = await socket.send(
-                '/auth/updates/digest',
-                { prefixes: ['global:'] },
-                false
-            );
+            let resp = await socket.send('/auth/updates/digest', { prefixes: ['global:'] }, false);
             this.processDigestResponse(resp);
-            resp = await socket.send(
-                '/auth/updates/digest',
-                { unread: true },
-                false
-            );
+            resp = await socket.send('/auth/updates/digest', { unread: true }, false);
             this.processDigestResponse(resp);
             if (!this.loadedOnce) {
                 this.markZeroCounterTypesAsRead();
@@ -306,15 +284,11 @@ class UpdateTracker {
                 this.loadDigest();
             }
         }
-    };
+    }
 
     // call this to make sure db digest is loaded disregarding its unread status
     async loadDigestFor(kegDbId) {
-        let resp = await socket.send(
-            '/auth/updates/digest',
-            { prefixes: [kegDbId] },
-            false
-        );
+        let resp = await socket.send('/auth/updates/digest', { prefixes: [kegDbId] }, false);
         this.processDigestResponse(resp);
     }
 
@@ -356,16 +330,7 @@ class UpdateTracker {
             } else this.seenThisQueue[id] = {};
             this.seenThisQueue[id][type] = updateId;
             // scheduling a run
-            setTimeout(
-                () =>
-                    this.seenThis(
-                        id,
-                        type,
-                        this.seenThisQueue[id][type],
-                        false
-                    ),
-                4000
-            );
+            setTimeout(() => this.seenThis(id, type, this.seenThisQueue[id][type], false), 4000);
             return;
         }
 
@@ -389,18 +354,12 @@ class UpdateTracker {
         // consumers should not care if this call fails, it makes things simpler.
         // to cover failure cases, consumers should activate 'mark as read' logic after every reconnect
         if (!socket.authenticated) return;
-        socket
-            .send(
-                '/auth/updates/last-known-version',
-                {
-                    path: type ? `${id}:${type}` : id,
-                    lastKnownVersion: updateId
-                },
-                false
-            )
+        socket.send('/auth/updates/last-known-version', {
+            path: type ? `${id}:${type}` : id,
+            lastKnownVersion: updateId
+        }, false)
             .then(() => {
-                if (digest.knownUpdateId < updateId)
-                    digest.knownUpdateId = updateId;
+                if (digest.knownUpdateId < updateId) digest.knownUpdateId = updateId;
             })
             .catch(this.logSeenThisError);
     }

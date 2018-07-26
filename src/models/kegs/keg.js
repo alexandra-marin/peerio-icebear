@@ -1,7 +1,7 @@
 const socket = require('../../network/socket');
 const { secret, sign, cryptoUtil } = require('../../crypto');
 const { AntiTamperError, ServerError } = require('../../errors');
-const { observable, action } = require('mobx');
+const { observable, action, when } = require('mobx');
 const { getContactStore } = require('../../helpers/di-contact-store');
 const { getUser } = require('../../helpers/di-current-user');
 const { asPromise, asPromiseMultiValue } = require('../../helpers/prombservable');
@@ -328,10 +328,11 @@ class Keg {
      * multiple kegs from server and want to instantiate them use this function
      * after creating appropriate keg instance.
      * @param {Object} keg data as received from server
+     * @param {bool} noVerify - prevents signature verification (for example, when loading cached keg)
      * @returns {Keg|boolean} - returns false if keg data could not have been loaded. This function doesn't throw,
      * you have to check error flags if you received false return value.
      */
-    @action loadFromKeg(keg) {
+    @action loadFromKeg(keg, noVerify = false) {
         try {
             this.lastLoadHadError = false;
             if (this.id && this.id !== keg.kegId) {
@@ -366,9 +367,11 @@ class Keg {
                 payload = new Uint8Array(keg.payload);
             }
             // SELF kegs do not require signing
-            if (this.forceSign || (!this.plaintext && this.db.id !== 'SELF')) {
+            if (!noVerify && (this.forceSign || (!this.plaintext && this.db.id !== 'SELF'))) {
                 const payloadToVerify = payload;
                 setTimeout(() => this.verifyKegSignature(payloadToVerify, keg.props), 3000);
+            } else {
+                this.signatureError = false;
             }
             this.pendingReEncryption = !!(keg.props.sharedBy && keg.props.sharedKegSenderPK);
             // is this keg shared with us and needs re-encryption?
@@ -407,10 +410,12 @@ class Keg {
             if (keg.props && keg.props.descriptor) this.deserializeDescriptor(keg.props.descriptor);
             if (this.afterLoad) this.afterLoad();
             this.loaded = true;
+            // TODO: not proud of this, looking for better ideas to get the raw keg from here to interested party
+            if (this.onLoadedFromKeg) this.onLoadedFromKeg(keg);
             return this;
         } catch (err) {
             console.error(err, this.id);
-            // TODO: refactor this fucntion to return error code instead
+            // TODO: refactor this function to return error code instead
             if (err instanceof DecryptionError) {
                 this.decryptionError = true;
             }
@@ -451,24 +456,36 @@ class Keg {
      */
     verifyKegSignature(payload, props) {
         if (!payload || this.lastLoadHadError) return;
-        let { signature } = props;
-        if (!signature) {
+        try {
+            let { signature } = props;
+            if (!signature) {
+                this.signatureError = true;
+                return;
+            }
+            signature = cryptoUtil.b64ToBytes(signature); // eslint-disable-line no-param-reassign
+            let signer = this.owner;
+            if (this.storeSignerData && props.signedBy) {
+                signer = props.signedBy;
+            }
+            const contact = getContactStore().getContact(signer);
+            contact.whenLoaded(async () => {
+                if (this.lastLoadHadError || contact.notFound) {
+                    this.signatureError = true;
+                    return;
+                }
+                try {
+                    const data = this.plaintext ? cryptoUtil.strToBytes(payload) : payload;
+                    const res = await sign.verifyDetached(data, signature, contact.signingPublicKey);
+                    this.signatureError = !res;
+                } catch (err) {
+                    console.error(err);
+                    this.signatureError = true;
+                }
+            });
+        } catch (err) {
+            console.error(err);
             this.signatureError = true;
-            return;
         }
-        signature = cryptoUtil.b64ToBytes(signature); // eslint-disable-line no-param-reassign
-        let signer = this.owner;
-        if (this.storeSignerData && props.signedBy) {
-            signer = props.signedBy;
-        }
-        const contact = getContactStore().getContact(signer);
-        contact.whenLoaded(() => {
-            if (this.lastLoadHadError) return;
-            contact.notFound ? Promise.resolve(false) :
-                sign.verifyDetached(
-                    this.plaintext ? cryptoUtil.strToBytes(payload) : payload, signature, contact.signingPublicKey
-                ).then(r => { this.signatureError = !r; });
-        });
     }
 
     /**
@@ -523,6 +540,10 @@ class Keg {
         if (payload._sys.type !== this.type) {
             throw new AntiTamperError(`Inner ${payload._sys.type} and outer ${this.type} keg type mismatch.`);
         }
+    }
+
+    onceVerified(callback) {
+        when(() => this.signatureError !== null, callback);
     }
 }
 

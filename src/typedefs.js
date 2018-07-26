@@ -28,6 +28,7 @@
  * @property {string} email
  * @property {number} added
  * @property {string} [username]
+ * @property {boolean} [isAutoImport]
  */
 
 /**

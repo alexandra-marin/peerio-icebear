@@ -167,6 +167,16 @@ class ChatMessageHandler {
     }
 
     loadMostRecentMessage() {
+        // This feature is not being used anymore,
+        // but it is not easy just to get rid of the flag,
+        // because it's being listened to by chat update code
+        // and it's being set when it is ok to actually load any updates (metaLoaded).
+        // In other words - it's in a chain of things that are supposed to execute in order.
+        // So maybe let's keep it this way for now to avoid refactoring that.
+        // Also maybe this feature will be requested again by product team.
+        setTimeout(() => { this.chat.mostRecentMessageLoaded = true; });
+        // DO NOT delete commented code, unless you are getting rid of the flag and the whole feature
+        /*
         retryUntilSuccess(() => socket.send('/auth/kegs/db/list-ext', {
             kegDbId: this.chat.id,
             options: {
@@ -181,6 +191,7 @@ class ChatMessageHandler {
                 this.chat.mostRecentMessageLoaded = true;
                 return this.chat.addMessages(resp.kegs);
             }));
+        */
     }
 
     getInitialPage() {
@@ -200,14 +211,15 @@ class ChatMessageHandler {
         }, false))
             .then(action(resp => {
                 this.chat.canGoUp = resp.hasMore;
-                this.chat.initialPageLoaded = true;
-                this.chat.loadingInitialPage = false;
                 this.chat._cancelTopPageLoad = false;
                 this.chat._cancelBottomPageLoad = false;
                 this.setDownloadedUpdateId(resp.kegs);
                 if (!this.chat.canGoDown) this.markAllAsSeen();
                 console.log(`got initial ${resp.kegs.length} for this.chat`, this.chat.id);
-                return this.chat.addMessages(resp.kegs);
+                return this.chat.addMessages(resp.kegs).finally(() => {
+                    this.chat.loadingInitialPage = false;
+                    this.chat.initialPageLoaded = true;
+                });
             }))
             .catch((err) => {
                 if (err && err.code === errorCodes.accessForbidden) {

@@ -49,10 +49,18 @@ class ContactStore {
     }
 
     /**
-     * Invited contacts.
-     * @type {ObservableArray<InvitedContacts>}
+     * Contacts pending to be added (invited manually or synced)
+     * @type {ObservableArray<InvitedContact>}
      */
-    @observable.shallow invitedContacts = [];
+    @observable.shallow pendingContacts = [];
+
+    /**
+     * Contacts pending to be added (invited manually or synced)
+     * @type {ObservableArray<InvitedContact>}
+     */
+    @computed get invitedContacts() {
+        return this.pendingContacts.filter(c => !c.isAutoImport);
+    }
 
     @computed get invitedNotJoinedContacts() {
         return this.invitedContacts.filter(c => !c.username);
@@ -185,22 +193,22 @@ class ContactStore {
     });
 
     applyInvitesData = action(() => {
-        this.invitedContacts = this.invites.issued;
+        this.pendingContacts = this.invites.issued;
         when(
             () => this.invites.loaded && tofuStore.loaded && getChatStore().loaded,
             () => {
                 try {
-                    this.invitedContacts.forEach(c => {
+                    this.pendingContacts.forEach(async c => {
                         if (c.username) {
                             // If c.username exists, then invited user has indeed joined Peerio & confirmed email.
                             // But, if same username isn't in tofuStore, current user doesn't yet know this,
                             // so emit `onInviteAccepted` event (on desktop this shows a notification).
-                            if (!tofuStore.cache[c.username]) {
+                            if (!await tofuStore.getByUsername(c.username)) {
                                 setTimeout(() => this.onInviteAccepted({ contact: c }));
                             }
 
                             this.getContactAndSave(c.username);
-                            getChatStore().pending.add(c.username, c.email);
+                            getChatStore().pending.add(c.username, c.email, false, c.isAutoImport);
                         }
                         return null;
                     });
@@ -445,8 +453,9 @@ class ContactStore {
      * Any contact that your app ever encountered has a tofu keg.
      */
     loadContactsFromTOFUKegs() {
-        when(() => tofuStore.loaded, () => {
-            tofuStore.usernames.forEach(username => this.getContactAndSave(username));
+        when(() => tofuStore.loaded, async () => {
+            const usernames = await tofuStore.getUsernames();
+            usernames.forEach(username => this.getContactAndSave(username));
             console.log('Loaded contacts from tofu kegs');
         });
     }

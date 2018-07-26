@@ -142,7 +142,6 @@ class FileStoreMigration {
         this.started = false;
         this.performedByAnotherClient = false;
         this.progress = 100;
-        this.fileStore.resume();
     }
 
     /**
@@ -282,7 +281,7 @@ class FileStoreMigration {
             if (!recipient) {
                 const chat = getChatStore().chatMap[item.kegDbId];
                 if (chat) {
-                    await asPromise(chat, 'headLoaded', true); //eslint-disable-line
+                    if (chat.isChannel) await asPromise(chat, 'headLoaded', true); //eslint-disable-line
                     recipient = chat.name;
                 } else {
                     recipient = item.kegDbId;

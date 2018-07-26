@@ -561,7 +561,7 @@ class File extends Keg {
             this.fileId = d.fileId;
         }
         if (this.fileId !== d.fileId) throw new Error('Descriptor fileId mismatch');
-        if (this.descriptorVersion > d.version) return;
+        if (this.descriptorVersion >= d.version) return;
         if (!this.descriptorKey) {
             // this is a legacy file, owner migrated it and by default descriptorKey == blobKey during migration
             this.descriptorKey = this.blobKey;
@@ -577,6 +577,11 @@ class File extends Keg {
         this.shared = d.shared;
         this.role = d.effectiveRole;
         this.descriptorVersion = d.version;
+        // TODO: it's pointless to verify signature currently
+        // because replacing blobKey will not help attacker(server) to achieve anything except
+        // preventing access to data, which is already possible by just removing keys
+        // BUT once we have some feature that allows uploading new blob version with
+        // existing blob key - we need to verify
         let payload = new Uint8Array(d.payload);
         payload = secret.decryptString(payload, cryptoUtil.b64ToBytes(this.descriptorKey));
         payload = JSON.parse(payload);

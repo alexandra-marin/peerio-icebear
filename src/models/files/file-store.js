@@ -10,6 +10,7 @@ const { retryUntilSuccess, isRunning } = require('../../helpers/retry');
 const TaskQueue = require('../../helpers/task-queue');
 const { setFileStore } = require('../../helpers/di-file-store');
 const { getChatStore } = require('../../helpers/di-chat-store');
+const { getVolumeStore } = require('../../helpers/di-volume-store');
 const FileStoreMigration = require('./file-store.migration');
 const errorCodes = require('../../errors').ServerError.codes;
 const FileStoreBase = require('./file-store-base');
@@ -28,13 +29,7 @@ class FileStore extends FileStoreBase {
         // not very intuitive, but until we make a special file store for chats it works
         this.chatFileMap = observable.map();
 
-        tracker.subscribeToFileDescriptorUpdates(() => {
-            const d = tracker.fileDescriptorDigest;
-            if (d.knownUpdateId >= d.maxUpdateId) return;
-            this.updateDescriptors(d.knownUpdateId);
-        });
-
-        when(() => this.loaded, this.onFinishLoading);
+        when(() => this.allStoresLoaded, this.onFinishLoading);
     }
 
     // Human readable maximum auto-expandable inline image size limit
@@ -45,15 +40,18 @@ class FileStore extends FileStoreBase {
     uploadQueue = new TaskQueue(1);
     migrationQueue = new TaskQueue(1);
 
+    @computed get allStoresLoaded() {
+        return this.loaded && getVolumeStore().loaded && FileStoreBase.instances.values().every(s => s.loaded);
+    }
+
     @computed get isEmpty() {
         return !this.files.length && !this.folderStore.root.folders.length;
     }
 
     updateDescriptors = _.debounce(() => {
-        if (this.paused) return;
-
+        console.log('Updating descriptors');
         const taskId = 'updating descriptors';
-        if (isRunning('taskId')) return;
+        if (isRunning(taskId)) return;
         if (!this.knownDescriptorVersion) {
             this.knownDescriptorVersion = tracker.fileDescriptorDigest.knownUpdateId;
         }
@@ -82,6 +80,7 @@ class FileStore extends FileStoreBase {
                         if (this.knownDescriptorVersion < d.collectionVersion) {
                             this.knownDescriptorVersion = d.collectionVersion;
                         }
+                        FileStoreBase.instances.forEach(store => store.cacheDescriptor(d));
                     });
             });
             // we might not have loaded all updated descriptors
@@ -92,11 +91,20 @@ class FileStore extends FileStoreBase {
                 this.knownDescriptorVersion = maxUpdateIdBefore;
             }
             tracker.seenThis(tracker.DESCRIPTOR_PATH, null, this.knownDescriptorVersion);
+            this.descriptorsCache.setValue(
+                'knownDescriptorVersion',
+                { key: 'knownDescriptorVersion', value: this.knownDescriptorVersion },
+                (oldVal, newVal) => {
+                    if (!oldVal) return newVal;
+                    if (oldVal.value >= newVal.value) return false;
+                    return newVal;
+                }
+            );
             if (this.knownDescriptorVersion < tracker.fileDescriptorDigest.maxUpdateId) this.updateDescriptors();
         });
     }, 1500, { leading: true, maxWait: 3000 });
 
-    @action.bound onInitialFileAdded(keg, file) {
+    @action.bound onFileAdded(keg, file) {
         if (!file.format) {
             if (file.fileOwner === User.current.username) {
                 file.migrating = true;
@@ -133,7 +141,7 @@ class FileStore extends FileStoreBase {
         }
     }
 
-    @action.bound onFinishLoading() {
+    @action.bound async onFinishLoading() {
         this.resumeBrokenDownloads();
         this.resumeBrokenUploads();
         this.detectCachedFiles();
@@ -150,6 +158,19 @@ class FileStore extends FileStoreBase {
                 }
             }
         });
+
+        this.descriptorsCache = new config.CacheEngine('file_store_meta', 'key');
+        await this.descriptorsCache.open();
+        const known = await this.descriptorsCache.getValue('knownDescriptorVersion');
+        if (known) {
+            this.knownDescriptorVersion = known.value;
+        }
+        tracker.subscribeToFileDescriptorUpdates(() => {
+            const d = tracker.fileDescriptorDigest;
+            if (d.knownUpdateId >= d.maxUpdateId) return;
+            this.updateDescriptors();
+        });
+        this.updateDescriptors();
     }
 
     onAfterUpdate(dirty) {
@@ -514,17 +535,6 @@ class FileStore extends FileStoreBase {
             setTimeout(checkFile);
         };
         checkFile();
-    }
-
-    /**
-     * Resume file store updates.
-     */
-    resume() {
-        super.resume();
-        setTimeout(() => {
-            this.onFileDigestUpdate();
-            this.updateDescriptors();
-        });
     }
 }
 

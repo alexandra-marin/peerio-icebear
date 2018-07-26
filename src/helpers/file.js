@@ -3,9 +3,6 @@
  * @alias fileHelpers
  */
 
-// jsdoc hack..
-let a; //eslint-disable-line
-
 /**
  * Extracts file name+extension portion from any path.
  * @param {string} path
@@ -139,7 +136,7 @@ function sanitizeBidirectionalFilePart(name) {
                 hadIsolatePop = true;
                 break;
             default:
-                // nothing
+            // nothing
         }
     }
     // If counts aren't zero, add more pops.

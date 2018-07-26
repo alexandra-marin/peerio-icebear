@@ -2,6 +2,7 @@ const { observable, action, computed, reaction, autorunAsync, isObservableArray,
 const Chat = require('./chat');
 const ChatStorePending = require('./chat-store.pending.js');
 const ChatStoreSpaces = require('./chat-store.spaces.js');
+const ChatStoreCache = require('./chat-store.cache.js');
 const socket = require('../../network/socket');
 const tracker = require('../update-tracker');
 const { EventEmitter } = require('eventemitter3');
@@ -13,7 +14,6 @@ const { asPromise } = require('../../helpers/prombservable');
 const { getUser } = require('../../helpers/di-current-user');
 const warnings = require('../warnings');
 const { setChatStore } = require('../../helpers/di-chat-store');
-const { getFileStore } = require('../../helpers/di-file-store');
 const { cryptoUtil } = require('../../crypto');
 const chatInviteStore = require('./chat-invite-store');
 const dbListProvider = require('../../helpers/keg-db-list-provider');
@@ -30,6 +30,7 @@ class ChatStore {
     constructor() {
         this.pending = new ChatStorePending(this);
         this.spaces = new ChatStoreSpaces(this);
+        this.cache = new ChatStoreCache(this);
 
         reaction(() => this.activeChat, chat => {
             if (chat) chat.loadMessages();
@@ -43,6 +44,7 @@ class ChatStore {
             autorunAsync(() => {
                 TinyDb.user.setValue('pref_unreadChatsAlwaysOnTop', this.unreadChatsAlwaysOnTop);
             }, 2000);
+            await this.cache.open();
             this.loadAllChats();
         });
         socket.onceStarted(() => {
@@ -126,7 +128,7 @@ class ChatStore {
      * @type {Array<Chat>}
      */
     @computed get directMessages() {
-        return this.chats.filter(chat => !chat.isChannel && chat.headLoaded);
+        return this.chats.filter(chat => !chat.isChannel);
     }
 
     /**
@@ -386,13 +388,13 @@ class ChatStore {
         }
 
         // waiting for most chats to load but up to a reasonable time
-        await Promise.map(this.chats, chat => asPromise(chat, 'headLoaded', true))
+        await Promise.map(this.chats,
+            chat => chat.isChannel
+                ? asPromise(chat, 'headLoaded', true)
+                : asPromise(chat, 'metaLoaded', true)
+        )
             .timeout(5000)
-            .catch(() => { /* well, the rest will trigger re-render */ })
-            .then(() => {
-                // not returning promise because don't want to wait
-                getFileStore().loadAllFiles();
-            });
+            .catch(() => { /* well, the rest will trigger re-render */ });
 
         // 8. find out which chat to activate.
         const lastUsed = await TinyDb.user.getValue('lastUsedChat');

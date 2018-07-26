@@ -12,9 +12,7 @@ describe('TaskQueue should', () => {
         });
 
         shareQueue.addTask(() => {
-            return Promise.delay(500).then(() =>
-                results.push(3)
-            );
+            return Promise.delay(500).then(() => results.push(3));
         });
 
         shareQueue.addTask(() => {
@@ -52,9 +50,7 @@ describe('TaskQueue should', () => {
         });
 
         shareQueue.addTask(() => {
-            return Promise.delay(500).then(() =>
-                results.push(3)
-            );
+            return Promise.delay(500).then(() => results.push(3));
         });
 
         results.should.be.empty;
@@ -66,4 +62,3 @@ describe('TaskQueue should', () => {
         results.should.deep.equal([1, 2, 3]);
     });
 });
-

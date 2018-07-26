@@ -23,7 +23,8 @@ if (global && global.cryptoShim) {
 // node crypto?
 if (!getRandomBytes && global) {
     try {
-        const crypto = require('crypto'); //eslint-disable-line
+        // eslint-disable-next-line global-require
+        const crypto = require('crypto');
         getRandomBytes = function(num) {
             return crypto.randomBytes(num);
         };
@@ -39,7 +40,8 @@ if (!getRandomBytes && window) {
     };
 }
 
-if (!getRandomBytes) throw new Error('No PRNG implementation found. Application can not start.');
+if (!getRandomBytes)
+    throw new Error('No PRNG implementation found. Application can not start.');
 
 /**
  * Generated cryptographically secure random number in a set range.
@@ -59,7 +61,7 @@ function getRandomNumber(min = 0, max = 2147483648) {
         throw new InvalidArgumentError('Range too big for getRandomNumber()');
     }
     const bytesNeeded = Math.ceil(bitsNeeded / 8);
-    const mask = (2 ** bitsNeeded) - 1;
+    const mask = 2 ** bitsNeeded - 1;
 
     let rval = 0;
 
@@ -69,7 +71,7 @@ function getRandomNumber(min = 0, max = 2147483648) {
 
         let p = (bytesNeeded - 1) * 8;
         for (let i = 0; i < bytesNeeded; i++) {
-            rval += byteArray[i] * (2 ** p);
+            rval += byteArray[i] * 2 ** p;
             p -= 8;
         }
         rval &= mask;
@@ -102,7 +104,10 @@ function getRandomNonce() {
  */
 function getRandomUserSpecificIdBytes(username) {
     const id = new Uint8Array(42);
-    const hash = hashing.getByteHash(16, convert.strToBytes(username + Date.now().toString()));
+    const hash = hashing.getByteHash(
+        16,
+        convert.strToBytes(username + Date.now().toString())
+    );
     id.set(hash);
     id.set(getRandomBytes(26), 16);
     return id;
@@ -134,8 +139,11 @@ function getRandomGlobalShortIdHex() {
 }
 
 function getRandomGlobalUrlSafeShortIdB64() {
-    return convert.bytesToB64(getRandomBytes(16))
-        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    return convert
+        .bytesToB64(getRandomBytes(16))
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
 }
 
 /**
@@ -151,7 +159,6 @@ function getRandomShortIdHex() {
     return convert.bytesToHex(id);
 }
 
-
 /**
  * Calculates deviceId from username and an optional device unique identifier.
  * If device unique identifier is not specified, a random value is used.
@@ -160,7 +167,11 @@ function getRandomShortIdHex() {
  * @param {[string]} deviceUID
  */
 function getDeviceId(username, deviceUID) {
-    const h = hashing.getHashObject(32, convert.strToBytes(username), 'PRIDevId');
+    const h = hashing.getHashObject(
+        32,
+        convert.strToBytes(username),
+        'PRIDevId'
+    );
     if (deviceUID && deviceUID.length > 0) {
         h.update(convert.strToBytes(deviceUID));
     } else {

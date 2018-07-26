@@ -4,7 +4,7 @@
 
 // jsdoc (or documentationjs?) freaks out and pulls param from the next function
 // unless this useless variable is defined
-let a;// eslint-disable-line
+let a; // eslint-disable-line no-unused-vars
 
 /**
  * Finds all ArrayBuffer type properties recursively and changes them to Uint8Array created with the same ArrayBuffer.
@@ -12,10 +12,10 @@ let a;// eslint-disable-line
  * @returns {Object} same object that was passed but with some property values changed.
  */
 function convertBuffers(obj) {
-    if (typeof (obj) !== 'object') return obj;
+    if (typeof obj !== 'object') return obj;
 
     for (const prop in obj) {
-        const type = typeof (obj[prop]);
+        const type = typeof obj[prop];
         if (type !== 'object') {
             continue;
         }
@@ -58,4 +58,3 @@ function tryToGet(fn, defaultValue) {
 }
 
 module.exports = { convertBuffers, formatBytes, tryToGet };
-

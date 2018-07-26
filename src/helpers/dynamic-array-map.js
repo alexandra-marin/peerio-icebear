@@ -5,7 +5,7 @@
 const { observable } = require('mobx');
 
 // jsdoc hack..
-let a;//eslint-disable-line
+let a; // eslint-disable-line no-unused-vars
 
 /**
  * Creates a map object that will be dynamically updated when items are added or removed to the passed array.

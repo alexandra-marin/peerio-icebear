@@ -29,8 +29,12 @@ class BootKeg extends Keg {
          * @type {KeyPair}
          */
         this.encryptionKeys = {};
-        this.encryptionKeys.publicKey = util.b64ToBytes(data.encryptionKeys.publicKey);
-        this.encryptionKeys.secretKey = util.b64ToBytes(data.encryptionKeys.secretKey);
+        this.encryptionKeys.publicKey = util.b64ToBytes(
+            data.encryptionKeys.publicKey
+        );
+        this.encryptionKeys.secretKey = util.b64ToBytes(
+            data.encryptionKeys.secretKey
+        );
         /**
          * @type {Uint8Array}
          */

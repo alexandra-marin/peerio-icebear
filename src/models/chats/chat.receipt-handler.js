@@ -23,24 +23,42 @@ class ChatReceiptHandler {
         this.chat = chat;
         // receipts cache {username: ReadReceipt}
         this.chat.receipts = observable.shallowMap();
-        tracker.subscribeToKegUpdates(chat.id, 'read_receipt', this.onDigestUpdate);
+        tracker.subscribeToKegUpdates(
+            chat.id,
+            'read_receipt',
+            this.onDigestUpdate
+        );
         this.onDigestUpdate();
-        this._reactionsToDispose.push(reaction(() => tracker.updated, updated => {
-            if (updated) this.onDigestUpdate();
-            if (!updated || !this.pendingReceipt) return;
-            const pos = this.pendingReceipt;
-            this.pendingReceipt = null;
-            this.sendReceipt(pos);
-        }));
-        this._reactionsToDispose.push(reaction(() => this.chat.active, active => {
-            if (active) this.onDigestUpdate();
-        }));
+        this._reactionsToDispose.push(
+            reaction(
+                () => tracker.updated,
+                updated => {
+                    if (updated) this.onDigestUpdate();
+                    if (!updated || !this.pendingReceipt) return;
+                    const pos = this.pendingReceipt;
+                    this.pendingReceipt = null;
+                    this.sendReceipt(pos);
+                }
+            )
+        );
+        this._reactionsToDispose.push(
+            reaction(
+                () => this.chat.active,
+                active => {
+                    if (active) this.onDigestUpdate();
+                }
+            )
+        );
     }
 
     onDigestUpdate = () => {
         const digest = tracker.getDigest(this.chat.id, 'read_receipt');
         if (digest.maxUpdateId < this.downloadedCollectionVersion) {
-            tracker.seenThis(this.chat.id, 'read_receipt', this.downloadedCollectionVersion);
+            tracker.seenThis(
+                this.chat.id,
+                'read_receipt',
+                this.downloadedCollectionVersion
+            );
         }
         if (!this.chat.active) return;
         this.loadQueue.addTask(this.loadReceipts);
@@ -51,7 +69,7 @@ class ChatReceiptHandler {
      */
     sendReceipt(pos) {
         // console.debug(`sendReceipt(${pos})`);
-        pos = +pos;// eslint-disable-line no-param-reassign
+        pos = +pos; // eslint-disable-line no-param-reassign
         // console.debug('asked to send receipt: ', pos);
         // if something is currently in progress of sending we just want to adjust max value
         if (this.pendingReceipt) {
@@ -63,96 +81,126 @@ class ChatReceiptHandler {
         }
         this.pendingReceipt = pos;
         // getting it from cache or from server
-        retryUntilSuccess(this.loadOwnReceipt)
-            .then(r => {
-                // console.debug('Loaded own receipt pos: ', r.chatPosition, ' pending: ', this.pendingReceipt);
-                if (r.chatPosition >= this.pendingReceipt) {
-                    // ups, keg has a bigger position then we are trying to save
-                    // console.debug('it is higher then pending one too:', this.pendingReceipt);
-                    this.pendingReceipt = null;
-                    return;
-                }
-                r.chatPosition = this.pendingReceipt;
-                // console.debug('Saving receipt: ', pos);
-                return r.saveToServer() // eslint-disable-line
-                    .then(() => {
-                        if (r.chatPosition >= this.pendingReceipt) {
-                            this.pendingReceipt = null;
-                        }
-                        if (this.pendingReceipt) {
-                            pos = this.pendingReceipt;// eslint-disable-line
-                            this.pendingReceipt = null;
-                            this.sendReceipt(pos);
-                        }
-                    })
-                    .catch(err => {
-                        // normally, this is a connection issue or concurrency.
-                        // to resolve concurrency error we reload the cached keg
-                        console.error(err);
-                        pos = this.pendingReceipt;// eslint-disable-line
+        retryUntilSuccess(this.loadOwnReceipt).then(r => {
+            // console.debug('Loaded own receipt pos: ', r.chatPosition, ' pending: ', this.pendingReceipt);
+            if (r.chatPosition >= this.pendingReceipt) {
+                // ups, keg has a bigger position then we are trying to save
+                // console.debug('it is higher then pending one too:', this.pendingReceipt);
+                this.pendingReceipt = null;
+                return;
+            }
+            r.chatPosition = this.pendingReceipt;
+            // console.debug('Saving receipt: ', pos);
+
+            // eslint-disable-next-line consistent-return
+            return r
+                .saveToServer()
+                .then(() => {
+                    if (r.chatPosition >= this.pendingReceipt) {
                         this.pendingReceipt = null;
-                        this._ownReceipt.load().then(() => {
-                            this.sendReceipt(pos);
-                        });
+                    }
+                    if (this.pendingReceipt) {
+                        // eslint-disable-next-line no-param-reassign
+                        pos = this.pendingReceipt;
+                        this.pendingReceipt = null;
+                        this.sendReceipt(pos);
+                    }
+                })
+                .catch(err => {
+                    // normally, this is a connection issue or concurrency.
+                    // to resolve concurrency error we reload the cached keg
+                    console.error(err);
+                    // eslint-disable-next-line no-param-reassign
+                    pos = this.pendingReceipt;
+                    this.pendingReceipt = null;
+                    this._ownReceipt.load().then(() => {
+                        this.sendReceipt(pos);
                     });
-            });
+                });
+        });
     }
 
     // loads own receipt keg, we needs this bcs named keg will not get created until read first time
     loadOwnReceipt = () => {
         if (this._ownReceipt) return Promise.resolve(this._ownReceipt);
         this._ownReceipt = new ReadReceipt(User.current.username, this.chat.db);
-        return retryUntilSuccess(() => this._ownReceipt.load())
-            .then(() => {
-                if (!this._ownReceipt.chatPosition) this._ownReceipt.chatPosition = 0;
-                return this._ownReceipt;
-            });
+        return retryUntilSuccess(() => this._ownReceipt.load()).then(() => {
+            if (!this._ownReceipt.chatPosition)
+                this._ownReceipt.chatPosition = 0;
+            return this._ownReceipt;
+        });
     };
 
     loadReceipts = () => {
         let digest = tracker.getDigest(this.chat.id, 'read_receipt');
-        if (digest.maxUpdateId && digest.maxUpdateId <= this.downloadedCollectionVersion) return null;
-        const filter = this.downloadedCollectionVersion ?
-            { minCollectionVersion: this.downloadedCollectionVersion } : {};
-        return socket.send('/auth/kegs/db/list-ext', {
-            kegDbId: this.chat.id,
-            options: {
-                type: 'read_receipt',
-                reverse: false
-            },
-            filter
-        }, false).then(res => {
-            const { kegs } = res;
-            if (!kegs || !kegs.length) return;
-            for (let i = 0; i < kegs.length; i++) {
-                if (kegs[i].collectionVersion > this.downloadedCollectionVersion) {
-                    this.downloadedCollectionVersion = kegs[i].collectionVersion;
-                }
-                try {
-                    const r = new ReadReceipt(null, this.chat.db);
-                    r.loadFromKeg(kegs[i]);
-                    if (r.owner === User.current.username) {
-                        if (this._ownReceipt && this._ownReceipt.version < r.version) {
-                            this._ownReceipt = r;
-                        }
-                    } else {
-                        this.chat.receipts.set(r.owner, r);
+        if (
+            digest.maxUpdateId &&
+            digest.maxUpdateId <= this.downloadedCollectionVersion
+        )
+            return null;
+        const filter = this.downloadedCollectionVersion
+            ? { minCollectionVersion: this.downloadedCollectionVersion }
+            : {};
+        return socket
+            .send(
+                '/auth/kegs/db/list-ext',
+                {
+                    kegDbId: this.chat.id,
+                    options: {
+                        type: 'read_receipt',
+                        reverse: false
+                    },
+                    filter
+                },
+                false
+            )
+            .then(res => {
+                const { kegs } = res;
+                if (!kegs || !kegs.length) return;
+                for (let i = 0; i < kegs.length; i++) {
+                    if (
+                        kegs[i].collectionVersion >
+                        this.downloadedCollectionVersion
+                    ) {
+                        this.downloadedCollectionVersion =
+                            kegs[i].collectionVersion;
                     }
-                } catch (err) {
-                    // we don't want to break everything for one faulty receipt
-                    console.error(err);
+                    try {
+                        const r = new ReadReceipt(null, this.chat.db);
+                        r.loadFromKeg(kegs[i]);
+                        if (r.owner === User.current.username) {
+                            if (
+                                this._ownReceipt &&
+                                this._ownReceipt.version < r.version
+                            ) {
+                                this._ownReceipt = r;
+                            }
+                        } else {
+                            this.chat.receipts.set(r.owner, r);
+                        }
+                    } catch (err) {
+                        // we don't want to break everything for one faulty receipt
+                        console.error(err);
+                    }
                 }
-            }
-            digest = tracker.getDigest(this.chat.id, 'read_receipt');
-            if (digest.knownUpdateId < digest.maxUpdateId || !digest.maxUpdateId) {
-                tracker.seenThis(this.chat.id, 'read_receipt', this.downloadedCollectionVersion);
-            }
-            this.applyReceipts();
-        });
-    }
+                digest = tracker.getDigest(this.chat.id, 'read_receipt');
+                if (
+                    digest.knownUpdateId < digest.maxUpdateId ||
+                    !digest.maxUpdateId
+                ) {
+                    tracker.seenThis(
+                        this.chat.id,
+                        'read_receipt',
+                        this.downloadedCollectionVersion
+                    );
+                }
+                this.applyReceipts();
+            });
+    };
 
     // todo: can be faster
-    @action applyReceipts() {
+    @action
+    applyReceipts() {
         const users = this.chat.receipts.keys();
 
         for (let i = 0; i < this.chat.messages.length; i++) {

@@ -3,7 +3,7 @@
  */
 
 // jsdoc hack..
-let a; //eslint-disable-line
+let a; // eslint-disable-line no-unused-vars
 
 /**
  * Returns first unicode character of a string.

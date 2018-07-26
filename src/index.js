@@ -61,7 +61,6 @@ const Contact = require('./models/contacts/contact');
 const prombservable = require('./helpers/prombservable');
 const tracker = require('./models/update-tracker');
 
-
 // MEMO: Do NOT export NodeJsonStorage and NodeFileStream here for compatibility reasons
 module.exports = {
     errors,

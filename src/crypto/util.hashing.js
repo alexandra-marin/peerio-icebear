@@ -16,7 +16,12 @@ const padding = require('./util.padding');
  */
 function getHashObject(length, value, personalizationString) {
     const personalization = personalizationString
-        ? { personalization: padding.padBytes(convert.strToBytes(personalizationString), 8) }
+        ? {
+              personalization: padding.padBytes(
+                  convert.strToBytes(personalizationString),
+                  8
+              )
+          }
         : undefined;
     const h = new BLAKE2s(length, personalization);
     h.update(value);
@@ -54,7 +59,12 @@ function getByteHash(length, value, personalizationString) {
 function getFingerprint(username, publicKey) {
     const scrypt = getScrypt();
     return new Promise(resolve => {
-        scrypt(publicKey, convert.strToBytes(username), { N: 4096, r: 8, dkLen: 24, encoding: 'binary' }, resolve);
+        scrypt(
+            publicKey,
+            convert.strToBytes(username),
+            { N: 4096, r: 8, dkLen: 24, encoding: 'binary' },
+            resolve
+        );
     }).then(fingerprintToStr);
 }
 
@@ -67,7 +77,7 @@ function fingerprintToStr(bytes) {
     const v = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
     const c = [];
     for (let i = 0; i < bytes.length; i += 4) {
-        c.push((`00000${v.getUint32(i) % 100000}`).slice(-5));
+        c.push(`00000${v.getUint32(i) % 100000}`.slice(-5));
     }
     return c.join('-');
 }

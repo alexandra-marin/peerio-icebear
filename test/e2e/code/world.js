@@ -23,7 +23,9 @@ class PeerioAppWorld {
      */
     waitFor = (lambda, timeout = 180000) => {
         let resolve;
-        const promise = new Promise((_resolve) => { resolve = _resolve; });
+        const promise = new Promise(_resolve => {
+            resolve = _resolve;
+        });
         const disposeReaction = this.libs.mobx.when(lambda, resolve);
         return promise.timeout(timeout).catch(err => {
             disposeReaction();
@@ -39,7 +41,7 @@ class PeerioAppWorld {
         ice.User.current = u;
         await u.login();
         return this.waitForAccountDataInit();
-    }
+    };
 
     waitForAccountDataInit = async () => {
         const { asPromise, asPromiseNegative } = this.libs.prombservable;
@@ -55,15 +57,23 @@ class PeerioAppWorld {
         await asPromise(ice.contactStore.myContacts.loaded, true);
         console.log('Account init: waiting self contact info to load');
         await ice.contactStore.currentUser.ensureLoaded();
-    }
+    };
 
-    confirmPrimaryEmail = async (emailAddress) => {
-        const email = await waitForEmail(emailAddress, testConfig.primaryEmailConfirmSubject);
+    confirmPrimaryEmail = async emailAddress => {
+        const email = await waitForEmail(
+            emailAddress,
+            testConfig.primaryEmailConfirmSubject
+        );
         const url = testConfig.emailConfirmUrlRegex.exec(email.body)[1];
         await getUrl(url);
-    }
+    };
 
-    createAccount = async (username, email, isTestAccount = false, extraProps = null) => {
+    createAccount = async (
+        username,
+        email,
+        isTestAccount = false,
+        extraProps = null
+    ) => {
         await this.libs.prombservable.asPromise(ice.socket, 'connected', true);
 
         const u = new ice.User();
@@ -86,7 +96,11 @@ class PeerioAppWorld {
             };
         }
 
-        console.log(`creating ${isTestAccount ? 'test ' : ''}user username: ${u.username} passphrase: ${u.passphrase}`);
+        console.log(
+            `creating ${isTestAccount ? 'test ' : ''}user username: ${
+                u.username
+            } passphrase: ${u.passphrase}`
+        );
 
         await u.createAccountAndLogin();
         console.log('Account created, waiting for initialization.');
@@ -95,9 +109,7 @@ class PeerioAppWorld {
 
     createTestAccount = async (username = null, email = null) => {
         return this.createAccount(username, email, true);
-    }
+    };
 }
 
-
 setWorldConstructor(PeerioAppWorld);
-

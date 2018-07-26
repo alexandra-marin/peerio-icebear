@@ -4,8 +4,10 @@ function isInvitedMember(world, chat, username) {
     const predicate = p => p.username === username;
     return world.waitFor(() => {
         const { allParticipants, allJoinedParticipants } = chat;
-        return allParticipants.find(predicate)
-            && !allJoinedParticipants.find(predicate);
+        return (
+            allParticipants.find(predicate) &&
+            !allJoinedParticipants.find(predicate)
+        );
     });
 }
 
@@ -13,8 +15,10 @@ function isJoinedMember(world, chat, username) {
     const predicate = p => p.username === username;
     return world.waitFor(() => {
         const { allParticipants, allJoinedParticipants } = chat;
-        return allParticipants.find(predicate)
-            && allJoinedParticipants.find(predicate);
+        return (
+            allParticipants.find(predicate) &&
+            allJoinedParticipants.find(predicate)
+        );
     });
 }
 
@@ -32,9 +36,9 @@ async function createRoom() {
 When('I create a room', createRoom);
 
 function inviteCucumbot() {
-    return ice.chatStore.activeChat.addParticipants(
-        [this.cucumbotClient.username]
-    );
+    return ice.chatStore.activeChat.addParticipants([
+        this.cucumbotClient.username
+    ]);
 }
 
 When('I invite Cucumbot to the room', inviteCucumbot);
@@ -60,42 +64,71 @@ When('Cucumbot rejects the invite', function() {
 });
 
 When('I recall the invite', function() {
-    return ice.chatInviteStore.revokeInvite(ice.chatStore.activeChat.id, this.cucumbotClient.username);
+    return ice.chatInviteStore.revokeInvite(
+        ice.chatStore.activeChat.id,
+        this.cucumbotClient.username
+    );
 });
 
 When('I kick Cucumbot from the room', function() {
-    return ice.chatStore.activeChat.removeParticipant(this.cucumbotClient.username);
+    return ice.chatStore.activeChat.removeParticipant(
+        this.cucumbotClient.username
+    );
 });
 
-
 Then('I see the invite I sent', async function() {
-    await this.waitFor(() => ice.chatStore.activeChat.messages.find((m) => {
-        const sd = m.systemData;
-        return sd && sd.action === 'inviteSent' && sd.usernames.length === 1
-            && sd.usernames[0] === this.cucumbotClient.username;
-    }));
+    await this.waitFor(() =>
+        ice.chatStore.activeChat.messages.find(m => {
+            const sd = m.systemData;
+            return (
+                sd &&
+                sd.action === 'inviteSent' &&
+                sd.usernames.length === 1 &&
+                sd.usernames[0] === this.cucumbotClient.username
+            );
+        })
+    );
     await this.waitFor(() => {
-        const invites = ice.chatInviteStore.sent.get(ice.chatStore.activeChat.id);
-        return invites && invites.length === 1 && invites[0].username === this.cucumbotClient.username;
+        const invites = ice.chatInviteStore.sent.get(
+            ice.chatStore.activeChat.id
+        );
+        return (
+            invites &&
+            invites.length === 1 &&
+            invites[0].username === this.cucumbotClient.username
+        );
     });
-    return isInvitedMember(this, ice.chatStore.activeChat, this.cucumbotClient.username);
+    return isInvitedMember(
+        this,
+        ice.chatStore.activeChat,
+        this.cucumbotClient.username
+    );
 });
 
 Then('I can see Cucumbot joined the room', async function() {
     await this.waitFor(() => ice.chatInviteStore.sent.keys.length === 0);
-    return isJoinedMember(this, ice.chatStore.activeChat, this.cucumbotClient.username);
+    return isJoinedMember(
+        this,
+        ice.chatStore.activeChat,
+        this.cucumbotClient.username
+    );
 });
 
 Then('Cucumbot has joined the room', async function() {
     await this.waitFor(() => ice.chatInviteStore.received.length === 0);
-    await this.waitFor(() => ice.chatStore.activeChat && ice.chatStore.activeChat.metaLoaded);
+    await this.waitFor(
+        () => ice.chatStore.activeChat && ice.chatStore.activeChat.metaLoaded
+    );
     return isJoinedMember(this, ice.chatStore.activeChat, this.username);
 });
 
 Then('Cucumbot receives the invite', function() {
     return this.waitFor(() => {
         const invites = ice.chatInviteStore.received;
-        return invites.length === 1 && invites[0].username === this.cucumbotServer.username;
+        return (
+            invites.length === 1 &&
+            invites[0].username === this.cucumbotServer.username
+        );
     });
 });
 
@@ -103,16 +136,22 @@ Then('The invite sent is removed', function() {
     return this.waitFor(() => ice.chatInviteStore.sent.keys.length === 0);
 });
 
-Then('Cucumbot\'s invite is removed', function() {
+Then("Cucumbot's invite is removed", function() {
     return this.waitFor(() => ice.chatInviteStore.received.length === 0);
 });
 
 Then('The Cucumbot is not a member of the room', function() {
-    return isNotAMember(this, ice.chatStore.activeChat, this.cucumbotClient.username);
+    return isNotAMember(
+        this,
+        ice.chatStore.activeChat,
+        this.cucumbotClient.username
+    );
 });
 
 Then('Cucumbot is not in the room anymore', function() {
-    return this.waitFor(() => !ice.chatStore.activeChat && ice.chatStore.channels.length === 0);
+    return this.waitFor(
+        () => !ice.chatStore.activeChat && ice.chatStore.channels.length === 0
+    );
 });
 
 When('I create a room with Cucumbot', async function() {

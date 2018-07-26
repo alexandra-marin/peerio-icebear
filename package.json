@@ -20,7 +20,7 @@
     "test:e2e:wip": "./test/e2e/run-wip.sh",
     "test:e2e:debug": "./test/e2e/debug.sh",
     "=== VALIDATION ===": "",
-    "code:verify": "eslint src --ext .js,.ts --max-warnings 0 && ./scripts/lint-copy.sh && prettier '{src,test}/**/*.{js,ts}' -l",
+    "code:verify": "eslint '{src,test}/**/*.{js,ts}' --max-warnings 0 && ./scripts/lint-copy.sh && prettier '{src,test}/**/*.{js,ts}' -l",
     "=== BENCHMARKS ===": "",
     "bench": "node ./benchmarks/index",
     "=== RELEASE ===": "",

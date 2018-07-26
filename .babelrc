@@ -14,6 +14,12 @@
                 "method": "coroutine"
             }
         ],
+        [
+            "babel-plugin-root-import",
+            {
+                "rootPathSuffix": "src"
+            }
+        ],
         "@babel/plugin-transform-modules-commonjs"
     ]
 }

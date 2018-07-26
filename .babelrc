@@ -17,7 +17,7 @@
         [
             "babel-plugin-root-import",
             {
-                "rootPathSuffix": "dist-ts"
+                "rootPathSuffix": "dist"
             }
         ],
         "@babel/plugin-transform-modules-commonjs"

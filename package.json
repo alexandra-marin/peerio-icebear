@@ -11,7 +11,7 @@
     "precommit": "opt --in lint --exec \"npm run code:verify\"",
     "commitmsg": "validate-commit-msg",
     "=== TESTS ===": "",
-    "test-build": "rm -rf dist-ts && ./node_modules/.bin/babel src --out-dir dist-ts --source-maps --extensions \".js,.ts\"",
+    "test-build": "rm -rf dist && ./node_modules/.bin/babel src --out-dir dist --source-maps --extensions \".js,.ts\"",
     "mocha": "mocha \"test/**/*.test.js\" --require test/unit/unit-global-setup --timeout 15000",
     "test": "run-s test:ts test-build test:unit test:e2e",
     "test:ts": "tsc --noEmit",

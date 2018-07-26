@@ -2,7 +2,8 @@ module.exports = {
     root: true,
     parser: 'babel-eslint',
     extends: [
-        'peerio/index.base.js'
+        'peerio/index.base.js',
+        'prettier'
     ],
     rules: {
         'no-labels': 0,

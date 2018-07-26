@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 DUPS=$(awk -F'"' '{ print $2 }' src/copy/en.json | awk 'NF' | sort | uniq -d)
 

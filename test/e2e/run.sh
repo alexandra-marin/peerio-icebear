@@ -1,3 +1,5 @@
+#!/bin/bash
+
 set -x
 mkdir -p ./test-results/e2e
 

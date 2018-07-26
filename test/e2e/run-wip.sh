@@ -1,3 +1,5 @@
+#!/bin/bash
+
 export SHOW_APP_LOGS=1
 export PEERIO_REDUCE_SCRYPT_FOR_TESTS=1
 

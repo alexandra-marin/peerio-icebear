@@ -3,6 +3,8 @@
 set -x
 mkdir -p ./test-results/e2e
 
+npm run test-build
+
 export PEERIO_REDUCE_SCRYPT_FOR_TESTS=1
 export SHOW_APP_LOGS=0
 

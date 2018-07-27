@@ -24,7 +24,8 @@ class TaskQueue {
      * Amount of currently running tasks + tasks in queue
      * @type {Computed<number>}
      */
-    @computed get length() {
+    @computed
+    get length() {
         return this.waitingTasks.length + this.runningTasks;
     }
 
@@ -44,7 +45,8 @@ class TaskQueue {
      * @param {callback<Error>} [onError] - callback will be executed if task throws or rejects promise
      * @returns {Promise}
      */
-    @action addTask(task, context, args, onSuccess, onError) {
+    @action
+    addTask(task, context, args, onSuccess, onError) {
         return new Promise((resolve, reject) => {
             this.waitingTasks.push({
                 task,
@@ -67,10 +69,15 @@ class TaskQueue {
     /**
      * Runs the next task in queue if it is possible
      */
-    @action.bound runTask() {
+    @action.bound
+    runTask() {
         if (this.paused) return;
         // if reached the limit of parallel running tasks or no tasks left - doing nothing
-        if (this.parallelism <= this.runningTasks || this.waitingTasks.length === 0) return;
+        if (
+            this.parallelism <= this.runningTasks ||
+            this.waitingTasks.length === 0
+        )
+            return;
         this.runningTasks++;
         let t;
         try {
@@ -97,7 +104,8 @@ class TaskQueue {
     /**
      * Performs necessary actions when a task is finished
      */
-    @action.bound onTaskComplete() {
+    @action.bound
+    onTaskComplete() {
         this.runningTasks--;
         if (this.paused) return;
         for (let i = this.runningTasks; i < this.parallelism; i++) {

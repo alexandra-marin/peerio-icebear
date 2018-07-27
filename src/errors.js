@@ -38,7 +38,8 @@ module.exports.normalize = function(error, failoverMessage) {
     if (failoverMessage) return new Error(failoverMessage);
 
     try {
-        const message = typeof error === 'string' ? error : JSON.stringify(error);
+        const message =
+            typeof error === 'string' ? error : JSON.stringify(error);
         return new Error(message);
     } catch (e) {
         return new Error('unknown error');
@@ -118,7 +119,7 @@ const serverErrorCodes = {
 };
 // reverse map
 const serverErrorMap = {};
-Object.keys(serverErrorCodes).forEach((key) => {
+Object.keys(serverErrorCodes).forEach(key => {
     serverErrorMap[serverErrorCodes[key]] = key;
 });
 

@@ -13,7 +13,9 @@ const errors = require('../errors');
 let SCRYPT_N = 16384;
 try {
     if (process.env.PEERIO_REDUCE_SCRYPT_FOR_TESTS) {
-        console.log('TEST ENVIRONMENT DETECTED. SCRYPT WILL USE REDUCED COMPLEXITY FOR PERFORMANCE BOOST.');
+        console.log(
+            'TEST ENVIRONMENT DETECTED. SCRYPT WILL USE REDUCED COMPLEXITY FOR PERFORMANCE BOOST.'
+        );
         SCRYPT_N = 1024;
     }
 } catch (ex) {
@@ -59,21 +61,32 @@ function prehashPass(value, personalization) {
 function deriveAccountKeys(username, passphrase, randomSalt) {
     try {
         // requesting 64 bytes to split them for 2 keys
-        const scryptOptions = { N: SCRYPT_N, r: 8, dkLen: 64, interruptStep: 2000 };
+        const scryptOptions = {
+            N: SCRYPT_N,
+            r: 8,
+            dkLen: 64,
+            interruptStep: 2000
+        };
         // secure salt - contains username
-        const salt = util.concatTypedArrays(util.strToBytes(username), randomSalt);
+        const salt = util.concatTypedArrays(
+            util.strToBytes(username),
+            randomSalt
+        );
         const pass = prehashPass(passphrase, 'PeerioPH');
 
-        return scryptPromise(pass, salt, scryptOptions)
-            .then(derivedByteArray => {
+        return scryptPromise(pass, salt, scryptOptions).then(
+            derivedByteArray => {
                 const keys = {};
                 // first 32 bytes - symmetric boot key
                 keys.bootKey = new Uint8Array(derivedByteArray.slice(0, 32));
                 // second 32 bytes - secret key of the auth key pair
-                const secretKey = new Uint8Array(derivedByteArray.slice(32, 64));
+                const secretKey = new Uint8Array(
+                    derivedByteArray.slice(32, 64)
+                );
                 keys.authKeyPair = nacl.box.keyPair.fromSecretKey(secretKey);
                 return keys;
-            });
+            }
+        );
     } catch (ex) {
         return Promise.reject(errors.normalize(ex));
     }
@@ -87,10 +100,17 @@ function deriveAccountKeys(username, passphrase, randomSalt) {
  */
 function deriveEphemeralKeys(salt, passphrase) {
     try {
-        const scryptOptions = { N: SCRYPT_N, r: 8, dkLen: 32, interruptStep: 200, encoding: 'binary' };
+        const scryptOptions = {
+            N: SCRYPT_N,
+            r: 8,
+            dkLen: 32,
+            interruptStep: 200,
+            encoding: 'binary'
+        };
         const pass = prehashPass(passphrase);
-        return scryptPromise(pass, salt, scryptOptions)
-            .then(keyBytes => nacl.box.keyPair.fromSecretKey(keyBytes));
+        return scryptPromise(pass, salt, scryptOptions).then(keyBytes =>
+            nacl.box.keyPair.fromSecretKey(keyBytes)
+        );
     } catch (ex) {
         return Promise.reject(errors.normalize(ex));
     }
@@ -103,7 +123,13 @@ function deriveEphemeralKeys(salt, passphrase) {
  */
 function deriveKeyFromPasscode(username, passcode) {
     try {
-        const scryptOptions = { N: SCRYPT_N, r: 8, dkLen: 32, interruptStep: 2000, encoding: 'binary' };
+        const scryptOptions = {
+            N: SCRYPT_N,
+            r: 8,
+            dkLen: 32,
+            interruptStep: 2000,
+            encoding: 'binary'
+        };
         const salt = util.strToBytes(username);
         const pass = prehashPass(passcode);
 
@@ -150,7 +176,9 @@ function generateAuthSalt() {
  * @returns {Uint8Array} 32 bytes personalized hash
  */
 function getAuthKeyHash(key) {
-    const hash = new BLAKE2s(32, { personalization: util.strToBytes('AuthCPK1') });
+    const hash = new BLAKE2s(32, {
+        personalization: util.strToBytes('AuthCPK1')
+    });
     hash.update(key);
     return hash.digest();
 }
@@ -169,7 +197,6 @@ function getRandomAccountKeyHex() {
     }
     return a.join(' ');
 }
-
 
 module.exports = {
     deriveAccountKeys,

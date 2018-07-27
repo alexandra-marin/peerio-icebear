@@ -26,4 +26,3 @@ describe('Observable clock should', () => {
         clock._atom.reportObserved().should.be.false;
     });
 });
-

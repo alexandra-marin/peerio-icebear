@@ -82,11 +82,14 @@ class Message extends Keg {
      * used to compare calendar days
      * @type {string}
      */
-    @computed get dayFingerprint() {
+    @computed
+    get dayFingerprint() {
         if (!this.timestamp) return null;
-        return this.timestamp.getDate().toString() +
+        return (
+            this.timestamp.getDate().toString() +
             this.timestamp.getMonth().toString() +
-            this.timestamp.getFullYear().toString();
+            this.timestamp.getFullYear().toString()
+        );
     }
 
     /**
@@ -95,7 +98,8 @@ class Message extends Keg {
      * TODO: resolve/unify this in favor of most performant method
      * @type {string}
      */
-    @computed get messageTimestampText() {
+    @computed
+    get messageTimestampText() {
         const { timestamp } = this;
         return timestamp ? moment(timestamp).format('LT') : null;
     }
@@ -116,7 +120,11 @@ class Message extends Keg {
         this.timestamp = new Date();
         let promise;
         // we want to auto-retry system messages and messages containing file attachments
-        if (this.systemData || (this.files && this.files.length) || (this.folders && this.folders.length)) {
+        if (
+            this.systemData ||
+            (this.files && this.files.length) ||
+            (this.folders && this.folders.length)
+        ) {
             promise = retryUntilSuccess(() => this.saveToServer());
         } else {
             promise = this.saveToServer();
@@ -251,7 +259,7 @@ class Message extends Keg {
             if (!this.sender.isAdded) return;
         }
 
-        urls = Array.from(new Set(urls));// deduplicate
+        urls = Array.from(new Set(urls)); // deduplicate
         for (let i = 0; i < urls.length; i++) {
             const url = urls[i];
             if (unfurl.urlCache[url]) {
@@ -264,7 +272,8 @@ class Message extends Keg {
 
     _queueUnfurl(url) {
         Message.unfurlQueue.addTask(() => {
-            return unfurl.getContentHeaders(url)
+            return unfurl
+                .getContentHeaders(url)
                 .catch(err => {
                     console.error(err);
                     // There's no reliable way to know if XMLHttpRequest has failed due to disconnection.
@@ -278,11 +287,15 @@ class Message extends Keg {
                         () => {
                             const queue = Message.unfurlQueue;
                             if (!queue.paused) {
-                                when(() => socket.connected, () => queue.resume());
+                                when(
+                                    () => socket.connected,
+                                    () => queue.resume()
+                                );
                                 queue.pause();
                             }
                             this._queueUnfurl(url);
-                        });
+                        }
+                    );
                     setTimeout(dispose, 2000);
                 })
                 .then(headers => {
@@ -295,7 +308,7 @@ class Message extends Keg {
         if (!headers || !headers['content-type']) return;
 
         const type = headers['content-type'].split(';')[0];
-        const length = +(headers['content-length'] || 0);// careful, +undefined is NaN
+        const length = +(headers['content-length'] || 0); // careful, +undefined is NaN
 
         if (!config.chat.allowedInlineContentTypes[type]) return;
 
@@ -303,7 +316,8 @@ class Message extends Keg {
             url,
             length,
             isOverInlineSizeLimit:
-                clientApp.uiUserPrefs.limitInlineImageSize && length > config.chat.inlineImageSizeLimit,
+                clientApp.uiUserPrefs.limitInlineImageSize &&
+                length > config.chat.inlineImageSizeLimit,
             isOversizeCutoff: length > config.chat.inlineImageSizeLimitCutoff
         });
     }
@@ -311,7 +325,11 @@ class Message extends Keg {
     serializeKegPayload() {
         this.format = this.latestFormat;
         this.userMentions = this.text
-            ? _.uniq(this.db.participants.filter((u) => this.text.match(u.mentionRegex)).map((u) => u.username))
+            ? _.uniq(
+                  this.db.participants
+                      .filter(u => this.text.match(u.mentionRegex))
+                      .map(u => u.username)
+              )
             : [];
         const ret = {
             text: this.text,
@@ -363,7 +381,9 @@ class Message extends Keg {
          * Does this message mention current user.
          * @type {boolean}
          */
-        this.isMention = this.userMentions ? this.userMentions.includes(User.current.username) : false;
+        this.isMention = this.userMentions
+            ? this.userMentions.includes(User.current.username)
+            : false;
     }
 
     serializeProps() {

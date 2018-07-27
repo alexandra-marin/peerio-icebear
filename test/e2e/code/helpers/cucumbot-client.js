@@ -43,7 +43,7 @@ class CucumbotClient extends CucumbotBase {
         // incoming messages from Cucumbot
         child.on('message', this.processMessage);
 
-        child.on('close', (code) => {
+        child.on('close', code => {
             this.finished = true;
             this.finishedWithError = code > 0;
             this.emit('finished');
@@ -63,6 +63,5 @@ class CucumbotClient extends CucumbotBase {
         });
     }
 }
-
 
 module.exports = CucumbotClient;

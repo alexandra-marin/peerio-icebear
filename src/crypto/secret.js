@@ -34,16 +34,24 @@ const NONCE_SIZE = 24;
  * @param {boolean} [prependLength=false] - adds 4 bytes containing message length after encryption to the beginning
  * @returns {Uint8Array} encrypted bytes
  */
-function encrypt(msgBytes, key, nonce = util.getRandomNonce(), appendNonce = true, prependLength = false) {
+function encrypt(
+    msgBytes,
+    key,
+    nonce = util.getRandomNonce(),
+    appendNonce = true,
+    prependLength = false
+) {
     const fullMsgLength = 32 + msgBytes.length; /* ZEROBYTES */
     const m = new Uint8Array(fullMsgLength);
     for (let i = 32; i < fullMsgLength; i++) m[i] = msgBytes[i - 32];
 
-    const lengthAdded = (appendNonce ? NONCE_SIZE : 0) + (prependLength ? 4 : 0);
+    const lengthAdded =
+        (appendNonce ? NONCE_SIZE : 0) + (prependLength ? 4 : 0);
     // container for cipher bytes
     const c = new Uint8Array(m.length + lengthAdded);
     if (appendNonce) {
-        for (let i = 0; i < NONCE_SIZE; i++) c[c.length - NONCE_SIZE + i] = nonce[i];
+        for (let i = 0; i < NONCE_SIZE; i++)
+            c[c.length - NONCE_SIZE + i] = nonce[i];
     }
     if (prependLength) {
         const l = util.numberToByteArray(c.length - 4);
@@ -59,7 +67,15 @@ function encrypt(msgBytes, key, nonce = util.getRandomNonce(), appendNonce = tru
             cipherContainer = c.subarray(start);
         }
     }
-    if (nacl.lowlevel.crypto_secretbox(cipherContainer, m, m.length, nonce, key) !== 0) {
+    if (
+        nacl.lowlevel.crypto_secretbox(
+            cipherContainer,
+            m,
+            m.length,
+            nonce,
+            key
+        ) !== 0
+    ) {
         throw new Error('Encryption failed');
     }
     return c; // contains 16 zero bytes in the beginning, needed for decryption
@@ -86,7 +102,8 @@ function encryptString(msg, key) {
  * @returns {Uint8Array} decrypted message
  */
 function decrypt(cipher, key, nonce, containsLength) {
-    let start = 0, end;
+    let start = 0,
+        end;
     if (!nonce) {
         // eslint-disable-next-line no-param-reassign
         nonce = cipher.subarray(-NONCE_SIZE);

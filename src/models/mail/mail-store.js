@@ -27,11 +27,13 @@ class MailStore {
         return !mail.sentId;
     }
 
-    @computed get hasSelectedMails() {
+    @computed
+    get hasSelectedMails() {
         return this.mails.some(MailStore.isMailSelected);
     }
 
-    @computed get allVisibleSelected() {
+    @computed
+    get allVisibleSelected() {
         for (let i = 0; i < this.mails.length; i++) {
             if (!this.mails[i].show) continue;
             if (this.mails[i].selected === false) return false;
@@ -39,7 +41,8 @@ class MailStore {
         return true;
     }
 
-    @computed get selectedCount() {
+    @computed
+    get selectedCount() {
         return this.mails.reduce((count, m) => count + (m.selected ? 1 : 0));
     }
 
@@ -70,13 +73,15 @@ class MailStore {
     /*
      * Deselects all mails
      */
-    @action clearSelection() {
+    @action
+    clearSelection() {
         for (let i = 0; i < this.mails.length; i++) {
             this.mails[i].selected = false;
         }
     }
 
-    @action selectAll() {
+    @action
+    selectAll() {
         for (let i = 0; i < this.mails.length; i++) {
             const mail = this.mails[i];
             if (!mail.show) continue;
@@ -86,7 +91,8 @@ class MailStore {
 
     // TODO: more filters
 
-    @action filterBySubject(query) {
+    @action
+    filterBySubject(query) {
         this.currentFilter = query;
         const regex = new RegExp(_.escapeRegExp(query), 'i');
         for (let i = 0; i < this.mails.length; i++) {
@@ -95,7 +101,8 @@ class MailStore {
         }
     }
 
-    @action clearFilter() {
+    @action
+    clearFilter() {
         this.currentFilter = '';
         for (let i = 0; i < this.mails.length; i++) {
             this.mails[i].show = true;
@@ -118,7 +125,9 @@ class MailStore {
     }, 1500);
 
     _getMails() {
-        const filter = this.knownUpdateId ? { minCollectionVersion: this.knownUpdateId } : { deleted: false };
+        const filter = this.knownUpdateId
+            ? { minCollectionVersion: this.knownUpdateId }
+            : { deleted: false };
 
         return socket.send('/auth/kegs/db/list-ext', {
             kegDbId: 'SELF',
@@ -133,8 +142,11 @@ class MailStore {
     loadAllMails() {
         if (this.loading || this.loaded) return;
         this.loading = true;
-        retryUntilSuccess(() => this._getMails(), 'Initial mail list loading')
-            .then(action(async kegs => {
+        retryUntilSuccess(
+            () => this._getMails(),
+            'Initial mail list loading'
+        ).then(
+            action(async kegs => {
                 for (const keg of kegs.kegs) {
                     const mail = new Mail(User.current.kegDb);
                     if (keg.collectionVersion > this.maxUpdateId) {
@@ -151,19 +163,24 @@ class MailStore {
                     this.onMailDigestUpdate();
                 });
                 setTimeout(this.updateMails);
-            }));
+            })
+        );
     }
 
     // this essentially does the same as loadAllMails but with filter,
     // we reserve this way of updating anyway for future, when we'll not gonna load entire mail list on start
-    updateMails = (maxId) => {
+    updateMails = maxId => {
         if (!this.loaded || this.updating) return;
         // eslint-disable-next-line no-param-reassign
         if (!maxId) maxId = this.maxUpdateId;
-        console.log(`Proceeding to mail update. Known collection version: ${this.knownUpdateId}`);
+        console.log(
+            `Proceeding to mail update. Known collection version: ${
+                this.knownUpdateId
+            }`
+        );
         this.updating = true;
-        retryUntilSuccess(() => this._getMails(), 'Updating mail list')
-            .then(action(async resp => {
+        retryUntilSuccess(() => this._getMails(), 'Updating mail list').then(
+            action(async resp => {
                 const { kegs } = resp;
                 for (const keg of kegs) {
                     if (keg.collectionVersion > this.knownUpdateId) {
@@ -175,19 +192,24 @@ class MailStore {
                         this.mails.remove(existing);
                         continue;
                     }
-                    if (!(await mail.loadFromKeg(keg)) || mail.isEmpty) continue;
+                    if (!(await mail.loadFromKeg(keg)) || mail.isEmpty)
+                        continue;
                     if (!mail.deleted && !existing) this.mails.unshift(mail);
                 }
                 this.updating = false;
                 // need this bcs if u delete all mails knownUpdateId won't be set at all after initial load
                 if (this.knownUpdateId < maxId) this.knownUpdateId = maxId;
                 // in case we missed another event while updating
-                if (kegs.length || (this.maxUpdateId && this.knownUpdateId < this.maxUpdateId)) {
+                if (
+                    kegs.length ||
+                    (this.maxUpdateId && this.knownUpdateId < this.maxUpdateId)
+                ) {
                     setTimeout(this.updateMails);
                 } else {
                     setTimeout(this.onMailDigestUpdate);
                 }
-            }));
+            })
+        );
     };
 
     // todo: mails map
@@ -235,7 +257,7 @@ class MailStore {
     remove(m) {
         if (!m.id) {
             const i = this.mails.indexOf(m);
-            (i !== -1) && this.mails.splice(i, 1);
+            i !== -1 && this.mails.splice(i, 1);
             return Promise.resolve();
         }
         return m.remove();

@@ -37,7 +37,7 @@ class User {
     }
 
     set username(v) {
-        this._username = typeof (v) === 'string' ? v.trim().toLowerCase() : '';
+        this._username = typeof v === 'string' ? v.trim().toLowerCase() : '';
     }
     // -- profile data
     /**
@@ -108,7 +108,8 @@ class User {
      */
     props = {};
 
-    @computed get isMCAdmin() {
+    @computed
+    get isMCAdmin() {
         if (!this.props || !this.props.mcrRoles) return null;
         return this.props.mcrRoles.some(x => x.includes('admin'));
     }
@@ -118,7 +119,6 @@ class User {
      * @type {boolean}
      */
     @observable twoFAEnabled = false;
-
 
     /**
      * Indicates device trust if 2fa is enabled.
@@ -131,7 +131,8 @@ class User {
      * Computed `firstName+' '+lastName`
      * @type {string}
      */
-    @computed get fullName() {
+    @computed
+    get fullName() {
         let ret = '';
         if (this.firstName) ret = this.firstName;
         if (this.lastName) {
@@ -205,23 +206,32 @@ class User {
      * All current active plan names
      * @type {Array<string>}
      */
-    @computed get activePlans() {
+    @computed
+    get activePlans() {
         if (this.quota == null || this.quota.quotas === null) return [];
         const { quotas } = this.quota;
         return Object.getOwnPropertyNames(quotas)
-            .map(k => quotas[k].plan).filter(p => !!p);
+            .map(k => quotas[k].plan)
+            .filter(p => !!p);
     }
 
     /**
      * Total amounts of bytes user can upload.
      * @type {number}
      */
-    @computed get fileQuotaTotal() {
-        if (this.quota == null || !this.quota.resultingQuotas
-            || !this.quota.resultingQuotas.file || !this.quota.resultingQuotas.file.length) return 0;
+    @computed
+    get fileQuotaTotal() {
+        if (
+            this.quota == null ||
+            !this.quota.resultingQuotas ||
+            !this.quota.resultingQuotas.file ||
+            !this.quota.resultingQuotas.file.length
+        )
+            return 0;
 
-        const found = this.quota.resultingQuotas.file
-            .find(item => item.period === 'total' && item.metric === 'storage');
+        const found = this.quota.resultingQuotas.file.find(
+            item => item.period === 'total' && item.metric === 'storage'
+        );
 
         if (!found) return 0;
         if (found.limit == null) return Number.MAX_SAFE_INTEGER;
@@ -232,7 +242,8 @@ class User {
      * Formatted total amounts of bytes user can upload.
      * @type {string}
      */
-    @computed get fileQuotaTotalFmt() {
+    @computed
+    get fileQuotaTotalFmt() {
         return formatBytes(this.fileQuotaTotal);
     }
 
@@ -240,11 +251,19 @@ class User {
      * Free bytes left for uploads.
      * @type {number}
      */
-    @computed get fileQuotaLeft() {
-        if (this.quota == null || !this.quota.quotasLeft
-            || !this.quota.quotasLeft.file || !this.quota.quotasLeft.file.length) return 0;
+    @computed
+    get fileQuotaLeft() {
+        if (
+            this.quota == null ||
+            !this.quota.quotasLeft ||
+            !this.quota.quotasLeft.file ||
+            !this.quota.quotasLeft.file.length
+        )
+            return 0;
 
-        const found = this.quota.quotasLeft.file.find(item => item.period === 'total' && item.metric === 'storage');
+        const found = this.quota.quotasLeft.file.find(
+            item => item.period === 'total' && item.metric === 'storage'
+        );
         if (!found) return 0;
         if (found.limit == null) return Number.MAX_SAFE_INTEGER;
         return found.limit;
@@ -254,7 +273,8 @@ class User {
      * Formatted bytes left for uploads.
      * @type {string}
      */
-    @computed get fileQuotaLeftFmt() {
+    @computed
+    get fileQuotaLeftFmt() {
         return formatBytes(this.fileQuotaLeft);
     }
 
@@ -262,14 +282,19 @@ class User {
      * Maximum file size user can upload.
      * @type {number}
      */
-    @computed get fileSizeLimit() {
-        if (this.quota == null
-            || !this.quota.resultingQuotas
-            || !this.quota.resultingQuotas.upload
-            || !this.quota.resultingQuotas.upload.length) return Number.MAX_SAFE_INTEGER;
+    @computed
+    get fileSizeLimit() {
+        if (
+            this.quota == null ||
+            !this.quota.resultingQuotas ||
+            !this.quota.resultingQuotas.upload ||
+            !this.quota.resultingQuotas.upload.length
+        )
+            return Number.MAX_SAFE_INTEGER;
 
-        const found = this.quota.resultingQuotas.upload
-            .find(item => item.period === 'total' && item.metric === 'maxSize');
+        const found = this.quota.resultingQuotas.upload.find(
+            item => item.period === 'total' && item.metric === 'maxSize'
+        );
 
         if (!found || found.limit == null) return Number.MAX_SAFE_INTEGER;
         return found.limit;
@@ -279,7 +304,8 @@ class User {
      * Formatted maximum file size user can upload.
      * @type {number}
      */
-    @computed get fileSizeLimitFmt() {
+    @computed
+    get fileSizeLimitFmt() {
         return formatBytes(this.fileSizeLimit);
     }
 
@@ -287,7 +313,8 @@ class User {
      * Used bytes in storage.
      * @type {number}
      */
-    @computed get fileQuotaUsed() {
+    @computed
+    get fileQuotaUsed() {
         return this.fileQuotaTotal - this.fileQuotaLeft;
     }
 
@@ -295,7 +322,8 @@ class User {
      * Formatted used bytes in storage.
      * @type {number}
      */
-    @computed get fileQuotaUsedFmt() {
+    @computed
+    get fileQuotaUsedFmt() {
         return formatBytes(this.fileQuotaUsed);
     }
 
@@ -303,20 +331,30 @@ class User {
      * Amount of % used bytes in storage.
      * @type {number}
      */
-    @computed get fileQuotaUsedPercent() {
-        return this.fileQuotaTotal === 0 ? 0 : Math.round(this.fileQuotaUsed / (this.fileQuotaTotal / 100));
+    @computed
+    get fileQuotaUsedPercent() {
+        return this.fileQuotaTotal === 0
+            ? 0
+            : Math.round(this.fileQuotaUsed / (this.fileQuotaTotal / 100));
     }
 
     /**
      * Maximum number of channels user can have
      * @type {number}
      */
-    @computed get channelLimit() {
-        if (this.quota == null || !this.quota.resultingQuotas
-            || !this.quota.resultingQuotas.channel || !this.quota.resultingQuotas.channel.length) return 0;
+    @computed
+    get channelLimit() {
+        if (
+            this.quota == null ||
+            !this.quota.resultingQuotas ||
+            !this.quota.resultingQuotas.channel ||
+            !this.quota.resultingQuotas.channel.length
+        )
+            return 0;
 
-        const found = this.quota.resultingQuotas.channel
-            .find(item => item.period === 'total' && item.metric === 'participate');
+        const found = this.quota.resultingQuotas.channel.find(
+            item => item.period === 'total' && item.metric === 'participate'
+        );
 
         if (!found) return 0;
         if (found.limit == null) return Number.MAX_SAFE_INTEGER;
@@ -327,12 +365,19 @@ class User {
      * Available channel slots left.
      * @type {number}
      */
-    @computed get channelsLeft() {
-        if (this.quota == null || !this.quota.quotasLeft
-            || !this.quota.quotasLeft.channel || !this.quota.quotasLeft.channel.length) return 0;
+    @computed
+    get channelsLeft() {
+        if (
+            this.quota == null ||
+            !this.quota.quotasLeft ||
+            !this.quota.quotasLeft.channel ||
+            !this.quota.quotasLeft.channel.length
+        )
+            return 0;
 
-        const found = this.quota.quotasLeft.channel
-            .find(item => item.period === 'total' && item.metric === 'participate');
+        const found = this.quota.quotasLeft.channel.find(
+            item => item.period === 'total' && item.metric === 'participate'
+        );
 
         if (!found) return 0;
         if (found.limit == null) return Number.MAX_SAFE_INTEGER;
@@ -347,14 +392,15 @@ class User {
     _adjustedOverheadFileSize(size) {
         const chunkSize = config.upload.getChunkSize(size);
         const chunkCount = Math.ceil(size / chunkSize);
-        return (size + chunkCount * config.CHUNK_OVERHEAD);
+        return size + chunkCount * config.CHUNK_OVERHEAD;
     }
 
     /**
      * Maximum amount of people invited which give you bonus
      * @type {number}
      */
-    @computed get maxInvitedPeopleBonus() {
+    @computed
+    get maxInvitedPeopleBonus() {
         // TODO[backlog]: this should be stored in server
         return 5;
     }
@@ -363,10 +409,16 @@ class User {
      * Maximum amount of people invited which give you bonus
      * @type {number}
      */
-    @computed get currentInvitedPeopleBonus() {
+    @computed
+    get currentInvitedPeopleBonus() {
         // TODO[backlog]: this should be stored in server
         const bonusPerUser = 50 * 1024 * 1024;
-        const limit = tryToGet(() => User.current.quota.quotas.userInviteOnboardingBonus.bonus.file.limit, 0);
+        const limit = tryToGet(
+            () =>
+                User.current.quota.quotas.userInviteOnboardingBonus.bonus.file
+                    .limit,
+            0
+        );
         return Math.ceil(limit / bonusPerUser);
     }
 
@@ -374,7 +426,8 @@ class User {
      * Maximum bonus user can achieve if they complete all tasks
      * @type {number}
      */
-    @computed get maximumOnboardingBonus() {
+    @computed
+    get maximumOnboardingBonus() {
         // TODO[backlog]: this should be stored in server
         const avatarBonus = 100;
         const emailConfirmedBonus = 100;
@@ -383,15 +436,23 @@ class User {
         const backupBonus = 100;
         const installBonus = 100;
         const twoFABonus = 100;
-        return avatarBonus + emailConfirmedBonus + invitedUserBonus
-            + roomBonus + backupBonus + installBonus + twoFABonus;
+        return (
+            avatarBonus +
+            emailConfirmedBonus +
+            invitedUserBonus +
+            roomBonus +
+            backupBonus +
+            installBonus +
+            twoFABonus
+        );
     }
 
     /**
      * Maximum bonus user can achieve if they complete all tasks
      * @type {number}
      */
-    @computed get currentOnboardingBonus() {
+    @computed
+    get currentOnboardingBonus() {
         if (!User.current.quota) return 0;
         const {
             createRoomOnboardingBonus,
@@ -402,15 +463,23 @@ class User {
             confirmedEmailBonus,
             userInviteOnboardingBonus
         } = User.current.quota.quotas;
-        return tryToGet(() => [
-            createRoomOnboardingBonus,
-            avatarOnboardingBonus,
-            twofaOnboardingBonus,
-            installsOnboardingBonus,
-            backupOnboardingBonus,
-            confirmedEmailBonus,
-            userInviteOnboardingBonus
-        ].reduce((sum, value) => (sum + Math.ceil(value.bonus.file.limit / 1024 / 1024)), 0), 0);
+        return tryToGet(
+            () =>
+                [
+                    createRoomOnboardingBonus,
+                    avatarOnboardingBonus,
+                    twofaOnboardingBonus,
+                    installsOnboardingBonus,
+                    backupOnboardingBonus,
+                    confirmedEmailBonus,
+                    userInviteOnboardingBonus
+                ].reduce(
+                    (sum, value) =>
+                        sum + Math.ceil(value.bonus.file.limit / 1024 / 1024),
+                    0
+                ),
+            0
+        );
     }
 
     /**
@@ -418,7 +487,7 @@ class User {
      * @param {number} size - amount of bytes user wants to upload.
      * @returns {boolean} is there enough storage left to upload.
      */
-    canUploadFileSize = (size) => {
+    canUploadFileSize = size => {
         return this.fileQuotaLeft >= this._adjustedOverheadFileSize(size);
     };
 
@@ -428,48 +497,81 @@ class User {
      * @param {number} size - amount of bytes user wants to upload.
      * @returns {boolean} is file size acceptable for current plan
      */
-    canUploadMaxFileSize = (size) => {
+    canUploadMaxFileSize = size => {
         const realSize = this._adjustedOverheadFileSize(size);
         return realSize <= this.fileSizeLimit;
     };
 
-    @computed get hasAvatarUploadedBonus() {
-        return tryToGet(() => !!this.quota.quotas.avatarOnboardingBonus.bonus.file.limit, false);
+    @computed
+    get hasAvatarUploadedBonus() {
+        return tryToGet(
+            () => !!this.quota.quotas.avatarOnboardingBonus.bonus.file.limit,
+            false
+        );
     }
 
-    @computed get hasConfirmedEmailBonus() {
+    @computed
+    get hasConfirmedEmailBonus() {
         return tryToGet(() => !!this.addresses.find(f => f.confirmed), false);
     }
 
-    @computed get hasCreatedRoomBonus() {
-        return tryToGet(() => !!this.quota.quotas.createRoomOnboardingBonus.bonus.file.limit, false);
+    @computed
+    get hasCreatedRoomBonus() {
+        return tryToGet(
+            () =>
+                !!this.quota.quotas.createRoomOnboardingBonus.bonus.file.limit,
+            false
+        );
     }
 
-    @computed get hasInvitedFriendsBonus() {
-        return tryToGet(() => !!this.quota.quotas.userInviteOnboardingBonus.bonus.file.limit, false);
+    @computed
+    get hasInvitedFriendsBonus() {
+        return tryToGet(
+            () =>
+                !!this.quota.quotas.userInviteOnboardingBonus.bonus.file.limit,
+            false
+        );
     }
 
-    @computed get hasTwoFABonus() {
-        return tryToGet(() => !!this.quota.quotas.twofaOnboardingBonus.bonus.file.limit, false);
+    @computed
+    get hasTwoFABonus() {
+        return tryToGet(
+            () => !!this.quota.quotas.twofaOnboardingBonus.bonus.file.limit,
+            false
+        );
     }
 
-    @computed get hasInstallBonus() {
-        return tryToGet(() => !!this.quota.quotas.installsOnboardingBonus.bonus.file.limit, false);
+    @computed
+    get hasInstallBonus() {
+        return tryToGet(
+            () => !!this.quota.quotas.installsOnboardingBonus.bonus.file.limit,
+            false
+        );
     }
 
-    @computed get hasAccountKeyBackedUpBonus() {
-        return tryToGet(() => !!this.quota.quotas.backupOnboardingBonus.bonus.file.limit, false);
+    @computed
+    get hasAccountKeyBackedUpBonus() {
+        return tryToGet(
+            () => !!this.quota.quotas.backupOnboardingBonus.bonus.file.limit,
+            false
+        );
     }
 
-    @computed get isPremiumUser() {
-        return !!this.activePlans.filter(s => config.serverPlansPremium.includes(s)).length;
+    @computed
+    get isPremiumUser() {
+        return !!this.activePlans.filter(s =>
+            config.serverPlansPremium.includes(s)
+        ).length;
     }
 
-    @computed get isProUser() {
-        return !!this.activePlans.filter(s => config.serverPlansPro.includes(s)).length;
+    @computed
+    get isProUser() {
+        return !!this.activePlans.filter(s => config.serverPlansPro.includes(s))
+            .length;
     }
 
-    @computed get hasActivePlans() {
+    @computed
+    get hasActivePlans() {
         return !!(this.activePlans && this.activePlans.length);
     }
 
@@ -486,8 +588,10 @@ class User {
             .then(() => {
                 console.log('Creating boot keg.');
                 return this.kegDb.createBootKeg(
-                    this.bootKey, this.signKeys,
-                    this.encryptionKeys, this.kegKey
+                    this.bootKey,
+                    this.signKeys,
+                    this.encryptionKeys,
+                    this.kegKey
                 );
             })
             .then(() => this._postAuth())
@@ -522,7 +626,11 @@ class User {
                 performance.measure('Login', 'Login start', 'Login end');
             })
             .catch(e => {
-                if (!socket.authenticated && !clientApp.clientVersionDeprecated && !clientApp.clientSessionExpired) {
+                if (
+                    !socket.authenticated &&
+                    !clientApp.clientVersionDeprecated &&
+                    !clientApp.clientSessionExpired
+                ) {
                     socket.reset();
                 }
                 return Promise.reject(e);
@@ -545,17 +653,24 @@ class User {
             this.loadProfile();
             this.loadQuota();
             this.loadSettings();
-            when(() => this.profileLoaded, () => {
-                this.setAsLastAuthenticated()
-                    .catch(err => console.error(err)); // not critical, we can ignore this error
-            });
+            when(
+                () => this.profileLoaded,
+                () => {
+                    this.setAsLastAuthenticated().catch(err =>
+                        console.error(err)
+                    ); // not critical, we can ignore this error
+                }
+            );
         }
     }
 
     setReauthOnReconnect = () => {
         // only need to set reauth listener once
         if (this.stopReauthenticator) return;
-        this.stopReauthenticator = socket.subscribe(socket.SOCKET_EVENTS.connect, this.login);
+        this.stopReauthenticator = socket.subscribe(
+            socket.SOCKET_EVENTS.connect,
+            this.login
+        );
     };
 
     /**
@@ -610,29 +725,34 @@ class User {
      * @return {Uint8Array}
      */
     getSharedKey(theirPublicKey) {
-        if (!(theirPublicKey instanceof Uint8Array)) throw new Error('Invalid argument type');
+        if (!(theirPublicKey instanceof Uint8Array))
+            throw new Error('Invalid argument type');
         const cacheKey = theirPublicKey.join(',');
         let cachedValue = this._sharedKeyCache[cacheKey];
         if (cachedValue) return cachedValue;
-        cachedValue = publicCrypto.computeSharedKey(theirPublicKey, this.encryptionKeys.secretKey);
+        cachedValue = publicCrypto.computeSharedKey(
+            theirPublicKey,
+            this.encryptionKeys.secretKey
+        );
         this._sharedKeyCache[cacheKey] = cachedValue;
         return cachedValue;
     }
 
     deleteAccount(username) {
         if (username !== this.username) {
-            return Promise.reject(new Error('Pass username to delete current user account.'));
+            return Promise.reject(
+                new Error('Pass username to delete current user account.')
+            );
         }
         if (!this.primaryAddressConfirmed) {
             warnings.addSevere('error_deletingAccountNoConfirmedEmail');
             return Promise.reject();
         }
-        return socket.send('/auth/user/close')
-            .catch(err => {
-                console.error(err);
-                warnings.addSevere('error_deletingAccount');
-                return Promise.reject(err);
-            });
+        return socket.send('/auth/user/close').catch(err => {
+            console.error(err);
+            warnings.addSevere('error_deletingAccount');
+            return Promise.reject(err);
+        });
     }
 
     clearFromTinyDb() {

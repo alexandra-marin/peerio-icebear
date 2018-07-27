@@ -2,7 +2,7 @@
  * Uint8Array extensions and polyfills.
  */
 
-if (typeof (Uint8Array.prototype.slice) === 'undefined') {
+if (typeof Uint8Array.prototype.slice === 'undefined') {
     /**
      * Returns a new Uint8Array containing a portion of current array defined by parameters.
      * @param {number} [begin=0] - starting index in the original array.
@@ -16,7 +16,8 @@ if (typeof (Uint8Array.prototype.slice) === 'undefined') {
         /* eslint-disable no-param-reassign */
         begin = begin || 0;
         if (begin < 0) begin = Math.max(0, this.length + begin);
-        end = typeof (end) === 'number' ? Math.min(this.length, end) : this.length;
+        end =
+            typeof end === 'number' ? Math.min(this.length, end) : this.length;
         if (end < 0) end = this.length + end;
         /* eslint-enable no-param-reassign */
 

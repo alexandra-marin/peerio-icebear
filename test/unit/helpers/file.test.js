@@ -80,13 +80,15 @@ describe('File helper should', () => {
         paths.concat(paths.map(p => f + p));
     });
 
-    paths.forEach((testCase) => {
+    paths.forEach(testCase => {
         it(`return file name from path ${testCase.data}`, () => {
             const actual = helper.getFileName(testCase.data);
             actual.should.equal(testCase.expectedFullName);
         });
 
-        it(`return file name without extension from path ${testCase.data}`, () => {
+        it(`return file name without extension from path ${
+            testCase.data
+        }`, () => {
             const actual = helper.getFileNameWithoutExtension(testCase.data);
             actual.should.equal(testCase.expectedName);
         });
@@ -97,11 +99,12 @@ describe('File helper should', () => {
         });
     });
 
-    unicode.forEach((testCase) => {
+    unicode.forEach(testCase => {
         it('sanitizes broken bi-directional formatting', () => {
-            const sanitized = helper.sanitizeBidirectionalFilename(testCase.name);
+            const sanitized = helper.sanitizeBidirectionalFilename(
+                testCase.name
+            );
             sanitized.should.equal(testCase.expectedSanitizedName);
         });
     });
 });
-

@@ -32,7 +32,6 @@ class Mail extends Keg {
     @observable body = '';
     @observable timestamp = Date.now();
 
-
     @observable sender;
     @observable.shallow recipients = [];
     @observable.shallow files = [];
@@ -51,11 +50,13 @@ class Mail extends Keg {
 
     // -- computed properties ------------------------------------------------------------------------------------
 
-    @computed get date() {
+    @computed
+    get date() {
         return moment(this.timestamp);
     }
 
-    @computed get fileCounter() {
+    @computed
+    get fileCounter() {
         return this.files.length;
     }
 
@@ -74,7 +75,8 @@ class Mail extends Keg {
         return ret;
     }
 
-    @action deserializeKegPayload(data) {
+    @action
+    deserializeKegPayload(data) {
         this.messageId = data.messageId;
         this.sentId = data.sentId;
         this.replyId = data.replyId;
@@ -95,14 +97,16 @@ class Mail extends Keg {
         return ret;
     }
 
-    @action deserializeProps(props) {
+    @action
+    deserializeProps(props) {
         // The source of truth for messageId, sentId, replyId, files, and
         // recipients is the payload, so we don't deserialize them here.
         this.sender = props.sharedBy;
     }
 
     // -- class methods ------------------------------------------------------------------------------------------
-    @action send(contacts) {
+    @action
+    send(contacts) {
         this.sending = true;
         this.timestamp = Date.now();
         this.sender = getUser().username;
@@ -132,7 +136,10 @@ class Mail extends Keg {
             recipients[contact.username] = {
                 publicKey: cryptoUtil.bytesToB64(contact.encryptionPublicKey),
                 encryptedPayloadKey: cryptoUtil.bytesToB64(
-                    secret.encryptString(payloadKey, getUser().getSharedKey(contact.encryptionPublicKey))
+                    secret.encryptString(
+                        payloadKey,
+                        getUser().getSharedKey(contact.encryptionPublicKey)
+                    )
                 )
             };
         });
@@ -148,25 +155,35 @@ class Mail extends Keg {
 
         // when we implement key change history, this will help to figure out which key to use
         // this properties should not be blindly trusted, recipient verifies them
-        data.keg.props.sharedKegSenderPK = cryptoUtil.bytesToB64(getUser().encryptionKeys.publicKey);
+        data.keg.props.sharedKegSenderPK = cryptoUtil.bytesToB64(
+            getUser().encryptionKeys.publicKey
+        );
 
         return retryUntilSuccess(() => socket.send('/auth/kegs/send', data))
             .then(() => {
                 this.sent = true;
                 // Save an outgoing copy, changing ids.
                 this.sentId = this.messageId;
-                this.messageId = cryptoUtil.getRandomUserSpecificIdB64(this.sender);
+                this.messageId = cryptoUtil.getRandomUserSpecificIdB64(
+                    this.sender
+                );
                 return retryUntilSuccess(() => this.saveToServer());
             })
-            .finally(action(() => {
-                this.sending = false;
-            }));
+            .finally(
+                action(() => {
+                    this.sending = false;
+                })
+            );
     }
 
     remove() {
         if (!this.id) return Promise.resolve();
-        return retryUntilSuccess(() => super.remove(), `remove mail ${this.id}`)
-            .then(() => { this.deleted = true; });
+        return retryUntilSuccess(
+            () => super.remove(),
+            `remove mail ${this.id}`
+        ).then(() => {
+            this.deleted = true;
+        });
     }
 }
 

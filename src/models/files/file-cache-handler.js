@@ -15,10 +15,13 @@ const fileCacheOptions = {
         // exceeds cache limit, we are deleting file whenever it does become invisible
         // it may lead to actual cache size exceeding our limit, but this should be a non-issue
         console.debug(`trying to dispose: ${key}, ${file.tmpCachePath}`);
-        when(() => !file.visibleCounter, () => {
-            console.debug(`removing file: ${key}, ${file.tmpCachePath}`);
-            file.removeCache();
-        });
+        when(
+            () => !file.visibleCounter,
+            () => {
+                console.debug(`removing file: ${key}, ${file.tmpCachePath}`);
+                file.removeCache();
+            }
+        );
     }
 };
 

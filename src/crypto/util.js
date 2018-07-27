@@ -20,4 +20,10 @@ function concatTypedArrays(arr1, arr2) {
     return joined;
 }
 
-module.exports = Object.assign({ concatTypedArrays }, conversion, random, hashing, padding);
+module.exports = Object.assign(
+    { concatTypedArrays },
+    conversion,
+    random,
+    hashing,
+    padding
+);

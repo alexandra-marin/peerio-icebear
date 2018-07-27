@@ -2,7 +2,6 @@
  * String helpers
  */
 
-
 /**
  * Returns first unicode character of a string.
  * @param {string} str

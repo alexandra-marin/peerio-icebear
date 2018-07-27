@@ -1,7 +1,6 @@
 // ArrayStream is not currently used anywhere, but I don't want to delete it, might get handy (Anri)
 // todo: Add unit tests if you decide to use this class
 
-
 // /**
 //  * Provides access to array of Uint8Array chunks of data in a stream fashion.
 //  * Currently supports only reading from stream.
@@ -57,12 +56,14 @@
 //             return;
 //         }
 //         // first chunk goes away for sure
-//         size -= this.arr[0].length - this.pos; // eslint-disable-line
+//         // eslint-disable-next-line no-param-reassign
+//         size -= this.arr[0].length - this.pos;
 //         this.arr.shift();
 //         this.pos = 0;
 //         while (size > 0) {
 //             if (size >= this.arr[0].length) {
-//                 size -= this.arr[0].length; // eslint-disable-line
+//                 // eslint-disable-next-line no-param-reassign
+//                 size -= this.arr[0].length;
 //                 this.arr.shift();
 //             } else {
 //                 this.pos = size;

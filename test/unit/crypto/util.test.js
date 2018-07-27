@@ -36,18 +36,41 @@ describe('Crypto Utilities module', () => {
             expected: new Uint8Array([5, 4, 3]),
             negate: true
         }
-    ].forEach((test) => {
+    ].forEach(test => {
         it(`should concatenate buffers. case: ${test.name}`, () => {
             const actual = util.concatTypedArrays(test.arg1, test.arg2);
             actual.should.be.instanceOf(Uint8Array);
-            test.negate ? actual.should.not.eql(test.expected) : actual.should.eql(test.expected);
+            test.negate
+                ? actual.should.not.eql(test.expected)
+                : actual.should.eql(test.expected);
         });
     });
 
     it('should encode and decode string', () => {
         const str = 'test string to decode';
-        const bytes = new Uint8Array([116, 101, 115, 116, 32, 115, 116, 114, 105, 110, 103,
-            32, 116, 111, 32, 100, 101, 99, 111, 100, 101]);
+        const bytes = new Uint8Array([
+            116,
+            101,
+            115,
+            116,
+            32,
+            115,
+            116,
+            114,
+            105,
+            110,
+            103,
+            32,
+            116,
+            111,
+            32,
+            100,
+            101,
+            99,
+            111,
+            100,
+            101
+        ]);
 
         const actualBytes = util.strToBytes(str);
         const actualStr = util.bytesToStr(bytes);
@@ -92,7 +115,9 @@ describe('Crypto Utilities module', () => {
     it('should generate a non-personalized hex hash', () => {
         const string = util.strToBytes('bladiblalala');
         const hash = util.getHexHash(32, string);
-        hash.should.deep.equal('001417df228a3630ccbe463bc15a82c29a80ec565633db4d8ccf259238970cd0');
+        hash.should.deep.equal(
+            '001417df228a3630ccbe463bc15a82c29a80ec565633db4d8ccf259238970cd0'
+        );
     });
 
     it('should generate a non-personalized byte hash', () => {
@@ -109,8 +134,12 @@ describe('Crypto Utilities module', () => {
         const personalization2 = 'fg';
         const hash1 = util.getHexHash(32, string, personalization1);
         const hash2 = util.getHexHash(32, string, personalization2);
-        hash1.should.deep.equal('0447c1bcd5739016604b495bc7790291df2dd80a9e197312ca0cc02efd3457ac');
-        hash2.should.deep.equal('2cf712b1f1f35527d4f3c09ee7ddeca8237f71b0be58cba5cfe11087a434ce82');
+        hash1.should.deep.equal(
+            '0447c1bcd5739016604b495bc7790291df2dd80a9e197312ca0cc02efd3457ac'
+        );
+        hash2.should.deep.equal(
+            '2cf712b1f1f35527d4f3c09ee7ddeca8237f71b0be58cba5cfe11087a434ce82'
+        );
     });
 
     it('should pad and unpad passphrase', () => {

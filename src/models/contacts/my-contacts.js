@@ -41,5 +41,4 @@ class MyContacts extends SyncedKeg {
     }
 }
 
-
 module.exports = MyContacts;

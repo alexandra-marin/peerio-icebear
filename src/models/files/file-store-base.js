@@ -74,52 +74,65 @@ class FileStoreBase {
     }
 
     // all files currently loaded in RAM, including volumes, excluding chats
-    @computed get allFiles() {
+    @computed
+    get allFiles() {
         let ret = this.files;
         if (this.isMainStore) {
-            FileStoreBase.instances.forEach(store => { ret = ret.concat(store.files.slice()); });
+            FileStoreBase.instances.forEach(store => {
+                ret = ret.concat(store.files.slice());
+            });
         }
         return ret;
     }
 
     // Subset of files not currently hidden by any applied filters
-    @computed get filesSearchResult() {
+    @computed
+    get filesSearchResult() {
         if (!this.searchQuery) return [];
         const q = this.searchQuery.toUpperCase();
-        return this.allFiles
-            .filter(f => f.normalizedName.includes(q));
+        return this.allFiles.filter(f => f.normalizedName.includes(q));
     }
 
     // Subset of folders not currently hidden by any applied filters
-    @computed get foldersSearchResult() {
+    @computed
+    get foldersSearchResult() {
         if (!this.searchQuery) return [];
         return this.foldersFiltered(this.searchQuery);
     }
 
-    foldersFiltered = (query) => {
+    foldersFiltered = query => {
         const q = query.toUpperCase();
-        return this.folderStore.root.allFolders
-            .filter(f => f.normalizedName.includes(q));
-    }
+        return this.folderStore.root.allFolders.filter(f =>
+            f.normalizedName.includes(q)
+        );
+    };
 
     // Subset of files and folders not currently hidden by any applied filters
-    @computed get filesAndFoldersSearchResult() {
+    @computed
+    get filesAndFoldersSearchResult() {
         return this.foldersSearchResult.concat(this.filesSearchResult);
     }
 
-    @computed get hasSelectedFiles() {
+    @computed
+    get hasSelectedFiles() {
         return this.allFiles.some(isFileSelected);
     }
 
-    @computed get hasSelectedFilesOrFolders() {
+    @computed
+    get hasSelectedFilesOrFolders() {
         return this.selectedFilesOrFolders.length;
     }
 
-    @computed get canShareSelectedFiles() {
-        return this.hasSelectedFiles && this.allFiles.every(isSelectedFileShareable);
+    @computed
+    get canShareSelectedFiles() {
+        return (
+            this.hasSelectedFiles &&
+            this.allFiles.every(isSelectedFileShareable)
+        );
     }
     // Returns currently selected files (file.selected == true)
-    @computed get selectedFiles() {
+    @computed
+    get selectedFiles() {
         return this.allFiles.filter(isFileSelected);
     }
 
@@ -128,7 +141,8 @@ class FileStoreBase {
         return getFileStore().folderStore.selectedFolders;
     }
 
-    @computed get selectedFilesOrFolders() {
+    @computed
+    get selectedFilesOrFolders() {
         return this.selectedFolders.concat(this.selectedFiles);
     }
 
@@ -158,12 +172,16 @@ class FileStoreBase {
     }
 
     // Deselects all files and folders
-    @action clearSelection() {
-        this.selectedFilesOrFolders.forEach(f => { f.selected = false; });
+    @action
+    clearSelection() {
+        this.selectedFilesOrFolders.forEach(f => {
+            f.selected = false;
+        });
     }
 
     // Deselects unshareable files
-    @action deselectUnshareableFiles() {
+    @action
+    deselectUnshareableFiles() {
         this.selectedFilesOrFolders.forEach(f => {
             if (f.canShare) return;
             f.selected = false;
@@ -183,22 +201,29 @@ class FileStoreBase {
         this.updateFiles();
     };
 
-    onFileDigestUpdate = _.debounce(this._onFileDigestUpdate, 700, { leading: true, maxWait: 1500 });
+    onFileDigestUpdate = _.debounce(this._onFileDigestUpdate, 700, {
+        leading: true,
+        maxWait: 1500
+    });
 
     async getFileKegsFromServer() {
         const filter = { collectionVersion: { $gt: this.knownUpdateId } };
         if (!this.loaded) {
             filter.deleted = false;
         }
-        const options = { count: PAGE_SIZE/* , reverse: false */ };
+        const options = { count: PAGE_SIZE /* , reverse: false */ };
         // this is naturally paged because every update calls another update in the end
         // until all update pages are loaded
-        return socket.send('/auth/kegs/db/query', {
-            kegDbId: this.kegDb.id,
-            type: 'file',
-            filter,
-            options
-        }, false);
+        return socket.send(
+            '/auth/kegs/db/query',
+            {
+                kegDbId: this.kegDb.id,
+                type: 'file',
+                filter,
+                options
+            },
+            false
+        );
     }
 
     verifyCacheObjectUpdate(oldKeg, newKeg) {
@@ -207,7 +232,11 @@ class FileStoreBase {
         const oldDesc = oldKeg.props.descriptor;
         const newDesc = newKeg.props.descriptor;
         let correctDescriptor = newDesc || oldDesc;
-        if (oldDesc && newDesc && oldDesc.collectionVersion > newDesc.collectionVersion) {
+        if (
+            oldDesc &&
+            newDesc &&
+            oldDesc.collectionVersion > newDesc.collectionVersion
+        ) {
             correctDescriptor = oldDesc;
         }
         let correctKeg = newKeg || oldKeg;
@@ -225,22 +254,30 @@ class FileStoreBase {
 
     cacheOnceVerified = (file, keg) => {
         file.onceVerified(() => {
-            this.cache.setValue(keg.kegId, keg, this.verifyCacheObjectUpdate)
+            this.cache
+                .setValue(keg.kegId, keg, this.verifyCacheObjectUpdate)
                 .catch(this.processCacheUpdateError);
         });
-    }
+    };
 
     async cacheDescriptor(d) {
         const file = this.getById(d.fileId);
         if (!file) return null;
         const cached = this.cache.get(file.id);
         if (!cached) {
-            console.error('cacheDescriptor was called, but cached keg not found');
+            console.error(
+                'cacheDescriptor was called, but cached keg not found'
+            );
             return null;
         }
-        if (cached.props.descriptor && cached.props.descriptor.version >= d.version) return null;
+        if (
+            cached.props.descriptor &&
+            cached.props.descriptor.version >= d.version
+        )
+            return null;
         cached.props.descriptor = d;
-        return this.cache.setValue(file.id, cached, this.verifyCacheObjectUpdate)
+        return this.cache
+            .setValue(file.id, cached, this.verifyCacheObjectUpdate)
             .catch(this.processCacheUpdateError);
     }
 
@@ -250,8 +287,16 @@ class FileStoreBase {
     // loaded - initial keg list loaded and now we only update
     // cacheLoaded - kegs from cache loaded (but might still be 'loading' from server)
     updateFiles = async () => {
-        if (this.updating || (this.loaded && this.knownUpdateId === this.maxUpdateId)) return;
-        console.log(`Proceeding to file update. Known collection version: ${this.knownUpdateId}`);
+        if (
+            this.updating ||
+            (this.loaded && this.knownUpdateId === this.maxUpdateId)
+        )
+            return;
+        console.log(
+            `Proceeding to file update. Known collection version: ${
+                this.knownUpdateId
+            }`
+        );
 
         if (!this.loaded && !this.loading) {
             performance.mark(`start loading files ${this.id}`);
@@ -261,7 +306,10 @@ class FileStoreBase {
 
         // creating cache storage object
         if (!this.cache) {
-            this.cache = new config.CacheEngine(`file_store_${this.id}`, 'kegId');
+            this.cache = new config.CacheEngine(
+                `file_store_${this.id}`,
+                'kegId'
+            );
             await this.cache.open();
         }
 
@@ -273,14 +321,19 @@ class FileStoreBase {
         if (this.cacheLoaded) {
             resp = await retryUntilSuccess(
                 () => this.getFileKegsFromServer(),
-                `Updating file list for ${this.id}`);
+                `Updating file list for ${this.id}`
+            );
         } else {
             performance.mark(`start loading files cache ${this.id}`);
             resp = { kegs: await this.cache.getAllValues(), hasMore: true };
             this.cacheLoaded = true;
             fromCache = true;
         }
-        console.log(`file store ${this.id} got ${resp.kegs.length} kegs from ${fromCache ? 'cache' : 'server'}`);
+        console.log(
+            `file store ${this.id} got ${resp.kegs.length} kegs from ${
+                fromCache ? 'cache' : 'server'
+            }`
+        );
         // process kegs
         runInAction(() => {
             for (const keg of resp.kegs) {
@@ -299,7 +352,10 @@ class FileStoreBase {
                     continue;
                 }
                 //  no point wasting time looking up existing kegs when we load from cache
-                const existing = fromCache ? null : (this.fileMap[keg.props.fileId] || this.getByKegId(keg.kegId));
+                const existing = fromCache
+                    ? null
+                    : this.fileMap[keg.props.fileId] ||
+                      this.getByKegId(keg.kegId);
                 if (keg.deleted || keg.hidden) {
                     // deleted keg that exists gets wiped from store and cache
                     if (existing) {
@@ -339,7 +395,8 @@ class FileStoreBase {
                 performance.measure(
                     `loading files cache ${this.id}`,
                     `start loading files cache ${this.id}`,
-                    `stop loading files cache ${this.id}`);
+                    `stop loading files cache ${this.id}`
+                );
             }
             // in a series of calls, when we got results count less then page size - we've loaded all files
             if (!resp.hasMore && !this.loaded) {
@@ -347,17 +404,25 @@ class FileStoreBase {
                 performance.measure(
                     `loading files ${this.id}`,
                     `start loading files ${this.id}`,
-                    `stop loading files ${this.id}`);
+                    `stop loading files ${this.id}`
+                );
 
                 this.loaded = true;
                 this.loading = false;
                 tracker.onUpdated(this.onFileDigestUpdate);
-                tracker.subscribeToKegUpdates(this.kegDb.id, 'file', this.onFileDigestUpdate);
-                socket.onDisconnect(() => { this.updatedAfterReconnect = false; });
+                tracker.subscribeToKegUpdates(
+                    this.kegDb.id,
+                    'file',
+                    this.onFileDigestUpdate
+                );
+                socket.onDisconnect(() => {
+                    this.updatedAfterReconnect = false;
+                });
             }
             this.updating = false;
             // keep the paging going
-            if (fromCache || resp.kegs.length > 0) setTimeout(this._onFileDigestUpdate);
+            if (fromCache || resp.kegs.length > 0)
+                setTimeout(this._onFileDigestUpdate);
             // this is kinda true, because if there's more then 1 page of updates it's not really true
             // but his flag is for UI indication only so it's fine
             this.updatedAfterReconnect = true;

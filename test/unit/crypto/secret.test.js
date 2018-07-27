@@ -6,8 +6,40 @@ const nacl = require('tweetnacl');
 const util = require('~/crypto/util');
 
 describe('Secret key encryption module', () => {
-    const key = new Uint8Array([127, 216, 168, 148, 177, 189, 134, 245, 107, 28, 100, 181, 50, 32, 94,
-        149, 237, 193, 148, 19, 11, 103, 73, 45, 1, 17, 102, 222, 82, 227, 123, 157]);
+    const key = new Uint8Array([
+        127,
+        216,
+        168,
+        148,
+        177,
+        189,
+        134,
+        245,
+        107,
+        28,
+        100,
+        181,
+        50,
+        32,
+        94,
+        149,
+        237,
+        193,
+        148,
+        19,
+        11,
+        103,
+        73,
+        45,
+        1,
+        17,
+        102,
+        222,
+        82,
+        227,
+        123,
+        157
+    ]);
 
     it('should encrypt and decrypt with auto nonce handling', () => {
         const message = new Uint8Array([1, 2, 3, 4, 5]);
@@ -38,7 +70,26 @@ describe('Secret key encryption module', () => {
         const message = new Uint8Array([1, 2, 3, 4, 5]);
         const nonce = util.getRandomNonce();
         const box = nacl.secretbox(message, nonce, key);
-        const oldFormatEncrypted = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...box, ...nonce]);
+        const oldFormatEncrypted = new Uint8Array([
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            ...box,
+            ...nonce
+        ]);
         const decrypted = crypto.decrypt(oldFormatEncrypted, key);
         decrypted.should.eql(message);
     });

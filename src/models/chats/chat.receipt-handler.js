@@ -74,13 +74,15 @@ class ChatReceiptHandler {
                 }
                 r.chatPosition = this.pendingReceipt;
                 // console.debug('Saving receipt: ', pos);
-                return r.saveToServer() // eslint-disable-line
+                // eslint-disable-next-line consistent-return
+                return r.saveToServer()
                     .then(() => {
                         if (r.chatPosition >= this.pendingReceipt) {
                             this.pendingReceipt = null;
                         }
                         if (this.pendingReceipt) {
-                            pos = this.pendingReceipt;// eslint-disable-line
+                            // eslint-disable-next-line no-param-reassign
+                            pos = this.pendingReceipt;
                             this.pendingReceipt = null;
                             this.sendReceipt(pos);
                         }
@@ -89,7 +91,8 @@ class ChatReceiptHandler {
                         // normally, this is a connection issue or concurrency.
                         // to resolve concurrency error we reload the cached keg
                         console.error(err);
-                        pos = this.pendingReceipt;// eslint-disable-line
+                        // eslint-disable-next-line no-param-reassign
+                        pos = this.pendingReceipt;
                         this.pendingReceipt = null;
                         this._ownReceipt.load().then(() => {
                             this.sendReceipt(pos);

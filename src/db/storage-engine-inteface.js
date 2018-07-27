@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* eslint-disable no-unused-vars, no-useless-constructor, no-empty-function */
 // This file exists just for the sake of documentation.
 // StorageEngineInterface class is never used.
 

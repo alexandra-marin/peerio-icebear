@@ -55,7 +55,8 @@ class TaskQueue {
                     if (onSuccess) onSuccess(...finishArgs);
                 },
                 onError: (...errArgs) => {
-                    reject(...errArgs); // eslint-disable-line prefer-promise-reject-errors
+                    // eslint-disable-next-line prefer-promise-reject-errors
+                    reject(...errArgs);
                     if (onError) onError(...errArgs);
                 }
             });

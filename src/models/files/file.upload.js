@@ -74,25 +74,28 @@ function upload(filePath, fileName, resume) {
             stream = new config.FileStream(filePath, 'read');
             return stream.open();
         })
-            .then(async () => { // eslint-disable-line consistent-return
-                console.log(`File read stream open. File size: ${stream.size}`);
-                if (nextChunkId === null) {
-                    this.size = stream.size;
-                    if (!this.size) return Promise.reject(new Error('Can not upload zero size file.'));
-                    this.chunkSize = config.upload.getChunkSize(this.size);
-                    nonceGen = new FileNonceGenerator(0, this.chunksCount - 1);
-                    this.blobNonce = cryptoUtil.bytesToB64(nonceGen.nonce);
-                    try {
-                        await this.createDescriptor();
-                        return this.saveToServer();
-                    } catch (err) {
-                        console.error(err);
-                        this.remove();
-                        return Promise.reject(err);
+            .then(
+                // eslint-disable-next-line consistent-return
+                async () => {
+                    console.log(`File read stream open. File size: ${stream.size}`);
+                    if (nextChunkId === null) {
+                        this.size = stream.size;
+                        if (!this.size) return Promise.reject(new Error('Can not upload zero size file.'));
+                        this.chunkSize = config.upload.getChunkSize(this.size);
+                        nonceGen = new FileNonceGenerator(0, this.chunksCount - 1);
+                        this.blobNonce = cryptoUtil.bytesToB64(nonceGen.nonce);
+                        try {
+                            await this.createDescriptor();
+                            return this.saveToServer();
+                        } catch (err) {
+                            console.error(err);
+                            this.remove();
+                            return Promise.reject(err);
+                        }
                     }
+                    nonceGen = new FileNonceGenerator(0, this.chunksCount - 1, cryptoUtil.b64ToBytes(this.blobNonce));
                 }
-                nonceGen = new FileNonceGenerator(0, this.chunksCount - 1, cryptoUtil.b64ToBytes(this.blobNonce));
-            })
+            )
             .then(() => {
                 if (nextChunkId === null) this._saveUploadStartFact(filePath);
                 this.uploader = new FileUploader(this, stream, nonceGen, nextChunkId);

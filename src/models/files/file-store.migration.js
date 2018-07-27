@@ -156,7 +156,6 @@ class FileStoreMigration {
     async doMigrate() {
         await this.waitForStores();
 
-        /* eslint-disable no-await-in-loop */
         for (let i = 0; i < this.legacySharedFiles.length; i++) {
             if (!this.pending) return; // it was ended externally
             this.progress = Math.floor(i / (this.legacySharedFiles.length / 100));
@@ -226,7 +225,6 @@ class FileStoreMigration {
                 });
             }
         }
-        /* eslint-enable no-await-in-loop */
         this.finishMigration();
         this.migrationKeg.save(() => {
             this.migrationKeg.migration.files = [];
@@ -281,7 +279,7 @@ class FileStoreMigration {
             if (!recipient) {
                 const chat = getChatStore().chatMap[item.kegDbId];
                 if (chat) {
-                    if (chat.isChannel) await asPromise(chat, 'headLoaded', true); //eslint-disable-line
+                    if (chat.isChannel) await asPromise(chat, 'headLoaded', true);
                     recipient = chat.name;
                 } else {
                     recipient = item.kegDbId;

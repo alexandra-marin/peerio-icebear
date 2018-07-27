@@ -503,7 +503,7 @@ class Keg {
      * Override in child classes to convert raw keg data into object properties.
      * @abstract
      */
-    // eslint-disable-next-line
+    // eslint-disable-next-line no-unused-vars
     deserializeKegPayload(payload) { }
 
     /**

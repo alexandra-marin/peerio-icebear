@@ -141,11 +141,11 @@ function sanitizeBidirectionalFilePart(name) {
     }
     // If counts aren't zero, add more pops.
     while (formattingCount--) {
-        // eslint-disable-next-line
+        // eslint-disable-next-line no-param-reassign
         name += String.fromCharCode(0x202c); // POP DIRECTIONAL FORMATTING
     }
     while (isolateCount--) {
-        // eslint-disable-next-line
+        // eslint-disable-next-line no-param-reassign
         name += String.fromCharCode(0x2069); // POP DIRECTIONAL ISOLATE
     }
 

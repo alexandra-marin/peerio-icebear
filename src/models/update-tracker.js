@@ -164,7 +164,7 @@ class UpdateTracker {
     }
 
     processDigestEvent(kegDbId, ev, isFromEvent) {
-        /* eslint-disable prefer-const, no-unused-vars */
+        // eslint-disable-next-line prefer-const
         let [kegType, maxUpdateId, sessionUpdateId, newKegsCount] = ev;
         // GOTCHA: when this is a digest event and not the result of getDigest
         // sessionUpdateId is actually not session specific
@@ -254,7 +254,7 @@ class UpdateTracker {
         try {
             for (let i = 0; i < dbList.length; i++) {
                 const kegDbId = dbList[i];
-                let events = digest[kegDbId];
+                const events = digest[kegDbId];
                 for (let j = 0; j < events.length; j++) {
                     this.processDigestEvent(kegDbId, events[j]);
                 }
@@ -302,7 +302,7 @@ class UpdateTracker {
 
     // call this to make sure db digest is loaded disregarding its unread status
     async loadDigestFor(kegDbId) {
-        let resp = await socket.send('/auth/updates/digest', { prefixes: [kegDbId] }, false);
+        const resp = await socket.send('/auth/updates/digest', { prefixes: [kegDbId] }, false);
         this.processDigestResponse(resp);
     }
 

@@ -23,7 +23,8 @@ if (globalContext.cryptoShim) {
 // node crypto?
 if (!getRandomBytes) {
     try {
-        const crypto = require('crypto'); //eslint-disable-line
+        // eslint-disable-next-line global-require
+        const crypto = require('crypto');
         if (typeof crypto.randomBytes === 'function') {
             getRandomBytes = function(num) {
                 return crypto.randomBytes(num);

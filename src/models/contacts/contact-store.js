@@ -466,10 +466,12 @@ class ContactStore {
      * @returns {Array<Contact>}
      */
     filter(token, list, nosort = false) {
-        token = token.toLocaleLowerCase(); // eslint-disable-line
+        // eslint-disable-next-line no-param-reassign
+        token = token.toLocaleLowerCase();
         let removeUnavailable = false;
         if (!list) {
-            list = this.contacts; // eslint-disable-line
+            // eslint-disable-next-line no-param-reassign
+            list = this.contacts;
             removeUnavailable = true;
         }
         const ret = list

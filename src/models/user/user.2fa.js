@@ -26,7 +26,8 @@ module.exports = function mixUser2faModule() {
      * @returns {Promise<Array<string>>} backup codes
      */
     this.confirm2faSetup = (code, trust = false) => {
-        code = sanitizeCode(code); //eslint-disable-line
+        // eslint-disable-next-line no-param-reassign
+        code = sanitizeCode(code);
         console.log('Confirming 2fa setup.');
         return socket.send('/auth/2fa/confirm', {
             TOTPCode: code,
@@ -126,7 +127,8 @@ module.exports = function mixUser2faModule() {
                 (code, trustDevice = false) => {
                     this._getDeviceId()
                         .then(deviceId => {
-                            code = sanitizeCode(code); //eslint-disable-line
+                            // eslint-disable-next-line no-param-reassign
+                            code = sanitizeCode(code);
                             const req = {
                                 username: this.username,
                                 deviceId,
@@ -154,7 +156,8 @@ module.exports = function mixUser2faModule() {
             clientApp.create2FARequest(
                 type,
                 (code) => {
-                    code = sanitizeCode(code); //eslint-disable-line
+                    // eslint-disable-next-line no-param-reassign
+                    code = sanitizeCode(code);
                     const req = { [code.length === 6 ? 'TOTPCode' : 'backupCode']: code };
                     socket.send('/auth/2fa/verify', req)
                         .then(resolve)

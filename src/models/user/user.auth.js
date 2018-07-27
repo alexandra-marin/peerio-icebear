@@ -280,7 +280,7 @@ module.exports = function mixUserAuthModule() {
      */
     this.validatePasscode = (passcode) => {
         // creating temporary user obj to do that without affecting current instance's state
-        const u = new this.constructor(); // eslint-disable-line
+        const u = new this.constructor();
         u.passphrase = passcode;
         u.username = this.username;
         return u._checkForPasscode()

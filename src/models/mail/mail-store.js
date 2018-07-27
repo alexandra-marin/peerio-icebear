@@ -158,7 +158,8 @@ class MailStore {
     // we reserve this way of updating anyway for future, when we'll not gonna load entire mail list on start
     updateMails = (maxId) => {
         if (!this.loaded || this.updating) return;
-        if (!maxId) maxId = this.maxUpdateId; // eslint-disable-line
+        // eslint-disable-next-line no-param-reassign
+        if (!maxId) maxId = this.maxUpdateId;
         console.log(`Proceeding to mail update. Known collection version: ${this.knownUpdateId}`);
         this.updating = true;
         retryUntilSuccess(() => this._getMails(), 'Updating mail list')

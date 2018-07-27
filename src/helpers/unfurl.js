@@ -1,4 +1,3 @@
-/* eslint-disable no-case-declarations */
 /**
 * All kinds of unfurl helpers
 */
@@ -29,6 +28,7 @@ function getContentHeaders(url) {
         const req = new XMLHttpRequest();
         let resolved = false;
         req.onreadystatechange = () => {
+            /* eslint-disable no-case-declarations */
             switch (req.readyState) {
                 case 1:
                     req.send();
@@ -46,6 +46,7 @@ function getContentHeaders(url) {
                     break;
                 default: break;
             }
+            /* eslint-enable no-case-declarations */
         };
         req.timeout = config.unfurlTimeout;
         req.open('GET', url);

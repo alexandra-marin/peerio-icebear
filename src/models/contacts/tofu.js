@@ -1,7 +1,6 @@
 const Keg = require('./../kegs/keg');
 const { AntiTamperError } = require('../../errors');
 
-
 /**
  * Tofu keg.
  * @param {KegDb} db
@@ -61,8 +60,10 @@ class Tofu extends Keg {
     detectTampering(payload) {
         super.detectTampering(payload);
         if (payload.username !== this.username) {
-            throw new AntiTamperError('Tofu keg inner and outer username mismatch. '
-                + `Inner: ${payload.username}. Outer: ${this.username}`);
+            throw new AntiTamperError(
+                'Tofu keg inner and outer username mismatch. ' +
+                    `Inner: ${payload.username}. Outer: ${this.username}`
+            );
         }
     }
 }

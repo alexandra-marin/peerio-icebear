@@ -10,24 +10,26 @@ describe('Retry helper should', function() {
     });
 
     it('resolve immediately', async () => {
-        const task = () => new Promise((resolve) => {
-            resolve();
-        });
+        const task = () =>
+            new Promise(resolve => {
+                resolve();
+            });
 
         await retryUntilSuccess(task).should.eventually.be.fulfilled;
     });
 
     it('reject 3 times and then resolve', async () => {
         let attemptNumber = 0;
-        const task = () => new Promise((resolve, reject) => {
-            attemptNumber++;
+        const task = () =>
+            new Promise((resolve, reject) => {
+                attemptNumber++;
 
-            if (attemptNumber < 3) {
-                reject();
-            } else {
-                resolve();
-            }
-        });
+                if (attemptNumber < 3) {
+                    reject();
+                } else {
+                    resolve();
+                }
+            });
 
         await retryUntilSuccess(task).should.be.fulfilled;
         attemptNumber.should.equal(3);
@@ -35,11 +37,12 @@ describe('Retry helper should', function() {
 
     it('fail to resolve after 3 tries', async () => {
         let attemptNumber = 0;
-        const task = () => new Promise((resolve, reject) => {
-            attemptNumber++;
-            console.log('attemptNumber', attemptNumber);
-            reject();
-        });
+        const task = () =>
+            new Promise((resolve, reject) => {
+                attemptNumber++;
+                console.log('attemptNumber', attemptNumber);
+                reject();
+            });
 
         await retryUntilSuccess(task, 'task 1', 3).should.be.rejected;
         attemptNumber.should.equal(4); // 4 because it's attempt number, first one doesn't count as retry
@@ -49,21 +52,21 @@ describe('Retry helper should', function() {
         let attemptNumber = 0;
         let started;
         let ended;
-        const task = () => new Promise((resolve, reject) => {
-            ended = performance.now();
-            attemptNumber++;
+        const task = () =>
+            new Promise((resolve, reject) => {
+                ended = performance.now();
+                attemptNumber++;
 
-            if (attemptNumber < 2) {
-                reject();
-                started = performance.now();
-            } else {
-                resolve();
-            }
-        });
+                if (attemptNumber < 2) {
+                    reject();
+                    started = performance.now();
+                } else {
+                    resolve();
+                }
+            });
 
         await retryUntilSuccess(task).should.be.fulfilled;
         const timeout = ended - started;
         timeout.should.be.above(1200).and.below(1300);
     });
 });
-

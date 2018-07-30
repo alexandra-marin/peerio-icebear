@@ -24,11 +24,14 @@ class CucumbotClient extends CucumbotBase {
                 '--expose-gc',
                 './node_modules/.bin/cucumber-js',
                 'test/e2e/spec',
-                '-r', 'test/e2e/code',
-                '--require-module', 'babel-register',
-                '--format', 'node_modules/cucumber-pretty',
-                '--format', `json:./test-results/e2e/${this.name}_result.json`,
-                '--tags', `@${this.name}`,
+                '-r',
+                'test/e2e/code',
+                '--format',
+                'node_modules/cucumber-pretty',
+                '--format',
+                `json:./test-results/e2e/${this.name}_result.json`,
+                '--tags',
+                `@${this.name}`,
                 '--exit'
             ],
             {
@@ -40,7 +43,7 @@ class CucumbotClient extends CucumbotBase {
         // incoming messages from Cucumbot
         child.on('message', this.processMessage);
 
-        child.on('close', (code) => {
+        child.on('close', code => {
             this.finished = true;
             this.finishedWithError = code > 0;
             this.emit('finished');
@@ -49,7 +52,7 @@ class CucumbotClient extends CucumbotBase {
         if (!testConfig.muteCucumbot) {
             child.stdout.on('data', data => {
                 const msg = data.toString().split('\n');
-                msg.forEach(m => m && console._log('>>>>>>BOT:', m));
+                msg.forEach(m => m && console._logBot('[[CUCUMBOT]]:', m));
             });
         }
 
@@ -60,6 +63,5 @@ class CucumbotClient extends CucumbotBase {
         });
     }
 }
-
 
 module.exports = CucumbotClient;

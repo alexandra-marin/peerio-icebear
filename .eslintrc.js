@@ -2,7 +2,8 @@ module.exports = {
     root: true,
     parser: 'babel-eslint',
     extends: [
-        'peerio/index.base.js'
+        'peerio/index.base.js',
+        'prettier'
     ],
     rules: {
         'no-labels': 0,
@@ -24,5 +25,15 @@ module.exports = {
         WebSocket: false,
         XMLHttpRequest: false,
         performance: false
+    },
+    settings: {
+        'import/resolver': {
+            node: {
+                extensions: [
+                    '.js',
+                    '.ts'
+                ]
+            }
+        }
     }
 };

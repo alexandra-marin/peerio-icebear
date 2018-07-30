@@ -32,7 +32,7 @@ function padPassphrase(passphrase) {
         throw new Error('Account Key is too long');
     }
     // Calculate hex length
-    const len = (`00000000${(passphrase.length).toString(16)}`).substr(-8);
+    const len = `00000000${passphrase.length.toString(16)}`.substr(-8);
     // Calculate padding.
     const paddingLen = MAX_PASSPHRASE_LENGTH - passphrase.length;
     const padding = new Array(paddingLen + 1).join('.'); // string of paddingLen dots

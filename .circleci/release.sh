@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # this script is supposed to run from ci only
 set -e
 

@@ -1,4 +1,3 @@
-
 const socket = require('../../network/socket');
 const { observable, action, when, computed, reaction } = require('mobx');
 const { cryptoUtil } = require('../../crypto/index');
@@ -32,8 +31,18 @@ class Contact {
         this.usernameTag = `@${this.username}`;
         if (this.isMe) {
             this.usernameTag += ` (${t('title_you')})`;
-            reaction(() => getUser().firstName, n => { this.firstName = n; });
-            reaction(() => getUser().lastName, n => { this.lastName = n; });
+            reaction(
+                () => getUser().firstName,
+                n => {
+                    this.firstName = n;
+                }
+            );
+            reaction(
+                () => getUser().lastName,
+                n => {
+                    this.lastName = n;
+                }
+            );
         }
         if (!noAutoLoad) this.load(prefetchedData);
     }
@@ -113,7 +122,8 @@ class Contact {
      * RGB string built based on hashed signing public key, not cryptographically strong, just for better UX
      * @type {string}
      */
-    @computed get color() {
+    @computed
+    get color() {
         if (!this.signingPublicKey) return { value: '#e0e1e6', isLight: true };
         const int = this.signingPublicKey[0] % ContactColors.length;
         return ContactColors[int];
@@ -123,14 +133,16 @@ class Contact {
      * First letter of first name or username.
      * @type {string}
      */
-    @computed get letter() {
+    @computed
+    get letter() {
         return getFirstLetterUpperCase(this.firstName || this.username);
     }
 
     /**
      * @type {string}
      */
-    @computed get fullName() {
+    @computed
+    get fullName() {
         let ret = '';
         if (this.firstName) ret = this.firstName;
         if (this.lastName) {
@@ -143,7 +155,8 @@ class Contact {
     /**
      * @type {string}
      */
-    @computed get fullNameAndUsername() {
+    @computed
+    get fullNameAndUsername() {
         let ret = '';
         if (this.firstName) ret = this.firstName;
         if (this.lastName) {
@@ -159,7 +172,8 @@ class Contact {
      * Lower cased full name for search/filter optimization
      * @type {string}
      */
-    @computed get fullNameLower() {
+    @computed
+    get fullNameLower() {
         return this.fullName.toLocaleLowerCase();
     }
 
@@ -174,32 +188,42 @@ class Contact {
      * Looks like '12345-12345-12345-12345-12345', empty value is '00000-00000-00000-00000-00000-00000'
      * @type {string}
      */
-    @computed get fingerprint() {
+    @computed
+    get fingerprint() {
         if (!this.signingPublicKey) return nullFingerprint;
-        if (!this.__fingerprint || this.__fingerprintKey !== this.signingPublicKey) {
+        if (
+            !this.__fingerprint ||
+            this.__fingerprintKey !== this.signingPublicKey
+        ) {
             this.__fingerprintKey = this.signingPublicKey;
-            cryptoUtil.getFingerprint(this.username, this.signingPublicKey)
-                .then(f => { this.__fingerprint = f; });
+            cryptoUtil
+                .getFingerprint(this.username, this.signingPublicKey)
+                .then(f => {
+                    this.__fingerprint = f;
+                });
 
             return nullFingerprint;
         }
         return this.__fingerprint;
     }
 
-    @computed get _avatarUrl() {
+    @computed
+    get _avatarUrl() {
         return `${serverSettings.avatarServer}/v2/avatar/${this.urlSalt}`;
     }
     /**
      * @type {string}
      */
-    @computed get largeAvatarUrl() {
+    @computed
+    get largeAvatarUrl() {
         if (!this.hasAvatar) return null;
         return `${this._avatarUrl}/large/?${this.profileVersion}`;
     }
     /**
      * @type {string}
      */
-    @computed get mediumAvatarUrl() {
+    @computed
+    get mediumAvatarUrl() {
         if (!this.hasAvatar) return null;
         // todo: returning large size here to deal with 64px upscaling to 80px on retina mess
         return `${this._avatarUrl}/large/?${this.profileVersion}`;
@@ -209,7 +233,8 @@ class Contact {
      * Same as {@link fingerprint}, but formatted as: '1234 5123 4512\n3451 2345 1234 5123 45'
      * @type {string}
      */
-    @computed get fingerprintSkylarFormatted() {
+    @computed
+    get fingerprintSkylarFormatted() {
         let i = 0;
         return this.fingerprint
             .replace(/-/g, '')
@@ -234,14 +259,25 @@ class Contact {
     static lastAdditionTime = 0;
     static smartRequestStartExecutor() {
         if (Contact.smartRequestTimer) return;
-        Contact.lastTimerInterval = clientApp.updatingAfterReconnect ? 2000 : 300;
-        console.log('Starting batch executor with interval', Contact.lastTimerInterval);
-        Contact.smartRequestTimer = setInterval(Contact.smartRequestExecutor, Contact.lastTimerInterval);
+        Contact.lastTimerInterval = clientApp.updatingAfterReconnect
+            ? 2000
+            : 300;
+        console.log(
+            'Starting batch executor with interval',
+            Contact.lastTimerInterval
+        );
+        Contact.smartRequestTimer = setInterval(
+            Contact.smartRequestExecutor,
+            Contact.lastTimerInterval
+        );
     }
 
     static smartRequestExecutor() {
-        if ((Date.now() - Contact.lastAdditionTime < Contact.lastTimerInterval)
-            && Contact.smartRequestQueue.length < 50) return;
+        if (
+            Date.now() - Contact.lastAdditionTime < Contact.lastTimerInterval &&
+            Contact.smartRequestQueue.length < 50
+        )
+            return;
         if (!Contact.smartRequestQueue.length) {
             clearInterval(Contact.smartRequestTimer);
             Contact.smartRequestTimer = null;
@@ -249,7 +285,12 @@ class Contact {
         }
         const usernames = Contact.smartRequestQueue.splice(0, 50); // 50 - max allowed batch size on server
         console.log(`Batch requesting ${usernames.length} lookups`);
-        socket.send('/auth/user/lookup', { string: usernames.map(u => u.username) }, false)
+        socket
+            .send(
+                '/auth/user/lookup',
+                { string: usernames.map(u => u.username) },
+                false
+            )
             .then(res => {
                 for (let i = 0; i < usernames.length; i++) {
                     usernames[i].resolve([res[i]]);
@@ -279,39 +320,48 @@ class Contact {
         this.loading = true;
         this._waitingForResponse = true;
 
-        (
-            prefetchedData
-                ? Promise.resolve(prefetchedData)
-                : Contact.smartRequest(this.username)
+        (prefetchedData
+            ? Promise.resolve(prefetchedData)
+            : Contact.smartRequest(this.username)
         )
-            .then(action(resp => {
-                const profile = resp && resp[0] && resp[0][0] && resp[0][0].profile || null;
-                if (!profile) {
-                    this.notFound = true;
+            .then(
+                action(resp => {
+                    const profile =
+                        (resp && resp[0] && resp[0][0] && resp[0][0].profile) ||
+                        null;
+                    if (!profile) {
+                        this.notFound = true;
+                        this._waitingForResponse = false;
+                        this.loading = false;
+                        return;
+                    }
+                    this.username = profile.username;
+                    this.usernameTag = `@${this.username}`;
+                    this.appLabel = profile.appLabel || 'peerio';
+                    this.firstName = profile.firstName || '';
+                    this.lastName = profile.lastName || '';
+                    this.urlSalt = profile.urlSalt;
+                    this.hasAvatar = profile.hasAvatar;
+                    this.isDeleted = !!profile.isDeleted;
+                    this.addresses = profile.addresses || [];
+                    this.mentionRegex = new RegExp(`@${this.username}`, 'gi');
+                    this.profileVersion = profile.profileVersion || 0;
+                    this.mcrRoles = profile.props
+                        ? profile.props.mcrRoles
+                        : null;
+
+                    // this is server - controlled data, so we don't account for cases when it's invalid
+                    this.encryptionPublicKey = new Uint8Array(
+                        profile.encryptionPublicKey
+                    );
+                    this.signingPublicKey = new Uint8Array(
+                        profile.signingPublicKey
+                    );
+                    // HINT: not calling loadTofu automatically anymore
                     this._waitingForResponse = false;
                     this.loading = false;
-                    return;
-                }
-                this.username = profile.username;
-                this.usernameTag = `@${this.username}`;
-                this.appLabel = profile.appLabel || 'peerio';
-                this.firstName = profile.firstName || '';
-                this.lastName = profile.lastName || '';
-                this.urlSalt = profile.urlSalt;
-                this.hasAvatar = profile.hasAvatar;
-                this.isDeleted = !!profile.isDeleted;
-                this.addresses = profile.addresses || [];
-                this.mentionRegex = new RegExp(`@${this.username}`, 'gi');
-                this.profileVersion = profile.profileVersion || 0;
-                this.mcrRoles = profile.props ? profile.props.mcrRoles : null;
-
-                // this is server - controlled data, so we don't account for cases when it's invalid
-                this.encryptionPublicKey = new Uint8Array(profile.encryptionPublicKey);
-                this.signingPublicKey = new Uint8Array(profile.signingPublicKey);
-                // HINT: not calling loadTofu automatically anymore
-                this._waitingForResponse = false;
-                this.loading = false;
-            }))
+                })
+            )
             .catch(err => {
                 this._waitingForResponse = false;
                 if (!prefetchedData) {
@@ -329,8 +379,8 @@ class Contact {
      */
     loadTofu() {
         // console.log('Loading tofu:', this.username);
-        return tofuStore.getByUsername(this.username)
-            .then(action(tofu => {
+        return tofuStore.getByUsername(this.username).then(
+            action(tofu => {
                 this._waitingForResponse = false;
                 this.loading = false;
                 if (!tofu) {
@@ -338,24 +388,37 @@ class Contact {
                     newTofu.username = this.username;
                     newTofu.firstName = this.firstName;
                     newTofu.lastName = this.lastName;
-                    newTofu.encryptionPublicKey = cryptoUtil.bytesToB64(this.encryptionPublicKey);
-                    newTofu.signingPublicKey = cryptoUtil.bytesToB64(this.signingPublicKey);
+                    newTofu.encryptionPublicKey = cryptoUtil.bytesToB64(
+                        this.encryptionPublicKey
+                    );
+                    newTofu.signingPublicKey = cryptoUtil.bytesToB64(
+                        this.signingPublicKey
+                    );
                     // todo: this has a potential of creating 2+ tofu kegs for same contact
                     // todo: add checks similar to receipt keg dedupe
                     return newTofu.saveToServer();
                 }
                 // flagging contact
-                if (tofu.encryptionPublicKey !== cryptoUtil.bytesToB64(this.encryptionPublicKey)
-                    || tofu.signingPublicKey !== cryptoUtil.bytesToB64(this.signingPublicKey)) {
+                if (
+                    tofu.encryptionPublicKey !==
+                        cryptoUtil.bytesToB64(this.encryptionPublicKey) ||
+                    tofu.signingPublicKey !==
+                        cryptoUtil.bytesToB64(this.signingPublicKey)
+                ) {
                     this.tofuError = true;
                 }
                 // overriding whatever server returned for contact with our stored keys
                 // so crypto operations will fail in case of difference
                 // todo: this works only until we implement key change feature
-                this.encryptionPublicKey = cryptoUtil.b64ToBytes(tofu.encryptionPublicKey);
-                this.signingPublicKey = cryptoUtil.b64ToBytes(tofu.signingPublicKey);
+                this.encryptionPublicKey = cryptoUtil.b64ToBytes(
+                    tofu.encryptionPublicKey
+                );
+                this.signingPublicKey = cryptoUtil.b64ToBytes(
+                    tofu.signingPublicKey
+                );
                 return null;
-            }));
+            })
+        );
     }
 
     /**
@@ -365,7 +428,10 @@ class Contact {
      */
     whenLoaded(callback) {
         // it is important for this to be async
-        when(() => !this.loading && getContactStore().myContacts.loaded, () => setTimeout(() => callback(this)));
+        when(
+            () => !this.loading && getContactStore().myContacts.loaded,
+            () => setTimeout(() => callback(this))
+        );
     }
     /**
      * Helper function to get a promise that resolves when contact is loaded.

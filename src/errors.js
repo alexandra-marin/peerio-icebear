@@ -18,9 +18,6 @@
  *                   make sure they haven't been used by name anywhere.
  */
 
-// jsdoc freaks out and merges next jsdoc with previous if this var is not defined here
-let a; // eslint-disable-line
-
 /**
  * Use this helper to resolve returning error value.
  * If you:
@@ -41,7 +38,8 @@ module.exports.normalize = function(error, failoverMessage) {
     if (failoverMessage) return new Error(failoverMessage);
 
     try {
-        const message = typeof error === 'string' ? error : JSON.stringify(error);
+        const message =
+            typeof error === 'string' ? error : JSON.stringify(error);
         return new Error(message);
     } catch (e) {
         return new Error('unknown error');
@@ -121,7 +119,7 @@ const serverErrorCodes = {
 };
 // reverse map
 const serverErrorMap = {};
-Object.keys(serverErrorCodes).forEach((key) => {
+Object.keys(serverErrorCodes).forEach(key => {
     serverErrorMap[serverErrorCodes[key]] = key;
 });
 

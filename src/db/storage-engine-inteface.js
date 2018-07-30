@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* eslint-disable no-unused-vars, no-useless-constructor, no-empty-function */
 // This file exists just for the sake of documentation.
 // StorageEngineInterface class is never used.
 
@@ -10,7 +10,7 @@
  * @interface StorageEngineInterface
  */
 class StorageEngineInterface {
-    constructor(namespace) { }
+    constructor(namespace) {}
 
     /**
      * Asynchronously gets a value from storage.
@@ -18,7 +18,7 @@ class StorageEngineInterface {
      * @returns {Promise<string>} - strictly `null` if key or value doesn't exist. TinyDb stores only strings,
      * so any other return type is an error.
      */
-    getValue(key) { }
+    getValue(key) {}
 
     /**
      * Asynchronously saves a value to storage.
@@ -26,23 +26,23 @@ class StorageEngineInterface {
      * @param {string} value - TinyDb will serialize any value to string before saving it.
      * @returns {Promise}
      */
-    setValue(key, value) { }
+    setValue(key, value) {}
 
     /**
      * Asynchronously removes key/value from store.
      * @param {string} key - if key doesn't exist, just resolve promise.
      * @returns {Promise}
      */
-    removeValue(key) { }
+    removeValue(key) {}
 
     /**
      * Asynchronously retrieves a list of all keys in current namespace
      * @returns {Promise<string[]>}
      */
-    getAllKeys() { }
+    getAllKeys() {}
 
     /**
      * Removes all data from current namespace.
      */
-    clear() { }
+    clear() {}
 }

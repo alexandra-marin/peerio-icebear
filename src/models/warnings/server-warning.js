@@ -3,7 +3,6 @@ const isKnownKey = require('peerio-translator').has;
 const SystemWarning = require('./system-warning');
 const socket = require('../../network/socket');
 
-
 /**
  * Server warning. Server sends locale key and severity level for client to display.
  * You don't need to create instances of this class, Icebear takes care of it.
@@ -16,9 +15,16 @@ const socket = require('../../network/socket');
  */
 class ServerWarning extends SystemWarning {
     constructor(obj, onClear) {
-        if (!obj || !obj.msg || !obj.msg.startsWith('serverWarning_') || !isKnownKey(obj.msg)) {
+        if (
+            !obj ||
+            !obj.msg ||
+            !obj.msg.startsWith('serverWarning_') ||
+            !isKnownKey(obj.msg)
+        ) {
             console.debug(obj);
-            throw new Error(`Invalid/unknown warning key '${obj.msg}' received from server.`);
+            throw new Error(
+                `Invalid/unknown warning key '${obj.msg}' received from server.`
+            );
         }
         super(obj.msg, obj.title, null, obj.level);
         this.token = obj.token; // to use when dismissing/acknowledging server message
@@ -26,10 +32,11 @@ class ServerWarning extends SystemWarning {
     }
 
     dispose() {
-        return retryUntilSuccess(() => socket.send('/auth/warning/clear', { token: this.token }))
-            .then(() => {
-                if (this.onClear) this.onClear();
-            });
+        return retryUntilSuccess(() =>
+            socket.send('/auth/warning/clear', { token: this.token })
+        ).then(() => {
+            if (this.onClear) this.onClear();
+        });
     }
 }
 

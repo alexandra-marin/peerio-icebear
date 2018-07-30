@@ -11,7 +11,10 @@ class VolumeStore {
     constructor() {
         tracker.onceUpdated(this.loadAllVolumes);
         socket.onceStarted(() => {
-            socket.subscribe(socket.APP_EVENTS.volumeDeleted, this.processVolumeDeletedEvent);
+            socket.subscribe(
+                socket.APP_EVENTS.volumeDeleted,
+                this.processVolumeDeletedEvent
+            );
         });
     }
 
@@ -25,16 +28,23 @@ class VolumeStore {
         const volume = this.volumeMap[data.kegDbId];
         if (!volume) return;
         if (!volume.deletedByMyself) {
-            warnings.addSevere('title_kickedFromVolume', '', { name: volume.name });
+            warnings.addSevere('title_kickedFromVolume', '', {
+                name: volume.name
+            });
         }
         this.unloadVolume(volume);
     };
 
-    @action.bound addVolume(volume) {
+    @action.bound
+    addVolume(volume) {
         if (!volume) throw new Error(`Invalid volume id. ${volume}`);
         let v;
         if (typeof volume === 'string') {
-            if (volume === 'SELF' || this.volumeMap[volume] || !volume.startsWith('volume:')) {
+            if (
+                volume === 'SELF' ||
+                this.volumeMap[volume] ||
+                !volume.startsWith('volume:')
+            ) {
                 return this.volumeMap[volume];
             }
             v = new Volume(volume);
@@ -48,10 +58,9 @@ class VolumeStore {
         this.volumeMap[v.id] = v;
         this.volumes.push(v);
         v.added = true;
-        v.loadMetadata().then(() => v.store.loadAllFiles());
+        v.loadMetadata().then(() => v.store.updateFiles());
         return v;
     }
-
 
     /**
      * Initial volumes list loading, call once after login.
@@ -64,7 +73,8 @@ class VolumeStore {
      * ORDER OF THE STEPS IS IMPORTANT ON MANY LEVELS
      * @returns {Promise}
      */
-    @action.bound async loadAllVolumes() {
+    @action.bound
+    async loadAllVolumes() {
         if (this.loaded || this.loading) return;
         this.loading = true;
         await tracker.waitUntilUpdated();
@@ -77,7 +87,8 @@ class VolumeStore {
         this.loaded = true;
     }
 
-    @action async createVolume(participants = [], name) {
+    @action
+    async createVolume(participants = [], name) {
         try {
             // 1. we can't add participants before setting volume name because
             // server will trigger invites and send empty volume name to user
@@ -92,7 +103,7 @@ class VolumeStore {
             // in case instance has changed. otherwise it will immediately resolve
             await volume.loadMetadata();
             await volume.rename(name);
-            await volume.store.loadAllFiles();
+            await volume.store.updateFiles();
             await volume.addParticipants(participants.filter(p => !p.isMe));
             return volume;
         } catch (err) {
@@ -101,7 +112,8 @@ class VolumeStore {
         }
     }
 
-    @action unloadVolume(volume) {
+    @action
+    unloadVolume(volume) {
         volume.isDeleted = true;
         volume.dispose();
         delete this.volumeMap[volume.id];
@@ -109,7 +121,7 @@ class VolumeStore {
     }
 
     getVolumeWhenReady(id) {
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
             when(
                 () => {
                     const volume = this.volumes.find(c => c.id === id);
@@ -120,18 +132,25 @@ class VolumeStore {
         });
     }
 
-    @computed get sortedVolumes() {
-        return this.volumes
-            .sort((f1, f2) => f1.normalizedName > f2.normalizedName);
+    @computed
+    get sortedVolumes() {
+        return this.volumes.sort(
+            (f1, f2) => f1.normalizedName > f2.normalizedName
+        );
     }
 
-    @action.bound async shareFolder(folder, participants) {
+    @action.bound
+    async shareFolder(folder, participants) {
         if (folder.isShared && participants) {
             return folder.addParticipants(participants);
         }
-        if (folder.store.id !== 'main') throw new Error('Can only share local folders');
+        if (folder.store.id !== 'main')
+            throw new Error('Can only share local folders');
         return this.shareQueue.addTask(async () => {
-            const newFolder = await this.createVolume(participants, folder.name);
+            const newFolder = await this.createVolume(
+                participants,
+                folder.name
+            );
             folder.convertingToVolume = true;
             newFolder.convertingFromFolder = true;
             await newFolder.attach(folder, false, true);

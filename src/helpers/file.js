@@ -3,9 +3,6 @@
  * @alias fileHelpers
  */
 
-// jsdoc hack..
-let a; //eslint-disable-line
-
 /**
  * Extracts file name+extension portion from any path.
  * @param {string} path
@@ -46,14 +43,22 @@ const fileIconType = {
     ai: 'ai',
     psd: 'psd'
 };
-function createFileType(ext, type) { fileIconType[ext] = type; }
-['bmp', 'gif', 'jpeg', 'jpg', 'png', 'svg', 'tif', 'tiff'].forEach((ext) => createFileType(ext, 'img'));
-['aif', 'aiff', 'flac', 'm4a', 'mp3', 'ogg', 'opus', 'wav'].forEach((ext) => createFileType(ext, 'audio'));
-['avi', 'flv', 'm4v', 'mov', 'mp4', 'mpeg', 'mpg', 'wbm', 'wmv'].forEach((ext) => createFileType(ext, 'video'));
-['7z', 'gz', 'rar', 'zip', 'zipx'].forEach((ext) => createFileType(ext, 'zip'));
-['doc', 'docx'].forEach((ext) => createFileType(ext, 'word'));
-['xls', 'xlsx'].forEach((ext) => createFileType(ext, 'xls'));
-['ppt', 'pptx'].forEach((ext) => createFileType(ext, 'ppt'));
+function createFileType(ext, type) {
+    fileIconType[ext] = type;
+}
+['bmp', 'gif', 'jpeg', 'jpg', 'png', 'svg', 'tif', 'tiff'].forEach(ext =>
+    createFileType(ext, 'img')
+);
+['aif', 'aiff', 'flac', 'm4a', 'mp3', 'ogg', 'opus', 'wav'].forEach(ext =>
+    createFileType(ext, 'audio')
+);
+['avi', 'flv', 'm4v', 'mov', 'mp4', 'mpeg', 'mpg', 'wbm', 'wmv'].forEach(ext =>
+    createFileType(ext, 'video')
+);
+['7z', 'gz', 'rar', 'zip', 'zipx'].forEach(ext => createFileType(ext, 'zip'));
+['doc', 'docx'].forEach(ext => createFileType(ext, 'word'));
+['xls', 'xlsx'].forEach(ext => createFileType(ext, 'xls'));
+['ppt', 'pptx'].forEach(ext => createFileType(ext, 'ppt'));
 
 function getFileIconType(ext) {
     return fileIconType[ext] ? fileIconType[ext] : 'other';
@@ -112,14 +117,14 @@ function sanitizeBidirectionalFilePart(name) {
 
     for (let i = 0; i < name.length; i++) {
         switch (name.charCodeAt(i)) {
-            case 0x202A: // LEFT-TO-RIGHT EMBEDDING
-            case 0x202B: // RIGHT-TO-LEFT EMBEDDING
-            case 0x202D: // LEFT-TO-RIGHT OVERRIDE
-            case 0x202E: // RIGHT-TO-LEFT OVERRIDE
+            case 0x202a: // LEFT-TO-RIGHT EMBEDDING
+            case 0x202b: // RIGHT-TO-LEFT EMBEDDING
+            case 0x202d: // LEFT-TO-RIGHT OVERRIDE
+            case 0x202e: // RIGHT-TO-LEFT OVERRIDE
                 formattingCount++;
                 hadFormattingPop = false;
                 break;
-            case 0x202C: // POP DIRECTIONAL FORMATTING
+            case 0x202c: // POP DIRECTIONAL FORMATTING
                 if (!hadFormattingPop && formattingCount > 0) {
                     formattingCount--;
                 }
@@ -139,16 +144,16 @@ function sanitizeBidirectionalFilePart(name) {
                 hadIsolatePop = true;
                 break;
             default:
-                // nothing
+            // nothing
         }
     }
     // If counts aren't zero, add more pops.
     while (formattingCount--) {
-        // eslint-disable-next-line
+        // eslint-disable-next-line no-param-reassign
         name += String.fromCharCode(0x202c); // POP DIRECTIONAL FORMATTING
     }
     while (isolateCount--) {
-        // eslint-disable-next-line
+        // eslint-disable-next-line no-param-reassign
         name += String.fromCharCode(0x2069); // POP DIRECTIONAL ISOLATE
     }
 
@@ -161,8 +166,12 @@ function sanitizeBidirectionalFilename(filename) {
     // won't "corrupt" extension, and vice versa.
     const dotIndex = filename.lastIndexOf('.');
     if (dotIndex >= 0) {
-        const name = sanitizeBidirectionalFilePart(filename.substring(0, dotIndex));
-        const ext = sanitizeBidirectionalFilePart(filename.substring(dotIndex + 1));
+        const name = sanitizeBidirectionalFilePart(
+            filename.substring(0, dotIndex)
+        );
+        const ext = sanitizeBidirectionalFilePart(
+            filename.substring(dotIndex + 1)
+        );
         return `${name}.${ext}`;
     }
     return sanitizeBidirectionalFilePart(filename);

@@ -1,4 +1,5 @@
 const _sdkVersion = require('./__sdk');
+const MemoryCacheEngine = require('./db/memory-cache-engine');
 
 const SERVER_PLAN_PREMIUM_MONTHLY = 'icebear_premium_monthly';
 const SERVER_PLAN_PREMIUM_YEARLY = 'icebear_premium_yearly';
@@ -55,7 +56,9 @@ class UploadConfig {
             if (fileSize > row.maxFileSize) continue;
             return row.chunkSize;
         }
-        throw new Error('Ups. This should not have ever happen. We could not detect chunk size to use for upload.');
+        throw new Error(
+            'Ups. This should not have ever happen. We could not detect chunk size to use for upload.'
+        );
     }
 
     /**
@@ -161,7 +164,9 @@ const config = new class {
      * DO NOT change this value unless you really know what you're doing.
      * @returns {number} 32
      */
-    get CHUNK_OVERHEAD() { return 32; }
+    get CHUNK_OVERHEAD() {
+        return 32;
+    }
 
     upload = new UploadConfig();
 
@@ -205,6 +210,13 @@ const config = new class {
      */
     StorageEngine = null;
     /**
+     * Storage engine implementation class.
+     *
+     * **Client app is required to set this property before using Icebear SDK.**
+     * @type {StorageEngineInterface}
+     */
+    CacheEngine = MemoryCacheEngine;
+    /**
      * Frequency (seconds) at which default observable clock will be changing its value.
      * Default clock can be used for refreshing timestamps and other time counters.
      * Do not set this value too low, create custom clocks instead.
@@ -227,7 +239,10 @@ const config = new class {
      * Server premium plans ids
      * @type {Array<string>}
      */
-    serverPlansPremium = [SERVER_PLAN_PREMIUM_MONTHLY, SERVER_PLAN_PREMIUM_YEARLY];
+    serverPlansPremium = [
+        SERVER_PLAN_PREMIUM_MONTHLY,
+        SERVER_PLAN_PREMIUM_YEARLY
+    ];
 
     /**
      * Server pro plans ids
@@ -316,6 +331,5 @@ const config = new class {
      */
     temporaryCacheLimit = 1000 * 1024 * 1024;
 }();
-
 
 module.exports = config;

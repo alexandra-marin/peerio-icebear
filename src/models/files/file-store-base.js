@@ -335,7 +335,7 @@ class FileStoreBase {
             }`
         );
         // process kegs
-        runInAction(() => {
+        runInAction(async () => {
             for (const keg of resp.kegs) {
                 if (keg.collectionVersion > this.knownUpdateId) {
                     this.knownUpdateId = keg.collectionVersion;
@@ -366,7 +366,7 @@ class FileStoreBase {
                 }
                 const file = existing || new File(this.kegDb, this);
                 // this will deserialize new keg in to new file object or existing file object
-                if (!file.loadFromKeg(keg, fromCache)) {
+                if (!(await file.loadFromKeg(keg, fromCache))) {
                     console.error('Failed to load file keg.', keg.kegId);
                     // broken keg, removing from store and cache
                     if (existing) {

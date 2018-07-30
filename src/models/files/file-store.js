@@ -337,7 +337,7 @@ class FileStore extends FileStoreBase {
                 ),
             `loading recent files for ${kegDbId}`,
             10
-        ).then(resp => {
+        ).then(async resp => {
             for (const keg of resp.kegs) {
                 if (keg.deleted || keg.hidden) {
                     console.log(
@@ -349,7 +349,7 @@ class FileStore extends FileStoreBase {
                 const chat = getChatStore().chatMap[kegDbId];
                 if (!chat) continue;
                 const file = new File(chat.db, this);
-                if (file.loadFromKeg(keg)) {
+                if (await file.loadFromKeg(keg)) {
                     if (!file.fileId) {
                         if (file.version > 1)
                             console.error('File keg missing fileId', file.id);
@@ -423,7 +423,11 @@ class FileStore extends FileStoreBase {
                 undefined,
                 3
             );
-            if (!resp || !resp.kegs[0] || !file.loadFromKeg(resp.kegs[0])) {
+            if (
+                !resp ||
+                !resp.kegs[0] ||
+                !(await file.loadFromKeg(resp.kegs[0]))
+            ) {
                 return null;
             }
             if (file.deleted) {
@@ -489,7 +493,10 @@ class FileStore extends FileStoreBase {
                             return;
                         }
                     }
-                    if (!resp.kegs[0] || !file.loadFromKeg(resp.kegs[0])) {
+                    if (
+                        !resp.kegs[0] ||
+                        !(await file.loadFromKeg(resp.kegs[0]))
+                    ) {
                         file.deleted = true;
                         file.loaded = true;
                     }

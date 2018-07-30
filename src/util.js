@@ -1,10 +1,6 @@
-/**
+/*
  * Various utility functions that didn't fit anywhere else.
  */
-
-// jsdoc (or documentationjs?) freaks out and pulls param from the next function
-// unless this useless variable is defined
-let a;// eslint-disable-line
 
 /**
  * Finds all ArrayBuffer type properties recursively and changes them to Uint8Array created with the same ArrayBuffer.
@@ -12,10 +8,10 @@ let a;// eslint-disable-line
  * @returns {Object} same object that was passed but with some property values changed.
  */
 function convertBuffers(obj) {
-    if (typeof (obj) !== 'object') return obj;
+    if (typeof obj !== 'object') return obj;
 
     for (const prop in obj) {
-        const type = typeof (obj[prop]);
+        const type = typeof obj[prop];
         if (type !== 'object') {
             continue;
         }
@@ -57,5 +53,17 @@ function tryToGet(fn, defaultValue) {
     return defaultValue;
 }
 
-module.exports = { convertBuffers, formatBytes, tryToGet };
+function simpleHash(str) {
+    let hash = 0;
+    if (!str.length) {
+        return hash;
+    }
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = (hash << 5) - hash + char;
+        hash &= hash; // Convert to 32bit integer
+    }
+    return hash;
+}
 
+module.exports = { convertBuffers, formatBytes, tryToGet, simpleHash };

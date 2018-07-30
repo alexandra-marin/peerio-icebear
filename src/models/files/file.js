@@ -1,6 +1,10 @@
 const Keg = require('./../kegs/keg');
 const { observable, computed, action } = require('mobx');
-const { cryptoUtil, secret, sign: { signDetached } } = require('../../crypto');
+const {
+    cryptoUtil,
+    secret,
+    sign: { signDetached }
+} = require('../../crypto');
 const fileHelper = require('../../helpers/file');
 const util = require('../../util');
 const config = require('../../config');
@@ -46,57 +50,75 @@ class FileData {
     blobKey = null;
     blobNonce = null;
 
-    @computed get name() {
+    @computed
+    get name() {
         return fileHelper.sanitizeBidirectionalFilename(this.unsanitizedName);
     }
 
-    @computed get normalizedName() {
+    @computed
+    get normalizedName() {
         return this.unsanitizedName ? this.unsanitizedName.toUpperCase() : '';
     }
 
-    @computed get ext() {
+    @computed
+    get ext() {
         return fileHelper.getFileExtension(this.name);
     }
 
-    @computed get iconType() {
+    @computed
+    get iconType() {
         return fileHelper.getFileIconType(this.ext);
     }
 
-    @computed get nameWithoutExtension() {
+    @computed
+    get nameWithoutExtension() {
         return fileHelper.getFileNameWithoutExtension(this.name);
     }
 
-    @computed get isImage() {
+    @computed
+    get isImage() {
         return fileHelper.isImage(this.ext);
     }
 
-    @computed get fsSafeUid() {
+    @computed
+    get fsSafeUid() {
         return cryptoUtil.getHexHash(16, cryptoUtil.b64ToBytes(this.fileId));
     }
 
-    @computed get tmpCachePath() {
-        return config.FileStream.getTempCachePath(`${this.fsSafeUid}.${this.ext}`);
+    @computed
+    get tmpCachePath() {
+        return config.FileStream.getTempCachePath(
+            `${this.fsSafeUid}.${this.ext}`
+        );
     }
 
-    @computed get cachePath() {
+    @computed
+    get cachePath() {
         if (!config.isMobile) return null;
 
         const name = `${this.name || this.fsSafeUid}.${this.ext}`;
         return config.FileStream.getFullPath(this.fsSafeUid, name);
     }
-    @computed get sizeFormatted() {
+    @computed
+    get sizeFormatted() {
         return util.formatBytes(this.size);
     }
 
-    @computed get chunksCount() {
+    @computed
+    get chunksCount() {
         return Math.ceil(this.size / this.chunkSize);
     }
 
-    @computed get isOverInlineSizeLimit() {
-        return clientApp.uiUserPrefs.limitInlineImageSize && this.size > config.chat.inlineImageSizeLimit;
+    @computed
+    get isOverInlineSizeLimit() {
+        return (
+            clientApp.uiUserPrefs.limitInlineImageSize &&
+            this.size > config.chat.inlineImageSizeLimit
+        );
     }
 
-    @computed get isOversizeCutoff() {
+    @computed
+    get isOversizeCutoff() {
         return this.size > config.chat.inlineImageSizeLimitCutoff;
     }
 }
@@ -131,7 +153,6 @@ class File extends Keg {
     }
 
     @observable migrating = false;
-
 
     /**
      * System-wide unique client-generated id
@@ -372,15 +393,16 @@ class File extends Keg {
      * null: file is in the root folder
      * @type {FileFolder}
      */
-    @computed get folder() {
+    @computed
+    get folder() {
         const folder = this.store.folderStore.getById(this.folderId);
         return folder || this.store.folderStore.root;
     }
 
-    @computed get isLegacy() {
+    @computed
+    get isLegacy() {
         return !this.format;
     }
-
 
     get descriptorVersion() {
         return this.data.descriptorVersion;
@@ -431,7 +453,8 @@ class File extends Keg {
     /**
      * @type {boolean}
      */
-    @computed get canShare() {
+    @computed
+    get canShare() {
         return this.format === 1;
     }
     /**
@@ -488,7 +511,6 @@ class File extends Keg {
         this.data.blobNonce = val;
     }
 
-
     serializeKegPayload() {
         if (!this.format) {
             return {
@@ -502,7 +524,8 @@ class File extends Keg {
         };
     }
 
-    @action deserializeKegPayload(data) {
+    @action
+    deserializeKegPayload(data) {
         if (!this.format) {
             this.name = data.name;
             this.blobKey = data.key;
@@ -519,7 +542,8 @@ class File extends Keg {
         };
     }
 
-    @action deserializeProps(props) {
+    @action
+    deserializeProps(props) {
         this.fileId = props.fileId;
         if (!this.fileId) return; // happens with keg version==1
         this.folderId = props.folderId;
@@ -541,9 +565,15 @@ class File extends Keg {
             blobNonce: this.blobNonce
         };
         payload = JSON.stringify(payload);
-        payload = secret.encryptString(payload, cryptoUtil.b64ToBytes(this.descriptorKey));
+        payload = secret.encryptString(
+            payload,
+            cryptoUtil.b64ToBytes(this.descriptorKey)
+        );
 
-        let signature = await signDetached(payload, getUser().signKeys.secretKey);
+        let signature = await signDetached(
+            payload,
+            getUser().signKeys.secretKey
+        );
         signature = cryptoUtil.bytesToB64(signature);
 
         const descriptor = {
@@ -560,8 +590,9 @@ class File extends Keg {
         if (!this.fileId) {
             this.fileId = d.fileId;
         }
-        if (this.fileId !== d.fileId) throw new Error('Descriptor fileId mismatch');
-        if (this.descriptorVersion > d.version) return;
+        if (this.fileId !== d.fileId)
+            throw new Error('Descriptor fileId mismatch');
+        if (this.descriptorVersion >= d.version) return;
         if (!this.descriptorKey) {
             // this is a legacy file, owner migrated it and by default descriptorKey == blobKey during migration
             this.descriptorKey = this.blobKey;
@@ -570,15 +601,23 @@ class File extends Keg {
         this.updatedAt = new Date(+d.updatedAt);
         this.readyForDownload = d.blobAvailable;
         this.fileOwner = d.owner;
-        this.sharedBy = '';// TODO: maybe
+        this.sharedBy = ''; // TODO: maybe
         this.chunkSize = +d.chunkSize;
         this.size = +d.size;
         this.descriptorFormat = d.format;
         this.shared = d.shared;
         this.role = d.effectiveRole;
         this.descriptorVersion = d.version;
+        // TODO: it's pointless to verify signature currently
+        // because replacing blobKey will not help attacker(server) to achieve anything except
+        // preventing access to data, which is already possible by just removing keys
+        // BUT once we have some feature that allows uploading new blob version with
+        // existing blob key - we need to verify
         let payload = new Uint8Array(d.payload);
-        payload = secret.decryptString(payload, cryptoUtil.b64ToBytes(this.descriptorKey));
+        payload = secret.decryptString(
+            payload,
+            cryptoUtil.b64ToBytes(this.descriptorKey)
+        );
         payload = JSON.parse(payload);
         this.name = payload.name;
         this.blobKey = payload.blobKey;
@@ -596,7 +635,8 @@ class File extends Keg {
         const descriptor = await this.serializeDescriptor();
         const version = this.descriptorVersion + 1;
         descriptor.version = version;
-        return socket.send('/auth/file/descriptor/update', descriptor, true)
+        return socket
+            .send('/auth/file/descriptor/update', descriptor, true)
             .then(() => {
                 // in case descriptor was updated while waiting for response
                 if (this.descriptorVersion + 1 === version) {
@@ -647,8 +687,10 @@ class File extends Keg {
         return retryUntilSuccess(
             () => super.remove(),
             `remove file ${this.id} from ${this.db.id}`,
-            5)
-            .then(() => { this.deleted = true; });
+            5
+        ).then(() => {
+            this.deleted = true;
+        });
     }
 
     /**
@@ -658,38 +700,57 @@ class File extends Keg {
      * @returns {Promise}
      */
     rename(newName) {
-        return retryUntilSuccess(() => {
-            this.name = newName;
-            return this.updateDescriptor()
-                .catch(err => {
-                    if (err && err.code === ServerError.codes.malformedRequest) {
+        return retryUntilSuccess(
+            () => {
+                this.name = newName;
+                return this.updateDescriptor().catch(err => {
+                    if (
+                        err &&
+                        err.code === ServerError.codes.malformedRequest
+                    ) {
                         return this.load(); // mitigating optimistic concurrency issues
                     }
                     return Promise.reject(err);
                 });
-        }, undefined, 5);
+            },
+            undefined,
+            5
+        );
     }
 
     hide() {
-        return retryUntilSuccess(() => {
-            this.hidden = true;
-            return this.saveToServer();
-        }, `hiding ${this.fileId} in ${this.db.id}`, 5, () => this.load());
+        return retryUntilSuccess(
+            () => {
+                this.hidden = true;
+                return this.saveToServer();
+            },
+            `hiding ${this.fileId} in ${this.db.id}`,
+            5,
+            () => this.load()
+        );
     }
     unhide() {
-        return retryUntilSuccess(() => {
-            this.hidden = false;
-            return this.saveToServer();
-        }, `unhiding ${this.fileId} in ${this.db.id}`, 5, () => this.load());
+        return retryUntilSuccess(
+            () => {
+                this.hidden = false;
+                return this.saveToServer();
+            },
+            `unhiding ${this.fileId} in ${this.db.id}`,
+            5,
+            () => this.load()
+        );
     }
 
     tryToCacheTemporarily(force) {
-        if (this.tmpCached
-            || this.downloading
-            || (!force && !clientApp.uiUserPrefs.peerioContentEnabled)
-            || (!force && this.isOverInlineSizeLimit)
-            || this.isOversizeCutoff
-            || this.cachingFailed) return;
+        if (
+            this.tmpCached ||
+            this.downloading ||
+            (!force && !clientApp.uiUserPrefs.peerioContentEnabled) ||
+            (!force && this.isOverInlineSizeLimit) ||
+            this.isOversizeCutoff ||
+            this.cachingFailed
+        )
+            return;
 
         this.downloadToTmpCache();
     }
@@ -704,12 +765,14 @@ class File extends Keg {
      */
     copyTo(db, store, folderId) {
         // TODO: ugly, refactor when chats get their own file stores
-        const dstIsChat = db.id.startsWith('channel:') || db.id.startsWith('chat:');
+        const dstIsChat =
+            db.id.startsWith('channel:') || db.id.startsWith('chat:');
         const dstIsSELF = db.id === 'SELF';
         const dstIsVolume = db.id.startsWith('volume:');
         if (dstIsChat) {
             const chatFile = store.getByIdInChat(db.id, this.fileId);
-            if (chatFile && chatFile.loaded && !chatFile.deleted) return Promise.resolve();
+            if (chatFile && chatFile.loaded && !chatFile.deleted)
+                return Promise.resolve();
         } else if (store.getById(this.fileId)) {
             return Promise.resolve();
         }
@@ -717,11 +780,15 @@ class File extends Keg {
             retryUntilSuccess(
                 async () => {
                     // to avoid creating empty keg
-                    const resp = await socket.send('/auth/kegs/db/query', {
-                        kegDbId: db.id,
-                        type: 'file',
-                        filter: { fileId: this.fileId }
-                    }, false);
+                    const resp = await socket.send(
+                        '/auth/kegs/db/query',
+                        {
+                            kegDbId: db.id,
+                            type: 'file',
+                            filter: { fileId: this.fileId }
+                        },
+                        false
+                    );
                     // file already exists in this db
                     if (resp.kegs.length) {
                         // we want to change folder and unhide file if needed
@@ -744,7 +811,10 @@ class File extends Keg {
                             store.files.unshift(file);
                         }
                     } catch (err) {
-                        if (err && err.code === ServerError.codes.fileKegAlreadyExists) {
+                        if (
+                            err &&
+                            err.code === ServerError.codes.fileKegAlreadyExists
+                        ) {
                             // need to delete empty keg
                             return file.remove();
                         }

@@ -16,7 +16,8 @@ class GhostStore {
     @observable selectedId = null; // ghostId
     @observable selectedSort = 'kegId';
 
-    @computed get selectedGhost() {
+    @computed
+    get selectedGhost() {
         return this.ghostMap.get(this.selectedId);
     }
 
@@ -53,24 +54,32 @@ class GhostStore {
         if (this.loading || this.loaded) return;
         this.loading = true;
         this._getGhosts()
-            .then(action(resp => {
-                const { kegs } = resp;
-                console.log('there are mail kegs', kegs.length);
-                for (const keg of kegs) {
-                    const ghost = new Ghost(User.current.kegDb);
-                    if (keg.collectionVersion > this.knownCollectionVersion) {
-                        this.knownCollectionVersion = keg.collectionVersion;
+            .then(
+                action(resp => {
+                    const { kegs } = resp;
+                    console.log('there are mail kegs', kegs.length);
+                    for (const keg of kegs) {
+                        const ghost = new Ghost(User.current.kegDb);
+                        if (
+                            keg.collectionVersion > this.knownCollectionVersion
+                        ) {
+                            this.knownCollectionVersion = keg.collectionVersion;
+                        }
+                        if (ghost.loadFromKeg(keg)) {
+                            console.log('loading ghost', ghost.ghostId);
+                            this.ghostMap.set(ghost.ghostId, ghost);
+                        }
                     }
-                    if (ghost.loadFromKeg(keg)) {
-                        console.log('loading ghost', ghost.ghostId);
-                        this.ghostMap.set(ghost.ghostId, ghost);
-                    }
-                }
-                this.sort(this.selectedSort);
-                this.loading = false;
-                this.loaded = true;
-                tracker.subscribeToKegUpdates('SELF', 'ghost', this.updateGhosts);
-            }))
+                    this.sort(this.selectedSort);
+                    this.loading = false;
+                    this.loaded = true;
+                    tracker.subscribeToKegUpdates(
+                        'SELF',
+                        'ghost',
+                        this.updateGhosts
+                    );
+                })
+            )
             .catch(err => {
                 console.error('Failed to load ghosts:', err);
             });
@@ -83,8 +92,8 @@ class GhostStore {
     updateGhosts() {
         if (this.updating || this.loading) return;
         this.updating = true;
-        this._getGhosts()
-            .then(action((kegs) => {
+        this._getGhosts().then(
+            action(kegs => {
                 for (const keg of kegs) {
                     const inCollection = this.getById(keg.props.ghostId);
                     const g = inCollection || new Ghost(User.current.kegDb);
@@ -92,12 +101,15 @@ class GhostStore {
                         this.knownCollectionVersion = keg.collectionVersion;
                     }
                     if (!g.loadFromKeg(keg) || g.isEmpty) continue;
-                    if (!g.deleted && !inCollection) this.ghostMap.set(g.ghostId, g);
-                    if (g.deleted && inCollection) this.ghostMap.delete(keg.ghostId);
+                    if (!g.deleted && !inCollection)
+                        this.ghostMap.set(g.ghostId, g);
+                    if (g.deleted && inCollection)
+                        this.ghostMap.delete(keg.ghostId);
                 }
                 this.sort(this.selectedSort);
                 this.updating = false;
-            }));
+            })
+        );
     }
 
     /*
@@ -117,10 +129,14 @@ class GhostStore {
      * Send a new ghost
      */
     send(g, text) {
-        return g.send(text)
+        return g
+            .send(text)
             .catch(() => {
                 // TODO: global error handling
-                warnings.addSevere('error_mailQuotaExceeded', 'error_sendingMail');
+                warnings.addSevere(
+                    'error_mailQuotaExceeded',
+                    'error_sendingMail'
+                );
             })
             .finally(() => g.sendError && this.remove(g));
     }
@@ -135,7 +151,7 @@ class GhostStore {
         if (!g.id) {
             this.ghostMap.delete(g.ghostId);
             const i = this.ghosts.indexOf(g);
-            (i !== -1) && this.ghosts.splice(i, 1);
+            i !== -1 && this.ghosts.splice(i, 1);
             return Promise.resolve();
         }
         return g.remove();
@@ -161,7 +177,8 @@ class GhostStore {
      *
      * @param {string} value ['date']
      */
-    @action sort(value) {
+    @action
+    sort(value) {
         switch (value) {
             case 'attachment':
                 this.sortByAttachments();
@@ -187,7 +204,6 @@ class GhostStore {
         this.selectedSort = 'kegId';
     }
 
-
     /*
      * Sort by sent date, descending.
      */
@@ -209,7 +225,7 @@ class GhostStore {
      * @fixme this doesn't make much sense?
      */
     sortByRecipient() {
-        this.ghosts = _.sortBy(this.ghostMap.toJS(), (g) => g.recipients[0]);
+        this.ghosts = _.sortBy(this.ghostMap.toJS(), g => g.recipients[0]);
         this.selectedSort = 'recipient';
     }
 }

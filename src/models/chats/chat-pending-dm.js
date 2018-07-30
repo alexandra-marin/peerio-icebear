@@ -10,10 +10,11 @@ const { getContactStore } = require('../../helpers/di-contact-store');
  * @param {Date} timestamp - used to sort DMs with pending
  */
 class ChatPendingDM extends Chat {
-    constructor(username, email, isReceived) {
+    constructor(username, email, isReceived, isAutoImport) {
         super(`pending-dm:${username}`, [{ username }], getChatStore());
         this.username = username;
         this.email = email;
+        this.isAutoImport = isAutoImport;
         this.loaded = true;
         this.metaLoaded = true;
         this.isReceived = isReceived;
@@ -23,8 +24,14 @@ class ChatPendingDM extends Chat {
         return getContactStore().getContact(this.username);
     }
 
-    @computed get allParticipants() { return [getContactStore().getContact(this.username)]; }
-    @computed get otherParticipants() { return this.allParticipants; }
+    @computed
+    get allParticipants() {
+        return [getContactStore().getContact(this.username)];
+    }
+    @computed
+    get otherParticipants() {
+        return this.allParticipants;
+    }
 
     // stub function to imitate chat
     loadMetadata() {
@@ -39,28 +46,38 @@ class ChatPendingDM extends Chat {
         return Promise.resolve();
     }
 
-    @computed get recentFiles() {
+    @computed
+    get recentFiles() {
         return [];
     }
 
-    get headLoaded() { return true; }
+    get headLoaded() {
+        return true;
+    }
 
-    get isInvite() { return true; }
+    get isInvite() {
+        return true;
+    }
 
     // To prevent startChat from returning ChatPendingDM instance
-    hasSameParticipants() { return false; }
+    hasSameParticipants() {
+        return false;
+    }
 
     @observable unreadCount = 1;
     username;
     timestamp;
 
-    @action.bound dismiss() {
+    @action.bound
+    dismiss() {
         getChatStore().unloadChat(this);
-        return this.isReceived ? getContactStore().removeReceivedInvite(this.username)
+        return this.isReceived
+            ? getContactStore().removeReceivedInvite(this.username)
             : getContactStore().removeInvite(this.email);
     }
 
-    @action.bound start() {
+    @action.bound
+    start() {
         const { contact } = this;
         contact.whenLoaded(() => {
             if (contact.notFound || contact.isDeleted) {

@@ -19,44 +19,64 @@ class ChatMessageHandler {
     constructor(chat) {
         this.chat = chat;
         // asynchronously. to avoid changing unreadCount in reaction to unreadCount change
-        tracker.subscribeToKegUpdates(chat.id, 'message', () => setTimeout(this.onMessageDigestUpdate));
+        tracker.subscribeToKegUpdates(chat.id, 'message', () =>
+            setTimeout(this.onMessageDigestUpdate)
+        );
         this.onMessageDigestUpdate();
-        this._reactionsToDispose.push(reaction(
-            () => this.chat.active && clientApp.isInChatsView && clientApp.isReadingNewestMessages,
-            (active) => {
-                if (active) {
-                    this.onMessageDigestUpdate();
-                    this.markAllAsSeen();
-                    this.removeMaker();
-                } else {
-                    this.cancelTimers();
+        this._reactionsToDispose.push(
+            reaction(
+                () =>
+                    this.chat.active &&
+                    clientApp.isInChatsView &&
+                    clientApp.isReadingNewestMessages,
+                active => {
+                    if (active) {
+                        this.onMessageDigestUpdate();
+                        this.markAllAsSeen();
+                        this.removeMaker();
+                    } else {
+                        this.cancelTimers();
+                    }
                 }
-            }
-        ));
-        this._reactionsToDispose.push(reaction(() => tracker.updated, (updated) => {
-            if (updated) {
-                this.onMessageDigestUpdate();
-            } else {
-                this.chat.updatedAfterReconnect = false;
-            }
-        }));
-        this._reactionsToDispose.push(reaction(
-            () => tracker.updated
-                && this.chat.active
-                && clientApp.isFocused
-                && clientApp.isInChatsView
-                && clientApp.isReadingNewestMessages,
-            (userIsReading) => {
-                if (userIsReading) {
-                    this.markAllAsSeen();
-                    this.removeMaker();
-                } else if (!this.chat.newMessagesMarkerPos && this.chat.messages.length) {
-                    this.cancelTimers();
-                    const lastId = this.chat.messages[this.chat.messages.length - 1].id;
-                    this.chat.newMessagesMarkerPos = lastId;
+            )
+        );
+        this._reactionsToDispose.push(
+            reaction(
+                () => tracker.updated,
+                updated => {
+                    if (updated) {
+                        this.onMessageDigestUpdate();
+                    } else {
+                        this.chat.updatedAfterReconnect = false;
+                    }
                 }
-            }
-        ));
+            )
+        );
+        this._reactionsToDispose.push(
+            reaction(
+                () =>
+                    tracker.updated &&
+                    this.chat.active &&
+                    clientApp.isFocused &&
+                    clientApp.isInChatsView &&
+                    clientApp.isReadingNewestMessages,
+                userIsReading => {
+                    if (userIsReading) {
+                        this.markAllAsSeen();
+                        this.removeMaker();
+                    } else if (
+                        !this.chat.newMessagesMarkerPos &&
+                        this.chat.messages.length
+                    ) {
+                        this.cancelTimers();
+                        const lastId = this.chat.messages[
+                            this.chat.messages.length - 1
+                        ].id;
+                        this.chat.newMessagesMarkerPos = lastId;
+                    }
+                }
+            )
+        );
     }
 
     maxUpdateId = '';
@@ -75,11 +95,21 @@ class ChatMessageHandler {
     }
 
     removeMaker() {
-        if (!clientApp.isFocused || !clientApp.isInChatsView || !this.chat.active) return;
+        if (
+            !clientApp.isFocused ||
+            !clientApp.isInChatsView ||
+            !this.chat.active
+        )
+            return;
         if (this._removeMarkerTimer) clearTimeout(this._removeMarkerTimer);
         this._removeMarkerTimer = setTimeout(() => {
             this._removeMarkerTimer = null;
-            if (!clientApp.isFocused || !clientApp.isInChatsView || !this.chat.active) return;
+            if (
+                !clientApp.isFocused ||
+                !clientApp.isInChatsView ||
+                !this.chat.active
+            )
+                return;
             this.chat.newMessagesMarkerPos = null;
         }, 15000);
     }
@@ -89,11 +119,20 @@ class ChatMessageHandler {
         this.chat.unreadCount = msgDigest.newKegsCount;
         this.maxUpdateId = msgDigest.maxUpdateId;
         this.loadUpdates();
-    }
+    };
 
     loadUpdates() {
-        if (!(this.chat.mostRecentMessageLoaded || this.chat.initialPageLoaded) || !socket.authenticated) return;
-        if (this.chat.canGoDown || this.downloadedUpdateId >= this.maxUpdateId) {
+        if (
+            !(
+                this.chat.mostRecentMessageLoaded || this.chat.initialPageLoaded
+            ) ||
+            !socket.authenticated
+        )
+            return;
+        if (
+            this.chat.canGoDown ||
+            this.downloadedUpdateId >= this.maxUpdateId
+        ) {
             this.chat.updatedAfterReconnect = true;
             return;
         }
@@ -104,33 +143,47 @@ class ChatMessageHandler {
         this._loadingUpdates = true;
 
         // console.log('Getting updates for chat', this.chat.id);
-        const filter = this.downloadedUpdateId ? { minCollectionVersion: this.downloadedUpdateId } : {};
-        socket.send('/auth/kegs/db/list-ext', {
-            kegDbId: this.chat.id,
-            options: {
-                count: config.chat.maxLoadedMessages,
-                type: 'message',
-                reverse: false
-            },
-            filter
-        }, false)
-            .tapCatch(() => { this._loadingUpdates = false; })
-            .then(action(resp => {
+        const filter = this.downloadedUpdateId
+            ? { minCollectionVersion: this.downloadedUpdateId }
+            : {};
+        socket
+            .send(
+                '/auth/kegs/db/list-ext',
+                {
+                    kegDbId: this.chat.id,
+                    options: {
+                        count: config.chat.maxLoadedMessages,
+                        type: 'message',
+                        reverse: false
+                    },
+                    filter
+                },
+                false
+            )
+            .tapCatch(() => {
                 this._loadingUpdates = false;
-                // there's way more updates then we are allowed to load
-                // so we jump to most recent messages
-                if (resp.hasMore) {
-                    this.chat.reset();
-                    return;
-                }
-                this.setDownloadedUpdateId(resp.kegs);
-                this.markAllAsSeen();
-                console.log(`Got ${resp.kegs.length} updates for chat`, this.chat.id);
-                this.chat.addMessages(resp.kegs);
-                this.onMessageDigestUpdate();
-                this.chat.updatedAfterReconnect = true;
-            }))
-            .catch((err) => {
+            })
+            .then(
+                action(resp => {
+                    this._loadingUpdates = false;
+                    // there's way more updates then we are allowed to load
+                    // so we jump to most recent messages
+                    if (resp.hasMore) {
+                        this.chat.reset();
+                        return;
+                    }
+                    this.setDownloadedUpdateId(resp.kegs);
+                    this.markAllAsSeen();
+                    console.log(
+                        `Got ${resp.kegs.length} updates for chat`,
+                        this.chat.id
+                    );
+                    this.chat.addMessages(resp.kegs);
+                    this.onMessageDigestUpdate();
+                    this.chat.updatedAfterReconnect = true;
+                })
+            )
+            .catch(err => {
                 if (err && err.code === errorCodes.accessForbidden) {
                     getChatStore().unloadChat(this.chat);
                 } else {
@@ -140,15 +193,27 @@ class ChatMessageHandler {
     }
 
     markAllAsSeen() {
-        if (!clientApp.isFocused
-            || !clientApp.isInChatsView
-            || !this.chat.active
-            || !clientApp.isReadingNewestMessages
-        ) return;
+        if (
+            !clientApp.isFocused ||
+            !clientApp.isInChatsView ||
+            !this.chat.active ||
+            !clientApp.isReadingNewestMessages
+        )
+            return;
         this._markAsSeenTimer = setTimeout(() => {
             this._markAsSeenTimer = null;
-            if (!clientApp.isFocused || !clientApp.isInChatsView || !this.chat.active) return;
-            tracker.seenThis(this.chat.id, 'message', this.downloadedUpdateId, false);
+            if (
+                !clientApp.isFocused ||
+                !clientApp.isInChatsView ||
+                !this.chat.active
+            )
+                return;
+            tracker.seenThis(
+                this.chat.id,
+                'message',
+                this.downloadedUpdateId,
+                false
+            );
         }, this._getTimeoutValue(this.chat.unreadCount));
     }
 
@@ -167,6 +232,18 @@ class ChatMessageHandler {
     }
 
     loadMostRecentMessage() {
+        // This feature is not being used anymore,
+        // but it is not easy just to get rid of the flag,
+        // because it's being listened to by chat update code
+        // and it's being set when it is ok to actually load any updates (metaLoaded).
+        // In other words - it's in a chain of things that are supposed to execute in order.
+        // So maybe let's keep it this way for now to avoid refactoring that.
+        // Also maybe this feature will be requested again by product team.
+        setTimeout(() => {
+            this.chat.mostRecentMessageLoaded = true;
+        });
+        // DO NOT delete commented code, unless you are getting rid of the flag and the whole feature
+        /*
         retryUntilSuccess(() => socket.send('/auth/kegs/db/list-ext', {
             kegDbId: this.chat.id,
             options: {
@@ -181,6 +258,7 @@ class ChatMessageHandler {
                 this.chat.mostRecentMessageLoaded = true;
                 return this.chat.addMessages(resp.kegs);
             }));
+        */
     }
 
     getInitialPage() {
@@ -189,27 +267,39 @@ class ChatMessageHandler {
         }
         this.chat.loadingInitialPage = true;
         console.log('loading initial page for this.chat', this.chat.id);
-        return retryUntilSuccess(() => socket.send('/auth/kegs/db/list-ext', {
-            kegDbId: this.chat.id,
-            options: {
-                type: 'message',
-                reverse: true,
-                offset: 0,
-                count: config.chat.initialPageSize
-            }
-        }, false))
-            .then(action(resp => {
-                this.chat.canGoUp = resp.hasMore;
-                this.chat.initialPageLoaded = true;
-                this.chat.loadingInitialPage = false;
-                this.chat._cancelTopPageLoad = false;
-                this.chat._cancelBottomPageLoad = false;
-                this.setDownloadedUpdateId(resp.kegs);
-                if (!this.chat.canGoDown) this.markAllAsSeen();
-                console.log(`got initial ${resp.kegs.length} for this.chat`, this.chat.id);
-                return this.chat.addMessages(resp.kegs);
-            }))
-            .catch((err) => {
+        return retryUntilSuccess(() =>
+            socket.send(
+                '/auth/kegs/db/list-ext',
+                {
+                    kegDbId: this.chat.id,
+                    options: {
+                        type: 'message',
+                        reverse: true,
+                        offset: 0,
+                        count: config.chat.initialPageSize
+                    }
+                },
+                false
+            )
+        )
+            .then(
+                action(resp => {
+                    this.chat.canGoUp = resp.hasMore;
+                    this.chat._cancelTopPageLoad = false;
+                    this.chat._cancelBottomPageLoad = false;
+                    this.setDownloadedUpdateId(resp.kegs);
+                    if (!this.chat.canGoDown) this.markAllAsSeen();
+                    console.log(
+                        `got initial ${resp.kegs.length} for this.chat`,
+                        this.chat.id
+                    );
+                    return this.chat.addMessages(resp.kegs).finally(() => {
+                        this.chat.loadingInitialPage = false;
+                        this.chat.initialPageLoaded = true;
+                    });
+                })
+            )
+            .catch(err => {
                 if (err && err.code === errorCodes.accessForbidden) {
                     getChatStore().unloadChat(this.chat);
                 } else {
@@ -219,9 +309,11 @@ class ChatMessageHandler {
     }
     // startingKegId means that full page of empty messages has been detected and paging re-triggered
     getPage(pagingUp = true, startingKegId = null) {
-        if (!this.chat.initialPageLoaded
-            || (pagingUp && this.chat.loadingTopPage)
-            || (!pagingUp && this.chat.loadingBottomPage)) {
+        if (
+            !this.chat.initialPageLoaded ||
+            (pagingUp && this.chat.loadingTopPage) ||
+            (!pagingUp && this.chat.loadingBottomPage)
+        ) {
             return;
         }
         console.debug('Loading page', pagingUp ? 'UP' : 'DOWN');
@@ -239,41 +331,59 @@ class ChatMessageHandler {
             }
         }
         // todo: cancel retries if navigated away from chat?
-        retryUntilSuccess(() => socket.send('/auth/kegs/db/list-ext', {
-            kegDbId: this.chat.id,
-            options: {
-                type: 'message',
-                reverse: pagingUp,
-                fromKegId: startingKegId || this.chat.messages[pagingUp ? 0 : this.chat.messages.length - 1].id,
-                count: config.chat.pageSize
-            }
-        }, false))
-            .catch((err) => {
+        retryUntilSuccess(() =>
+            socket.send(
+                '/auth/kegs/db/list-ext',
+                {
+                    kegDbId: this.chat.id,
+                    options: {
+                        type: 'message',
+                        reverse: pagingUp,
+                        fromKegId:
+                            startingKegId ||
+                            this.chat.messages[
+                                pagingUp ? 0 : this.chat.messages.length - 1
+                            ].id,
+                        count: config.chat.pageSize
+                    }
+                },
+                false
+            )
+        )
+            .catch(err => {
                 if (err && err.code === errorCodes.accessForbidden) {
                     getChatStore().unloadChat(this.chat);
                 } else {
                     throw err;
                 }
-            }).then(action(resp => {
-                console.debug(
-                    'Received page', pagingUp ? 'UP' : 'DOWN',
-                    pagingUp && this.chat._cancelTopPageLoad
-                        || !pagingUp && this.chat._cancelBottomPageLoad ? 'and discarded' : ''
-                );
-                if (pagingUp) {
-                    if (this.chat._cancelTopPageLoad) return;
-                    this.chat.canGoUp = resp.hasMore;
-                } else {
-                    if (this.chat._cancelBottomPageLoad) return;
-                    this.chat.canGoDown = resp.hasMore;
-                }
-                if (!pagingUp) {
-                    this.setDownloadedUpdateId(resp.kegs);
-                    this.markAllAsSeen();
-                }
-                return this.chat.addMessages(resp.kegs, pagingUp); // eslint-disable-line consistent-return
-                // in case we paged to the most recent or new to us messages
-            })).finally(() => {
+            })
+            .then(
+                action(resp => {
+                    console.debug(
+                        'Received page',
+                        pagingUp ? 'UP' : 'DOWN',
+                        (pagingUp && this.chat._cancelTopPageLoad) ||
+                        (!pagingUp && this.chat._cancelBottomPageLoad)
+                            ? 'and discarded'
+                            : ''
+                    );
+                    if (pagingUp) {
+                        if (this.chat._cancelTopPageLoad) return;
+                        this.chat.canGoUp = resp.hasMore;
+                    } else {
+                        if (this.chat._cancelBottomPageLoad) return;
+                        this.chat.canGoDown = resp.hasMore;
+                    }
+                    if (!pagingUp) {
+                        this.setDownloadedUpdateId(resp.kegs);
+                        this.markAllAsSeen();
+                    }
+                    // eslint-disable-next-line consistent-return
+                    return this.chat.addMessages(resp.kegs, pagingUp);
+                    // in case we paged to the most recent or new to us messages
+                })
+            )
+            .finally(() => {
                 if (pagingUp) {
                     this.chat.loadingTopPage = false;
                     this.chat._cancelTopPageLoad = false;

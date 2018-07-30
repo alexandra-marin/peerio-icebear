@@ -11,9 +11,9 @@ async function encrypt() {
     for (const { len, n } of measurements) {
         const message = crypto.cryptoUtil.getRandomBytes(len);
         await measure(`Encrypt ${n} ${message.length}-byte messages with random nonce`, async () => {
-            for (let i = 0; i < n; i++) {
-                await crypto.secret.encrypt(message, key); // eslint-disable-line
-            }
+                for (let i = 0; i < n; i++) {
+                    await crypto.secret.encrypt(message, key);
+                }
         });
     }
 }

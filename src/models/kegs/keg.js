@@ -477,7 +477,7 @@ class Keg {
             if (!this.plaintext) {
                 let decryptionKey = payloadKey || this.overrideKey;
                 if (!decryptionKey) {
-                    decryptionKey = this.db.boot.keys[keg.keyId || '0'];
+                    decryptionKey = await this.db.boot.getKey(keg.keyId || '0');
                     if (decryptionKey) {
                         decryptionKey = decryptionKey.key;
                     }

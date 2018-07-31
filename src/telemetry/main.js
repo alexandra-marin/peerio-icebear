@@ -7,14 +7,13 @@ const baseUrl = 'https://api.mixpanel.com/track/?data=';
 const baseObj = {
     properties: {
         token: '05ee93d5cdb68e0de0709b6c85200c44', // TODO: this is for "Test setup". remember to replace it. env var?
-        Device: config.isMobile ? 'Mobile' : 'Desktop',
-        'App Version': config.appVersion,
         'Version Number': 1 // refers to our own tracker library versioning
     }
 };
 
 function getUserId() {
-    return TinyDb.system.getValue('uuid')
+    return TinyDb.system
+        .getValue('uuid')
         .then(id => {
             if (!id) {
                 const newId = cryptoUtil.getRandomGlobalShortIdHex().toString();
@@ -31,9 +30,9 @@ function getUserId() {
 async function init() {
     const uuid = await getUserId();
 
-    // base properties to be sent with all events
-    // TODO: mobile & desktop have different base props
     baseObj.properties.distinct_id = uuid;
+    baseObj.properties.Device = config.isMobile ? 'Mobile' : 'Desktop';
+    baseObj.properties['App Version'] = config.appVersion;
 }
 
 function camelToTitleCase(text) {

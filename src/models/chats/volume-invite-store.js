@@ -153,7 +153,7 @@ class VolumeInviteStore {
         );
     };
 
-    decryptChannelName(data) {
+    async decryptChannelName(data) {
         try {
             const { bootKeg, chatHeadKeg } = data;
             bootKeg.payload = JSON.parse(bootKeg.payload);
@@ -173,7 +173,7 @@ class VolumeInviteStore {
             const fakeDb = { id: data.volume };
             const chatHead = new ChatHead(fakeDb);
             chatHead.overrideKey = kegKey;
-            chatHead.loadFromKeg(chatHeadKeg);
+            await chatHead.loadFromKeg(chatHeadKeg);
             return chatHead.chatName;
         } catch (ex) {
             console.error(ex);

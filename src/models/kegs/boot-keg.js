@@ -27,10 +27,12 @@ class BootKeg extends Keg {
      * @param {number} timeout
      */
     async getKey(keyId, timeout = 30000) {
+        /* TODO(dchest): uncomment after testing
         if (this.keys[keyId]) {
             // quick path
             return this.keys[keyId];
         }
+         */
         let resolve;
         const promise = new Promise(_resolve => {
             resolve = _resolve;

@@ -13,11 +13,11 @@ const baseObj = {
 
 function getUserId() {
     return TinyDb.system
-        .getValue('uuid')
+        .getValue('telemetryUserId')
         .then(id => {
             if (!id) {
                 const newId = cryptoUtil.getRandomGlobalShortIdHex().toString();
-                TinyDb.system.setValue('uuid', newId);
+                TinyDb.system.setValue('telemetryUserId', newId);
                 return newId;
             }
             return id;

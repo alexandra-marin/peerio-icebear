@@ -462,6 +462,8 @@
   "title_soundsMention": "You receive a mention or direct messages only",
   "title_soundsMessage": "You receive messages",
   "title_soundsError": "An error occurs",
+  "title_soundSelectHeader": "Notification sound",
+  "title_preview": "Preview",
   "title_desktopNotifications": "Desktop notifications",
   "title_desktopNotificationsDetail": "Show a desktop notification when using the app and...",
   "title_mentionDesktopNotificationsMessage": "You receive a mention or direct message only",

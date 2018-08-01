@@ -127,7 +127,7 @@ class TofuStore {
         if (!resp.kegs || !resp.kegs.length) return null;
 
         const tofu = new Tofu(getUser().kegDb);
-        tofu.loadFromKeg(resp.kegs[0]); // TODO: detect and delete excess? shouldn't really happen though
+        await tofu.loadFromKeg(resp.kegs[0]); // TODO: detect and delete excess? shouldn't really happen though
         this.cacheTofu(tofu);
         return tofu;
     }

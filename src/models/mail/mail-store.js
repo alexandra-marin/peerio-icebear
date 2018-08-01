@@ -146,7 +146,7 @@ class MailStore {
             () => this._getMails(),
             'Initial mail list loading'
         ).then(
-            action(kegs => {
+            action(async kegs => {
                 for (const keg of kegs.kegs) {
                     const mail = new Mail(User.current.kegDb);
                     if (keg.collectionVersion > this.maxUpdateId) {
@@ -155,7 +155,7 @@ class MailStore {
                     if (keg.collectionVersion > this.knownUpdateId) {
                         this.knownUpdateId = keg.collectionVersion;
                     }
-                    if (mail.loadFromKeg(keg)) this.mails.unshift(mail);
+                    if (await mail.loadFromKeg(keg)) this.mails.unshift(mail);
                 }
                 this.loading = false;
                 this.loaded = true;
@@ -180,7 +180,7 @@ class MailStore {
         );
         this.updating = true;
         retryUntilSuccess(() => this._getMails(), 'Updating mail list').then(
-            action(resp => {
+            action(async resp => {
                 const { kegs } = resp;
                 for (const keg of kegs) {
                     if (keg.collectionVersion > this.knownUpdateId) {
@@ -192,7 +192,8 @@ class MailStore {
                         this.mails.remove(existing);
                         continue;
                     }
-                    if (!mail.loadFromKeg(keg) || mail.isEmpty) continue;
+                    if (!(await mail.loadFromKeg(keg)) || mail.isEmpty)
+                        continue;
                     if (!mail.deleted && !existing) this.mails.unshift(mail);
                 }
                 this.updating = false;

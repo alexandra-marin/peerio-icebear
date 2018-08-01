@@ -481,7 +481,9 @@ class Keg {
                     decryptionKey = this.db.boot.keys[keyId || '0']; // optimization, avoids async
                     */
                     if (!decryptionKey) {
-                        decryptionKey = await this.db.boot.getKey(keg.keyId || '0');
+                        decryptionKey = await this.db.boot.getKey(
+                            keg.keyId || '0'
+                        );
                     }
                     if (decryptionKey) {
                         decryptionKey = decryptionKey.key;

@@ -483,12 +483,14 @@ class Keg {
                     if (!decryptionKey) {
                         decryptionKey = await this.db.boot.getKey(keg.keyId || '0');
                     }
+                    if (decryptionKey) {
+                        decryptionKey = decryptionKey.key;
+                    }
                     if (!decryptionKey) {
                         throw new Error(
                             `Failed to resolve decryption key for ${this.id}`
                         );
                     }
-                    decryptionKey = decryptionKey.key;
                 }
                 payload = secret.decryptString(payload, decryptionKey);
             }

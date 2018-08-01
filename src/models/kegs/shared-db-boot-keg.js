@@ -176,7 +176,7 @@ class SharedDbBootKeg extends SyncedKeg {
      * @param {string} keyId
      * @param {number} timeout
      */
-    async getKey(keyId, timeout = 30000) {
+    async getKey(keyId, timeout = 120000) {
         /* TODO(dchest): uncomment after testing
         if (this.keys[keyId]) {
             // quick path

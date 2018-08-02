@@ -107,6 +107,10 @@ class User {
      * @type {string}
      */
     props = {};
+    /**
+     * @type {string}
+     */
+    @observable notificationSound = '';
 
     @computed
     get isMCAdmin() {

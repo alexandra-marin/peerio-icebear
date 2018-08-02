@@ -174,6 +174,10 @@ class Keg {
      * @returns {Promise}
      */
     saveToServer() {
+        console.log('keg.js: saveToServer()');
+        console.log(
+            `this.user.notificationSound: ${this.user.notificationSound}`
+        );
         if (this.loading) {
             console.warn(
                 `Keg ${this.id} ${

@@ -12,15 +12,22 @@ class Profile extends Keg {
     }
 
     serializeKegPayload() {
+        console.log('profile.js: serializeKegPayload()');
+        console.log(
+            `this.user.notificationSound: ${this.user.notificationSound}`
+        );
         return {
             firstName: this.user.firstName.trim(),
             lastName: this.user.lastName.trim(),
             locale: this.user.locale.trim(),
-            props: this.user.props
+            props: this.user.props,
+            notificationSound: this.user.notificationSound
         };
     }
 
     deserializeKegPayload(data) {
+        console.log('profile.js: deserializeKegPayload()');
+        console.log(`data.notificationSound: ${data.notificationSound}`);
         this.user.firstName = data.firstName;
         this.user.lastName = data.lastName;
         this.user.createdAt = data.created;
@@ -44,6 +51,7 @@ class Profile extends Keg {
         }
         this.user.isBlacklisted = data.isBlackListed;
         this.user.twoFAEnabled = data.use2fa;
+        this.user.notificationSound = data.notificationSound;
         this.user.profileLoaded = true;
     }
 }

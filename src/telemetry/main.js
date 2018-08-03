@@ -9,20 +9,15 @@ const baseObj = {
     }
 };
 
-function getUserId() {
-    return TinyDb.system
-        .getValue('telemetryUserId')
-        .then(id => {
-            if (!id) {
-                const newId = cryptoUtil.getRandomGlobalShortIdHex().toString();
-                TinyDb.system.setValue('telemetryUserId', newId);
-                return newId;
-            }
-            return id;
-        })
-        .catch(err => {
-            console.error(err);
-        });
+async function getUserId() {
+    const userId = await TinyDb.system.getValue('telemetryUserId');
+
+    if (!userId) {
+        const newId = cryptoUtil.getRandomGlobalShortIdHex().toString();
+        await TinyDb.system.setValue('telemetryUserId', newId);
+        return newId;
+    }
+    return userId;
 }
 
 async function init() {

@@ -40,10 +40,12 @@ interface ScryptTypeMap {
     binary: Uint8Array;
 }
 
+type ScryptParam = string | number[] | Uint8Array;
+
 type Scrypt = <K extends keyof ScryptTypeMap>(
-    password: string | number[] | Uint8Array,
-    salt: string | number[] | Uint8Array,
-    config: ScryptConfig & { encoding: K },
+    value: ScryptParam,
+    salt: ScryptParam,
+    config: ScryptConfig & { encoding?: K },
     callback: (res: ScryptTypeMap[K]) => void
 ) => void;
 
@@ -59,4 +61,30 @@ export function getScrypt(): Scrypt {
  */
 export function setScrypt(fn: Scrypt): void {
     scryptImplementation = fn;
+}
+
+/**
+ * Promisified scrypt call.
+ * @param value - the value that needs to be hashed
+ * @param options - scrypt options, see {@link https://github.com/dchest/scrypt-async-js#options}
+ * @returns hashed value
+ */
+export function scryptPromise<K extends keyof ScryptTypeMap>(
+    value: ScryptParam,
+    salt: ScryptParam,
+    config: ScryptConfig & { encoding: K }
+): Promise<ScryptTypeMap[K]>;
+export function scryptPromise(
+    value: ScryptParam,
+    salt: ScryptParam,
+    config: ScryptConfig
+): Promise<number[]>;
+export function scryptPromise(
+    value: ScryptParam,
+    salt: ScryptParam,
+    config: ScryptConfig & { encoding?: 'base64' | 'hex' | 'binary' }
+): Promise<ScryptParam> {
+    return new Promise(resolve => {
+        getScrypt()(value, salt, config, resolve);
+    });
 }

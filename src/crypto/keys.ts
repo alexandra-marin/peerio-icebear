@@ -1,11 +1,16 @@
 /**
  * Peerio Crypto module for key handling.
  */
-const { getScrypt } = require('./scrypt-proxy');
-const BLAKE2s = require('blake2s-js');
-const nacl = require('tweetnacl');
-const util = require('./util');
-const errors = require('../errors');
+import { scryptPromise } from './scrypt-proxy';
+import BLAKE2s from 'blake2s-js';
+import * as nacl from 'tweetnacl';
+import {
+    bytesToHex,
+    strToBytes,
+    concatTypedArrays,
+    getRandomBytes
+} from './util';
+import * as errors from '../errors';
 
 // ------------------------------------------------------------------------------------------
 // WARNING: changing scrypt params will break compatibility with older scrypt-generated data
@@ -23,42 +28,29 @@ try {
 }
 
 /**
- * Promisified scrypt call.
- * @param {string|Uint8Array|Array} value - the value that needs to be hashed
- * @param {string|Uint8Array|Array} salt
- * @param {Object} options - scrypt options, see {@link https://github.com/dchest/scrypt-async-js#options}
- * @returns {Promise<Uint8Array>} hashed value
- */
-function scryptPromise(value, salt, options) {
-    return new Promise(resolve => {
-        getScrypt()(value, salt, options, resolve);
-    });
-}
-
-/**
  * Prehashes secret for stronger key derivation.
- * @param {string} value - passphrase or other secret
- * @param {string} [personalization]
- * @returns {Uint8Array} hash
+ * @param value - passphrase or other secret
+ * @returns the hash
  */
-function prehashPass(value, personalization) {
+function prehashPass(value: string, personalization?: string): Uint8Array {
+    let blake2sOptions: { personalization: Uint8Array } | undefined;
     if (personalization) {
-        // eslint-disable-next-line no-param-reassign
-        personalization = { personalization: util.strToBytes(personalization) };
+        blake2sOptions = { personalization: strToBytes(personalization) };
     }
-    const prehashedPass = new BLAKE2s(32, personalization);
-    prehashedPass.update(util.strToBytes(value));
+    const prehashedPass = new BLAKE2s(32, blake2sOptions);
+    prehashedPass.update(strToBytes(value));
     return prehashedPass.digest();
 }
 
 /**
  * Deterministically derives symmetrical boot key and auth key pair.
- * @param {string} username
- * @param {string} passphrase
- * @param {Uint8Array} randomSalt - 32 random bytes
- * @returns {Promise<{bootKey: Uint8Array, authKeyPair: KeyPair}>}
+ * @param randomSalt - 32 random bytes
  */
-function deriveAccountKeys(username, passphrase, randomSalt) {
+function deriveAccountKeys(
+    username: string,
+    passphrase: string,
+    randomSalt: Uint8Array
+): Promise<{ bootKey: Uint8Array; authKeyPair: KeyPair }> {
     try {
         // requesting 64 bytes to split them for 2 keys
         const scryptOptions = {
@@ -68,23 +60,20 @@ function deriveAccountKeys(username, passphrase, randomSalt) {
             interruptStep: 2000
         };
         // secure salt - contains username
-        const salt = util.concatTypedArrays(
-            util.strToBytes(username),
-            randomSalt
-        );
+        const salt = concatTypedArrays(strToBytes(username), randomSalt);
         const pass = prehashPass(passphrase, 'PeerioPH');
 
         return scryptPromise(pass, salt, scryptOptions).then(
             derivedByteArray => {
-                const keys = {};
-                // first 32 bytes - symmetric boot key
-                keys.bootKey = new Uint8Array(derivedByteArray.slice(0, 32));
-                // second 32 bytes - secret key of the auth key pair
                 const secretKey = new Uint8Array(
                     derivedByteArray.slice(32, 64)
                 );
-                keys.authKeyPair = nacl.box.keyPair.fromSecretKey(secretKey);
-                return keys;
+                return {
+                    // first 32 bytes - symmetric boot key
+                    bootKey: new Uint8Array(derivedByteArray.slice(0, 32)),
+                    // second 32 bytes - secret key of the auth key pair
+                    authKeyPair: nacl.box.keyPair.fromSecretKey(secretKey)
+                };
             }
         );
     } catch (ex) {
@@ -98,19 +87,19 @@ function deriveAccountKeys(username, passphrase, randomSalt) {
  * @param {string} passphrase
  * @returns {Promise<KeyPair>}
  */
-function deriveEphemeralKeys(salt, passphrase) {
+function deriveEphemeralKeys(
+    salt: Uint8Array,
+    passphrase: string
+): Promise<KeyPair> {
     try {
-        const scryptOptions = {
+        const pass = prehashPass(passphrase);
+        return scryptPromise(pass, salt, {
             N: SCRYPT_N,
             r: 8,
             dkLen: 32,
             interruptStep: 200,
             encoding: 'binary'
-        };
-        const pass = prehashPass(passphrase);
-        return scryptPromise(pass, salt, scryptOptions).then(keyBytes =>
-            nacl.box.keyPair.fromSecretKey(keyBytes)
-        );
+        }).then(keyBytes => nacl.box.keyPair.fromSecretKey(keyBytes));
     } catch (ex) {
         return Promise.reject(errors.normalize(ex));
     }
@@ -121,19 +110,21 @@ function deriveEphemeralKeys(salt, passphrase) {
  * @param {string} passcode
  * @returns {Promise<Uint8Array>}
  */
-function deriveKeyFromPasscode(username, passcode) {
+function deriveKeyFromPasscode(
+    username: string,
+    passcode: string
+): Promise<Uint8Array> {
     try {
-        const scryptOptions = {
+        const salt = strToBytes(username);
+        const pass = prehashPass(passcode);
+
+        return scryptPromise(pass, salt, {
             N: SCRYPT_N,
             r: 8,
             dkLen: 32,
             interruptStep: 2000,
             encoding: 'binary'
-        };
-        const salt = util.strToBytes(username);
-        const pass = prehashPass(passcode);
-
-        return scryptPromise(pass, salt, scryptOptions);
+        });
     } catch (ex) {
         return Promise.reject(errors.normalize(ex));
     }
@@ -143,7 +134,7 @@ function deriveKeyFromPasscode(username, passcode) {
  * Generates new random signing (ed25519) key pair.
  * @returns {KeyPair} - 32 byte public key and 64 byte secret key.
  */
-function generateSigningKeyPair() {
+function generateSigningKeyPair(): KeyPair {
     return nacl.sign.keyPair();
 }
 
@@ -151,7 +142,7 @@ function generateSigningKeyPair() {
  * Generates new random asymmetric (curve25519) key pair.
  * @returns {KeyPair} 32 byte keys
  */
-function generateEncryptionKeyPair() {
+function generateEncryptionKeyPair(): KeyPair {
     return nacl.box.keyPair();
 }
 
@@ -159,25 +150,25 @@ function generateEncryptionKeyPair() {
  * Generates new random symmetric (xsalsa20) 32 byte secret key.
  * @returns {Uint8Array} 32 bytes
  */
-function generateEncryptionKey() {
-    return util.getRandomBytes(32);
+function generateEncryptionKey(): Uint8Array {
+    return getRandomBytes(32);
 }
 
 /**
  * Generates new salt for auth process
  * @returns {Uint8Array} 32 bytes
  */
-function generateAuthSalt() {
-    return util.getRandomBytes(32);
+function generateAuthSalt(): Uint8Array {
+    return getRandomBytes(32);
 }
 
 /**
  * Hashes auth public key. Uses personalized hash.
  * @returns {Uint8Array} 32 bytes personalized hash
  */
-function getAuthKeyHash(key) {
+function getAuthKeyHash(key): Uint8Array {
     const hash = new BLAKE2s(32, {
-        personalization: util.strToBytes('AuthCPK1')
+        personalization: strToBytes('AuthCPK1')
     });
     hash.update(key);
     return hash.digest();
@@ -190,10 +181,10 @@ function getAuthKeyHash(key) {
  *
  * @returns {string} account key
  */
-function getRandomAccountKeyHex() {
+function getRandomAccountKeyHex(): string {
     const a = [];
     for (let i = 0; i < 16; i += 2) {
-        a.push(util.bytesToHex(util.getRandomBytes(2)));
+        a.push(bytesToHex(getRandomBytes(2)));
     }
     return a.join(' ');
 }

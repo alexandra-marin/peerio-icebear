@@ -15,32 +15,52 @@
  *
  */
 
-const nacl = require('tweetnacl');
-const util = require('./util');
-const { DecryptionError } = require('../errors');
+import * as nacl from 'tweetnacl';
+import * as util from './util';
+import { DecryptionError } from '../errors';
+
+interface NaclLowlevel {
+    lowlevel: {
+        crypto_secretbox(
+            cipherContainer: Uint8Array,
+            message: Uint8Array,
+            messageLength: number,
+            nonce: Uint8Array,
+            key: Uint8Array
+        ): number;
+
+        crypto_secretbox_open(
+            messageContainer: Uint8Array,
+            cipher: Uint8Array,
+            cipherLength: number,
+            nonce: Uint8Array,
+            key: Uint8Array
+        ): number;
+    };
+}
 
 /**
  * 24 - The size of the nonce is used for encryption
  */
-const NONCE_SIZE = 24;
+export const NONCE_SIZE = 24;
 
 /**
  * Encrypts and authenticates data using symmetric encryption.
  * This is a refactored version of nacl.secretbox().
- * @param {Uint8Array} msgBytes
- * @param {Uint8Array} key - 32 bytes symmetric key
- * @param {Uint8Array} [nonce=getRandomNonce()] - in case you want to set your own nonce. 24 bytes.
- * @param {boolean} [appendNonce=true] - appends nonce to the end of encrypted bytes
- * @param {boolean} [prependLength=false] - adds 4 bytes containing message length after encryption to the beginning
- * @returns {Uint8Array} encrypted bytes
+ * @param msgBytes
+ * @param key - 32 bytes symmetric key
+ * @param nonce - in case you want to set your own nonce. 24 bytes.
+ * @param appendNonce - appends nonce to the end of encrypted bytes
+ * @param prependLength - adds 4 bytes containing message length after encryption to the beginning
+ * @returns encrypted bytes
  */
-function encrypt(
-    msgBytes,
-    key,
+export function encrypt(
+    msgBytes: Uint8Array,
+    key: Uint8Array,
     nonce = util.getRandomNonce(),
     appendNonce = true,
     prependLength = false
-) {
+): Uint8Array {
     const fullMsgLength = 32 + msgBytes.length; /* ZEROBYTES */
     const m = new Uint8Array(fullMsgLength);
     for (let i = 32; i < fullMsgLength; i++) m[i] = msgBytes[i - 32];
@@ -68,7 +88,7 @@ function encrypt(
         }
     }
     if (
-        nacl.lowlevel.crypto_secretbox(
+        ((nacl as any) as NaclLowlevel).lowlevel.crypto_secretbox(
             cipherContainer,
             m,
             m.length,
@@ -83,11 +103,11 @@ function encrypt(
 
 /**
  * Helper method to decode string to bytes and encrypt it.
- * @param {string} msg - message to encrypt
- * @param {Uint8Array} key - 32 bytes symmetric key
- * @returns {Uint8Array} encrypted bytes
+ * @param msg - message to encrypt
+ * @param key - 32 bytes symmetric key
+ * @returns encrypted bytes
  */
-function encryptString(msg, key) {
+export function encryptString(msg: string, key: Uint8Array): Uint8Array {
     const msgBytes = util.strToBytes(msg);
     return encrypt(msgBytes, key);
 }
@@ -95,15 +115,20 @@ function encryptString(msg, key) {
 /**
  * Decrypts and authenticates data using symmetric encryption.
  * This is a refactored version of nacl.secretbox.open().
- * @param {Uint8Array} cipher - cipher bytes with 16 zerobytes prepended and optionally appended nonce
- * @param {Uint8Array} key - 32 bytes symmetric key
- * @param {Uint8Array} [nonce='will be extracted from message'] - pass nonce when it's not appended to cipher bytes
- * @param {boolean} [containsLength=false] - whether or not to ignore first 4 bytes
- * @returns {Uint8Array} decrypted message
+ * @param cipher - cipher bytes with 16 zerobytes prepended and optionally appended nonce
+ * @param key - 32 bytes symmetric key
+ * @param nonce - pass nonce when it's not appended to cipher bytes
+ * @param containsLength - whether or not to ignore first 4 bytes
+ * @returns decrypted message
  */
-function decrypt(cipher, key, nonce, containsLength) {
-    let start = 0,
-        end;
+export function decrypt(
+    cipher: Uint8Array,
+    key: Uint8Array,
+    nonce?: Uint8Array,
+    containsLength?: boolean
+): Uint8Array {
+    let start = 0;
+    let end: number;
     if (!nonce) {
         // eslint-disable-next-line no-param-reassign
         nonce = cipher.subarray(-NONCE_SIZE);
@@ -118,7 +143,15 @@ function decrypt(cipher, key, nonce, containsLength) {
         c = c.subarray(start, end);
     }
     const m = new Uint8Array(c.length);
-    if (nacl.lowlevel.crypto_secretbox_open(m, c, c.length, nonce, key) !== 0) {
+    if (
+        ((nacl as any) as NaclLowlevel).lowlevel.crypto_secretbox_open(
+            m,
+            c,
+            c.length,
+            nonce,
+            key
+        ) !== 0
+    ) {
         throw new DecryptionError('Decryption failed.');
     }
     return m.subarray(32); /* ZEROBYTES */
@@ -126,12 +159,10 @@ function decrypt(cipher, key, nonce, containsLength) {
 
 /**
  * Helper method to decode decrypted data to a string.
- * @param {Uint8Array} cipher - encrypted message
- * @param {Uint8Array} key - 32 bytes symmetric key
- * @returns {string} decrypted message
+ * @param cipher - encrypted message
+ * @param key - 32 bytes symmetric key
+ * @returns decrypted message
  */
-function decryptString(cipher, key) {
+export function decryptString(cipher: Uint8Array, key: Uint8Array): string {
     return util.bytesToStr(decrypt(cipher, key));
 }
-
-module.exports = { encrypt, encryptString, decrypt, decryptString, NONCE_SIZE };

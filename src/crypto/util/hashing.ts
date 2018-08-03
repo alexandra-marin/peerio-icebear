@@ -3,7 +3,7 @@
 //
 
 import BLAKE2s from 'blake2s-js';
-import { getScrypt } from '../scrypt-proxy';
+import { scryptPromise } from '../scrypt-proxy';
 import { strToBytes } from './conversion';
 import * as padding from './padding';
 
@@ -66,14 +66,11 @@ export function getFingerprint(
     username: string,
     publicKey: Uint8Array
 ): Promise<string> {
-    const scrypt = getScrypt();
-    return new Promise<Uint8Array>(resolve => {
-        scrypt(
-            publicKey,
-            strToBytes(username),
-            { N: 4096, r: 8, dkLen: 24, encoding: 'binary' },
-            resolve
-        );
+    return scryptPromise(publicKey, strToBytes(username), {
+        N: 4096,
+        r: 8,
+        dkLen: 24,
+        encoding: 'binary'
     }).then(fingerprintToStr);
 }
 

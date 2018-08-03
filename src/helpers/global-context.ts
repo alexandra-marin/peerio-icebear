@@ -1,9 +1,9 @@
-let g;
+let g: any;
 if (typeof window !== 'undefined') {
     g = window;
 } else if (typeof global !== 'undefined') {
     g = global;
 } else {
-    g = self; // eslint-disable-line no-undef
+    g = self;
 }
-module.exports = g;
+export default g;

@@ -1,15 +1,18 @@
-const socket = require('../../network/socket');
-const { observable, action, when, computed, reaction } = require('mobx');
-const { cryptoUtil } = require('../../crypto/index');
-const { getUser } = require('./../../helpers/di-current-user');
-const Tofu = require('./tofu');
-const tofuStore = require('./tofu-store');
-const { getFirstLetterUpperCase } = require('./../../helpers/string');
-const serverSettings = require('../server-settings');
-const { t } = require('peerio-translator');
-const clientApp = require('../client-app');
-const { getContactStore } = require('../../helpers/di-contact-store');
-const ContactColors = require('./contact.colors');
+import { observable, action, when, computed, reaction } from 'mobx';
+import { t } from 'peerio-translator';
+
+import socket from '../../network/socket';
+import { cryptoUtil } from '../../crypto/index';
+
+import { getContactStore } from '../../helpers/di-contact-store';
+import { getUser } from './../../helpers/di-current-user';
+import { getFirstLetterUpperCase } from './../../helpers/string';
+
+import serverSettings from '../server-settings';
+import clientApp from '../client-app';
+import ContactColors from './contact.colors';
+import tofuStore from './tofu-store';
+import Tofu from './tofu';
 
 const nullFingerprint = '00000-00000-00000-00000-00000-00000';
 
@@ -20,12 +23,20 @@ const nullFingerprint = '00000-00000-00000-00000-00000-00000';
  * loading === true - trying to load contact, will make many attempts in case of connection issues
  * loading === false && notFound === false - success
  * loading === false && notFound === true  - fail
- * @param {string} username - this can also be an email which will be replaced with username if user found
- * @param {Object} [prefetchedData] - if, for some reason you have the contact data from server, feed it here
- * @param {bool} [noAutoLoad] - don't automatically call this.load() in constructor (needed for tests only)
  */
-class Contact {
-    constructor(username, prefetchedData, noAutoLoad) {
+export default class Contact {
+    /**
+     * @param username - this can also be an email which will be replaced with username if user found
+     * @param prefetchedData - if, for some reason you have the contact data from server, feed it here
+     * @param noAutoLoad - don't automatically call this.load() in constructor (needed for tests only)
+     */
+    constructor(username: string);
+    constructor(username: string, prefetchedData: object, noAutoLoad: boolean);
+    constructor(
+        username: string,
+        prefetchedData?: object,
+        noAutoLoad?: boolean
+    ) {
         this.username = username.toLowerCase();
         if (getUser().username === this.username) this.isMe = true;
         this.usernameTag = `@${this.username}`;
@@ -47,83 +58,66 @@ class Contact {
         if (!noAutoLoad) this.load(prefetchedData);
     }
 
-    /**
-     * This flag means that we are making attempts to load contact
-     * once it's 'false' it means that we are done trying with ether positive (notFound=false) result
-     * or negative result. It's set to true by default, right after it exits constructor.
-     * @type {boolean}
-     */
-    @observable loading = true; // default state, because that's what we do from the moment contact is created
-    /**
-     * @type {string}
-     */
-    username;
-    /**
-     * '@username'
-     * @type {string}
-     */
-    usernameTag;
-    /**
-     * @type {array<string>}
-     */
-    addresses = [];
-    /**
-     * @type {string}
-     */
-    @observable firstName = '';
-    /**
-     * @type {string}
-     */
-    @observable lastName = '';
-    /**
-     * @type {Uint8Array}
-     */
-    @observable encryptionPublicKey = null;
-    /**
-     * @type {Uint8Array}
-     */
-    @observable signingPublicKey = null;
-    /**
-     * @type {boolean}
-     */
-    @observable tofuError = false;
-    /**
-     * Wether or not user added this contact to his address book
-     * @type {boolean}
-     */
-    @observable isAdded = false;
-    /**
-     * Some server-generated random chars to prevent enumeration of user-specific urls
-     * @type {string}
-     */
-    @observable urlSalt = null;
-    /**
-     * @type {number}
-     */
-    @observable profileVersion = 0;
-    /**
-     * @type {boolean}
-     */
-    @observable hasAvatar = false;
-    /**
-     * @type {boolean}
-     */
-    @observable isDeleted = false;
-    /**
-     * @type {boolean}
-     */
-    @observable isHidden = false;
-    /**
-     * @type {string}
-     */
-    appLabel;
+    readonly isMe: boolean;
+
+    mentionRegex: RegExp;
+    mcrRoles;
 
     /**
-     * RGB string built based on hashed signing public key, not cryptographically strong, just for better UX
-     * @type {string}
+     * This flag means that we are making attempts to load
+     * contact once it's 'false' it means that we are done trying
+     * with ether positive (notFound=false) result or negative
+     * result. It's set to true by default, right after it exits
+     * constructor, because that's what we do from the moment
+     * contact is created.
+     */
+    @observable loading = true;
+
+    username: string;
+
+    /**
+     * '@username'
+     */
+    usernameTag: string;
+
+    addresses: string[] = [];
+
+    @observable firstName = '';
+
+    @observable lastName = '';
+
+    @observable encryptionPublicKey: Uint8Array | null = null;
+
+    @observable signingPublicKey: Uint8Array | null = null;
+
+    @observable tofuError = false;
+
+    /**
+     * Whether or not user added this contact to their address book
+     */
+    @observable isAdded = false;
+
+    /**
+     * Some server-generated random chars to prevent enumeration of user-specific urls
+     */
+    @observable urlSalt: string | null = null;
+
+    @observable profileVersion = 0;
+
+    @observable hasAvatar = false;
+
+    @observable isDeleted = false;
+
+    @observable isHidden = false;
+
+    appLabel: string;
+
+    /**
+     * RGB string built based on hashed signing public key, not
+     * cryptographically strong, just for better UX
      */
     @computed
-    get color() {
+    get color(): { value: string; isLight: boolean } {
         if (!this.signingPublicKey) return { value: '#e0e1e6', isLight: true };
         const int = this.signingPublicKey[0] % ContactColors.length;
         return ContactColors[int];
@@ -131,18 +125,14 @@ class Contact {
 
     /**
      * First letter of first name or username.
-     * @type {string}
      */
     @computed
-    get letter() {
+    get letter(): string {
         return getFirstLetterUpperCase(this.firstName || this.username);
     }
 
-    /**
-     * @type {string}
-     */
     @computed
-    get fullName() {
+    get fullName(): string {
         let ret = '';
         if (this.firstName) ret = this.firstName;
         if (this.lastName) {
@@ -152,11 +142,8 @@ class Contact {
         return ret;
     }
 
-    /**
-     * @type {string}
-     */
     @computed
-    get fullNameAndUsername() {
+    get fullNameAndUsername(): string {
         let ret = '';
         if (this.firstName) ret = this.firstName;
         if (this.lastName) {
@@ -170,26 +157,24 @@ class Contact {
 
     /**
      * Lower cased full name for search/filter optimization
-     * @type {string}
      */
     @computed
-    get fullNameLower() {
+    get fullNameLower(): string {
         return this.fullName.toLocaleLowerCase();
     }
 
     // fingerprint calculation is async, but at the same time we want it to be lazy computed
     // so we cache computed result here
-    @observable __fingerprint = null;
+    @observable __fingerprint: string | null = null;
     // but we also want to make sure computed will be refreshed on signing key change
     // so we remember which key was used
-    __fingerprintKey;
+    __fingerprintKey: Uint8Array | null;
     /**
      * Cryptographically strong User fingerprint based on signing public key.
      * Looks like '12345-12345-12345-12345-12345', empty value is '00000-00000-00000-00000-00000-00000'
-     * @type {string}
      */
     @computed
-    get fingerprint() {
+    get fingerprint(): string {
         if (!this.signingPublicKey) return nullFingerprint;
         if (
             !this.__fingerprint ||
@@ -208,22 +193,18 @@ class Contact {
     }
 
     @computed
-    get _avatarUrl() {
+    get _avatarUrl(): string {
         return `${serverSettings.avatarServer}/v2/avatar/${this.urlSalt}`;
     }
-    /**
-     * @type {string}
-     */
+
     @computed
-    get largeAvatarUrl() {
+    get largeAvatarUrl(): string {
         if (!this.hasAvatar) return null;
         return `${this._avatarUrl}/large/?${this.profileVersion}`;
     }
-    /**
-     * @type {string}
-     */
+
     @computed
-    get mediumAvatarUrl() {
+    get mediumAvatarUrl(): string {
         if (!this.hasAvatar) return null;
         // todo: returning large size here to deal with 64px upscaling to 80px on retina mess
         return `${this._avatarUrl}/large/?${this.profileVersion}`;
@@ -231,10 +212,9 @@ class Contact {
 
     /**
      * Same as {@link fingerprint}, but formatted as: '1234 5123 4512\n3451 2345 1234 5123 45'
-     * @type {string}
      */
     @computed
-    get fingerprintSkylarFormatted() {
+    get fingerprintSkylarFormatted(): string {
         let i = 0;
         return this.fingerprint
             .replace(/-/g, '')
@@ -244,20 +224,23 @@ class Contact {
     }
 
     /**
-     * Server said it couldn't find this user.
-     * @type {boolean}
+     * Did the server say it couldn't find this user?
      */
     @observable notFound = false;
 
     // to avoid parallel queries
     _waitingForResponse = false;
 
-    // {username: string, resolve: function, reject: function}
-    static smartRequestQueue = [];
+    // TODO: can we refine these anys?
+    static smartRequestQueue: {
+        username: string;
+        resolve: (value: any) => void;
+        reject: (err: any) => void;
+    }[] = [];
     static smartRequestTimer = null;
     static lastTimerInterval = 0;
     static lastAdditionTime = 0;
-    static smartRequestStartExecutor() {
+    static smartRequestStartExecutor(): void {
         if (Contact.smartRequestTimer) return;
         Contact.lastTimerInterval = clientApp.updatingAfterReconnect
             ? 2000
@@ -272,7 +255,7 @@ class Contact {
         );
     }
 
-    static smartRequestExecutor() {
+    static smartRequestExecutor(): void {
         if (
             Date.now() - Contact.lastAdditionTime < Contact.lastTimerInterval &&
             Contact.smartRequestQueue.length < 50
@@ -304,7 +287,11 @@ class Contact {
 
     static smartRequest(username) {
         return new Promise((resolve, reject) => {
-            Contact.smartRequestQueue.push({ username, resolve, reject });
+            Contact.smartRequestQueue.push({
+                username,
+                resolve,
+                reject
+            });
             Contact.lastAdditionTime = Date.now();
             Contact.smartRequestStartExecutor();
         });
@@ -312,9 +299,8 @@ class Contact {
 
     /**
      * Loads user data from server (or applies prefetched data)
-     * @param {Object} [prefetchedData]
      */
-    load(prefetchedData) {
+    load(prefetchedData?: object) {
         if (!this.loading || this._waitingForResponse) return;
         // console.log(`Loading contact: ${this.username}`);
         this.loading = true;
@@ -374,13 +360,14 @@ class Contact {
     }
 
     /**
-     * Loads or creates Tofu keg and verifies Tofu data, check `tofuError` observable.
-     * @returns {Promise}
+     * Loads or creates Tofu keg and verifies Tofu data, check `tofuError`
+     * observable.
      */
-    loadTofu() {
+    loadTofu(): Promise<any> {
+        // TODO: any
         // console.log('Loading tofu:', this.username);
         return tofuStore.getByUsername(this.username).then(
-            action(tofu => {
+            action<any>(tofu => {
                 this._waitingForResponse = false;
                 this.loading = false;
                 if (!tofu) {
@@ -424,9 +411,8 @@ class Contact {
     /**
      * Helper function to execute callback when contact is loaded.
      * Executes immediately if already loaded.
-     * @param {function} callback
      */
-    whenLoaded(callback) {
+    whenLoaded(callback: (contact?: Contact) => void): void {
         // it is important for this to be async
         when(
             () => !this.loading && getContactStore().myContacts.loaded,
@@ -435,21 +421,18 @@ class Contact {
     }
     /**
      * Helper function to get a promise that resolves when contact is loaded.
-     * @returns {Promise}
      */
-    ensureLoaded() {
-        return new Promise(resolve => {
+    ensureLoaded(): Promise<void> {
+        return new Promise<any>(resolve => {
             this.whenLoaded(resolve);
         });
     }
+
     /**
-     * Helper function to get a promise that resolves when all contacts in passed collection are loaded.
-     * @param {Array<Contact>} contacts
-     * @returns {Promise}
+     * Helper function to get a promise that resolves when all contacts in
+     * passed collection are loaded.
      */
-    static ensureAllLoaded(contacts) {
-        return Promise.map(contacts, contact => contact.ensureLoaded());
+    static ensureAllLoaded(contacts: Contact[]): Promise<void> {
+        return Promise.map(contacts, contact => contact.ensureLoaded()) as any; // bluebird incompatibility
     }
 }
-
-module.exports = Contact;

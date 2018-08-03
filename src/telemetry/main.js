@@ -3,10 +3,8 @@ const config = require('../config');
 const TinyDb = require('../db/tiny-db');
 const { cryptoUtil } = require('../crypto');
 
-const baseUrl = 'https://api.mixpanel.com/track/?data=';
 const baseObj = {
     properties: {
-        token: '05ee93d5cdb68e0de0709b6c85200c44', // TODO: this is for "Test setup". remember to replace it. env var?
         'Version Number': 1 // refers to our own tracker library versioning
     }
 };
@@ -31,6 +29,7 @@ async function init() {
     const uuid = await getUserId();
 
     baseObj.properties.distinct_id = uuid;
+    baseObj.properties.token = config.telemetry.token;
     baseObj.properties.Device = config.isMobile ? 'Mobile' : 'Desktop';
     baseObj.properties['App Version'] = config.appVersion;
 }
@@ -48,15 +47,16 @@ function send(eventObj) {
         properties[item] = eventObj.properties[itemInCamel];
     });
 
-    // `baseObj`'s properties will be overwritten on assign.
+    // `properties` will be overwritten if you directly assign eventObj to baseObj or vice versa.
     // This song-and-dance merges the properties first, assigns the object, then assigns the object's properties
     properties = Object.assign(properties, baseObj.properties);
     const object = Object.assign({}, eventObj, baseObj);
     object.properties = properties;
 
     const data = global.btoa(JSON.stringify(object));
-    const url = `${baseUrl}${data}`;
+    const url = `${config.telemetry.baseUrl}${data}`;
 
+    // TODO: this makes it easier to see tracking events for testing purposes. Remove before release.
     console.log(object);
 
     window.fetch(url, {

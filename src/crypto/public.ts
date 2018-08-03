@@ -84,5 +84,3 @@ export const computeSharedKey: (
     mySecretKey: Uint8Array
 ) => Uint8Array =
     nacl.box.before;
-
-module.exports = { decryptCompat, encrypt, decrypt, computeSharedKey };

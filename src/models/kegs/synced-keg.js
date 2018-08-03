@@ -14,7 +14,7 @@ const { ServerError } = require('../../errors');
  * @param {boolean} [forceSign=false] - force signature of plaintext kegs or not
  * @extends {Keg}
  */
-export default class SyncedKeg extends Keg {
+class SyncedKeg extends Keg {
     constructor(
         kegName,
         db,
@@ -174,3 +174,5 @@ export default class SyncedKeg extends Keg {
         warnings.add(localeKey);
     }
 }
+
+module.exports = SyncedKeg;

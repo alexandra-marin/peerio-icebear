@@ -6,8 +6,8 @@
  * once everything is ready.
  */
 
-import SocketClient from './socket-client';
-import config from '../config';
+const SocketClient = require('./socket-client');
+const config = require('../config');
 
 const socket = new SocketClient();
 
@@ -17,4 +17,4 @@ socket.start = function() {
     wrappedStart.call(socket, config.socketServerUrl);
 };
 
-export default socket;
+module.exports = socket;

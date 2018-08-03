@@ -1,7 +1,5 @@
-import _sdkVersion from './__sdk';
-import MemoryCacheEngine from './db/memory-cache-engine';
-import FileStreamAbstract from './models/files/file-stream-abstract';
-import StorageEngineInterface from './db/storage-engine-inteface';
+const _sdkVersion = require('./__sdk');
+const MemoryCacheEngine = require('./db/memory-cache-engine');
 
 const SERVER_PLAN_PREMIUM_MONTHLY = 'icebear_premium_monthly';
 const SERVER_PLAN_PREMIUM_YEARLY = 'icebear_premium_yearly';
@@ -28,8 +26,9 @@ class UploadConfig {
      * For reference. Table of chunk sizes based on file sizes.
      * Is not supposed to be changed ever.
      * If you do change it for some reason - remember to restart paused uploads as file chunk size might change.
+     * @type {Array<{maxFileSize: ?number, chunkSize: number}>}
      */
-    get chunkSizes(): { maxFileSize: number | null; chunkSize: number }[] {
+    get chunkSizes() {
         return [
             // up to ~10Mb file
             { maxFileSize: 192 * 1024 * 54, chunkSize: 192 * 1024 },
@@ -46,10 +45,10 @@ class UploadConfig {
 
     /**
      * Finds which chunk size to use for given file size based on {@link chunkSizes} reference table.
-     * @param fileSize in bytes.
-     * @returns chunk size to use, in bytes.
+     * @param {number} fileSize - in bytes.
+     * @returns {number} chunk size to use, in bytes.
      */
-    getChunkSize(fileSize: number): number {
+    getChunkSize(fileSize) {
         const data = this.chunkSizes;
         for (let i = 0; i < data.length; i++) {
             const row = data[i];
@@ -65,35 +64,38 @@ class UploadConfig {
     /**
      * Max amount of bytes to buffer from disk for encrypting.
      * This number can't be less than maximum chunk size.
+     * @type {number}
      */
-    encryptBufferSize: number = 1024 * 1024;
-
+    encryptBufferSize = 1024 * 1024;
     /**
      * Max amount of chunks to pre-encrypt for sending
      * This number can't be less than maximum chunk size.
+     * @type {number}
      */
-    uploadBufferSize: number = 1024 * 1024;
+    uploadBufferSize = 1024 * 1024;
 
     /**
      * Max amount of uploaded chunks per one file waiting for server response.
      * When reached this number, uploader will wait for at least one chunk to get a response.
      * Bigger number = faster upload = more pressure on server.
      * 0-5 is a reasonable range to pick. Default is 2.
+     * @type {number}
      */
-    maxResponseQueue: number = 2;
+    maxResponseQueue = 2;
 }
 
 const config = new class {
-    readonly sdkVersion = _sdkVersion;
+    sdkVersion = _sdkVersion;
 
     debug = {
         /**
          * Traffic stat summary will be logged with this interval (ms.)
+         * @type {number}
          */
         trafficReportInterval: 60 * 60 * 1000,
-
         /**
          * All socket messages will be logged if set to `true` before socket is started.
+         * @type {boolean}
          */
         socketLogEnabled: false
     };
@@ -102,15 +104,17 @@ const config = new class {
      * App server connection url. (wss://)
      *
      * **Client app is required to set this property before using Icebear SDK.**
+     * @type {string}
      */
-    socketServerUrl: string = 'wss://';
+    socketServerUrl = 'wss://';
 
     /**
      * Ghost website url. (https://)
      *
      * **Client app is required to set this property before using Icebear SDK.**
+     * @type {string}
      */
-    ghostFrontendUrl: string = 'https://';
+    ghostFrontendUrl = 'https://';
 
     /**
      * Application name
@@ -122,23 +126,26 @@ const config = new class {
      * Will be used by server to detect deprecated client versions.
      *
      * **Client app is required to set this property before using Icebear SDK.**
+     * @type {string}
      */
-    appVersion: string = '';
+    appVersion = '';
 
     /**
      * Strictly one of: 'electron', 'outlook', 'android', 'ios', 'browser',
      * unless server has been updated to support more platform strings and this documentation wasn't :-P
      *
      * **Client app is required to set this property before using Icebear SDK.**
+     * @type {string}
      */
-    platform: string = '';
+    platform = '';
 
     /**
      * Branding label for signup and login
      * Contains name, default is empty string
      * See other allowed values in your branding guide
+     * @type {object}
      */
-    whiteLabel: { [key: string]: string } = { name: '' };
+    whiteLabel = { name: '' };
 
     /**
      * Unique device identifying string (optional).
@@ -147,14 +154,17 @@ const config = new class {
      *
      * Used only once to derive deviceId, which is later stored in the local database.
      * If not set, deviceId is generated from a random value.
+     *
+     * @type {string | undefined}
      */
-    deviceUID: string | null = null;
+    deviceUID = null;
 
     /**
      * For reference. Amount of bytes added to every file chunk in encrypted state.
      * DO NOT change this value unless you really know what you're doing.
+     * @returns {number} 32
      */
-    get CHUNK_OVERHEAD(): number {
+    get CHUNK_OVERHEAD() {
         return 32;
     }
 
@@ -166,6 +176,7 @@ const config = new class {
          *
          * Note that maxDownloadChunkSize and maxDecryptBufferSize will be
          * multiplied by parallelism factor.
+         * @type {number}
          */
         parallelism: 1,
 
@@ -173,11 +184,13 @@ const config = new class {
          * Max amount of bytes to download at once for further processing.
          * File gets downloaded in 'downloadChunks' and then broken down to the chunk size it was uploaded with.
          * This number can't be less than maximum chunk size.
+         * @type {number}
          */
         maxDownloadChunkSize: 1024 * 1024,
         /**
          * Max amount of bytes to download and queue for decryption.
          * This number can't be less than maximum chunk size.
+         * @type {number}
          */
         maxDecryptBufferSize: 1024 * 1024 * 3
     };
@@ -186,36 +199,36 @@ const config = new class {
      * File stream implementation class.
      *
      * **Client app is required to set this property before using Icebear SDK.**
+     * @type {FileStreamAbstract}
      */
-    FileStream: FileStreamAbstract = null;
-
+    FileStream = null;
     /**
      * Storage engine implementation class.
      *
      * **Client app is required to set this property before using Icebear SDK.**
+     * @type {StorageEngineInterface}
      */
-    StorageEngine: StorageEngineInterface | null = null;
-
+    StorageEngine = null;
     /**
      * Storage engine implementation class.
      *
      * **Client app is required to set this property before using Icebear SDK.**
+     * @type {StorageEngineInterface}
      */
-    CacheEngine: {
-        new (namespace: string): StorageEngineInterface;
-    } = MemoryCacheEngine;
-
+    CacheEngine = MemoryCacheEngine;
     /**
      * Frequency (seconds) at which default observable clock will be changing its value.
      * Default clock can be used for refreshing timestamps and other time counters.
      * Do not set this value too low, create custom clocks instead.
+     * @type {number}
      */
-    observableClockEventFrequency: number = 30;
+    observableClockEventFrequency = 30; // seconds
 
     /**
      * Server plans ids
+     * @type {Array<string>}
      */
-    readonly serverPlans = [
+    serverPlans = [
         SERVER_PLAN_PREMIUM_MONTHLY,
         SERVER_PLAN_PREMIUM_YEARLY,
         SERVER_PLAN_PRO_MONTHLY,
@@ -224,80 +237,81 @@ const config = new class {
 
     /**
      * Server premium plans ids
+     * @type {Array<string>}
      */
-    readonly serverPlansPremium = [
+    serverPlansPremium = [
         SERVER_PLAN_PREMIUM_MONTHLY,
         SERVER_PLAN_PREMIUM_YEARLY
     ];
 
     /**
      * Server pro plans ids
+     * @type {Array<string>}
      */
-    readonly serverPlansPro = [SERVER_PLAN_PRO_MONTHLY, SERVER_PLAN_PRO_YEARLY];
+    serverPlansPro = [SERVER_PLAN_PRO_MONTHLY, SERVER_PLAN_PRO_YEARLY];
 
     basicMaxSingleFileUploadSize = 512 * 1024 * 1024;
     premiumMaxSingleFileUploadSize = 2048 * 1024 * 1024;
 
     chat = {
         /**
-         * Maximum amount of DM chats to load initially. Favorite chats do count
-         * toward this limit but will always load in full number, even if
-         * there's more favorite chats then limit allows.
+         * Maximum amount of DM chats to load initially.
+         * Favorite chats do count toward this limit but will always load in full number, even if there's more
+         * favorite chats then limit allows.
+         * @type {number}
          */
         maxInitialChats: 10,
-
         /**
          * Amount of messages to load to a chat initially.
+         * @type {number}
          */
         initialPageSize: 40,
-
         /**
          * When navigating chat history, load this amount of messages per page.
+         * @type {number}
          */
         pageSize: 30,
-
         /**
-         * Icebear will unload messages over this limit, resulting is low memory
-         * consumption when navigating history or chatting normally.
+         * Icebear will unload messages over this limit, resulting is low memory consumption when navigating history
+         * or chatting normally.
+         * @type {number}
          */
         maxLoadedMessages: 130,
         /**
-         * Delay (ms) between decryption of individual messages when processing
-         * a batch. Increase to get more responsiveness, but increase page load
-         * time.
+         * Delay (ms) between decryption of individual messages when processing a batch.
+         * Increase to get more responsiveness, but increase page load time.
+         * @type {number}
          */
         decryptQueueThrottle: 0,
-
         /**
-         * Maximum amount of recent files to maintain in chat object to be able
-         * to display the list on UI.
+         * Maximum amount of recent files to maintain in chat object to be able to display the list on UI.
+         * @type {number}
          */
         recentFilesDisplayLimit: 25,
         /**
-         * Maximum number of characters chat name can have. Do not override this
-         * in clients, it's supposed to be a system limit.
+         * Maximum number of characters chat name can have.
+         * Do not override this in clients, it's supposed to be a system limit.
+         * @type {number}
          */
         maxChatNameLength: 24,
-
         /**
-         * Maximum number of characters chat purpose can have. Do not override
-         * this in clients, it's supposed to be a system limit.
+         * Maximum number of characters chat purpose can have.
+         * Do not override this in clients, it's supposed to be a system limit.
+         * @type {number}
          */
         maxChatPurposeLength: 120,
-
         /**
-         * Maximum number of bytes inline image can have (both peerio file and
-         * external) to allow auto-downloading and showing it inline with "show
-         * big files" enabled or with manual "Display this image"
+         * Maximum number of bytes inline image can have (both peerio file and external)
+         * to allow auto-downloading and showing it inline with "show big files" enabled
+         * or with manual "Display this image"
+         * @type {number}
          */
         inlineImageSizeLimit: 10 * 1024 * 1024,
-
         /**
-         * Image bigger than this is not downloaded inline even with manual
-         * "Display this image"
+         * Image bigger than this is not downloaded inline even with manual "Display this image"
+         * @type {number}
          */
         inlineImageSizeLimitCutoff: 30 * 1024 * 1024,
-
         allowedInlineContentTypes: {
             'image/jpeg': true,
             'image/bmp': true,
@@ -318,4 +332,4 @@ const config = new class {
     temporaryCacheLimit = 1000 * 1024 * 1024;
 }();
 
-export default config;
+module.exports = config;

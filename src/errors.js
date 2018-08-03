@@ -79,6 +79,7 @@ module.exports.getGenericCustomError = getGenericCustomError;
     ['AntiTamperError'],
     ['DisconnectedError'],
     ['NotAuthenticatedError'],
+    ['AbstractCallError', 'Abstract function call. Override this function.'],
     ['NoPasscodeFoundError', 'No passcode found.'],
     ['InvalidArgumentError'],
     ['UserCancelError'] // when user has cancelled something in progress (like download)

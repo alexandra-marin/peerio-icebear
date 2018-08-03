@@ -1,12 +1,12 @@
-import Contact from './contact';
-import SyncedKeg from '../kegs/synced-keg';
-import { getUser } from '../../helpers/di-current-user';
+const SyncedKeg = require('../kegs/synced-keg');
+const { getUser } = require('../../helpers/di-current-user');
 
 /**
  * User's favorite contacts. Named plaintext synced keg.
+ * @extends {SyncedKeg}
  */
-export default class MyContacts extends SyncedKeg {
-    contacts: { [contactName: string]: { addedAt: number } } = {};
+class MyContacts extends SyncedKeg {
+    contacts = {};
 
     constructor() {
         super('my_contacts', getUser().kegDb, true, true);
@@ -21,20 +21,24 @@ export default class MyContacts extends SyncedKeg {
     }
 
     /**
-     * @returns true if contact was added, false if contact was already in the list.
+     * @param {Contact} contact
+     * @returns {boolean} - true if contact was added, false if contact was already in the list.
      */
-    addContact(contact: Contact): boolean {
+    addContact(contact) {
         if (this.contacts[contact.username]) return false;
         this.contacts[contact.username] = { addedAt: Date.now() };
         return true;
     }
 
     /**
-     * @returns true if contact was removed, false if contact was not in the list.
+     * @param {Contact} contact
+     * @returns {boolean} - true if contact was removed, false if contact was not in the list.
      */
-    removeContact(contact: Contact): boolean {
+    removeContact(contact) {
         if (!this.contacts[contact.username]) return false;
         delete this.contacts[contact.username];
         return true;
     }
 }
+
+module.exports = MyContacts;

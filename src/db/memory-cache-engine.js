@@ -1,12 +1,8 @@
-import StorageEngineInterface from './storage-engine-inteface';
-
 // Use this with tests
 
-export default class MemoryCacheEngine implements StorageEngineInterface {
-    readonly namespace: string;
-    readonly storage: { [namespace: string]: { [key: string]: string } };
-
-    constructor(namespace: string) {
+class MemoryCacheEngine {
+    // pass an empty(or existing) object as storage - MemoryCacheEngine will read and write objects to it
+    constructor(namespace) {
         this.namespace = namespace;
         this.storage = MemoryCacheEngine.defaultStorage;
         if (!this.storage[namespace]) {
@@ -16,7 +12,7 @@ export default class MemoryCacheEngine implements StorageEngineInterface {
 
     static defaultStorage = {};
 
-    static setStorage(val): void {
+    static setStorage(val) {
         MemoryCacheEngine.defaultStorage = val;
     }
 
@@ -24,21 +20,17 @@ export default class MemoryCacheEngine implements StorageEngineInterface {
         return this.storage[this.namespace];
     }
 
-    open(): Promise<void> {
+    open() {
         return Promise.resolve();
     }
 
-    getValue(key: string): Promise<string> {
+    getValue(key) {
         return new Promise(resolve => {
             setTimeout(() => resolve(this.db[key]));
         });
     }
 
-    async setValue(
-        key: string,
-        value: string,
-        callback?: (old: string, value: string) => string
-    ): Promise<void> {
+    async setValue(key, value, callback) {
         let newVal = value;
         if (callback) {
             const old = await this.getValue(key);
@@ -48,7 +40,7 @@ export default class MemoryCacheEngine implements StorageEngineInterface {
                 return Promise.resolve();
             }
         }
-        return new Promise<void>(resolve => {
+        return new Promise(resolve => {
             setTimeout(() => {
                 this.db[key] = newVal;
                 resolve();
@@ -56,7 +48,7 @@ export default class MemoryCacheEngine implements StorageEngineInterface {
         });
     }
 
-    removeValue(key: string): Promise<void> {
+    removeValue(key) {
         return new Promise(resolve => {
             setTimeout(() => {
                 delete this.db[key];
@@ -65,22 +57,24 @@ export default class MemoryCacheEngine implements StorageEngineInterface {
         });
     }
 
-    getAllKeys(): Promise<string[]> {
+    getAllKeys() {
         return new Promise(resolve => {
             setTimeout(() => resolve(Object.keys(this.db)));
         });
     }
 
-    getAllValues(): Promise<string[]> {
+    getAllValues() {
         return new Promise(resolve => {
             setTimeout(() => resolve(Object.values(this.db)));
         });
     }
 
-    clear(): Promise<void> {
+    clear() {
         return new Promise(resolve => {
             this.storage[this.namespace] = {};
             setTimeout(resolve);
         });
     }
 }
+
+module.exports = MemoryCacheEngine;

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 const { AbstractCallError } = require('../../errors');
 
 /**
@@ -7,18 +8,25 @@ const { AbstractCallError } = require('../../errors');
  * 1. create you own class and inherit from FileStreamAbstract.
  * 2. override required functions.
  * 3. set config.FileStream = YourFileStreamImplementation.
+ * @param {string} filePath - will be used by 'open' function
+ * @param {string} mode - 'read' or 'write' or 'append'
  */
-export default abstract class FileStreamAbstract {
-    readonly filePath: string;
-    readonly mode: string;
-
-    pos: number;
-
+class FileStreamAbstract {
     /**
-     * @param filePath - will be used by 'open' function
-     * @param mode - 'read' or 'write' or 'append'
+     * @type {string}
      */
-    constructor(filePath: string, mode: string) {
+    filePath;
+    /**
+     * @type {string}
+     */
+    mode;
+    /**
+     * File stream pointer
+     * @type {number}
+     */
+    pos;
+
+    constructor(filePath, mode) {
         this.filePath = filePath;
         if (mode !== 'read' && mode !== 'write' && mode !== 'append') {
             throw new Error('Invalid stream mode.');
@@ -29,10 +37,10 @@ export default abstract class FileStreamAbstract {
 
     /**
      * Reads a chunk of data from file stream.
-     * @param size amount of bytes to read (if possible)
-     * @return resolves with a number of bytes written to buffer
+     * @param {number} size - amount of bytes to read (if possible)
+     * @return {Promise<Uint8Array>} - resolves with a number of bytes written to buffer
      */
-    read = (size: number): Promise<Uint8Array> => {
+    read = size => {
         if (this.mode !== 'read') {
             return Promise.reject(
                 new Error('Attempt to read from write stream.')
@@ -47,15 +55,21 @@ export default abstract class FileStreamAbstract {
     };
 
     /**
-     * @param size The size in bytes.
+     * Override this in your implementation.
+     * @param {number} size - bytes
+     * @returns {Promise<Uint8Array>}
+     * @abstract
      */
-    abstract readInternal(size: number): Promise<Uint8Array>;
+    readInternal(size) {
+        throw new AbstractCallError();
+    }
 
     /**
      * Writes a chunk of data to file stream
-     * @returns Promise that resolves when chunk is written out
+     * @param {Uint8Array} buffer
+     * @returns {Promise} - resolves when chunk is written out
      */
-    write = (buffer: Uint8Array): Promise<void> => {
+    write = buffer => {
         if (this.mode !== 'write' && this.mode !== 'append') {
             return Promise.reject(
                 new Error(
@@ -72,29 +86,41 @@ export default abstract class FileStreamAbstract {
 
     /**
      * Override this in your implementation.
-     * @returns Promise that resolves to the same buffer as was passed
+     * @param {Uint8Array} buffer
+     * @returns {Promise<Uint8Array>} buffer, same one as was passed
+     * @abstract
      */
-    abstract writeInternal(buffer: Uint8Array): Promise<Uint8Array>;
+    writeInternal(buffer) {
+        throw new AbstractCallError();
+    }
 
     /**
      * Move file position pointer.
+     * @param {number} pos
+     * @returns {number} new position
      */
-    seek = (pos: number): number => {
+    seek = pos => {
         if (this.mode !== 'read') throw new Error('Seek only on read streams');
         return this.seekInternal(pos);
     };
 
     /**
      * Override this in your implementation. Move file position pointer.
-     * @returns new position
+     * @param {number} pos
+     * @returns {number} new position
      */
-    abstract seekInternal(pos: number): number;
+    seekInternal(pos) {
+        throw new AbstractCallError();
+    }
 
     /**
      * Override. This function has to set 'size' property.
-     * @returns Promise that resolves to this stream
+     * @returns {Promise<FileStreamAbstract>} - this
+     * @abstract
      */
-    abstract open(): Promise<FileStreamAbstract>;
+    open() {
+        throw new AbstractCallError();
+    }
 
     /**
      * Override. Called when done working with file, should flush all buffers and dispose resources.
@@ -112,7 +138,7 @@ export default abstract class FileStreamAbstract {
      * @returns {string} - actual device path for file
      * @abstract
      */
-    static getFullPath(uid: string, name: string): string {
+    static getFullPath(uid, name) {
         throw new AbstractCallError();
     }
 
@@ -122,7 +148,7 @@ export default abstract class FileStreamAbstract {
      * @returns {Promise<boolean>} - true if path exists on device
      * @abstract
      */
-    static exists(path: string): Promise<boolean> {
+    static exists(path) {
         throw new AbstractCallError();
     }
 
@@ -131,7 +157,7 @@ export default abstract class FileStreamAbstract {
      * @param {string} path - file path to open in a viewer.
      * @abstract
      */
-    static launchViewer(path: string) {
+    static launchViewer(path) {
         throw new AbstractCallError();
     }
 
@@ -141,7 +167,7 @@ export default abstract class FileStreamAbstract {
      * @returns {{size:number}}
      * @abstract
      */
-    static getStat(path: string): { size: number } {
+    static getStat(path) {
         throw new AbstractCallError();
     }
 
@@ -160,7 +186,7 @@ export default abstract class FileStreamAbstract {
      * @returns {Promise}
      * @abstract
      */
-    static delete(path: string): Promise<any> {
+    static delete(path) {
         throw new AbstractCallError();
     }
 
@@ -171,7 +197,7 @@ export default abstract class FileStreamAbstract {
      * @returns {Promise}
      * @abstract
      */
-    static rename(oldPath: string, newPath: string): Promise<any> {
+    static rename(oldPath, newPath) {
         throw new AbstractCallError();
     }
 
@@ -196,3 +222,5 @@ export default abstract class FileStreamAbstract {
         throw new AbstractCallError();
     }
 }
+
+module.exports = FileStreamAbstract;

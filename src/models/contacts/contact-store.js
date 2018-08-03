@@ -1,26 +1,26 @@
-import {
+const {
     observable,
     when,
     action,
     computed,
     intercept,
     isObservableArray
-} from 'mobx';
-import socket from '../../network/socket';
-import Contact from './contact';
-import { setContactStore } from '../../helpers/di-contact-store';
-import MyContacts from '../contacts/my-contacts';
-import Invites from '../contacts/invites';
-import { EventEmitter } from 'eventemitter3';
-import warnings from '../warnings';
-import createMap from '../../helpers/dynamic-array-map';
-import { getFirstLetterUpperCase } from './../../helpers/string';
-import { getUser } from '../../helpers/di-current-user';
-import { getChatStore } from '../../helpers/di-chat-store';
-import tofuStore from './tofu-store';
-import { asPromise } from '../../helpers/prombservable';
-import { retryUntilSuccess } from '../../helpers/retry';
-import ContactStoreWhitelabel from './contact-store.whitelabel';
+} = require('mobx');
+const socket = require('../../network/socket');
+const Contact = require('./contact');
+const { setContactStore } = require('../../helpers/di-contact-store');
+const MyContacts = require('../contacts/my-contacts');
+const Invites = require('../contacts/invites');
+const { EventEmitter } = require('eventemitter3');
+const warnings = require('../warnings');
+const createMap = require('../../helpers/dynamic-array-map');
+const { getFirstLetterUpperCase } = require('./../../helpers/string');
+const { getUser } = require('../../helpers/di-current-user');
+const { getChatStore } = require('../../helpers/di-chat-store');
+const tofuStore = require('./tofu-store');
+const { asPromise } = require('../../helpers/prombservable');
+const { retryUntilSuccess } = require('../../helpers/retry');
+const ContactStoreWhitelabel = require('./contact-store.whitelabel');
 
 /**
  * Contact store handles all Peerio users you(your app) are in some contact with,

@@ -7,7 +7,9 @@ const ERROR_MESSAGES = {
     error_invalidEmail: 'Not Valid Email',
     error_addressNotAvailable: 'Email Not Available',
     error_fieldRequired: 'Required',
-    error_loginFailed: 'Sign-in Failed'
+    error_loginFailed: 'Sign-in Failed',
+    error_invalidName: 'Not allowed',
+    error_wrongAK: 'Invalid Account Key'
 };
 
 function errorMessage(msg) {

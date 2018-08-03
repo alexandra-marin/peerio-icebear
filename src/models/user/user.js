@@ -110,8 +110,10 @@ class User {
     /**
      * @type {string}
      */
-    @observable _notificationSound = '';
-    get notificationSound() { return this._notificationSound; }
+    @observable _notificationSound = 'received';
+    get notificationSound() {
+        return this._notificationSound;
+    }
     set notificationSound(value) {
         this._notificationSound = value;
         this.props.notificationSound = value;

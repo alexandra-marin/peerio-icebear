@@ -75,12 +75,6 @@ module.exports = function mixUserProfileModule() {
     });
 
     this.saveProfile = function() {
-        console.log('saveProfile()');
-        console.log(
-            `_profileKeg.user.notificationSound: ${
-                _profileKeg.user.notificationSound
-            }`
-        );
         return _profileKeg.saveToServer().tapCatch(err => {
             console.error(err);
             warnings.add('error_saveSettings');

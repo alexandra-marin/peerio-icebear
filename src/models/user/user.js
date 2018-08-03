@@ -110,7 +110,12 @@ class User {
     /**
      * @type {string}
      */
-    @observable notificationSound = '';
+    @observable _notificationSound = '';
+    get notificationSound() { return this._notificationSound; }
+    set notificationSound(value) {
+        this._notificationSound = value;
+        this.props.notificationSound = value;
+    }
 
     @computed
     get isMCAdmin() {

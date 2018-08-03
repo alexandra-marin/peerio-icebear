@@ -112,7 +112,7 @@ class User {
      */
     @observable _notificationSound = '';
     get notificationSound() {
-        return this._notificationSound;
+        return this._notificationSound || 'received';
     }
     set notificationSound(value) {
         this._notificationSound = value;

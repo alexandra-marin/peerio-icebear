@@ -645,9 +645,9 @@ class Chat {
             // this was en entire page of empty/deleted messages
             this._reTriggerPaging(prepend, kegs);
         }
-        this.onNewMessageLoad(newMentionCount, newMessageCount, lastMentionId);
         // sort
         this.sortMessages();
+        this.onNewMessageLoad(newMentionCount, newMessageCount, lastMentionId);
         if (!prepend) {
             // updating most recent message
             for (let i = this.messages.length - 1; i >= 0; i--) {

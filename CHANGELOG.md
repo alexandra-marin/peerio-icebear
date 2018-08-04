@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.13.0"></a>
+# [5.13.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.12.0...v5.13.0) (2018-08-02)
+
+
+### Bug Fixes
+
+* add missing hashbangs ([4e509b5](https://github.com/PeerioTechnologies/peerio-icebear/commit/4e509b5))
+* default coroutine yield handler ([d962989](https://github.com/PeerioTechnologies/peerio-icebear/commit/d962989))
+* go back to using babel-eslint ([998e9fb](https://github.com/PeerioTechnologies/peerio-icebear/commit/998e9fb))
+* rogue babel register ([4c3dfcd](https://github.com/PeerioTechnologies/peerio-icebear/commit/4c3dfcd))
+* rogue babel register ([22df1d3](https://github.com/PeerioTechnologies/peerio-icebear/commit/22df1d3))
+* ts authoring ([5d1a456](https://github.com/PeerioTechnologies/peerio-icebear/commit/5d1a456))
+* when receiving a new message in the chat which hasn't been loaded, sorting order is incorrect for notification ([#267](https://github.com/PeerioTechnologies/peerio-icebear/issues/267)) ([df0ff02](https://github.com/PeerioTechnologies/peerio-icebear/commit/df0ff02))
+
+
+### Features
+
+* switch to first chat if removed from active chat [ch11920] ([#266](https://github.com/PeerioTechnologies/peerio-icebear/issues/266)) ([dc7b38b](https://github.com/PeerioTechnologies/peerio-icebear/commit/dc7b38b))
+
+
+
 <a name="5.12.0"></a>
 # [5.12.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.11.0...v5.12.0) (2018-07-25)
 

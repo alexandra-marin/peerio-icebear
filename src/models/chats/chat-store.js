@@ -299,7 +299,6 @@ class ChatStore {
             });
         }
         this.unloadChat(chat);
-        this.switchToFirstChat();
     };
 
     onNewMessages = _.throttle(props => {
@@ -648,6 +647,7 @@ class ChatStore {
         }
         if (chat.active) {
             this.deactivateCurrentChat();
+            this.switchToFirstChat();
         }
         chat.dispose();
         delete this.chatMap[chat.id];

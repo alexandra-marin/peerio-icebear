@@ -11,7 +11,7 @@ jobs:
     steps:
       - checkout
       - run: npm install
-      - run: npm run code:verify
+      - run: npm run validate
       - run: npm run test:unit
       - store_artifacts:
           path: test-results

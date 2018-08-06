@@ -477,9 +477,7 @@ class Keg {
             if (!this.plaintext) {
                 let decryptionKey = payloadKey || this.overrideKey;
                 if (!decryptionKey) {
-                    /* TODO(dchest): uncomment after testing
-                    decryptionKey = this.db.boot.keys[keyId || '0']; // optimization, avoids async
-                    */
+                    decryptionKey = this.db.boot.keys[keg.keyId || '0']; // optimization, avoids async
                     if (!decryptionKey) {
                         decryptionKey = await this.db.boot.getKey(
                             keg.keyId || '0'

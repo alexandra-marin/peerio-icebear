@@ -3,12 +3,14 @@
     "target": "esnext",
     "experimentalDecorators": true,
     "allowJs": true,
-    "strict": true,
-    "noImplicitAny": false, // FIXME: remove
     "moduleResolution": "node",
-    "lib": [
-      "dom",
-      "esnext"
-    ]
-  }
+    "esModuleInterop": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitAny": false, // TODO: enable (default enabled under `strict`, so just remove this line)
+    "strictNullChecks": false, // TODO: enable (default enabled under `strict`, so just remove this line)
+    "lib": ["dom", "esnext"]
+  },
+  "include": ["src/**/*", "test/**/*"]
 }

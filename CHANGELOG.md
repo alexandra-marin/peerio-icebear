@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.14.0"></a>
+# [5.14.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.13.0...v5.14.0) (2018-08-07)
+
+
+### Bug Fixes
+
+* file descriptor caching ([60b0812](https://github.com/PeerioTechnologies/peerio-icebear/commit/60b0812))
+* handle case when decryptionKey.key is undefined ([18bc76a](https://github.com/PeerioTechnologies/peerio-icebear/commit/18bc76a))
+* missing await in Chat.loadMetadata ([e23d3c3](https://github.com/PeerioTechnologies/peerio-icebear/commit/e23d3c3))
+* missing await in SharedDbBootKeg.loadBootKeg ([a56ead7](https://github.com/PeerioTechnologies/peerio-icebear/commit/a56ead7))
+* tofu caching ([105fa74](https://github.com/PeerioTechnologies/peerio-icebear/commit/105fa74))
+
+
+### Features
+
+* rekey shared keg DB on participant leave [ch2529] ([7b680d3](https://github.com/PeerioTechnologies/peerio-icebear/commit/7b680d3))
+* wait for boot keg key to appear ([dd7e292](https://github.com/PeerioTechnologies/peerio-icebear/commit/dd7e292))
+
+
+
 <a name="5.13.0"></a>
 # [5.13.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.12.0...v5.13.0) (2018-08-02)
 

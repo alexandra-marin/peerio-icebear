@@ -1,5 +1,5 @@
 const { cryptoUtil, publicCrypto, keys } = require('../../crypto');
-const { observable, action } = require('mobx');
+const { action, observable, when } = require('mobx');
 const { getContactStore } = require('../../helpers/di-contact-store');
 const SyncedKeg = require('../kegs/synced-keg');
 
@@ -100,7 +100,7 @@ class SharedDbBootKeg extends SyncedKeg {
      * Extracted from payload to use for decryption.
      * @type {{keyId: { createdAt: number, key: Uint8Array } }}
      */
-    keys = {};
+    @observable.shallow keys = {};
 
     /**
      * List of usernames who have access to the shared DB currently.
@@ -167,6 +167,29 @@ class SharedDbBootKeg extends SyncedKeg {
             delete this.keys[maxId.toString()];
             this.dirty = false;
         }
+    }
+
+    /**
+     * Waits until keyId is available and resolves with it.
+     * If the key will not appear in the timeout time, resolves to undefined.
+     *
+     * @param {string} keyId
+     * @param {number} timeout
+     */
+    async getKey(keyId, timeout = 120000) {
+        if (this.keys[keyId]) {
+            // quick path
+            return this.keys[keyId];
+        }
+        let resolve;
+        const promise = new Promise(_resolve => {
+            resolve = _resolve;
+        });
+        const disposeReaction = when(() => this.keys[keyId], resolve);
+        await promise.timeout(timeout).catch(() => {
+            disposeReaction();
+        });
+        return this.keys[keyId];
     }
 
     /**

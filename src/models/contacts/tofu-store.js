@@ -59,21 +59,25 @@ class TofuStore {
             console.error(err);
         }
         if (!resp || !resp.kegs || !resp.kegs.length) return false;
-        resp.kegs.forEach(keg => {
+        for (const keg of resp.kegs) {
             if (keg.collectionVersion > knownUpdateId) {
                 knownUpdateId = keg.collectionVersion;
             }
             const tofu = new Tofu(getUser().kegDb);
-            if (tofu.loadFromKeg(keg)) {
+            if (await tofu.loadFromKeg(keg)) {
                 this.cacheTofu(tofu);
             }
-        });
+        }
         await this.saveKnownUpdateId(knownUpdateId);
         return true;
     }
 
     // we don't need to wait for tofu keg to get signature verified, because it exists only in SELF
     cacheTofu(tofu) {
+        if (!tofu.encryptionPublicKey || !tofu.signingPublicKey) {
+            // Broken keg? Don't cache.
+            return;
+        }
         this.cache
             .setValue(tofu.username, tofu.serializeKegPayload())
             .catch(this.processCacheUpdateError);
@@ -82,8 +86,13 @@ class TofuStore {
         console.error(err);
     }
 
-    getFromCache(username) {
-        return this.cache.getValue(username);
+    async getFromCache(username) {
+        const cached = await this.cache.getValue(username);
+        if (!cached.encryptionPublicKey || !cached.signingPublicKey) {
+            // Broken cached tofu.
+            return null;
+        }
+        return cached;
     }
 
     /**
@@ -127,7 +136,11 @@ class TofuStore {
         if (!resp.kegs || !resp.kegs.length) return null;
 
         const tofu = new Tofu(getUser().kegDb);
-        await tofu.loadFromKeg(resp.kegs[0]); // TODO: detect and delete excess? shouldn't really happen though
+        if (!(await tofu.loadFromKeg(resp.kegs[0]))) {
+            // TODO: detect and delete excess? shouldn't really happen though
+            console.error('Failed to load tofu keg');
+            return null;
+        }
         this.cacheTofu(tofu);
         return tofu;
     }

@@ -511,7 +511,7 @@ class Chat {
         if (this.isChannel) {
             this.chatHead = new ChatHead(this.db);
             if (cachedData.chatHead) {
-                this.chatHead.loadFromKeg(cachedData.chatHead);
+                await this.chatHead.loadFromKeg(cachedData.chatHead);
             }
             this.chatHead.onLoadedFromKeg = chatHeadKeg => {
                 this.store.cache.saveChatHead(this.id, chatHeadKeg);

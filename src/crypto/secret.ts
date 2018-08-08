@@ -17,7 +17,8 @@
 
 import * as nacl from 'tweetnacl';
 import * as util from './util';
-import { DecryptionError } from '../errors';
+
+const { DecryptionError } = require('../errors');
 
 interface NaclLowlevel {
     lowlevel: {

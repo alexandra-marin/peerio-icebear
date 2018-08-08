@@ -46,7 +46,7 @@ function prehashPass(value: string, personalization?: string): Uint8Array {
  * Deterministically derives symmetrical boot key and auth key pair.
  * @param randomSalt - 32 random bytes
  */
-function deriveAccountKeys(
+export function deriveAccountKeys(
     username: string,
     passphrase: string,
     randomSalt: Uint8Array
@@ -83,11 +83,9 @@ function deriveAccountKeys(
 
 /**
  * Derive keys for a ghost/ephemeral user.
- * @param {Uint8Array} salt - e.g. ephemeral ID
- * @param {string} passphrase
- * @returns {Promise<KeyPair>}
+ * @param salt e.g. ephemeral ID
  */
-function deriveEphemeralKeys(
+export function deriveEphemeralKeys(
     salt: Uint8Array,
     passphrase: string
 ): Promise<KeyPair> {
@@ -105,12 +103,7 @@ function deriveEphemeralKeys(
     }
 }
 
-/**
- * @param {string} username
- * @param {string} passcode
- * @returns {Promise<Uint8Array>}
- */
-function deriveKeyFromPasscode(
+export function deriveKeyFromPasscode(
     username: string,
     passcode: string
 ): Promise<Uint8Array> {
@@ -132,41 +125,41 @@ function deriveKeyFromPasscode(
 
 /**
  * Generates new random signing (ed25519) key pair.
- * @returns {KeyPair} - 32 byte public key and 64 byte secret key.
+ * @returns 32 byte public key and 64 byte secret key.
  */
-function generateSigningKeyPair(): KeyPair {
+export function generateSigningKeyPair(): KeyPair {
     return nacl.sign.keyPair();
 }
 
 /**
  * Generates new random asymmetric (curve25519) key pair.
- * @returns {KeyPair} 32 byte keys
+ * @returns 32 byte keys
  */
-function generateEncryptionKeyPair(): KeyPair {
+export function generateEncryptionKeyPair(): KeyPair {
     return nacl.box.keyPair();
 }
 
 /**
  * Generates new random symmetric (xsalsa20) 32 byte secret key.
- * @returns {Uint8Array} 32 bytes
+ * @returns 32 bytes
  */
-function generateEncryptionKey(): Uint8Array {
+export function generateEncryptionKey(): Uint8Array {
     return getRandomBytes(32);
 }
 
 /**
  * Generates new salt for auth process
- * @returns {Uint8Array} 32 bytes
+ * @returns 32 bytes
  */
-function generateAuthSalt(): Uint8Array {
+export function generateAuthSalt(): Uint8Array {
     return getRandomBytes(32);
 }
 
 /**
  * Hashes auth public key. Uses personalized hash.
- * @returns {Uint8Array} 32 bytes personalized hash
+ * @returns 32 bytes personalized hash
  */
-function getAuthKeyHash(key): Uint8Array {
+export function getAuthKeyHash(key): Uint8Array {
     const hash = new BLAKE2s(32, {
         personalization: strToBytes('AuthCPK1')
     });
@@ -179,24 +172,12 @@ function getAuthKeyHash(key): Uint8Array {
  * formatted as "13c0 9f98 5be6 6013 044a 5471 5973 8e59"
  * containing 128 bits of entropy.
  *
- * @returns {string} account key
+ * @returns account key
  */
-function getRandomAccountKeyHex(): string {
+export function getRandomAccountKeyHex(): string {
     const a = [];
     for (let i = 0; i < 16; i += 2) {
         a.push(bytesToHex(getRandomBytes(2)));
     }
     return a.join(' ');
 }
-
-module.exports = {
-    deriveAccountKeys,
-    deriveEphemeralKeys,
-    deriveKeyFromPasscode,
-    generateSigningKeyPair,
-    generateEncryptionKeyPair,
-    generateEncryptionKey,
-    generateAuthSalt,
-    getAuthKeyHash,
-    getRandomAccountKeyHex
-};

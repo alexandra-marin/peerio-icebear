@@ -2,10 +2,12 @@
 // Random things generator part of Peerio crypto utilities module.
 //
 
-import { InvalidArgumentError } from '../../errors';
 import * as convert from './conversion';
 import * as hashing from './hashing';
-import globalContext from '../../helpers/global-context';
+
+const globalContext = require('../../helpers/global-context');
+const { InvalidArgumentError } = require('../../errors');
+
 /**
  * Generates random bytes suitable for crypto use
  * @param num byte count to return

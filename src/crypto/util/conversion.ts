@@ -1,7 +1,14 @@
 //
 // Conversion part of Peerio crypto utilities module.
 //
-import { Buffer } from 'buffer';
+
+// The trailing slash in this import is necessary -- this isn't the native Node
+// buffer, but a "polyfill" (that actually behaves differently than the thing
+// it's polyfilling, because javascript software engineering.) Mysterious things
+// will explode and you'll lose hours to debugging weird errors (questioning
+// whether you've completely gone unhinged) if you omit the slash. Don't omit
+// the slash.
+import { Buffer } from 'buffer/';
 
 const HAS_TEXT_ENCODER =
     typeof TextEncoder !== 'undefined' && typeof TextDecoder !== 'undefined';

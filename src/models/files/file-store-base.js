@@ -263,7 +263,7 @@ class FileStoreBase {
     async cacheDescriptor(d) {
         const file = this.getById(d.fileId);
         if (!file) return null;
-        const cached = this.cache.get(file.id);
+        const cached = await this.cache.getValue(file.id);
         if (!cached) {
             console.error(
                 'cacheDescriptor was called, but cached keg not found'

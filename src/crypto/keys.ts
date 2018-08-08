@@ -1,9 +1,9 @@
 /**
  * Peerio Crypto module for key handling.
  */
-import { scryptPromise } from './scrypt-proxy';
 import BLAKE2s from 'blake2s-js';
 import * as nacl from 'tweetnacl';
+import { scryptPromise } from './scrypt-proxy';
 import {
     bytesToHex,
     strToBytes,

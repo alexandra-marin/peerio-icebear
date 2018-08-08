@@ -22,6 +22,7 @@ const { DecryptionError } = require('../errors');
 
 interface NaclLowlevel {
     lowlevel: {
+        // eslint-disable-next-line camelcase
         crypto_secretbox(
             cipherContainer: Uint8Array,
             message: Uint8Array,
@@ -29,7 +30,7 @@ interface NaclLowlevel {
             nonce: Uint8Array,
             key: Uint8Array
         ): number;
-
+        // eslint-disable-next-line camelcase
         crypto_secretbox_open(
             messageContainer: Uint8Array,
             cipher: Uint8Array,

@@ -13,6 +13,7 @@ const { InvalidArgumentError } = require('../../errors');
  * @param num byte count to return
  * @returns random bytes array of `num` size
  */
+// eslint-disable-next-line import/no-mutable-exports
 export let getRandomBytes: (num: number) => Buffer | Uint8Array;
 
 // do we have crypto shim?
@@ -25,6 +26,7 @@ if (globalContext.cryptoShim) {
 // node crypto?
 if (!getRandomBytes) {
     try {
+        // eslint-disable-next-line global-require
         const crypto = require('crypto');
         if (typeof crypto.randomBytes === 'function') {
             getRandomBytes = function(num) {

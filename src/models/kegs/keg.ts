@@ -239,8 +239,9 @@ abstract class Keg<TProps extends {} = {}> {
                 }
                 if (this.sharedKegError || this.signatureError) {
                     throw new Error(
-                        'Not allowed to save a keg with sharedKegError or signatureError',
+                        `Not allowed to save a keg with sharedKegError or signatureError. Keg ID: [${
                         this.id
+                        }]`
                     );
                 }
                 props.sharedKegSenderPK = null;
@@ -574,12 +575,12 @@ abstract class Keg<TProps extends {} = {}> {
     ): void {
         if (!payload || this.lastLoadHadError) return;
         try {
-            let { signature } = props;
+            const { signature } = props;
             if (!signature) {
                 this.signatureError = true;
                 return;
             }
-            signature = cryptoUtil.b64ToBytes(signature);
+            const signatureBytes = cryptoUtil.b64ToBytes(signature);
             let signer = this.owner;
             if (this.storeSignerData && props.signedBy) {
                 signer = props.signedBy;
@@ -596,7 +597,7 @@ abstract class Keg<TProps extends {} = {}> {
                         : (payload as Uint8Array);
                     const res = await sign.verifyDetached(
                         data,
-                        signature,
+                        signatureBytes,
                         contact.signingPublicKey
                     );
                     this.signatureError = !res;

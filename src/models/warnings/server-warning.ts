@@ -1,20 +1,46 @@
-const { retryUntilSuccess } = require('../../helpers/retry');
-const isKnownKey = require('peerio-translator').has;
-const SystemWarning = require('./system-warning');
-const socket = require('../../network/socket');
+import { has as isKnownKey } from 'peerio-translator';
+import { retryUntilSuccess } from '../../helpers/retry';
+import * as socket from '../../network/socket';
+import SystemWarning, { WarningLevel } from './system-warning';
+
+/**
+ * warning object as received from server
+ */
+export interface ServerWarningData {
+    /**
+     * translation key starting with `serverWarning_` for security any other keys will be ignored
+     */
+    msg: string;
+    /**
+     * same as 'msg' but for dialog title
+     */
+    title: string;
+
+    level: WarningLevel;
+    /**
+     * unique id of this warning to send it back and dismiss this warning
+     */
+    token: string;
+}
 
 /**
  * Server warning. Server sends locale key and severity level for client to display.
  * You don't need to create instances of this class, Icebear takes care of it.
- * @param {Object} obj - warning object as received from server
- * @param {string} obj.msg - translation key starting with `serverWarning_` for security any other keys will be ignored
- * @param {string} obj.title - same as 'msg' but for dialog title
- * @param {string} obj.level - 'medium' or 'severe'
- * @param {string} obj.token - unique id of this warning to send it back and dismiss this warning
- * @param {function} onClear - callback will be called when warning is successfully dismissed on server
  */
-class ServerWarning extends SystemWarning {
-    constructor(obj, onClear) {
+export default class ServerWarning extends SystemWarning {
+    /**
+     * to use when dismissing/acknowledging server message
+     */
+    token: string;
+    onClear?: () => void;
+
+    /**
+     * Server warning. Server sends locale key and severity level for client to display.
+     * You don't need to create instances of this class, Icebear takes care of it.
+     * @param obj warning object as received from server
+     * @param onClear callback will be called when warning is successfully dismissed on server
+     */
+    constructor(obj: ServerWarningData, onClear?: () => void) {
         if (
             !obj ||
             !obj.msg ||
@@ -27,17 +53,17 @@ class ServerWarning extends SystemWarning {
             );
         }
         super(obj.msg, obj.title, null, obj.level);
-        this.token = obj.token; // to use when dismissing/acknowledging server message
+        this.token = obj.token;
         this.onClear = onClear;
     }
 
     dispose() {
         return retryUntilSuccess(() =>
-            socket.send('/auth/warning/clear', { token: this.token })
+            socket.send('/auth/warning/clear', {
+                token: this.token
+            })
         ).then(() => {
             if (this.onClear) this.onClear();
         });
     }
 }
-
-module.exports = ServerWarning;

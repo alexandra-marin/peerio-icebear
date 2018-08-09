@@ -1,1 +1,2 @@
-module.exports = require('./warnings');
+// @ts-check
+module.exports = require('./warnings').default;

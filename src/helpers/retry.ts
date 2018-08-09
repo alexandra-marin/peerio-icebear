@@ -10,24 +10,36 @@ const minRetryInterval = 1000; // will start with this interval between retries
 const maxRetryInterval = 10000; // this will be the maximum interval between retries
 const retryIntervalMultFactor = 250; // every retry will add this amount to retry interval
 
-const callsInProgress = {};
+interface CallInfo {
+    retryCount: number;
+    maxRetries: number;
+    errorHandler?: () => void | Promise<any>;
+    fatalErrorCount: number;
+    promise: Promise<any>;
+    resolve?: (res?: any) => any;
+    reject?: (err?: any) => any;
+    lastError?: any;
+}
+
+const callsInProgress: { [id: number]: CallInfo } = {};
+
 /**
  * 1. Executes the passed function
  * 2. If promise returned by function rejects - goto 1
  * Makes sure socket is authenticated before calling, and waits for it to become authenticated if needed.
- * @param {function} fn - function to execute
- * @param {string} [id] - unique id for this action, to prevent multiple parallel attempts
- * @param {number} [maxRetries=120] - override if needed
- * @param {bool} [thisIsRetry] - for internal use only
- * @returns {Promise} - resolves when action is finally executed, rejects after all attempts exhausted
+ * @param fn - function to execute
+ * @param id - unique id for this action, to prevent multiple parallel attempts
+ * @param maxRetries - override if needed
+ * @param thisIsRetry - for internal use only
+ * @returns A Promise that resolves when action is finally executed or rejects after all attempts are exhausted
  */
-function retryUntilSuccess(
-    fn,
-    id = Math.random(),
+export function retryUntilSuccess<T = any>(
+    fn: () => Promise<T>,
+    id = Math.random(), // TODO: audit
     maxRetries = maxRetryCount,
-    errorHandler,
-    thisIsRetry
-) {
+    errorHandler?: () => void | Promise<any>,
+    thisIsRetry?: boolean
+): Promise<T> {
     let callInfo = callsInProgress[id];
     // don't make parallel calls
     if (!thisIsRetry && callInfo) return callInfo.promise;
@@ -37,7 +49,7 @@ function retryUntilSuccess(
             maxRetries,
             errorHandler,
             fatalErrorCount: 0
-        };
+        } as CallInfo;
         callInfo.promise = new Promise((resolve, reject) => {
             callInfo.resolve = resolve;
             callInfo.reject = reject;
@@ -77,7 +89,7 @@ function retryUntilSuccess(
     return callInfo.promise;
 }
 // todo: don't retry if throttled
-function scheduleRetry(fn, id) {
+function scheduleRetry(fn: () => Promise<any>, id: number): void {
     const callInfo = callsInProgress[id];
     if (
         ++callInfo.retryCount > callInfo.maxRetries ||
@@ -112,8 +124,6 @@ function scheduleRetry(fn, id) {
     );
 }
 
-function isRunning(id) {
+export function isRunning(id: number) {
     return !!callsInProgress[id];
 }
-
-module.exports = { retryUntilSuccess, isRunning };

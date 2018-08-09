@@ -53,7 +53,9 @@ const TinyDb = require('./db/tiny-db');
 const Clock = require('./helpers/observable-clock');
 const fileHelpers = require('./helpers/file');
 const MRUList = require('./helpers/mru-list');
-const warningStates = require('./models/warnings/system-warning').STATES;
+const {
+    WarningStates: warningStates
+} = require('./models/warnings/system-warning');
 const clientApp = require('./models/client-app');
 const systemMessages = require('./helpers/system-messages');
 const serverSettings = require('./models/server-settings');

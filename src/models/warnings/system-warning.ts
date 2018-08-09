@@ -1,32 +1,47 @@
-const { observable } = require('mobx');
+import { observable } from 'mobx';
+
+export type WarningLevel = 'medium' | 'severe';
+
+/**
+ * Warning life cycle states.
+ */
+export enum WarningStates {
+    QUEUED = 0,
+    /* WILL_SHOW = 1, */ SHOWING = 2,
+    WILL_DISMISS = 3,
+    DISMISSED = 4
+}
 
 /**
  * Base/local class for warnings. Server warnings class inherits from it.
  * You don't need to instantiate it directly, Icebear warnings module has a factory for that.
- * @class
- * @param {string} content - localization string key
- * @param {string} [title] - localization string key
- * @param {Object} [data] - variables to pass to peerio-translator when resolving content
- * @param {string} [level='medium'] - severity level, options (medium, severe)
  */
-class SystemWarning {
-    /**
-     * Warning life cycle states.
-     */
-    static STATES = {
-        QUEUED: 0,
-        /* WILL_SHOW: 1, */ SHOWING: 2,
-        WILL_DISMISS: 3,
-        DISMISSED: 4
-    };
-
+export default class SystemWarning {
     /**
      * Observable current life cycle state.
-     * @type {number}
      */
-    @observable state = SystemWarning.STATES.QUEUED;
+    @observable state = WarningStates.QUEUED;
 
-    constructor(content, title, data, level = 'medium', callback) {
+    content: string;
+    level: WarningLevel;
+    title?: string;
+    data?: unknown;
+    callback?: () => void;
+    timer: number | null = null;
+
+    /**
+     * @param content - localization string key
+     * @param title - localization string key
+     * @param data - variables to pass to peerio-translator when resolving content
+     * @param level - severity level, options (medium, severe)
+     */
+    constructor(
+        content: string,
+        title?: string,
+        data?: unknown,
+        level: WarningLevel = 'medium',
+        callback?: () => void
+    ) {
         this.content = content;
         this.title = title;
         this.data = data;
@@ -38,22 +53,23 @@ class SystemWarning {
      * Advances life cycle state to SHOWING
      */
     show() {
-        if (this.state !== SystemWarning.STATES.QUEUED) return;
-        // this.state = SystemWarning.STATES.WILL_SHOW;
+        if (this.state !== WarningStates.QUEUED) return;
+        // this.state = WarningStates.WILL_SHOW;
         // setTimeout(() => {
-        this.state = SystemWarning.STATES.SHOWING;
+        this.state = WarningStates.SHOWING;
         // }, 1000);
     }
+
     /**
      * Advances life cycle state to final status.
      * Does it gradually to allow UI animations to execute.
      */
     dismiss() {
-        if (this.state > SystemWarning.STATES.SHOWING) return;
-        this.state = SystemWarning.STATES.WILL_DISMISS;
+        if (this.state > WarningStates.SHOWING) return;
+        this.state = WarningStates.WILL_DISMISS;
         setTimeout(() => {
             this.dispose();
-            this.state = SystemWarning.STATES.DISMISSED;
+            this.state = WarningStates.DISMISSED;
             if (this.callback) this.callback();
         }, 700);
     }
@@ -62,12 +78,12 @@ class SystemWarning {
      * Starts a timer that will dismiss the warning automatically.
      */
     autoDismiss() {
-        if (this.state > SystemWarning.STATES.SHOWING) return;
+        if (this.state > WarningStates.SHOWING) return;
         if (this.timer) return;
         this.timer = setTimeout(() => {
             this.dismiss();
             this.timer = null;
-        }, 7000);
+        }, 7000) as any; // TODO: remove node typings
     }
     /**
      * Removes auto-dismiss timer
@@ -82,9 +98,8 @@ class SystemWarning {
     /**
      *  Does nothing in this class, but you can override it in child class if needed.
      *  Will get called after warning dismiss.
-     *  @protected
      */
-    dispose() {}
+    protected dispose() {}
 }
 
 module.exports = SystemWarning;

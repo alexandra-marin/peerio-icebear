@@ -1,12 +1,10 @@
-// Use this with tests
-
 class MemoryCacheEngine {
     // pass an empty(or existing) object as storage - MemoryCacheEngine will read and write objects to it
-    constructor(namespace) {
-        this.namespace = namespace;
+    constructor(name) {
+        this.name = name;
         this.storage = MemoryCacheEngine.defaultStorage;
-        if (!this.storage[namespace]) {
-            this.storage[namespace] = {};
+        if (!this.storage[name]) {
+            this.storage[name] = {};
         }
     }
 
@@ -17,10 +15,11 @@ class MemoryCacheEngine {
     }
 
     get db() {
-        return this.storage[this.namespace];
+        return this.storage[this.name];
     }
 
-    openInternal() {
+    open() {
+        this.isOpen = true;
         return Promise.resolve();
     }
 
@@ -71,7 +70,7 @@ class MemoryCacheEngine {
 
     clear() {
         return new Promise(resolve => {
-            this.storage[this.namespace] = {};
+            this.storage[this.name] = {};
             setTimeout(resolve);
         });
     }

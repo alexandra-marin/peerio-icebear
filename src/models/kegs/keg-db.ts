@@ -1,10 +1,11 @@
 const BootKeg = require('./boot-keg');
 const tracker = require('../../models/update-tracker');
+
 /**
  * Keg database.
  * This class is for user's own database ('SELF')
  */
-class KegDb {
+export default class KegDb {
     /**
      * Always equals 'SELF'
      * @type {string}
@@ -81,5 +82,3 @@ class KegDb {
         };
     }
 }
-
-module.exports = KegDb;

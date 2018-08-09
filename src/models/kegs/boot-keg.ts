@@ -1,6 +1,6 @@
-const { observable, when } = require('mobx');
-
 import KegDb from './keg-db';
+
+const { observable, when } = require('mobx');
 
 const Keg = require('./keg');
 const util = require('../../crypto/util');

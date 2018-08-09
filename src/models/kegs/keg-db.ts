@@ -1,4 +1,4 @@
-const BootKeg = require('./boot-keg');
+import BootKeg from './boot-keg';
 const tracker = require('../../models/update-tracker');
 
 /**
@@ -8,42 +8,33 @@ const tracker = require('../../models/update-tracker');
 export default class KegDb {
     /**
      * Always equals 'SELF'
-     * @type {string}
      */
-    id;
+    readonly id = 'SELF';
 
     /**
      * Database key to use for keg encryption.
-     * @type {Uint8Array}
      */
-    key;
+    key: Uint8Array;
 
     /**
      * Current key id for the database
-     * @type {?string}
      */
-    get keyId() {
+    get keyId(): string | null {
         return this.boot ? this.boot.kegKeyId : null;
     }
 
-    /**
-     * @type {BootKeg}
-     */
-    boot;
-
-    constructor() {
-        this.id = 'SELF';
-    }
+    boot: BootKeg;
 
     /**
      * Creates boot keg for this database.
      * todo: when we will have key change, we'll need update operation load()->update() because of keg version
-     * @param {Uint8Array} bootKey
-     * @param {KeyPair} signKeys
-     * @param {KeyPair} encryptionKeys
-     * @param {Uint8Array} kegKey
      */
-    createBootKeg(bootKey, signKeys, encryptionKeys, kegKey) {
+    createBootKeg(
+        bootKey: Uint8Array,
+        signKeys: KeyPair,
+        encryptionKeys: KeyPair,
+        kegKey: Uint8Array
+    ) {
         console.log('Creating boot keg of "SELF".');
         const boot = new BootKeg(this, bootKey);
         Object.assign(boot, {
@@ -59,9 +50,8 @@ export default class KegDb {
 
     /**
      * Retrieves boot keg for the db and initializes this KegDb instance with required data.
-     * @param {Uint8Array} bootKey
      */
-    loadBootKeg(bootKey) {
+    loadBootKeg(bootKey: Uint8Array) {
         console.log('Loading boot keg of "SELF".');
         const boot = new BootKeg(this, bootKey);
         this.boot = boot;

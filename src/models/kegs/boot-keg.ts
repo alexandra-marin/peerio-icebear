@@ -1,18 +1,19 @@
 const { observable, when } = require('mobx');
+
+import KegDb from './keg-db';
+
 const Keg = require('./keg');
 const util = require('../../crypto/util');
 
 /**
  * Named plaintext Boot keg for 'SELF' databases.
- * @param {KegDb} db - owner instance
- * @param {Uint8Array} bootKey
  */
-class BootKeg extends Keg {
+export default class BootKeg extends Keg {
     @observable.shallow keys = {};
     kegKey;
     kegKeyId = '0';
 
-    constructor(db, bootKey) {
+    constructor(db: KegDb, bootKey: Uint8Array) {
         // named kegs are pre-created, so we know the id already and only going to update boot keg
         super('boot', 'boot', db);
         this.overrideKey = bootKey;
@@ -22,11 +23,8 @@ class BootKeg extends Keg {
     /**
      * Waits until keyId is available and resolves with it.
      * If the key will not appear in the timeout time, resolves to undefined.
-     *
-     * @param {string} keyId
-     * @param {number} timeout
      */
-    async getKey(keyId, timeout = 120000) {
+    async getKey(keyId: string, timeout = 120000) {
         if (this.keys[keyId]) {
             // quick path
             return this.keys[keyId];
@@ -80,5 +78,3 @@ class BootKeg extends Keg {
         };
     }
 }
-
-module.exports = BootKeg;

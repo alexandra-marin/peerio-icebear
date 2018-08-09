@@ -1,7 +1,9 @@
+// @ts-check
+
 const { observable, computed, when } = require('mobx');
 const contactStore = require('./../contacts/contact-store');
 const User = require('./../user/user');
-const Keg = require('./../kegs/keg');
+const Keg = require('./../kegs/keg').default;
 const moment = require('moment');
 const _ = require('lodash');
 const { retryUntilSuccess } = require('../../helpers/retry');

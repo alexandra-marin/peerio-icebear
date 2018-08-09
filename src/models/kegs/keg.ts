@@ -23,7 +23,7 @@ function getTemporaryKegId() {
 /**
  * Base class with common metadata and operations.
  */
-abstract class Keg<TProps extends {} = {}> {
+export default abstract class Keg<TProps extends {} = {}> {
     /**
      * @param id kegId, or null for new kegs
      * @param type keg type
@@ -671,5 +671,3 @@ abstract class Keg<TProps extends {} = {}> {
         when(() => this.signatureError !== null, callback);
     }
 }
-
-module.exports = Keg;

@@ -1,10 +1,11 @@
+// @ts-check
 const { observable, action, when } = require('mobx');
 const socket = require('../../network/socket');
 const warnings = require('../warnings');
 const { getChatStore } = require('../../helpers/di-chat-store');
 const { cryptoUtil, publicCrypto } = require('../../crypto');
 const User = require('../user/user');
-const Keg = require('../kegs/keg');
+const Keg = require('../kegs/keg').default;
 const { getUser } = require('../../helpers/di-current-user');
 
 // this is not... the most amazing code reuse, but it works, and it's clear

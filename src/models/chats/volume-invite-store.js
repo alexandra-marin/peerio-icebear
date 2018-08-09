@@ -1,10 +1,12 @@
+// @ts-check
+
 const { observable, action, when } = require('mobx');
 const socket = require('../../network/socket');
 const warnings = require('../warnings');
 const { getVolumeStore } = require('../../helpers/di-volume-store');
 const { cryptoUtil, publicCrypto } = require('../../crypto');
 const User = require('../user/user');
-const Keg = require('../kegs/keg');
+const Keg = require('../kegs/keg').default;
 
 // this is not... the most amazing code reuse, but it works, and it's clear
 class ChatHead extends Keg {

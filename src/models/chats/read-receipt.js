@@ -1,5 +1,7 @@
+// @ts-check
+
 const { observable } = require('mobx');
-const Keg = require('../kegs/keg');
+const Keg = require('../kegs/keg').default;
 
 /**
  * Holds read position (kegId) for a user in a chat. Named keg, names contain usernames.

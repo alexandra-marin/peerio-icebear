@@ -1,6 +1,8 @@
+// @ts-check
+
 const { observable, computed, action } = require('mobx');
 const moment = require('moment');
-const Keg = require('../kegs/keg');
+const Keg = require('../kegs/keg').default;
 const { cryptoUtil } = require('../../crypto/index');
 const User = require('../user/user');
 const PhraseDictionary = require('../phrase-dictionary');

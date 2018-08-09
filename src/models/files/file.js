@@ -1,4 +1,6 @@
-const Keg = require('./../kegs/keg');
+// @ts-check
+
+const Keg = require('./../kegs/keg').default;
 const { observable, computed, action } = require('mobx');
 const {
     cryptoUtil,

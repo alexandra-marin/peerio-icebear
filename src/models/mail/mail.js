@@ -1,5 +1,7 @@
+// @ts-check
+
 const moment = require('moment');
-const Keg = require('./../kegs/keg');
+const Keg = require('./../kegs/keg').default;
 const { observable, computed, action } = require('mobx');
 const { cryptoUtil, secret } = require('../../crypto');
 const socket = require('../../network/socket');

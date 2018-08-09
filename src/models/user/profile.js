@@ -1,4 +1,6 @@
-const Keg = require('../kegs/keg');
+// @ts-check
+
+const Keg = require('../kegs/keg').default;
 
 /**
  * Plaintext system named keg. Server verifies contract on update.

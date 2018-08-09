@@ -1,7 +1,9 @@
+// @ts-check
+
 const tracker = require('../update-tracker');
 const { retryUntilSuccess } = require('../../helpers/retry');
 const TaskQueue = require('../../helpers/task-queue');
-const Keg = require('./keg');
+const Keg = require('./keg').default;
 const warnings = require('../warnings');
 const { ServerError } = require('../../errors');
 

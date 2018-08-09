@@ -20,10 +20,39 @@ function getTemporaryKegId() {
     return `tempKegId_${temporaryKegId++}`;
 }
 
+export interface BaseProps {
+    encryptedPayloadKey?: string;
+    sharedBy?: string;
+    sharedKegSenderPK?: string;
+    signedBy?: string;
+    signature?: string;
+    descriptor?: unknown;
+}
+
+export interface RawKegData<TProps> {
+    kegId: string;
+    owner: string;
+    /** The ciphertext of the payload. */
+    payload: string;
+    type?: string;
+    keyId?: string;
+    /** this is a new field so older kegs might not have it */
+    format?: number;
+    version: number;
+    /** guard against potential server bugs sending null */
+    collectionVersion: string | null;
+    deleted: boolean;
+    // hidden?: boolean
+    createdAt: number;
+    updatedAt: number;
+    props: BaseProps & TProps;
+    // permissions: { users: { [username: string]: '' | 'r' | 'rw' }, groups: { [username: string]: '' | 'r' | 'rw' } }
+}
+
 /**
  * Base class with common metadata and operations.
  */
-export default abstract class Keg<TProps extends {} = {}> {
+export default abstract class Keg<TPayload, TProps extends {} = {}> {
     /**
      * @param id kegId, or null for new kegs
      * @param type keg type
@@ -72,18 +101,18 @@ export default abstract class Keg<TProps extends {} = {}> {
     /**
      * Sometimes this specific key has to be en/decrypted with other then default for this KegDb key.
      */
-    protected readonly overrideKey: Uint8Array | null = null;
+    protected overrideKey: Uint8Array | null = null;
 
     /**
      * Keg collection (all kegs with this.type) version, snowflake string id.
      * null means we don't know the version yet, need to fetch keg at least once.
      */
-    protected collectionVersion: string | null = null;
+    collectionVersion: string | null = null;
 
     /**
      * Default props object for default props serializers. More advanced logic usually ignores this property.
      */
-    protected props: TProps;
+    protected props?: BaseProps & TProps;
 
     protected readonly forceSign: boolean;
 
@@ -96,9 +125,9 @@ export default abstract class Keg<TProps extends {} = {}> {
 
     protected decryptionError?: unknown;
 
-    owner?: unknown;
-    kegCreatedAt?: unknown;
-    kegUpdatedAt?: unknown;
+    owner?: string;
+    kegCreatedAt?: number;
+    kegUpdatedAt?: number;
     deserializeDescriptor?: (descriptor: unknown) => void;
     afterLoad?: () => void;
     onLoadedFromKeg?: (keg: unknown) => void;
@@ -179,7 +208,7 @@ export default abstract class Keg<TProps extends {} = {}> {
     /**
      * Saves keg to server, creates keg (reserves id) first if needed
      */
-    protected saveToServer(): Promise<unknown> {
+    saveToServer(): Promise<unknown> {
         if (this.loading) {
             console.warn(
                 `Keg ${this.id} ${
@@ -240,7 +269,7 @@ export default abstract class Keg<TProps extends {} = {}> {
                 if (this.sharedKegError || this.signatureError) {
                     throw new Error(
                         `Not allowed to save a keg with sharedKegError or signatureError. Keg ID: [${
-                        this.id
+                            this.id
                         }]`
                     );
                 }
@@ -329,7 +358,7 @@ export default abstract class Keg<TProps extends {} = {}> {
     /**
      * (Re)populates this keg instance with data from server
      */
-    protected load(): Promise<Keg> {
+    load(): Promise<this> {
         if (this.saving) {
             return asPromise(this, 'saving', false).then(() => this.load());
         }
@@ -407,10 +436,10 @@ export default abstract class Keg<TProps extends {} = {}> {
      *                  flags if you received false return value.
      */
     @action
-    protected async loadFromKeg(
-        keg: any, // TODO: audit
+    async loadFromKeg(
+        keg: RawKegData<TProps>,
         noVerify = false
-    ): Promise<Keg | boolean> {
+    ): Promise<this | false> {
         try {
             this.lastLoadHadError = false;
             if (this.id && this.id !== keg.kegId) {
@@ -442,6 +471,11 @@ export default abstract class Keg<TProps extends {} = {}> {
                 this.lastLoadHadError = true;
                 return false;
             }
+
+            // TODO: refactor this! needs simpler code paths for plainText kegs
+            // vs. encrypted kegs, as a first step to simplifying the tangled
+            // nest of conditionals below.
+
             let { payload } = keg;
             let payloadKey = null;
 
@@ -507,6 +541,7 @@ export default abstract class Keg<TProps extends {} = {}> {
                 payload = secret.decryptString(payload, decryptionKey);
             }
             payload = JSON.parse(payload);
+
             if (
                 !this.ignoreAntiTamperProtection &&
                 (this.forceSign ||
@@ -539,8 +574,8 @@ export default abstract class Keg<TProps extends {} = {}> {
      */
     @action
     protected validateAndReEncryptSharedKeg(kegProps: {
-        sharedBy: unknown;
-        sharedKegSenderPK: unknown;
+        sharedBy: string;
+        sharedKegSenderPK: string;
     }): void {
         this.sharedKegError = null;
         this.signatureError = null;
@@ -571,7 +606,7 @@ export default abstract class Keg<TProps extends {} = {}> {
      */
     verifyKegSignature(
         payload: Uint8Array | string,
-        props: { signedBy: unknown; signature: string }
+        props: { signedBy: string; signature: string }
     ): void {
         if (!payload || this.lastLoadHadError) return;
         try {
@@ -616,13 +651,15 @@ export default abstract class Keg<TProps extends {} = {}> {
      * Generic version that provides empty keg payload.
      * Override in child classes to.
      */
-    protected abstract serializeKegPayload(): unknown;
+    protected serializeKegPayload(): TPayload {
+        return {} as TPayload;
+    }
 
     /**
      * Generic version that does nothing.
      * Override in child classes to convert raw keg data into object properties.
      */
-    protected abstract deserializeKegPayload(payload: unknown): void;
+    protected deserializeKegPayload(_payload: TPayload): void {}
 
     /**
      * Generic version that uses this.props object as-is

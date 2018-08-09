@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.15.0"></a>
+# [5.15.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.14.0...v5.15.0) (2018-08-09)
+
+
+### Bug Fixes
+
+* prettier ([7a69c33](https://github.com/PeerioTechnologies/peerio-icebear/commit/7a69c33))
+* tests ([19531f8](https://github.com/PeerioTechnologies/peerio-icebear/commit/19531f8))
+
+
+### Features
+
+* reset legacy cache [ch12236] ([cd69c16](https://github.com/PeerioTechnologies/peerio-icebear/commit/cd69c16))
+
+
+
 <a name="5.14.0"></a>
 # [5.14.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.13.0...v5.14.0) (2018-08-07)
 

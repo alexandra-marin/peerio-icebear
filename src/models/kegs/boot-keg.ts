@@ -5,13 +5,28 @@ const { observable, when } = require('mobx');
 
 const util = require('../../crypto/util');
 
+interface BootKegPayload {
+    kegKey: string;
+    signKeys: {
+        publicKey: string;
+        secretKey: string;
+    };
+    encryptionKeys: {
+        publicKey: string;
+        secretKey: string;
+    };
+}
+
 /**
  * Named plaintext Boot keg for 'SELF' databases.
  */
-export default class BootKeg extends Keg {
+export default class BootKeg extends Keg<BootKegPayload> {
     @observable.shallow keys = {};
-    kegKey;
+    kegKey: Uint8Array | null = null;
     kegKeyId = '0';
+
+    signKeys: KeyPair | null = null;
+    encryptionKeys: KeyPair | null = null;
 
     constructor(db: KegDb, bootKey: Uint8Array) {
         // named kegs are pre-created, so we know the id already and only going to update boot keg
@@ -40,31 +55,24 @@ export default class BootKeg extends Keg {
         return this.keys[keyId];
     }
 
-    deserializeKegPayload(data) {
-        /**
-         * @type {KeyPair}
-         */
-        this.signKeys = {};
+    deserializeKegPayload(data: BootKegPayload) {
+        this.signKeys = {} as KeyPair;
         this.signKeys.publicKey = util.b64ToBytes(data.signKeys.publicKey);
         this.signKeys.secretKey = util.b64ToBytes(data.signKeys.secretKey);
-        /**
-         * @type {KeyPair}
-         */
-        this.encryptionKeys = {};
+
+        this.encryptionKeys = {} as KeyPair;
         this.encryptionKeys.publicKey = util.b64ToBytes(
             data.encryptionKeys.publicKey
         );
         this.encryptionKeys.secretKey = util.b64ToBytes(
             data.encryptionKeys.secretKey
         );
-        /**
-         * @type {Uint8Array}
-         */
+
         this.kegKey = util.b64ToBytes(data.kegKey);
         this.keys[this.kegKeyId] = { key: this.kegKey, createdAt: Date.now() };
     }
 
-    serializeKegPayload() {
+    serializeKegPayload(): BootKegPayload {
         return {
             signKeys: {
                 publicKey: util.bytesToB64(this.signKeys.publicKey),

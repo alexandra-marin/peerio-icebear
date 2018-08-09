@@ -14,11 +14,10 @@ const TinyDb = require('../db/tiny-db');
 
 const META_DB_NAME = 'peerio_cache_meta';
 
-const CURRENT_CACHE_VERSION = 2;
+// Increment this to reset cache in the next release
+const CACHE_RESET_COUNTER = 3;
 
-const cacheStatus = observable({
-    upgrading: false
-});
+const CACHE_RESET_KEY = 'cacheResetCounter';
 
 /**
  * CacheEngineBase
@@ -40,41 +39,43 @@ class CacheEngineBase {
     }
 
     static metaDb;
-    static version;
+    // exists and resolved if we already checked if cache needs resetting and did the reset (if needed)
+    static cacheResetPromise;
 
     /**
-     * Resets or upgrades cache between releases if cache-breaking changes are introduced
-     * Se
+     * Resets cache between releases if cache-breaking changes have been introduced or bugs found
      */
-    static async upgradeIfNeeded() {
-        // to prevent race condition with multiple databases being open
-        await asPromise(cacheStatus, 'upgrading', false);
+    static async resetCacheIfNeeded() {
         // no action taken if we already ensured the correct version
-        if (CacheEngineBase.version) return;
-        // set mutex
-        cacheStatus.upgrading = true;
-        const version = await TinyDb.system.getValue(`cacheEngineVersion`);
+        // otherwise returning same promise to prevent race condition with multiple databases being open
+        if (CacheEngineBase.cacheResetPromise) {
+            return CacheEngineBase.cacheResetPromise;
+        }
+        let resolve;
+        CacheEngineBase.cacheResetPromise = new Promise(r => {
+            resolve = r;
+        });
+        const version = await TinyDb.system.getValue(CACHE_RESET_KEY);
         try {
-            if (version === CURRENT_CACHE_VERSION) {
-                console.log(
-                    `Cache db exists and version is up to date (${version})`
-                );
+            if (version === CACHE_RESET_COUNTER) {
+                console.log('Cache reset not needed.');
             } else {
-                console.log(`Cache version ${version} is outdated. Clearing`);
+                console.log(`Cache reset is required. Resetting...`);
                 await CacheEngineBase.clearAllCache();
-                CacheEngineBase.version = CURRENT_CACHE_VERSION;
                 await TinyDb.system.setValue(
-                    `cacheEngineVersion`,
-                    CacheEngineBase.version
+                    CACHE_RESET_KEY,
+                    CACHE_RESET_COUNTER
                 );
-                console.log(
-                    `Current cache version is ${CacheEngineBase.version}`
-                );
+                console.log('Finished cache reset.');
             }
         } catch (e) {
             console.error(e);
+            console.error('Failed to process cache reset.');
         }
-        cacheStatus.upgrading = false;
+        // resolving even in case of error hoping that app can continue,
+        // otherwise everything relying on cache will just wait forever
+        resolve();
+        return null;
     }
 
     static async clearAllCache() {
@@ -125,20 +126,21 @@ class CacheEngineBase {
      */
     @observable isOpen;
 
-    /**
-     * Ensures cache engine is upgraded and opens the database
-     */
-    async upgradeAndOpen() {
-        await CacheEngineBase.upgradeIfNeeded();
-        return this.open();
+    async open() {
+        // not the best design, if we invoke reset for meta db it's gonna lock,
+        // but meta db is meta db, it's not a regular db, so it can have exceptions
+        if (this.name !== META_DB_NAME) {
+            await CacheEngineBase.resetCacheIfNeeded();
+        }
+        await this.openInternal();
+        this.isOpen = true;
     }
 
     /**
      * Ensures database is open and ready (in case of async).
-     * (!) In your implementation, please set this.isOpen = true on success.
      * @returns {Promise}
      */
-    open() {
+    openInternal() {
         throw new Error('Method not implemented');
     }
 

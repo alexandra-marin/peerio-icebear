@@ -15,9 +15,9 @@ class TofuStore {
         if (this.loading || this.loaded) return;
         this.loading = true;
         this.cache = new config.CacheEngine('tofu', 'username');
-        await this.cache.upgradeAndOpen();
+        await this.cache.open();
         this.cacheMeta = new config.CacheEngine('tofu_meta', 'key');
-        await this.cacheMeta.upgradeAndOpen();
+        await this.cacheMeta.open();
         while (await this.loadTofuKegs()) {
             console.log('Loaded a page of tofu kegs from server.');
         }

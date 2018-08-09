@@ -20,7 +20,7 @@ class MemoryCacheEngine {
         return this.storage[this.namespace];
     }
 
-    open() {
+    openInternal() {
         return Promise.resolve();
     }
 

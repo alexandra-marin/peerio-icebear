@@ -310,7 +310,7 @@ class FileStoreBase {
                 `file_store_${this.id}`,
                 'kegId'
             );
-            await this.cache.upgradeAndOpen();
+            await this.cache.open();
         }
 
         let fromCache = false; // current cycle is from cache

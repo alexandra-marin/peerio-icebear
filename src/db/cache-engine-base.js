@@ -3,6 +3,7 @@ const { asPromise } = require('../helpers/prombservable');
 const { simpleHash } = require('../util');
 const config = require('../config');
 const { getUser } = require('../helpers/di-current-user');
+const TinyDb = require('../db/tiny-db');
 
 /**
  * @callback CacheEngineBase~cacheUpdateCallback
@@ -12,6 +13,13 @@ const { getUser } = require('../helpers/di-current-user');
  */
 
 const META_DB_NAME = 'peerio_cache_meta';
+
+const CURRENT_CACHE_VERSION = 2;
+
+const cacheStatus = observable({
+    upgrading: false
+});
+
 /**
  * CacheEngineBase
  */
@@ -32,6 +40,42 @@ class CacheEngineBase {
     }
 
     static metaDb;
+    static version;
+
+    /**
+     * Resets or upgrades cache between releases if cache-breaking changes are introduced
+     * Se
+     */
+    static async upgradeIfNeeded() {
+        // to prevent race condition with multiple databases being open
+        await asPromise(cacheStatus, 'upgrading', false);
+        // no action taken if we already ensured the correct version
+        if (CacheEngineBase.version) return;
+        // set mutex
+        cacheStatus.upgrading = true;
+        const version = await TinyDb.system.getValue(`cacheEngineVersion`);
+        try {
+            if (version === CURRENT_CACHE_VERSION) {
+                console.log(
+                    `Cache db exists and version is up to date (${version})`
+                );
+            } else {
+                console.log(`Cache version ${version} is outdated. Clearing`);
+                await CacheEngineBase.clearAllCache();
+                CacheEngineBase.version = CURRENT_CACHE_VERSION;
+                await TinyDb.system.setValue(
+                    `cacheEngineVersion`,
+                    CacheEngineBase.version
+                );
+                console.log(
+                    `Current cache version is ${CacheEngineBase.version}`
+                );
+            }
+        } catch (e) {
+            console.error(e);
+        }
+        cacheStatus.upgrading = false;
+    }
 
     static async clearAllCache() {
         await CacheEngineBase.openMetaDatabase();
@@ -80,6 +124,14 @@ class CacheEngineBase {
      * {boolean}
      */
     @observable isOpen;
+
+    /**
+     * Ensures cache engine is upgraded and opens the database
+     */
+    async upgradeAndOpen() {
+        await CacheEngineBase.upgradeIfNeeded();
+        return this.open();
+    }
 
     /**
      * Ensures database is open and ready (in case of async).

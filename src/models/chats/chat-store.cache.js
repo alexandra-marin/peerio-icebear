@@ -9,7 +9,7 @@ class ChatStoreCache {
     async open() {
         if (!this.cache) {
             this.cache = new config.CacheEngine('chat_store', 'kegDbId');
-            await this.cache.open();
+            await this.cache.upgradeAndOpen();
         }
     }
 

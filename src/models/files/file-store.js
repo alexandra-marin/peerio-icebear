@@ -226,7 +226,7 @@ class FileStore extends FileStoreBase {
             'file_store_meta',
             'key'
         );
-        await this.descriptorsCache.open();
+        await this.descriptorsCache.upgradeAndOpen();
         const known = await this.descriptorsCache.getValue(
             'knownDescriptorVersion'
         );

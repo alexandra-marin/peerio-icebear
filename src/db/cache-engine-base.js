@@ -3,6 +3,7 @@ const { asPromise } = require('../helpers/prombservable');
 const { simpleHash } = require('../util');
 const config = require('../config');
 const { getUser } = require('../helpers/di-current-user');
+const TinyDb = require('../db/tiny-db');
 
 /**
  * @callback CacheEngineBase~cacheUpdateCallback
@@ -12,6 +13,12 @@ const { getUser } = require('../helpers/di-current-user');
  */
 
 const META_DB_NAME = 'peerio_cache_meta';
+
+// Increment this to reset cache in the next release
+const CACHE_RESET_COUNTER = 3;
+
+const CACHE_RESET_KEY = 'cacheResetCounter';
+
 /**
  * CacheEngineBase
  */
@@ -32,6 +39,44 @@ class CacheEngineBase {
     }
 
     static metaDb;
+    // exists and resolved if we already checked if cache needs resetting and did the reset (if needed)
+    static cacheResetPromise;
+
+    /**
+     * Resets cache between releases if cache-breaking changes have been introduced or bugs found
+     */
+    static async resetCacheIfNeeded() {
+        // no action taken if we already ensured the correct version
+        // otherwise returning same promise to prevent race condition with multiple databases being open
+        if (CacheEngineBase.cacheResetPromise) {
+            return CacheEngineBase.cacheResetPromise;
+        }
+        let resolve;
+        CacheEngineBase.cacheResetPromise = new Promise(r => {
+            resolve = r;
+        });
+        const version = await TinyDb.system.getValue(CACHE_RESET_KEY);
+        try {
+            if (version === CACHE_RESET_COUNTER) {
+                console.log('Cache reset not needed.');
+            } else {
+                console.log(`Cache reset is required. Resetting...`);
+                await CacheEngineBase.clearAllCache();
+                await TinyDb.system.setValue(
+                    CACHE_RESET_KEY,
+                    CACHE_RESET_COUNTER
+                );
+                console.log('Finished cache reset.');
+            }
+        } catch (e) {
+            console.error(e);
+            console.error('Failed to process cache reset.');
+        }
+        // resolving even in case of error hoping that app can continue,
+        // otherwise everything relying on cache will just wait forever
+        resolve();
+        return null;
+    }
 
     static async clearAllCache() {
         await CacheEngineBase.openMetaDatabase();
@@ -81,12 +126,21 @@ class CacheEngineBase {
      */
     @observable isOpen;
 
+    async open() {
+        // not the best design, if we invoke reset for meta db it's gonna lock,
+        // but meta db is meta db, it's not a regular db, so it can have exceptions
+        if (this.name !== META_DB_NAME) {
+            await CacheEngineBase.resetCacheIfNeeded();
+        }
+        await this.openInternal();
+        this.isOpen = true;
+    }
+
     /**
      * Ensures database is open and ready (in case of async).
-     * (!) In your implementation, please set this.isOpen = true on success.
      * @returns {Promise}
      */
-    open() {
+    openInternal() {
         throw new Error('Method not implemented');
     }
 

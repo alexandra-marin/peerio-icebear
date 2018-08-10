@@ -511,7 +511,7 @@ class Chat {
         if (this.isChannel) {
             this.chatHead = new ChatHead(this.db);
             if (cachedData.chatHead) {
-                this.chatHead.loadFromKeg(cachedData.chatHead);
+                await this.chatHead.loadFromKeg(cachedData.chatHead);
             }
             this.chatHead.onLoadedFromKeg = chatHeadKeg => {
                 this.store.cache.saveChatHead(this.id, chatHeadKeg);
@@ -645,9 +645,9 @@ class Chat {
             // this was en entire page of empty/deleted messages
             this._reTriggerPaging(prepend, kegs);
         }
-        this.onNewMessageLoad(newMentionCount, newMessageCount, lastMentionId);
         // sort
         this.sortMessages();
+        this.onNewMessageLoad(newMentionCount, newMessageCount, lastMentionId);
         if (!prepend) {
             // updating most recent message
             for (let i = this.messages.length - 1; i >= 0; i--) {
@@ -1293,10 +1293,12 @@ class Chat {
                     () => {
                         if (wasAdmin) boot.unassignRole(contact, 'admin');
                         boot.removeParticipant(contact);
+                        boot.addKey();
                         return true;
                     },
                     () => {
                         boot.addParticipant(contact);
+                        boot.removeUnsavedKey();
                         if (wasAdmin) boot.assignRole(contact, 'admin');
                     },
                     'error_removeParticipant'

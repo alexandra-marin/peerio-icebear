@@ -18,7 +18,7 @@ const { ServerError } = require('../../errors');
 const clientApp = require('../client-app');
 const { asPromise } = require('../../helpers/prombservable');
 const TaskQueue = require('../../helpers/task-queue');
-const { timestamp } = require('../../helpers/time-formatting');
+const { relativeTimestamp } = require('../../helpers/time-formatting');
 
 // every unique file (fileId) has a set of properties we want to be shared between all the file kegs
 // representing this file
@@ -191,7 +191,7 @@ class File extends Keg {
     }
     @computed
     get uploadTimeFormatted() {
-        return timestamp(this.uploadedAt);
+        return relativeTimestamp(this.uploadedAt);
     }
 
     /**

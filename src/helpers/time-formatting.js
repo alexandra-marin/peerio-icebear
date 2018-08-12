@@ -12,11 +12,10 @@ const day = 24 * 60 * 60 * 1000;
  * < 7 days passed  => day of week
  * > 7 days passed  => full date
  */
-function timestamp(time) {
+function relativeTimestamp(time) {
     const timeFromNow = Date.now() - time;
-    console.log(timeFromNow);
     if (timeFromNow > 7 * day) {
-        return moment(time).format('l');
+        return moment(time).format('LL');
     } else if (timeFromNow > 2 * day) {
         return moment(time).format('dddd');
     } else if (timeFromNow > relativeTimeDisplayLimit) {
@@ -27,5 +26,5 @@ function timestamp(time) {
 
 module.exports = {
     relativeTimeDisplayLimit,
-    timestamp
+    relativeTimestamp
 };

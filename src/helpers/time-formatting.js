@@ -1,4 +1,5 @@
 const moment = require('moment');
+const defaultClock = require('./observable-clock').default;
 const { t } = require('peerio-translator');
 
 // 21 hour limit for displaying relative timestamp (because moment.js says '1 day' starting from 21h)
@@ -15,7 +16,7 @@ const day = 24 * 60 * 60 * 1000;
  * @returns {string}
  */
 function relativeTimestamp(time) {
-    const timeFromNow = Date.now() - time;
+    const timeFromNow = defaultClock.now - time;
     if (timeFromNow > 7 * day) {
         return moment(time).format('LL');
     } else if (timeFromNow > 2 * day) {

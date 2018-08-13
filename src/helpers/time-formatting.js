@@ -11,6 +11,8 @@ const day = 24 * 60 * 60 * 1000;
  * < 48hr passed    => "Yesterday"
  * < 7 days passed  => day of week
  * > 7 days passed  => full date
+ * @param {number} time
+ * @returns {string}
  */
 function relativeTimestamp(time) {
     const timeFromNow = Date.now() - time;

@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.15.1"></a>
+## [5.15.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.15.0...v5.15.1) (2018-08-14)
+
+
+### Bug Fixes
+
+* don't omit the slash ([fc2de80](https://github.com/PeerioTechnologies/peerio-icebear/commit/fc2de80))
+* don't precompile before unit tests, make root import point to src/ ([3f938f1](https://github.com/PeerioTechnologies/peerio-icebear/commit/3f938f1))
+* ensure unit tests can require ts files ([5a4660c](https://github.com/PeerioTechnologies/peerio-icebear/commit/5a4660c))
+* eslint errors ([4ed5ba1](https://github.com/PeerioTechnologies/peerio-icebear/commit/4ed5ba1))
+* make e2e tests work too ([b8ca837](https://github.com/PeerioTechnologies/peerio-icebear/commit/b8ca837))
+* use requires for dynamically-generated exports for now; fix exports ([c4b5720](https://github.com/PeerioTechnologies/peerio-icebear/commit/c4b5720))
+
+
+
 <a name="5.15.0"></a>
 # [5.15.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.14.0...v5.15.0) (2018-08-09)
 

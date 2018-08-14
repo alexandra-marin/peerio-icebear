@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.15.2"></a>
+## [5.15.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.15.1...v5.15.2) (2018-08-14)
+
+
+### Bug Fixes
+
+* chat unloading was reactivating same chat if there was just one chat ([5f3f834](https://github.com/PeerioTechnologies/peerio-icebear/commit/5f3f834))
+* sane limits on some retries ([cf92665](https://github.com/PeerioTechnologies/peerio-icebear/commit/cf92665))
+
+
+
 <a name="5.15.1"></a>
 ## [5.15.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.15.0...v5.15.1) (2018-08-14)
 

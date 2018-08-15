@@ -29,11 +29,9 @@ export interface BaseProps {
     descriptor?: unknown;
 }
 
-export interface RawKegData<TProps> {
+interface RawKegData<TProps> {
     kegId: string;
     owner: string;
-    /** The ciphertext of the payload. */
-    payload: string;
     type?: string;
     keyId?: string;
     /** this is a new field so older kegs might not have it */
@@ -47,6 +45,24 @@ export interface RawKegData<TProps> {
     updatedAt: number;
     props: BaseProps & TProps;
     // permissions: { users: { [username: string]: '' | 'r' | 'rw' }, groups: { [username: string]: '' | 'r' | 'rw' } }
+}
+
+// TODO: subclasses get to decide whether they're plaintext -- afaik it's not
+// self-described in keg payloads or anything -- so we should maybe be exposing
+// these as eg. IPlaintextKeg class-level interfaces and let
+// subclasses/consumers implement those instead of having all this logic in the
+// base class.
+
+// TODO: verify the interface definitions below -- are there more fields that
+// vary depending on whether the keg is plaintext or not?
+export interface RawKegDataPlaintext<TProps> extends RawKegData<TProps> {
+    /** The plaintext of the payload. */
+    payload: string;
+}
+
+export interface RawKegDataEncrypted<TProps> extends RawKegData<TProps> {
+    /** The ciphertext of the payload. */
+    payload: ArrayBuffer;
 }
 
 /**
@@ -437,7 +453,7 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
      */
     @action
     async loadFromKeg(
-        keg: RawKegData<TProps>,
+        keg: RawKegDataPlaintext<TProps> | RawKegDataEncrypted<TProps>,
         noVerify = false
     ): Promise<this | false> {
         try {
@@ -480,7 +496,8 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
             let payloadKey = null;
 
             if (!this.plaintext) {
-                payload = new Uint8Array(keg.payload);
+                // if the keg is not plaintext, payload is an arraybuffer
+                payload = new Uint8Array(keg.payload as ArrayBuffer); // FIXME: can't reassign as U8Arr here, just introduce new field please
             }
             // SELF kegs do not require signing
             if (
@@ -489,7 +506,7 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
             ) {
                 const payloadToVerify = payload;
                 setTimeout(
-                    () => this.verifyKegSignature(payloadToVerify, keg.props),
+                    () => this.verifyKegSignature(payloadToVerify, keg.props), //FIXME: use new Uint8Array field introduced above to fix this assignment
                     3000
                 );
             } else {
@@ -540,7 +557,7 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
                 }
                 payload = secret.decryptString(payload, decryptionKey);
             }
-            payload = JSON.parse(payload);
+            payload = JSON.parse(payload); // FIXME: introduce new field to fix this
 
             if (
                 !this.ignoreAntiTamperProtection &&

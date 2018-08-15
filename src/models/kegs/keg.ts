@@ -20,6 +20,11 @@ function getTemporaryKegId() {
     return `tempKegId_${temporaryKegId++}`;
 }
 
+// FIXME: from looking at various keg types in the in-app devtools, these are
+// not present on all kegs! (so on further consideration, probably no such thing
+// as "base props", just props that may be present in subclasses.) nevertheless,
+// these props are assumed to be present at various points in this base class, so
+// this identity needs to be untangled somewhat.
 export interface BaseProps {
     encryptedPayloadKey?: string;
     sharedBy?: string;
@@ -663,6 +668,19 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
             this.signatureError = true;
         }
     }
+
+    // //////////////////////
+    // //////////////////////
+    // TODO: the below are "abstract-ish" methods -- having a base
+    // implementation might not actually be desirable vs just declaring the
+    // default behaviour in subclasses where it's really necessary and wanted.
+    //
+    // more generally, abstract methods don't... super make sense in the context
+    // of a duck-typed language -- doubly when interfaces are available as a
+    // language feature. these should maybe be deprecated in favour of a more
+    // composable abstraction.
+    // //////////////////////
+    // //////////////////////
 
     /**
      * Generic version that provides empty keg payload.

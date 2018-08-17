@@ -15,3 +15,6 @@ if (!console.debug) {
 
 global.expect = chai.expect;
 global.Promise = Promise;
+
+const cfg = require('../../src/config');
+cfg.FileStream = require('../../src/models/files/node-file-stream');

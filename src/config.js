@@ -330,6 +330,12 @@ const config = new class {
      * Maximum total size of cached images which we store before we start deleting the least recent ones
      */
     temporaryCacheLimit = 1000 * 1024 * 1024;
+    /**
+     * Given a file name returns correct path to any asset file in sdk 'src/assets/' folder
+     */
+    assetPathResolver = fileName => {
+        return `./src/assets/${fileName}`;
+    };
 }();
 
 module.exports = config;

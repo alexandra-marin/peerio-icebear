@@ -125,7 +125,11 @@ class Message extends Keg {
             (this.files && this.files.length) ||
             (this.folders && this.folders.length)
         ) {
-            promise = retryUntilSuccess(() => this.saveToServer());
+            promise = retryUntilSuccess(
+                () => this.saveToServer(),
+                undefined,
+                5
+            );
         } else {
             promise = this.saveToServer();
         }

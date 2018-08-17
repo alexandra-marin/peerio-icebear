@@ -55,6 +55,7 @@ Feature: Room management
         And   Cucumbot leaves the room
         Then  Cucumbot is not in the room anymore
         And   The Cucumbot is not a member of the room
+        And   The room is rekeyed
 
     # online: invite -> accept -> kick
     @BOT_room_invite_accept_kick
@@ -64,6 +65,7 @@ Feature: Room management
         And   I kick Cucumbot from the room
         Then  Cucumbot is not in the room anymore
         And   The Cucumbot is not a member of the room
+        And   The room is rekeyed
 
     # online: invite -> reject -> invite -> accept
     @BOT_room_invite_reject_invite_accept

@@ -273,7 +273,7 @@ class SharedKegDb {
     async loadBootKeg(cachedBootKeg) {
         // console.log(`Loading chat boot keg for ${this.id}`);
         const boot = new SharedDbBootKeg(this, User.current);
-        if (cachedBootKeg && boot.loadFromKeg(cachedBootKeg)) {
+        if (cachedBootKeg && (await boot.loadFromKeg(cachedBootKeg))) {
             // important to not set before .loadFromKeg call, but to set before return
             boot.onLoadedFromKeg = this.onBootKegLoadedFromKeg;
             return boot;

@@ -36,6 +36,9 @@ async function createRoom() {
 When('I create a room', createRoom);
 
 function inviteCucumbot() {
+    this.chatKeyCountWhenInviting = Object.keys(
+        ice.chatStore.activeChat.db.boot.keys
+    ).length;
     return ice.chatStore.activeChat.addParticipants([
         this.cucumbotClient.username
     ]);
@@ -73,6 +76,13 @@ When('I recall the invite', function() {
 When('I kick Cucumbot from the room', function() {
     return ice.chatStore.activeChat.removeParticipant(
         this.cucumbotClient.username
+    );
+});
+
+Then('The room is rekeyed', function() {
+    return (
+        Object.keys(ice.chatStore.activeChat.db.boot.keys).length >
+        this.chatKeyCountWhenInviting
     );
 });
 

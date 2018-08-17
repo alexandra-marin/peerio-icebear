@@ -267,20 +267,23 @@ class ChatMessageHandler {
         }
         this.chat.loadingInitialPage = true;
         console.log('loading initial page for this.chat', this.chat.id);
-        return retryUntilSuccess(() =>
-            socket.send(
-                '/auth/kegs/db/list-ext',
-                {
-                    kegDbId: this.chat.id,
-                    options: {
-                        type: 'message',
-                        reverse: true,
-                        offset: 0,
-                        count: config.chat.initialPageSize
-                    }
-                },
-                false
-            )
+        return retryUntilSuccess(
+            () =>
+                socket.send(
+                    '/auth/kegs/db/list-ext',
+                    {
+                        kegDbId: this.chat.id,
+                        options: {
+                            type: 'message',
+                            reverse: true,
+                            offset: 0,
+                            count: config.chat.initialPageSize
+                        }
+                    },
+                    false
+                ),
+            undefined,
+            5
         )
             .then(
                 action(resp => {
@@ -331,24 +334,27 @@ class ChatMessageHandler {
             }
         }
         // todo: cancel retries if navigated away from chat?
-        retryUntilSuccess(() =>
-            socket.send(
-                '/auth/kegs/db/list-ext',
-                {
-                    kegDbId: this.chat.id,
-                    options: {
-                        type: 'message',
-                        reverse: pagingUp,
-                        fromKegId:
-                            startingKegId ||
-                            this.chat.messages[
-                                pagingUp ? 0 : this.chat.messages.length - 1
-                            ].id,
-                        count: config.chat.pageSize
-                    }
-                },
-                false
-            )
+        retryUntilSuccess(
+            () =>
+                socket.send(
+                    '/auth/kegs/db/list-ext',
+                    {
+                        kegDbId: this.chat.id,
+                        options: {
+                            type: 'message',
+                            reverse: pagingUp,
+                            fromKegId:
+                                startingKegId ||
+                                this.chat.messages[
+                                    pagingUp ? 0 : this.chat.messages.length - 1
+                                ].id,
+                            count: config.chat.pageSize
+                        }
+                    },
+                    false
+                ),
+            undefined,
+            5
         )
             .catch(err => {
                 if (err && err.code === errorCodes.accessForbidden) {

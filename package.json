@@ -1,6 +1,6 @@
 {
   "name": "peerio-icebear",
-  "version": "5.15.0",
+  "version": "5.15.2",
   "description": "Peerio Icebear client library",
   "main": "dist/index.js",
   "scripts": {
@@ -15,7 +15,7 @@
     "mocha": "mocha \"test/**/*.test.js\" --require test/unit/unit-global-setup --timeout 15000",
     "test": "run-s test:ts test:unit test:e2e",
     "test:ts": "tsc --noEmit",
-    "test:unit": "npm run test-build && nyc --reporter=text --reporter=html --report-dir=test-results/unit  npm run mocha",
+    "test:unit": "nyc --reporter=text --reporter=html --report-dir=test-results/unit npm run mocha",
     "test:e2e": "./test/e2e/run.sh",
     "test:e2e:wip": "./test/e2e/run-wip.sh",
     "test:e2e:debug": "./test/e2e/debug.sh",
@@ -48,13 +48,13 @@
   },
   "homepage": "https://github.com/PeerioTechnologies/peerio-icebear#readme",
   "dependencies": {
-    "blake2s-js": "1.2.3",
+    "blake2s-js": "1.3.0",
     "bluebird": "3.5.1",
     "buffer": "5.0.8",
     "eventemitter3": "3.1.0",
     "lodash": "4.17.10",
-    "mkdirp": "0.5.1",
     "lru-cache": "4.1.3",
+    "mkdirp": "0.5.1",
     "mobx": "3.5.1",
     "moment": "2.22.2",
     "peerio-translator": "github:PeerioTechnologies/peerio-translator#v1.0.0",

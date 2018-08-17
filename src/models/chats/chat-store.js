@@ -647,7 +647,8 @@ class ChatStore {
         }
         if (chat.active) {
             this.deactivateCurrentChat();
-            this.switchToFirstChat();
+            // if not in timeout it will set activeChat again
+            setTimeout(() => this.switchToFirstChat());
         }
         chat.dispose();
         delete this.chatMap[chat.id];

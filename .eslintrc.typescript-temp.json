@@ -4,6 +4,7 @@
     "extends": ["./.eslintrc"],
     "rules": {
       "no-undef": 0,
-      "no-unused-vars": 0
+      "no-unused-vars": 0,
+      "import/export": 0
     }
 }

@@ -477,14 +477,20 @@ class Keg {
             if (!this.plaintext) {
                 let decryptionKey = payloadKey || this.overrideKey;
                 if (!decryptionKey) {
-                    decryptionKey = this.db.boot.keys[keg.keyId || '0'];
+                    decryptionKey = this.db.boot.keys[keg.keyId || '0']; // optimization, avoids async
+                    if (!decryptionKey) {
+                        decryptionKey = await this.db.boot.getKey(
+                            keg.keyId || '0'
+                        );
+                    }
                     if (decryptionKey) {
                         decryptionKey = decryptionKey.key;
                     }
-                    if (!decryptionKey)
+                    if (!decryptionKey) {
                         throw new Error(
                             `Failed to resolve decryption key for ${this.id}`
                         );
+                    }
                 }
                 payload = secret.decryptString(payload, decryptionKey);
             }

@@ -2,16 +2,19 @@
 // Random things generator part of Peerio crypto utilities module.
 //
 
-const { InvalidArgumentError } = require('../errors');
-const convert = require('./util.conversion');
-const hashing = require('./util.hashing');
-const globalContext = require('../helpers/global-context');
+import * as convert from './conversion';
+import * as hashing from './hashing';
+
+const globalContext = require('../../helpers/global-context');
+const { InvalidArgumentError } = require('../../errors');
+
 /**
  * Generates random bytes suitable for crypto use
- * @param {number} num - byte count to return
- * @returns {Uint8Array} - random bytes array of `num` size
+ * @param num byte count to return
+ * @returns random bytes array of `num` size
  */
-let getRandomBytes;
+// eslint-disable-next-line import/no-mutable-exports
+export let getRandomBytes: (num: number) => Buffer | Uint8Array;
 
 // do we have crypto shim?
 if (globalContext.cryptoShim) {
@@ -48,12 +51,12 @@ if (!getRandomBytes)
 /**
  * Generated cryptographically secure random number in a set range.
  * Range can't be more then 2**31 (2147483648).
- * @param {number} [min=0] - minimum random number value (inclusive)
- * @param {number} [max=2147483648] - maximum random value (exclusive)
- * @returns {number} random number
+ * @param minimum random number value (inclusive)
+ * @param maximum random value (exclusive)
+ * @returns random number
  * @throws {InvalidArgumentError}
  */
-function getRandomNumber(min = 0, max = 2147483648) {
+export function getRandomNumber(min = 0, max = 2147483648) {
     const range = max - min;
     if (typeof min !== 'number' || typeof max !== 'number' || range <= 0) {
         throw new InvalidArgumentError();
@@ -87,9 +90,9 @@ function getRandomNumber(min = 0, max = 2147483648) {
  * Partially consists of 4 bytes of current timestamp. 4 bytes fits almost 50 days worth of milliseconds,
  * so if you are generating 1 nonce every millisecond, it's guaranteed to have no collisions within 50 days
  * even without random bytes part.
- * @returns {Uint8Array} - 24 bytes, [4: from timestamp][20: random]
+ * @returns 24 bytes, [4: from timestamp][20: random]
  */
-function getRandomNonce() {
+export function getRandomNonce(): Uint8Array {
     const nonce = new Uint8Array(24);
     // we take last 4 bytes of current date timestamp
     nonce.set(convert.numberToByteArray(Date.now() >>> 32));
@@ -104,7 +107,7 @@ function getRandomNonce() {
  * @param {string} username
  * @returns {Uint8Array} 42 bytes, [16: username+timestamp hash][26: random bytes]
  */
-function getRandomUserSpecificIdBytes(username) {
+export function getRandomUserSpecificIdBytes(username) {
     const id = new Uint8Array(42);
     const hash = hashing.getByteHash(
         16,
@@ -120,7 +123,7 @@ function getRandomUserSpecificIdBytes(username) {
  * @param {string} username
  * @returns {string} id in base64 encoding
  */
-function getRandomUserSpecificIdB64(username) {
+export function getRandomUserSpecificIdB64(username) {
     return convert.bytesToB64(getRandomUserSpecificIdBytes(username));
 }
 
@@ -129,18 +132,18 @@ function getRandomUserSpecificIdB64(username) {
  * @param {string} username
  * @returns {string} id in hex encoding
  */
-function getRandomUserSpecificIdHex(username) {
+export function getRandomUserSpecificIdHex(username) {
     return convert.bytesToHex(getRandomUserSpecificIdBytes(username));
 }
 
 /**
  * 16 random bytes in hex, can work as global id
  */
-function getRandomGlobalShortIdHex() {
+export function getRandomGlobalShortIdHex() {
     return convert.bytesToHex(getRandomBytes(16));
 }
 
-function getRandomGlobalUrlSafeShortIdB64() {
+export function getRandomGlobalUrlSafeShortIdB64() {
     return convert
         .bytesToB64(getRandomBytes(16))
         .replace(/\+/g, '-')
@@ -152,7 +155,7 @@ function getRandomGlobalUrlSafeShortIdB64() {
  * Generates hex string of 10-byte unique random id suitable for personal use (one keg db).
  * @returns {string} 10 bytes id in hex encoding
  */
-function getRandomShortIdHex() {
+export function getRandomShortIdHex() {
     const id = new Uint8Array(10);
     // we take last 4 bytes of current date timestamp
     id.set(convert.numberToByteArray(Date.now() >>> 32));
@@ -168,7 +171,7 @@ function getRandomShortIdHex() {
  * @param {string} username
  * @param {[string]} deviceUID
  */
-function getDeviceId(username, deviceUID) {
+export function getDeviceId(username, deviceUID) {
     const h = hashing.getHashObject(
         32,
         convert.strToBytes(username),
@@ -184,16 +187,3 @@ function getDeviceId(username, deviceUID) {
     }
     return convert.bytesToB64(h.digest());
 }
-
-module.exports = {
-    getRandomBytes,
-    getRandomNumber,
-    getRandomNonce,
-    getRandomUserSpecificIdBytes,
-    getRandomUserSpecificIdB64,
-    getRandomUserSpecificIdHex,
-    getRandomGlobalShortIdHex,
-    getRandomShortIdHex,
-    getRandomGlobalUrlSafeShortIdB64,
-    getDeviceId
-};

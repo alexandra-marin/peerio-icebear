@@ -86,7 +86,7 @@ class FileStore extends FileStoreBase {
                     if (!file) return Promise.resolve();
                     return socket
                         .send('/auth/file/descriptor/get', { fileId }, false)
-                        .then(d => {
+                        .then(async d => {
                             if (!file.format) {
                                 // time to migrate keg
                                 file.format = file.latestFormat;
@@ -105,9 +105,12 @@ class FileStore extends FileStoreBase {
                                 this.knownDescriptorVersion =
                                     d.collectionVersion;
                             }
-                            FileStoreBase.instances.forEach(store =>
-                                store.cacheDescriptor(d)
-                            );
+                            if (this.isMainStore) {
+                                await this.cacheDescriptor(d);
+                            }
+                            for (const store of this.getFileStoreInstances()) {
+                                await store.cacheDescriptor(d);
+                            }
                         });
                 });
                 // we might not have loaded all updated descriptors

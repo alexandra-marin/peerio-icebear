@@ -2,6 +2,68 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.15.2"></a>
+## [5.15.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.15.1...v5.15.2) (2018-08-14)
+
+
+### Bug Fixes
+
+* chat unloading was reactivating same chat if there was just one chat ([5f3f834](https://github.com/PeerioTechnologies/peerio-icebear/commit/5f3f834))
+* sane limits on some retries ([cf92665](https://github.com/PeerioTechnologies/peerio-icebear/commit/cf92665))
+
+
+
+<a name="5.15.1"></a>
+## [5.15.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.15.0...v5.15.1) (2018-08-14)
+
+
+### Bug Fixes
+
+* don't omit the slash ([fc2de80](https://github.com/PeerioTechnologies/peerio-icebear/commit/fc2de80))
+* don't precompile before unit tests, make root import point to src/ ([3f938f1](https://github.com/PeerioTechnologies/peerio-icebear/commit/3f938f1))
+* ensure unit tests can require ts files ([5a4660c](https://github.com/PeerioTechnologies/peerio-icebear/commit/5a4660c))
+* eslint errors ([4ed5ba1](https://github.com/PeerioTechnologies/peerio-icebear/commit/4ed5ba1))
+* make e2e tests work too ([b8ca837](https://github.com/PeerioTechnologies/peerio-icebear/commit/b8ca837))
+* use requires for dynamically-generated exports for now; fix exports ([c4b5720](https://github.com/PeerioTechnologies/peerio-icebear/commit/c4b5720))
+
+
+
+<a name="5.15.0"></a>
+# [5.15.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.14.0...v5.15.0) (2018-08-09)
+
+
+### Bug Fixes
+
+* prettier ([7a69c33](https://github.com/PeerioTechnologies/peerio-icebear/commit/7a69c33))
+* tests ([19531f8](https://github.com/PeerioTechnologies/peerio-icebear/commit/19531f8))
+
+
+### Features
+
+* reset legacy cache [ch12236] ([cd69c16](https://github.com/PeerioTechnologies/peerio-icebear/commit/cd69c16))
+
+
+
+<a name="5.14.0"></a>
+# [5.14.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.13.0...v5.14.0) (2018-08-07)
+
+
+### Bug Fixes
+
+* file descriptor caching ([60b0812](https://github.com/PeerioTechnologies/peerio-icebear/commit/60b0812))
+* handle case when decryptionKey.key is undefined ([18bc76a](https://github.com/PeerioTechnologies/peerio-icebear/commit/18bc76a))
+* missing await in Chat.loadMetadata ([e23d3c3](https://github.com/PeerioTechnologies/peerio-icebear/commit/e23d3c3))
+* missing await in SharedDbBootKeg.loadBootKeg ([a56ead7](https://github.com/PeerioTechnologies/peerio-icebear/commit/a56ead7))
+* tofu caching ([105fa74](https://github.com/PeerioTechnologies/peerio-icebear/commit/105fa74))
+
+
+### Features
+
+* rekey shared keg DB on participant leave [ch2529] ([7b680d3](https://github.com/PeerioTechnologies/peerio-icebear/commit/7b680d3))
+* wait for boot keg key to appear ([dd7e292](https://github.com/PeerioTechnologies/peerio-icebear/commit/dd7e292))
+
+
+
 <a name="5.13.0"></a>
 # [5.13.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.12.0...v5.13.0) (2018-08-02)
 

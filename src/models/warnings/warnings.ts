@@ -1,7 +1,7 @@
 import { observable, action, when, reaction } from 'mobx';
 
-import * as socket from '../../network/socket';
-import * as clientApp from '../client-app';
+import socket from '../../network/socket';
+import clientApp from '../client-app';
 import SystemWarning, { WarningStates, WarningLevel } from './system-warning';
 import ServerWarning, { ServerWarningData } from './server-warning';
 
@@ -64,8 +64,7 @@ class Warnings {
             () => this.current.state === WarningStates.DISMISSED,
             () => setTimeout(this.assignNextItem)
         );
-        if (this.current.level === 'medium' && clientApp.isFocused)
-            this.current.autoDismiss();
+        if (this.current.level === 'medium' && clientApp.isFocused) this.current.autoDismiss();
         this.current.show();
     };
 
@@ -86,9 +85,7 @@ class Warnings {
         level: WarningLevel = 'medium',
         callback?: () => {}
     ) {
-        this.queueItem(
-            new SystemWarning(content, title, data, level, callback)
-        );
+        this.queueItem(new SystemWarning(content, title, data, level, callback));
     }
 
     /**
@@ -100,12 +97,7 @@ class Warnings {
      * @param callback - executes when warning is dismissed
      */
     @action
-    addSevere(
-        content: string,
-        title?: string,
-        data?: unknown,
-        callback?: () => {}
-    ) {
+    addSevere(content: string, title?: string, data?: unknown, callback?: () => {}) {
         this.add(content, title, data, 'severe', callback);
     }
 
@@ -129,10 +121,9 @@ class Warnings {
     }
 }
 
-const w = new Warnings();
+const warnings = new Warnings();
+export default warnings;
 
 socket.onceStarted(() =>
-    socket.subscribe(socket.APP_EVENTS.serverWarning, w.addServerWarning)
+    socket.subscribe(socket.APP_EVENTS.serverWarning, warnings.addServerWarning)
 );
-
-export default w;

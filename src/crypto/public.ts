@@ -4,8 +4,7 @@
 
 import * as nacl from 'tweetnacl';
 import * as secret from './secret';
-
-const { DecryptionError } = require('../errors');
+import { DecryptionError } from '../errors';
 
 /**
  * This is a classic variant of decryption function for server compatibility.
@@ -80,8 +79,5 @@ export function decrypt(
  * @param mySecretKey - current user's secret key
  * @returns 32 bytes shared key
  */
-export const computeSharedKey: (
-    theirPublicKey: Uint8Array,
-    mySecretKey: Uint8Array
-) => Uint8Array =
+export const computeSharedKey: (theirPublicKey: Uint8Array, mySecretKey: Uint8Array) => Uint8Array =
     nacl.box.before;

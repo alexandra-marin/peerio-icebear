@@ -5,8 +5,8 @@
 import * as convert from './conversion';
 import * as hashing from './hashing';
 
-const globalContext = require('../../helpers/global-context');
-const { InvalidArgumentError } = require('../../errors');
+import globalContext from '../../helpers/global-context';
+import { InvalidArgumentError } from '../../errors';
 
 /**
  * Generates random bytes suitable for crypto use
@@ -14,7 +14,7 @@ const { InvalidArgumentError } = require('../../errors');
  * @returns random bytes array of `num` size
  */
 // eslint-disable-next-line import/no-mutable-exports
-export let getRandomBytes: (num: number) => Buffer | Uint8Array;
+export let getRandomBytes: (num: number) => Uint8Array;
 
 // do we have crypto shim?
 if (globalContext.cryptoShim) {
@@ -45,8 +45,7 @@ if (!getRandomBytes) {
     };
 }
 
-if (!getRandomBytes)
-    throw new Error('No PRNG implementation found. Application can not start.');
+if (!getRandomBytes) throw new Error('No PRNG implementation found. Application can not start.');
 
 /**
  * Generated cryptographically secure random number in a set range.
@@ -109,10 +108,7 @@ export function getRandomNonce(): Uint8Array {
  */
 export function getRandomUserSpecificIdBytes(username) {
     const id = new Uint8Array(42);
-    const hash = hashing.getByteHash(
-        16,
-        convert.strToBytes(username + Date.now().toString())
-    );
+    const hash = hashing.getByteHash(16, convert.strToBytes(username + Date.now().toString()));
     id.set(hash);
     id.set(getRandomBytes(26), 16);
     return id;
@@ -172,11 +168,7 @@ export function getRandomShortIdHex() {
  * @param {[string]} deviceUID
  */
 export function getDeviceId(username, deviceUID) {
-    const h = hashing.getHashObject(
-        32,
-        convert.strToBytes(username),
-        'PRIDevId'
-    );
+    const h = hashing.getHashObject(32, convert.strToBytes(username), 'PRIDevId');
     if (deviceUID && deviceUID.length > 0) {
         h.update(convert.strToBytes(deviceUID));
     } else {

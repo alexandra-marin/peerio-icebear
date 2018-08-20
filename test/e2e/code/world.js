@@ -61,20 +61,12 @@ class PeerioAppWorld {
     };
 
     confirmPrimaryEmail = async emailAddress => {
-        const email = await waitForEmail(
-            emailAddress,
-            testConfig.primaryEmailConfirmSubject
-        );
+        const email = await waitForEmail(emailAddress, testConfig.primaryEmailConfirmSubject);
         const url = testConfig.emailConfirmUrlRegex.exec(email.body)[1];
         await getUrl(url);
     };
 
-    createAccount = async (
-        username,
-        email,
-        isTestAccount = false,
-        extraProps = null
-    ) => {
+    createAccount = async (username, email, isTestAccount = false, extraProps = null) => {
         await this.libs.prombservable.asPromise(ice.socket, 'connected', true);
 
         const u = new ice.User();
@@ -98,9 +90,9 @@ class PeerioAppWorld {
         }
 
         console.log(
-            `creating ${isTestAccount ? 'test ' : ''}user username: ${
-                u.username
-            } passphrase: ${u.passphrase}`
+            `creating ${isTestAccount ? 'test ' : ''}user username: ${u.username} passphrase: ${
+                u.passphrase
+            }`
         );
 
         await u.createAccountAndLogin();

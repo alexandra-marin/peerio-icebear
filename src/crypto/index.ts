@@ -5,4 +5,4 @@ import * as secret from './secret';
 import * as sign from './sign';
 import { setScrypt } from './scrypt-proxy';
 
-export { cryptoUtil, keys, publicCrypto, secret, sign, setScrypt };
+export default { cryptoUtil, keys, publicCrypto, secret, sign, setScrypt };

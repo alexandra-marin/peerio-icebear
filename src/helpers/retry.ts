@@ -2,8 +2,8 @@
  * Retry operation tools.
  */
 
-const errors = require('../errors');
-const tracker = require('../models/update-tracker');
+import { normalize, serverErrorCodes } from '../errors';
+import tracker from '../models/update-tracker';
 
 const maxRetryCount = 120; // will bail out after this amount of retries
 const minRetryInterval = 1000; // will start with this interval between retries
@@ -65,13 +65,10 @@ export function retryUntilSuccess<T = any>(
             console.error(err);
             callInfo.lastError = err;
             if (err) {
-                if (err.code === errors.ServerError.codes.notFound) {
+                if (err.code === serverErrorCodes.notFound) {
                     callInfo.fatalErrorCount++;
                 }
-                if (
-                    errorHandler &&
-                    err.code === errors.ServerError.codes.malformedRequest
-                ) {
+                if (errorHandler && err.code === serverErrorCodes.malformedRequest) {
                     try {
                         const res = errorHandler();
                         if (res && res.then) {
@@ -91,34 +88,22 @@ export function retryUntilSuccess<T = any>(
 // todo: don't retry if throttled
 function scheduleRetry(fn: () => Promise<any>, id: number): void {
     const callInfo = callsInProgress[id];
-    if (
-        ++callInfo.retryCount > callInfo.maxRetries ||
-        callInfo.fatalErrorCount > 2
-    ) {
+    if (++callInfo.retryCount > callInfo.maxRetries || callInfo.fatalErrorCount > 2) {
         console.error(
             `Maximum retry count reached for action id ${id}. Giving up, rejecting promise.`
         );
         console.debug(fn);
-        callInfo.reject(errors.normalize(callInfo.lastError));
+        callInfo.reject(normalize(callInfo.lastError));
         return;
     }
     const delay =
         minRetryInterval +
-        Math.min(
-            maxRetryInterval,
-            callInfo.retryCount * retryIntervalMultFactor
-        );
+        Math.min(maxRetryInterval, callInfo.retryCount * retryIntervalMultFactor);
     console.debug(`Retrying ${id} in ${delay} second`);
     setTimeout(
         () =>
             tracker.onceUpdated(() =>
-                retryUntilSuccess(
-                    fn,
-                    id,
-                    callInfo.maxRetries,
-                    callInfo.errorHandler,
-                    true
-                )
+                retryUntilSuccess(fn, id, callInfo.maxRetries, callInfo.errorHandler, true)
             ),
         delay
     );

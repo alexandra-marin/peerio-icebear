@@ -1,9 +1,9 @@
 import Keg from './keg';
 import KegDb from './keg-db';
 
-const { observable, when } = require('mobx');
+import { observable, when } from 'mobx';
 
-const util = require('../../crypto/util');
+import util from '../../crypto/util';
 
 interface BootKegPayload {
     kegKey: string;
@@ -61,12 +61,8 @@ export default class BootKeg extends Keg<BootKegPayload> {
         this.signKeys.secretKey = util.b64ToBytes(data.signKeys.secretKey);
 
         this.encryptionKeys = {} as KeyPair;
-        this.encryptionKeys.publicKey = util.b64ToBytes(
-            data.encryptionKeys.publicKey
-        );
-        this.encryptionKeys.secretKey = util.b64ToBytes(
-            data.encryptionKeys.secretKey
-        );
+        this.encryptionKeys.publicKey = util.b64ToBytes(data.encryptionKeys.publicKey);
+        this.encryptionKeys.secretKey = util.b64ToBytes(data.encryptionKeys.secretKey);
 
         this.kegKey = util.b64ToBytes(data.kegKey);
         this.keys[this.kegKeyId] = { key: this.kegKey, createdAt: Date.now() };

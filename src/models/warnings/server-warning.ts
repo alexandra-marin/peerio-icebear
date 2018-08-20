@@ -1,6 +1,6 @@
 import { has as isKnownKey } from 'peerio-translator';
 import { retryUntilSuccess } from '../../helpers/retry';
-import * as socket from '../../network/socket';
+import socket from '../../network/socket';
 import SystemWarning, { WarningLevel } from './system-warning';
 
 /**
@@ -41,16 +41,9 @@ export default class ServerWarning extends SystemWarning {
      * @param onClear callback will be called when warning is successfully dismissed on server
      */
     constructor(obj: ServerWarningData, onClear?: () => void) {
-        if (
-            !obj ||
-            !obj.msg ||
-            !obj.msg.startsWith('serverWarning_') ||
-            !isKnownKey(obj.msg)
-        ) {
+        if (!obj || !obj.msg || !obj.msg.startsWith('serverWarning_') || !isKnownKey(obj.msg)) {
             console.debug(obj);
-            throw new Error(
-                `Invalid/unknown warning key '${obj.msg}' received from server.`
-            );
+            throw new Error(`Invalid/unknown warning key '${obj.msg}' received from server.`);
         }
         super(obj.msg, obj.title, null, obj.level);
         this.token = obj.token;

@@ -101,5 +101,3 @@ export default class SystemWarning {
      */
     protected dispose() {}
 }
-
-module.exports = SystemWarning;

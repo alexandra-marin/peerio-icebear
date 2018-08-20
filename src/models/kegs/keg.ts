@@ -3,36 +3,29 @@ import { observable, action, when } from 'mobx';
 import KegDb from './keg-db';
 
 import { secret, sign, cryptoUtil } from '../../crypto';
-import * as socket from '../../network/socket';
+import socket from '../../network/socket';
 
 import { getContactStore } from '../../helpers/di-contact-store';
 import { getUser } from '../../helpers/di-current-user';
-import { asPromise, asPromiseMultiValue } from '../../helpers/prombservable';
+import { asPromise } from '../../helpers/prombservable';
 
-const {
-    AntiTamperError,
-    DecryptionError,
-    ServerError
-} = require('../../errors');
+import { AntiTamperError, DecryptionError, serverErrorCodes } from '../../errors';
 
 let temporaryKegId = 0;
 function getTemporaryKegId() {
     return `tempKegId_${temporaryKegId++}`;
 }
 
-// FIXME: from looking at various keg types in the in-app devtools, these are
-// not present on all kegs! (so on further consideration, probably no such thing
-// as "base props", just props that may be present in subclasses.) nevertheless,
-// these props are assumed to be present at various points in this base class, so
-// this identity needs to be untangled somewhat.
-export interface BaseProps {
-    encryptedPayloadKey?: string;
-    sharedBy?: string;
-    sharedKegSenderPK?: string;
-    signedBy?: string;
-    signature?: string;
+interface FileProps {
     descriptor?: unknown;
 }
+
+interface SignedKegProps {
+    signedBy?: string;
+    signature?: string;
+}
+
+type BaseProps = FileProps & SignedKegProps;
 
 interface RawKegData<TProps> {
     kegId: string;
@@ -141,7 +134,6 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
 
     protected readonly storeSignerData: boolean;
 
-    protected pendingReEncryption: boolean | null = null;
     protected validatingKeg: boolean | null = null;
 
     protected decryptionError?: unknown;
@@ -163,10 +155,6 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
      * to be signed.
      */
     @observable protected signatureError: boolean | null = null;
-    /**
-     * Indicates failure to process received/shared keg.
-     */
-    @observable protected sharedKegError: boolean | null = null;
 
     @observable protected id: string | null;
 
@@ -231,16 +219,10 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
      */
     saveToServer(): Promise<unknown> {
         if (this.loading) {
-            console.warn(
-                `Keg ${this.id} ${
-                    this.type
-                } is trying to save while already loading.`
-            );
+            console.warn(`Keg ${this.id} ${this.type} is trying to save while already loading.`);
         }
         if (this.saving) {
-            return asPromise(this, 'saving', false).then(() =>
-                this.saveToServer()
-            );
+            return asPromise(this, 'saving', false).then(() => this.saveToServer());
         }
         this.saving = true;
         if (this.id) return this.internalSave().finally(this.resetSavingState);
@@ -272,37 +254,12 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
         let payload,
             props,
             lastVersion,
-            signingPromise: Promise<true | undefined> = Promise.resolve<true>(
-                true
-            );
+            signingPromise: Promise<true | undefined> = Promise.resolve<true>(true);
         try {
             payload = this.serializeKegPayload();
             props = this.serializeProps();
-            // existence of these properties means this keg was shared with us and we haven't re-encrypted it yet
-            if (this.pendingReEncryption) {
-                // we don't want to save (re-encrypt and lose original sharing data) before we validate the keg
-                if (this.validatingKeg) {
-                    return asPromiseMultiValue(this, 'sharedKegError', [
-                        true,
-                        false
-                    ]).then(() => this.internalSave());
-                }
-                if (this.sharedKegError || this.signatureError) {
-                    throw new Error(
-                        `Not allowed to save a keg with sharedKegError or signatureError. Keg ID: [${
-                            this.id
-                        }]`
-                    );
-                }
-                props.sharedKegSenderPK = null;
-                props.sharedKegRecipientPK = null;
-                props.encryptedPayloadKey = null;
-            }
             // anti-tamper protection, we do it here, so we don't have to remember to do it somewhere else
-            if (
-                !this.ignoreAntiTamperProtection &&
-                (!this.plaintext || this.forceSign)
-            ) {
+            if (!this.ignoreAntiTamperProtection && (!this.plaintext || this.forceSign)) {
                 payload._sys = {
                     kegId: this.id,
                     type: this.type
@@ -312,10 +269,7 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
             payload = JSON.stringify(payload);
             // should we encrypt the string?
             if (!this.plaintext) {
-                payload = secret.encryptString(
-                    payload,
-                    this.overrideKey || this.db.key
-                );
+                payload = secret.encryptString(payload, this.overrideKey || this.db.key);
             }
             if (this.forceSign || (!this.plaintext && this.db.id !== 'SELF')) {
                 signingPromise = this.signKegPayload(payload)
@@ -326,9 +280,9 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
                         }
                         this.signatureError = false;
                     })
-                    .tapCatch(err =>
-                        console.error('Failed to sign keg', err)
-                    ) as Promise<undefined>;
+                    .tapCatch(err => console.error('Failed to sign keg', err)) as Promise<
+                    undefined
+                >;
             }
         } catch (err) {
             console.error('Failed preparing keg to save.', err);
@@ -355,7 +309,6 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
                 )
             )
             .then(resp => {
-                this.pendingReEncryption = false;
                 this.dirty = false;
                 this.collectionVersion = resp.collectionVersion;
                 // in case this keg was already updated through other code paths we change version in a smart way
@@ -371,9 +324,7 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
             ? cryptoUtil.strToBytes(payload as string)
             : (payload as Uint8Array);
 
-        return sign
-            .signDetached(toSign, getUser().signKeys.secretKey)
-            .then(cryptoUtil.bytesToB64);
+        return sign.signDetached(toSign, getUser().signKeys.secretKey).then(cryptoUtil.bytesToB64);
     }
 
     /**
@@ -397,11 +348,7 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
                 false
             )
             .catch(err => {
-                if (
-                    this.allowEmpty &&
-                    err &&
-                    err.code === ServerError.codes.notFound
-                ) {
+                if (this.allowEmpty && err && err.code === serverErrorCodes.notFound) {
                     // expected error for empty named kegs
                     const keg = {
                         kegId: this.id,
@@ -417,9 +364,7 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
                 const ret = await this.loadFromKeg(keg);
                 if (ret === false) {
                     const err = new Error(
-                        `Failed to hydrate keg id ${
-                            this.id
-                        } with server data from db ${
+                        `Failed to hydrate keg id ${this.id} with server data from db ${
                             this.db ? this.db.id : 'null'
                         }`
                     );
@@ -465,9 +410,7 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
             this.lastLoadHadError = false;
             if (this.id && this.id !== keg.kegId) {
                 console.error(
-                    `Attempt to rehydrate keg(${
-                        this.id
-                    }) with data from another keg(${keg.kegId}).`
+                    `Attempt to rehydrate keg(${this.id}) with data from another keg(${keg.kegId}).`
                 );
                 this.lastLoadHadError = true;
                 return false;
@@ -497,83 +440,44 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
             // vs. encrypted kegs, as a first step to simplifying the tangled
             // nest of conditionals below.
 
-            let { payload } = keg;
+            let binPayload: Uint8Array;
+            let stringPayload: string;
             let payloadKey = null;
 
-            if (!this.plaintext) {
-                // if the keg is not plaintext, payload is an arraybuffer
-                payload = new Uint8Array(keg.payload as ArrayBuffer); // FIXME: can't reassign as U8Arr here, just introduce new field please
+            if (this.plaintext) {
+                stringPayload = keg.payload as string;
+            } else {
+                binPayload = new Uint8Array(keg.payload as ArrayBuffer);
             }
             // SELF kegs do not require signing
-            if (
-                !noVerify &&
-                (this.forceSign || (!this.plaintext && this.db.id !== 'SELF'))
-            ) {
-                const payloadToVerify = payload;
-                setTimeout(
-                    () => this.verifyKegSignature(payloadToVerify, keg.props), //FIXME: use new Uint8Array field introduced above to fix this assignment
-                    3000
-                );
+            if (!noVerify && (this.forceSign || (!this.plaintext && this.db.id !== 'SELF'))) {
+                setTimeout(() => this.verifyKegSignature(binPayload, keg.props), 3000);
             } else {
                 this.signatureError = false;
-            }
-            this.pendingReEncryption = !!(
-                keg.props.sharedBy && keg.props.sharedKegSenderPK
-            );
-            // is this keg shared with us and needs re-encryption?
-            // sharedKegSenderPK is used here to detect keg that still needs re-encryption
-            // the property will get deleted after re-encryption
-            // we can't introduce additional flag because props are not being deleted on keg delete
-            // to allow re-sharing of the same file keg
-            if (!this.plaintext && this.pendingReEncryption) {
-                // async call, changes state of the keg in case of issues
-                this.validateAndReEncryptSharedKeg(keg.props);
-                // todo: when we'll have key change, this should use secret key corresponding to sharedKegRecipientPK
-                const sharedKey = getUser().getSharedKey(
-                    cryptoUtil.b64ToBytes(keg.props.sharedKegSenderPK)
-                );
-
-                if (keg.props.encryptedPayloadKey) {
-                    // Payload was encrypted with a symmetric key, which was encrypted
-                    // for our public key and stored in encryptedPayloadKey prop.
-                    payloadKey = secret.decrypt(
-                        cryptoUtil.b64ToBytes(keg.props.encryptedPayloadKey),
-                        sharedKey
-                    );
-                }
             }
             if (!this.plaintext) {
                 let decryptionKey = payloadKey || this.overrideKey;
                 if (!decryptionKey) {
                     decryptionKey = this.db.boot.keys[keg.keyId || '0']; // optimization, avoids async
                     if (!decryptionKey) {
-                        decryptionKey = await this.db.boot.getKey(
-                            keg.keyId || '0'
-                        );
+                        decryptionKey = await this.db.boot.getKey(keg.keyId || '0');
                     }
                     if (decryptionKey) {
                         decryptionKey = decryptionKey.key;
                     }
                     if (!decryptionKey) {
-                        throw new Error(
-                            `Failed to resolve decryption key for ${this.id}`
-                        );
+                        throw new Error(`Failed to resolve decryption key for ${this.id}`);
                     }
                 }
-                payload = secret.decryptString(payload, decryptionKey);
+                stringPayload = secret.decryptString(binPayload, decryptionKey);
             }
-            payload = JSON.parse(payload); // FIXME: introduce new field to fix this
+            const payload = JSON.parse(stringPayload); // FIXME: introduce new field to fix this
 
-            if (
-                !this.ignoreAntiTamperProtection &&
-                (this.forceSign ||
-                    !(this.plaintext || this.pendingReEncryption))
-            ) {
+            if (!this.ignoreAntiTamperProtection && (this.forceSign || !this.plaintext)) {
                 this.detectTampering(payload);
             }
             this.deserializeKegPayload(payload);
-            if (keg.props && keg.props.descriptor)
-                this.deserializeDescriptor(keg.props.descriptor);
+            if (keg.props && keg.props.descriptor) this.deserializeDescriptor(keg.props.descriptor);
             if (this.afterLoad) this.afterLoad();
             this.loaded = true;
             // TODO: not proud of this, looking for better ideas to get the raw keg from here to interested party
@@ -591,45 +495,9 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
     }
 
     /**
-     * Shared/received kegs are encrypted by sender and this function checks if keg is valid and secure
-     * and re-encrypts it with own KegDb key removing sharing metadata props that's not needed anymore
-     */
-    @action
-    protected validateAndReEncryptSharedKeg(kegProps: {
-        sharedBy: string;
-        sharedKegSenderPK: string;
-    }): void {
-        this.sharedKegError = null;
-        this.signatureError = null;
-        this.validatingKeg = true;
-        // we need to make sure that sender's public key really belongs to him
-        const contact = getContactStore().getContact(kegProps.sharedBy);
-        contact.whenLoaded(
-            action(() => {
-                this.validatingKeg = false;
-                if (
-                    cryptoUtil.bytesToB64(contact.encryptionPublicKey) !==
-                    kegProps.sharedKegSenderPK
-                ) {
-                    this.sharedKegError = true;
-                    this.signatureError = true;
-                    return;
-                }
-                this.sharedKegError = false;
-                this.signatureError = false;
-                // we don't care much if this fails because next time it will get re-saved
-                this.saveToServer();
-            })
-        );
-    }
-
-    /**
      * Asynchronously checks signature.
      */
-    verifyKegSignature(
-        payload: Uint8Array | string,
-        props: { signedBy: string; signature: string }
-    ): void {
+    verifyKegSignature(payload: Uint8Array | string, props: SignedKegProps): void {
         if (!payload || this.lastLoadHadError) return;
         try {
             const { signature } = props;
@@ -715,26 +583,18 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
      * @param payload decrypted keg payload
      * @throws AntiTamperError
      */
-    protected detectTampering(payload: {
-        _sys: { kegId: string; type: string };
-    }): void {
+    protected detectTampering(payload: { _sys: { kegId: string; type: string } }): void {
         if (!payload._sys) {
-            throw new AntiTamperError(
-                `Anti tamper data missing for ${this.id}`
-            );
+            throw new AntiTamperError(`Anti tamper data missing for ${this.id}`);
         }
         if (payload._sys.kegId !== this.id) {
             throw new AntiTamperError(
-                `Inner ${payload._sys.kegId} and outer ${
-                    this.id
-                } keg id mismatch.`
+                `Inner ${payload._sys.kegId} and outer ${this.id} keg id mismatch.`
             );
         }
         if (payload._sys.type !== this.type) {
             throw new AntiTamperError(
-                `Inner ${payload._sys.type} and outer ${
-                    this.type
-                } keg type mismatch.`
+                `Inner ${payload._sys.type} and outer ${this.type} keg type mismatch.`
             );
         }
     }

@@ -2,7 +2,7 @@ const MRUList = require('~/helpers/mru-list');
 const TinyDb = require('~/db/tiny-db');
 const StorageEngine = require('~/models/storage/node-json-storage');
 const config = require('~./config');
-const { observable } = require('mobx');
+import { observable } from 'mobx';
 
 describe('MRU list helper should', () => {
     before(() => {

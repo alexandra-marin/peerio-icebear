@@ -1,4 +1,4 @@
-const { observable } = require('mobx');
+import { observable } from 'mobx';
 const { asPromise } = require('~/helpers/prombservable');
 
 describe('Promservable should', () => {

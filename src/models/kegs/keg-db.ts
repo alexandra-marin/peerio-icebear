@@ -1,5 +1,5 @@
 import BootKeg from './boot-keg';
-const tracker = require('../../models/update-tracker');
+import tracker from '../../models/update-tracker';
 
 /**
  * Keg database.

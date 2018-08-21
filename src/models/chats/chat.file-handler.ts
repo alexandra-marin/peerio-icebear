@@ -11,8 +11,6 @@ import File from '../files/file';
  * @param {Chat} chat - chat creates an instance and passes itself to it.
  */
 class ChatFileHandler {
-    knownUpdateId = '';
-    maxUpdateId = '';
     constructor(chat) {
         /**
          * @type {Chat}
@@ -21,6 +19,9 @@ class ChatFileHandler {
         tracker.subscribeToKegUpdates(chat.id, 'file', this.onFileDigestUpdate);
         tracker.onUpdated(this.onFileDigestUpdate, true);
     }
+
+    knownUpdateId = '';
+    maxUpdateId = '';
 
     onFileDigestUpdate = async (kegDbId, digestEnsured) => {
         const msgDigest = tracker.getDigest(this.chat.id, 'file');

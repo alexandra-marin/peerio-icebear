@@ -65,20 +65,18 @@ export interface RawKegDataEncrypted<TProps> extends RawKegData<TProps> {
 
 /**
  * Base class with common metadata and operations.
+ * @param id kegId, or null for new kegs
+ * @param type keg type
+ * @param db keg database instance owning this keg
+ * @param plaintext should keg be encrypted
+ * @param forceSign plaintext kegs are not normally signed unless forceSign is true
+ * @param allowEmpty normally client doesn't expect empty keg when calling `.load()` and will throw
+ * @param storeSignerData if the keg is signed, in addition to signature it will store
+ *                        and then verify over signedByUsername prop instead of `keg.owner`.
+ *
+ * todo: convert this monstrous constructor params to object
  */
 export default abstract class Keg<TPayload, TProps extends {} = {}> {
-    /**
-     * @param id kegId, or null for new kegs
-     * @param type keg type
-     * @param db keg database instance owning this keg
-     * @param plaintext should keg be encrypted
-     * @param forceSign plaintext kegs are not normally signed unless forceSign is true
-     * @param allowEmpty normally client doesn't expect empty keg when calling `.load()` and will throw
-     * @param storeSignerData if the keg is signed, in addition to signature it will store
-     *                        and then verify over signedByUsername prop instead of `keg.owner`.
-     *
-     * todo: convert this monstrous constructor params to object
-     */
     constructor(
         id: string | null,
         type: string,

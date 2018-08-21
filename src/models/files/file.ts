@@ -128,14 +128,14 @@ const fileDataMap = new Map();
  * @extends {Keg}
  */
 class File extends Keg {
-    static copyQueue = new TaskQueue(1, 200);
-
     constructor(db, store) {
         super(null, 'file', db);
         this.store = store;
         this.format = 1;
         this.latestFormat = 1;
     }
+
+    static copyQueue = new TaskQueue(1, 200);
 
     get data() {
         if (!this.fileId) return null;

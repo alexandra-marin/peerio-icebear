@@ -9,6 +9,9 @@ import warnings from '../warnings';
  * Extension to operate with selected files and folders in bulk
  */
 class FileStoreBulk {
+    constructor(fileStore) {
+        this.fileStore = fileStore;
+    }
     // functor taking items selected as an argument to choose who to share with
     shareWithSelector = null;
 
@@ -21,10 +24,6 @@ class FileStoreBulk {
 
     // functor selecting folder for bulk download
     downloadFolderSelector = null;
-
-    constructor(fileStore) {
-        this.fileStore = fileStore;
-    }
 
     @computed
     get canMove() {

@@ -1,5 +1,7 @@
 import socket from '../network/socket';
 
+type DbListEventHandler = (kegDbId: string) => void;
+
 /**
  * Provides easy access to the list of user's keg database ids.
  * Retrieves the list only once and caches it.
@@ -13,16 +15,17 @@ class KegDbListProvider {
         });
     }
 
-    loadingPromise = null;
-    cachedList = null;
+    loadingPromise: Promise<void> = null;
+    cachedList: string[] = null;
+    prevCachedList: string[] = null;
 
-    dbAddedHandlers = [];
-    dbRemovedHandlers = [];
+    dbAddedHandlers: DbListEventHandler[] = [];
+    dbRemovedHandlers: DbListEventHandler[] = [];
 
     async cacheList() {
         if (this.loadingPromise) return this.loadingPromise;
         if (this.cachedList) return this.cachedList;
-        this.loadingPromise = socket.send('/auth/kegs/user/dbs').then(list => {
+        this.loadingPromise = socket.send('/auth/kegs/user/dbs').then((list: string[]) => {
             this.loadingPromise = null;
             this.cachedList = list;
             this.compareChanges();
@@ -61,11 +64,11 @@ class KegDbListProvider {
         return this.filterBy('volume:');
     }
 
-    onDbAdded(handler) {
+    onDbAdded(handler: DbListEventHandler) {
         this.dbAddedHandlers.push(handler);
     }
 
-    onDbRemoved(handler) {
+    onDbRemoved(handler: DbListEventHandler) {
         this.dbRemovedHandlers.push(handler);
     }
 }

@@ -8,11 +8,12 @@ import { getUser } from '../../helpers/di-current-user';
 import ChatHead from './chat-head';
 
 class ReceivedInvite {
-    @observable declined = false;
-    metaLoaded = true;
     constructor(data) {
         Object.assign(this, data);
     }
+
+    metaLoaded = true;
+    @observable declined = false;
 }
 
 /**

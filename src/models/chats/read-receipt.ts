@@ -8,6 +8,9 @@ import Keg from '../kegs/keg';
  * @extends {Keg}
  */
 class ReadReceipt extends Keg {
+    constructor(username, db) {
+        super(username ? `read_receipt-${username}` : null, 'read_receipt', db, false, false, true);
+    }
     /**
      * Id of the last read message
      * @type {number}
@@ -18,10 +21,6 @@ class ReadReceipt extends Keg {
      * @type {bool}
      */
     receiptError;
-
-    constructor(username, db) {
-        super(username ? `read_receipt-${username}` : null, 'read_receipt', db, false, false, true);
-    }
 
     serializeKegPayload() {
         return { chatPosition: +this.chatPosition };

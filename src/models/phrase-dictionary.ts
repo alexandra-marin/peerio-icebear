@@ -6,13 +6,13 @@ import util from '../crypto/util';
  * @param {string} dictString - '\n' separated word list
  */
 class PhraseDictionary {
-    locale;
-    dict;
-
     constructor(locale, dictString) {
         this.locale = locale;
         this._buildDict(dictString);
     }
+
+    locale;
+    dict;
 
     /**
      * Returns a random passphrase of chosen word length

@@ -18,18 +18,6 @@ export enum WarningStates {
  */
 export default class SystemWarning {
     /**
-     * Observable current life cycle state.
-     */
-    @observable state = WarningStates.QUEUED;
-
-    content: string;
-    level: WarningLevel;
-    title?: string;
-    data?: unknown;
-    callback?: () => void;
-    timer: number | null = null;
-
-    /**
      * @param content - localization string key
      * @param title - localization string key
      * @param data - variables to pass to peerio-translator when resolving content
@@ -48,6 +36,17 @@ export default class SystemWarning {
         this.level = level;
         this.callback = callback;
     }
+    /**
+     * Observable current life cycle state.
+     */
+    @observable state = WarningStates.QUEUED;
+
+    content: string;
+    level: WarningLevel;
+    title?: string;
+    data?: unknown;
+    callback?: () => void;
+    timer: number | null = null;
 
     /**
      * Advances life cycle state to SHOWING

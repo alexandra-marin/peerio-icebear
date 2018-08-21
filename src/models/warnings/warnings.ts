@@ -9,6 +9,19 @@ import ServerWarning, { ServerWarningData } from './server-warning';
  * Public API for Warnings system.
  */
 class Warnings {
+    constructor() {
+        reaction(
+            () => clientApp.isFocused,
+            isFocused => {
+                if (!this.current || this.current.level !== 'medium') return;
+                if (isFocused) {
+                    this.current.autoDismiss();
+                } else {
+                    this.current.cancelAutoDismiss();
+                }
+            }
+        );
+    }
     /**
      * Observable. Clients should watch this and render new snackbar/dialog on change.
      */
@@ -25,20 +38,6 @@ class Warnings {
      * To avoid that we store a cache of unconfirmed server warnings for the session.
      */
     private readonly sessionCache = {};
-
-    constructor() {
-        reaction(
-            () => clientApp.isFocused,
-            isFocused => {
-                if (!this.current || this.current.level !== 'medium') return;
-                if (isFocused) {
-                    this.current.autoDismiss();
-                } else {
-                    this.current.cancelAutoDismiss();
-                }
-            }
-        );
-    }
 
     /**
      * Adds the warning to internal queue.

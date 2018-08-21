@@ -8,6 +8,9 @@ import _ from 'lodash';
  * @extends {SyncedKeg}
  */
 class Invites extends SyncedKeg {
+    constructor() {
+        super('invites', getUser().kegDb, true);
+    }
     /**
      * @type {Array<InvitedContact>}
      */
@@ -17,9 +20,6 @@ class Invites extends SyncedKeg {
      * @type {Array<string>}
      */
     received = [];
-    constructor() {
-        super('invites', getUser().kegDb, true);
-    }
 
     serializeKegPayload() {
         throw new Error('Read only keg is not supposed to be saved.');

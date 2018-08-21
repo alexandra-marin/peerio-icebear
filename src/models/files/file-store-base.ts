@@ -20,6 +20,20 @@ function isSelectedFileShareable(file) {
 }
 
 class FileStoreBase {
+    constructor(kegDb, root = null, id) {
+        this.id = id; // something to identify this instance in runtime
+        this._kegDb = kegDb;
+        const m = createMap(this.files, 'fileId');
+        this.fileMap = m.map;
+        this.fileMapObservable = m.observableMap;
+        this.folderStore = new FileStoreFolders(this, root);
+        if (id !== 'main') {
+            FileStoreBase.instances.set(this.id, this);
+        } else {
+            tracker.onceUpdated(this.onFileDigestUpdate);
+        }
+    }
+
     // #region File store instances
     static instances = observable.map();
     getFileStoreById(id) {
@@ -34,20 +48,6 @@ class FileStoreBase {
         FileStoreBase.instances.delete(this.id);
     }
     // #endregion
-
-    constructor(kegDb, root = null, id) {
-        this.id = id; // something to identify this instance in runtime
-        this._kegDb = kegDb;
-        const m = createMap(this.files, 'fileId');
-        this.fileMap = m.map;
-        this.fileMapObservable = m.observableMap;
-        this.folderStore = new FileStoreFolders(this, root);
-        if (id !== 'main') {
-            FileStoreBase.instances.set(this.id, this);
-        } else {
-            tracker.onceUpdated(this.onFileDigestUpdate);
-        }
-    }
 
     // #region Properties
     @observable.shallow files = [];

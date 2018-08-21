@@ -96,7 +96,7 @@
     "nyc": "12.0.2",
     "opt-cli": "1.6.0",
     "otplib": "10.0.1",
-    "prettier": "1.14.2",
+    "prettier": "1.13.7",
     "quoted-printable": "1.0.1",
     "request": "2.88.0",
     "standard-version": "4.4.0",

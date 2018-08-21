@@ -1,7 +1,7 @@
 import config from '../../config';
 
+/** @param {ChatStore} store */
 class ChatStoreCache {
-    /** @param {ChatStore} store */
     constructor(store) {
         this.store = store;
     }

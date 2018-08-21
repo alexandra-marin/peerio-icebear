@@ -3,12 +3,9 @@ import TinyDbCollection from './tiny-db-collection';
 /**
  * TinyDbManager manages system and user collections, and allows opening
  * other collections.
+ * @param {Function} [createStorageEngine] - function returning a new storage engine for the name
  */
 class TinyDbManager {
-    /**
-     * Creates a TinyDB instance.
-     * @param {Function} [createStorageEngine] - function returning a new storage engine for the name
-     */
     constructor(createStorageEngine) {
         this.createStorageEngine = createStorageEngine;
         this.systemCollection = null;

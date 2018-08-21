@@ -20,7 +20,6 @@ import { asPromise } from '../../helpers/prombservable';
 import _ from 'lodash';
 
 export class FileStore extends FileStoreBase {
-    isMainStore = true;
     constructor() {
         super(null, null, 'main');
         this.bulk = new FileStoreBulk(this);
@@ -31,6 +30,7 @@ export class FileStore extends FileStoreBase {
 
         when(() => this.allStoresLoaded, this.onFinishLoading);
     }
+    isMainStore = true;
 
     // Human readable maximum auto-expandable inline image size limit
     inlineImageSizeLimitFormatted = util.formatBytes(config.chat.inlineImageSizeLimit);

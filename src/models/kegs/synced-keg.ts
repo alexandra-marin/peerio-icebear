@@ -2,7 +2,7 @@ import { serverErrorCodes } from '../../errors';
 import tracker from '../update-tracker';
 import { retryUntilSuccess } from '../../helpers/retry';
 import TaskQueue from '../../helpers/task-queue';
-import Keg from './keg'.default;
+import Keg from './keg';
 import warnings from '../warnings';
 
 /**

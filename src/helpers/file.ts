@@ -1,50 +1,41 @@
 /**
  * Various file helpers
- * @alias fileHelpers
  */
 
 /**
  * Extracts file name+extension portion from any path.
- * @param {string} path
- * @returns {string} file name and extension without any parent folders.
+ * @returns file name and extension without any parent folders.
  */
-function getFileName(path) {
+export function getFileName(path: string) {
     return path.replace(/^.*[\\/]/, '');
 }
 
 /**
  * Extracts file name without extension from any path
- * @param {string} path
- * @returns {string} file name without extension
+ * @returns file name without extension
  */
-function getFileNameWithoutExtension(path) {
+export function getFileNameWithoutExtension(path: string) {
     return getFileName(path).replace(/\.\w+$/, '');
 }
 
 /**
  * Extracts file extension from any path.
- * @param {string} path
- * @returns {string} file extension
+ * @returns file extension
  */
-function getFileExtension(path) {
-    let extension = path.toLocaleLowerCase().match(/\.\w+$/);
-    extension = extension ? extension[0].substring(1) : '';
+export function getFileExtension(path: string) {
+    let matches = path.toLocaleLowerCase().match(/\.\w+$/);
+    const extension = matches ? matches[0].substring(1) : '';
     return extension;
 }
 
-/**
- * For use with FileSpriteIcon. Determines general file "type" based on extension.
- * @param {string} file extension
- * @returns {string} file type
- */
-const fileIconType = {
+const fileIconTypes = {
     txt: 'txt',
     pdf: 'pdf',
     ai: 'ai',
     psd: 'psd'
 };
 function createFileType(ext, type) {
-    fileIconType[ext] = type;
+    fileIconTypes[ext] = type;
 }
 ['bmp', 'gif', 'jpeg', 'jpg', 'png', 'svg', 'tif', 'tiff'].forEach(ext =>
     createFileType(ext, 'img')
@@ -60,13 +51,18 @@ function createFileType(ext, type) {
 ['xls', 'xlsx'].forEach(ext => createFileType(ext, 'xls'));
 ['ppt', 'pptx'].forEach(ext => createFileType(ext, 'ppt'));
 
-function getFileIconType(ext) {
-    return fileIconType[ext] ? fileIconType[ext] : 'other';
+/**
+ * For use with FileSpriteIcon. Determines general file "type" based on extension.
+ * @param file extension
+ * @returns  file type
+ */
+export function getFileIconType(ext: string): string {
+    return fileIconTypes[ext] ? fileIconTypes[ext] : 'other';
 }
 
 const IMAGE_EXTS = { png: true, jpg: true, jpeg: true, bmp: true, gif: true };
 
-function isImage(ext) {
+export function isImage(ext) {
     return !!IMAGE_EXTS[ext.toLowerCase().trim()];
 }
 
@@ -103,7 +99,7 @@ to the example above, it would be displayed as:
 // Regex for matching opening Directional Formatting Codes.
 const DFC_RX = /[\u202A-\u202E\u2066-\u2068]/;
 
-function sanitizeBidirectionalFilePart(name) {
+function sanitizeBidirectionalFilePart(name: string): string {
     // Quickly check if name contains characters we're interested in
     // (only those that push to formatting stack, not pop).
     if (name.length === 0 || !DFC_RX.test(name)) {
@@ -160,7 +156,7 @@ function sanitizeBidirectionalFilePart(name) {
     return name;
 }
 
-function sanitizeBidirectionalFilename(filename) {
+export function sanitizeBidirectionalFilename(filename: string) {
     // Filename and extension are sanitize separately
     // to ensure that bad name bidirectional formatting
     // won't "corrupt" extension, and vice versa.
@@ -172,12 +168,3 @@ function sanitizeBidirectionalFilename(filename) {
     }
     return sanitizeBidirectionalFilePart(filename);
 }
-
-export default {
-    getFileName,
-    getFileExtension,
-    getFileNameWithoutExtension,
-    getFileIconType,
-    isImage,
-    sanitizeBidirectionalFilename
-};

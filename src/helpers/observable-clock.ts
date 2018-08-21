@@ -10,6 +10,11 @@ import config from '../config';
  * @param {number} interval - clock update interval in seconds
  */
 class Clock {
+    constructor(interval) {
+        this._atom = new Atom('Clock', this._startTicking, this._stopTicking);
+        this._interval = interval;
+    }
+
     _atom;
     _intervalHandler = null;
     _lastTickValue;
@@ -18,11 +23,6 @@ class Clock {
      * @type {Clock}
      */
     static default;
-
-    constructor(interval) {
-        this._atom = new Atom('Clock', this._startTicking, this._stopTicking);
-        this._interval = interval;
-    }
 
     /**
      * Current timestamp. Observable. Updates every `this.interval` seconds

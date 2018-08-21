@@ -3,15 +3,14 @@ const CucumbotBase = require('./cucumbot-base');
 const testConfig = require('../test-config');
 
 class CucumbotClient extends CucumbotBase {
-    finished = false;
-    finishedWithError = false;
-
-    hasControl = 0;
-
     constructor(name, world) {
         super(world);
         this.name = name;
     }
+    finished = false;
+    finishedWithError = false;
+
+    hasControl = 0;
 
     start(noAccount) {
         let env = Object.assign({ CUCUMBOT: 1 }, process.env);

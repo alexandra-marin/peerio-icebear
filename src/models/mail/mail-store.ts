@@ -7,6 +7,13 @@ import _ from 'lodash';
 import { retryUntilSuccess } from '../../helpers/retry';
 
 class MailStore {
+    constructor() {
+        tracker.subscribeToKegUpdates('SELF', 'mail', () => {
+            console.log('Mails update event received');
+            this.onMailDigestUpdate();
+        });
+    }
+
     @observable.shallow mails = [];
     @observable loading = false;
     @observable currentFilter = '';
@@ -107,13 +114,6 @@ class MailStore {
         for (let i = 0; i < this.mails.length; i++) {
             this.mails[i].show = true;
         }
-    }
-
-    constructor() {
-        tracker.subscribeToKegUpdates('SELF', 'mail', () => {
-            console.log('Mails update event received');
-            this.onMailDigestUpdate();
-        });
     }
 
     onMailDigestUpdate = _.throttle(() => {

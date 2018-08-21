@@ -12,6 +12,15 @@ import { AbstractCallError } from '../../errors';
  * @param {string} mode - 'read' or 'write' or 'append'
  */
 class FileStreamAbstract {
+    constructor(filePath, mode) {
+        this.filePath = filePath;
+        if (mode !== 'read' && mode !== 'write' && mode !== 'append') {
+            throw new Error('Invalid stream mode.');
+        }
+        this.mode = mode;
+        this.pos = 0;
+    }
+
     /**
      * @type {string}
      */
@@ -25,15 +34,6 @@ class FileStreamAbstract {
      * @type {number}
      */
     pos;
-
-    constructor(filePath, mode) {
-        this.filePath = filePath;
-        if (mode !== 'read' && mode !== 'write' && mode !== 'append') {
-            throw new Error('Invalid stream mode.');
-        }
-        this.mode = mode;
-        this.pos = 0;
-    }
 
     /**
      * Reads a chunk of data from file stream.

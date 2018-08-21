@@ -7,6 +7,10 @@ import { computed, observable, action } from 'mobx';
  * @class TaskQueue
  */
 class TaskQueue {
+    constructor(parallelism, throttle) {
+        this.parallelism = parallelism || 1;
+        this.throttle = throttle || 0;
+    }
     /**
      */
     paused = false;
@@ -27,11 +31,6 @@ class TaskQueue {
     @computed
     get length() {
         return this.waitingTasks.length + this.runningTasks;
-    }
-
-    constructor(parallelism, throttle) {
-        this.parallelism = parallelism || 1;
-        this.throttle = throttle || 0;
     }
 
     /**

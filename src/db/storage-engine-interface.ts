@@ -3,8 +3,8 @@
  * TinyDb will get the implementation from config module and use it.
  */
 export interface StorageEngineInterface {
-    /** 
-     * @param namespace - unique namespace will be passed to storage engine when instantiating. 
+    /**
+     * @param namespace - unique namespace will be passed to storage engine when instantiating.
      */
     new (namespace: string, keyPath?: string): StorageEngineInterface;
 

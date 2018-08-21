@@ -6,11 +6,11 @@ import { getUser } from '../../helpers/di-current-user';
  * @extends {SyncedKeg}
  */
 class MyContacts extends SyncedKeg {
-    contacts = {};
-
     constructor() {
         super('my_contacts', getUser().kegDb, true, true);
     }
+
+    contacts = {};
 
     serializeKegPayload() {
         return { contacts: this.contacts };

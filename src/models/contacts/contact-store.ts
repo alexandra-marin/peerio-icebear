@@ -21,6 +21,21 @@ import ContactStoreWhitelabel from './contact-store.whitelabel';
  * @namespace
  */
 export class ContactStore {
+    constructor() {
+        intercept(this, 'uiViewSortBy', this._checkSortValue);
+        intercept(this, 'uiViewFilter', this._checkFilterValue);
+        this._contactMap = createMap(this.contacts, 'username').map;
+        this.whitelabel = new ContactStoreWhitelabel(this);
+        socket.onceAuthenticated(() => {
+            this.myContacts = new MyContacts();
+            this.myContacts.onUpdated = this.applyMyContactsData;
+            this.invites = new Invites();
+            this.invites.onUpdated = this.applyInvitesData;
+            this.loadContactsFromTOFUKegs();
+            this.currentUser = this.getContact(getUser().username);
+        });
+    }
+
     /**
      * All peerio users your app encounters end up here (except invited by email, they're non-peerio users).
      * @type {ObservableArray<Contact>}
@@ -171,21 +186,6 @@ export class ContactStore {
             ret.push({ letter, items: itemsByLetter[letter] });
         }
         return ret;
-    }
-
-    constructor() {
-        intercept(this, 'uiViewSortBy', this._checkSortValue);
-        intercept(this, 'uiViewFilter', this._checkFilterValue);
-        this._contactMap = createMap(this.contacts, 'username').map;
-        this.whitelabel = new ContactStoreWhitelabel(this);
-        socket.onceAuthenticated(() => {
-            this.myContacts = new MyContacts();
-            this.myContacts.onUpdated = this.applyMyContactsData;
-            this.invites = new Invites();
-            this.invites.onUpdated = this.applyInvitesData;
-            this.loadContactsFromTOFUKegs();
-            this.currentUser = this.getContact(getUser().username);
-        });
     }
 
     applyMyContactsData = action(() => {

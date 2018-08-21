@@ -7,6 +7,11 @@ import tracker from '../update-tracker';
 import warnings from '../warnings';
 
 class GhostStore {
+    constructor() {
+        this.updateGhosts = this.updateGhosts.bind(this);
+        this.loadAllGhosts = this.loadAllGhosts.bind(this);
+    }
+
     @observable.shallow ghosts = []; // sorted array
     @observable ghostMap = observable.shallowMap({}); // ghost by ghostId
     @observable loading = false;
@@ -18,11 +23,6 @@ class GhostStore {
     @computed
     get selectedGhost() {
         return this.ghostMap.get(this.selectedId);
-    }
-
-    constructor() {
-        this.updateGhosts = this.updateGhosts.bind(this);
-        this.loadAllGhosts = this.loadAllGhosts.bind(this);
     }
 
     /*

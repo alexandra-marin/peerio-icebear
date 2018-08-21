@@ -18,6 +18,27 @@ import { asPromise } from '../helpers/prombservable';
  * @namespace UpdateTracker
  */
 class UpdateTracker {
+    constructor() {
+        socket.onceStarted(() => {
+            socket.subscribe(socket.APP_EVENTS.digestUpdate, data => {
+                this.processDigestEvent(
+                    data.kegDbId || data.path,
+                    [data.type, data.maxUpdateId, data.knownUpdateId, data.newKegsCount],
+                    true
+                );
+            });
+            socket.subscribe(
+                socket.APP_EVENTS.channelDeleted,
+                this.processChannelDeletedEvent.bind(this)
+            );
+            socket.onAuthenticated(this.loadDigest);
+            socket.onDisconnect(() => {
+                this.updated = false;
+            });
+            if (socket.authenticated) this.loadDigest();
+        });
+    }
+
     DESCRIPTOR_PATH = 'global:fileDescriptor:updated';
     /**
      * listeners to new keg db added event
@@ -70,27 +91,6 @@ class UpdateTracker {
 
     onceUpdated(handler) {
         when(() => this.updated, () => setTimeout(handler));
-    }
-
-    constructor() {
-        socket.onceStarted(() => {
-            socket.subscribe(socket.APP_EVENTS.digestUpdate, data => {
-                this.processDigestEvent(
-                    data.kegDbId || data.path,
-                    [data.type, data.maxUpdateId, data.knownUpdateId, data.newKegsCount],
-                    true
-                );
-            });
-            socket.subscribe(
-                socket.APP_EVENTS.channelDeleted,
-                this.processChannelDeletedEvent.bind(this)
-            );
-            socket.onAuthenticated(this.loadDigest);
-            socket.onDisconnect(() => {
-                this.updated = false;
-            });
-            if (socket.authenticated) this.loadDigest();
-        });
     }
 
     processChannelDeletedEvent(data) {

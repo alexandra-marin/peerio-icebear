@@ -38,12 +38,12 @@ function getContactFilter() {
 }
 
 class ContactStoreWhitelabel {
-    // ref to contactStore
-    store = null;
-
     constructor(store) {
         this.store = store;
     }
+
+    // ref to contactStore
+    store = null;
 
     // Filter contacts in whitelabel namespace
     // Context corresponds to part of UI where filtering is applied

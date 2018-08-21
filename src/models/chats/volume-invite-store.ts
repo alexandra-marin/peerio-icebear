@@ -19,10 +19,10 @@ class ChatHead extends Keg {
 }
 
 class ReceivedInvite {
-    @observable declined = false;
     constructor(data) {
         Object.assign(this, data);
     }
+    @observable declined = false;
 }
 
 class VolumeInviteStore {

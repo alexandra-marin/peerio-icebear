@@ -29,12 +29,6 @@ export interface ServerWarningData {
  */
 export default class ServerWarning extends SystemWarning {
     /**
-     * to use when dismissing/acknowledging server message
-     */
-    token: string;
-    onClear?: () => void;
-
-    /**
      * Server warning. Server sends locale key and severity level for client to display.
      * You don't need to create instances of this class, Icebear takes care of it.
      * @param obj warning object as received from server
@@ -49,6 +43,12 @@ export default class ServerWarning extends SystemWarning {
         this.token = obj.token;
         this.onClear = onClear;
     }
+
+    /**
+     * to use when dismissing/acknowledging server message
+     */
+    token: string;
+    onClear?: () => void;
 
     dispose() {
         return retryUntilSuccess(() =>

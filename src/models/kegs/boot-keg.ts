@@ -21,19 +21,19 @@ interface BootKegPayload {
  * Named plaintext Boot keg for 'SELF' databases.
  */
 export default class BootKeg extends Keg<BootKegPayload> {
-    @observable.shallow keys = {};
-    kegKey: Uint8Array | null = null;
-    kegKeyId = '0';
-
-    signKeys: KeyPair | null = null;
-    encryptionKeys: KeyPair | null = null;
-
     constructor(db: KegDb, bootKey: Uint8Array) {
         // named kegs are pre-created, so we know the id already and only going to update boot keg
         super('boot', 'boot', db);
         this.overrideKey = bootKey;
         this.version = 1; // pre-created named keg
     }
+
+    @observable.shallow keys = {};
+    kegKey: Uint8Array | null = null;
+    kegKeyId = '0';
+
+    signKeys: KeyPair | null = null;
+    encryptionKeys: KeyPair | null = null;
 
     /**
      * Waits until keyId is available and resolves with it.

@@ -3,7 +3,7 @@ import mixUserProfileModule from './user.profile.js';
 import mixUserRegisterModule from './user.register.js';
 import mixUserAuthModule from './user.auth.js';
 import mixUser2faModule from './user.2fa.js';
-import KegDb from './../kegs/keg-db'.default;
+import KegDb from './../kegs/keg-db';
 import TinyDb from '../../db/tiny-db';
 import { observable, when, computed } from 'mobx';
 import currentUserHelper from './../../helpers/di-current-user';
@@ -28,6 +28,16 @@ let currentUser;
  * Many private and protected members are not documented with jsdoc tags to avoid clutter.
  */
 export default class User {
+    constructor() {
+        this.kegDb = new KegDb('SELF');
+        // this is not really extending prototype, but we don't care because User is almost a singleton
+        // (new instance created on every initial login attempt only)
+        mixUserProfileModule.call(this);
+        mixUserAuthModule.call(this);
+        mixUserRegisterModule.call(this);
+        mixUser2faModule.call(this);
+    }
+
     _username = '';
     /**
      * @type {string}
@@ -191,16 +201,6 @@ export default class User {
      * @type {MRUList}
      */
     emojiMRU = new MRUList('emojiPicker', 30);
-
-    constructor() {
-        this.kegDb = new KegDb('SELF');
-        // this is not really extending prototype, but we don't care because User is almost a singleton
-        // (new instance created on every initial login attempt only)
-        mixUserProfileModule.call(this);
-        mixUserAuthModule.call(this);
-        mixUserRegisterModule.call(this);
-        mixUser2faModule.call(this);
-    }
 
     /**
      * All current active plan names

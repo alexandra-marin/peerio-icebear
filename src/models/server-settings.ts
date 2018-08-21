@@ -9,6 +9,15 @@ import { observable, reaction } from 'mobx';
 import { retryUntilSuccess } from '../helpers/retry';
 
 class ServerSettings {
+    constructor() {
+        reaction(
+            () => socket.authenticated,
+            authenticated => {
+                if (authenticated) this.loadSettings();
+            },
+            true
+        );
+    }
     /**
      * Observable base url for avatars https service
      * @type {string}
@@ -31,15 +40,6 @@ class ServerSettings {
      */
     @observable maintenanceWindow;
 
-    constructor() {
-        reaction(
-            () => socket.authenticated,
-            authenticated => {
-                if (authenticated) this.loadSettings();
-            },
-            true
-        );
-    }
     /**
      * (Re)loads server settings from server.
      */

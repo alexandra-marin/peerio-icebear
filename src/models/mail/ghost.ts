@@ -9,6 +9,22 @@ import defaultClock from '../../helpers/observable-clock';
 import ghostAPI from './ghost.api'; // most of the ghost-specific logic is in here
 
 class Ghost extends Keg {
+    /*
+     * Constructor.
+     *
+     * NOTE: ghost IDs are in hex for browser compatibility.
+     */
+    constructor(db) {
+        super(null, 'ghost', db);
+        this.revoke = this.revoke.bind(this);
+        this.version = 2;
+        this.passphrase = PhraseDictionary.current.getPassphrase(
+            this.DEFAULT_GHOST_PASSPHRASE_LENGTH
+        );
+        // encode user-specific ID in hex
+        this.ghostId = cryptoUtil.getRandomUserSpecificIdHex(User.current.username);
+    }
+
     DEFAULT_GHOST_LIFESPAN = 259200; // 3 days
     DEFAULT_GHOST_PASSPHRASE_LENGTH = 5;
 
@@ -65,22 +81,6 @@ class Ghost extends Keg {
 
     set ephemeralKeypair(kp) {
         this.keypair = kp;
-    }
-
-    /*
-     * Constructor.
-     *
-     * NOTE: ghost IDs are in hex for browser compatibility.
-     */
-    constructor(db) {
-        super(null, 'ghost', db);
-        this.revoke = this.revoke.bind(this);
-        this.version = 2;
-        this.passphrase = PhraseDictionary.current.getPassphrase(
-            this.DEFAULT_GHOST_PASSPHRASE_LENGTH
-        );
-        // encode user-specific ID in hex
-        this.ghostId = cryptoUtil.getRandomUserSpecificIdHex(User.current.username);
     }
 
     /*

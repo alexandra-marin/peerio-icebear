@@ -7,7 +7,7 @@ import { observable, action, IObservableArray } from 'mobx';
  * @param name - unique name for the list
  * @param limit - maximum number of elements in the list (will remove least recent)
  */
-class MRUList {
+export default class MRUList {
     constructor(name: string, limit = 10) {
         this._name = `MRU_${name}`;
         this._limit = limit;
@@ -45,5 +45,3 @@ class MRUList {
         this._saveCache();
     }
 }
-
-export default MRUList;

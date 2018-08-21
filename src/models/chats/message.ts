@@ -1,7 +1,7 @@
 import { observable, computed, when } from 'mobx';
 import contactStore from './../contacts/contact-store';
 import User from './../user/user';
-import Keg from './../kegs/keg'.default;
+import Keg from './../kegs/keg';
 import moment from 'moment';
 import _ from 'lodash';
 import { retryUntilSuccess } from '../../helpers/retry';

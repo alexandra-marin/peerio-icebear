@@ -1,4 +1,4 @@
-import Keg from '../kegs/keg'.default;
+import Keg from '../kegs/keg';
 
 /**
  * Plaintext readonly system named keg.

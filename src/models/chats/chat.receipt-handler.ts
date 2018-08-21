@@ -12,13 +12,6 @@ import TaskQueue from '../../helpers/task-queue';
  */
 
 class ChatReceiptHandler {
-    downloadedCollectionVersion = '';
-    // this value means that something is scheduled to send
-    pendingReceipt = null;
-    _reactionsToDispose = [];
-
-    loadQueue = new TaskQueue(1, 1000);
-
     constructor(chat) {
         this.chat = chat;
         // receipts cache {username: ReadReceipt}
@@ -46,6 +39,13 @@ class ChatReceiptHandler {
             )
         );
     }
+
+    downloadedCollectionVersion = '';
+    // this value means that something is scheduled to send
+    pendingReceipt = null;
+    _reactionsToDispose = [];
+
+    loadQueue = new TaskQueue(1, 1000);
 
     onDigestUpdate = () => {
         const digest = tracker.getDigest(this.chat.id, 'read_receipt');

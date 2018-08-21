@@ -1,4 +1,4 @@
-import Keg from '../kegs/keg'.default;
+import Keg from '../kegs/keg';
 import { observable } from 'mobx';
 
 /**
@@ -8,6 +8,11 @@ import { observable } from 'mobx';
  * @param {User} user
  */
 class Settings extends Keg {
+    constructor(user) {
+        super('settings', 'settings', user.kegDb, true);
+        this.user = user;
+    }
+
     /**
      * @type {boolean}
      */
@@ -34,11 +39,6 @@ class Settings extends Keg {
     @observable subscribeToPromoEmails = false;
 
     @observable loaded = false;
-
-    constructor(user) {
-        super('settings', 'settings', user.kegDb, true);
-        this.user = user;
-    }
 
     serializeKegPayload() {
         return {

@@ -6,6 +6,9 @@ import { getUser } from '../../helpers/di-current-user';
  * @extends {SyncedKeg}
  */
 class MyChats extends SyncedKeg {
+    constructor() {
+        super('my_chats', getUser().kegDb);
+    }
     /**
      * Favorite chat ids
      * @type {Array<string>}
@@ -16,10 +19,6 @@ class MyChats extends SyncedKeg {
      * @type {Array<string>}
      */
     hidden = [];
-
-    constructor() {
-        super('my_chats', getUser().kegDb);
-    }
 
     serializeKegPayload() {
         return {

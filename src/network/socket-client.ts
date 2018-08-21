@@ -7,7 +7,7 @@ import { ServerError, serverErrorCodes, DisconnectedError, NotAuthenticatedError
 import io from 'socket.io-client/dist/socket.io';
 import { observable } from 'mobx';
 import config from '../config';
-import util from '../util';
+import * as util from '../util';
 import Timer from '../helpers/observable-timer';
 import { getUser } from '../helpers/di-current-user';
 import TaskPacer from '../helpers/task-pacer';
@@ -352,9 +352,9 @@ export default class SocketClient {
      * @param {string} name - api method name
      * @param {any=} data - data to send
      * @param {?bool} hasBinaryData - if you know for sure, set this to true/false to increase performance
-     * @returns {Promise<Object>} - server response, always returns `{}` if response is empty
+     * @returns - server response, always returns `{}` if response is empty
      */
-    send(name, data, hasBinaryData = null) {
+    send(name, data?, hasBinaryData = null) {
         const id = this.requestId++;
         return new Promise((resolve, reject) => {
             this.awaitingRequests[id] = { name, data, reject };
@@ -401,7 +401,7 @@ export default class SocketClient {
             .timeout(60000)
             .finally(() => {
                 delete this.awaitingRequests[id];
-            });
+            }) as Promise<any>;
     }
 
     /**

@@ -556,7 +556,7 @@ class ContactStore {
                 if (c.loading || c.notFound) return false;
             }
             return (
-                c.username.includes(token) || c.fullNameLower.includes(token)
+                c.username.includes(token) || c.fullNameLower.includes(token) || c.addresses.some(x => x.includes(token))
             );
         });
         if (nosort) return ret;

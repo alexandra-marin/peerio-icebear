@@ -8,13 +8,13 @@
 
 import { t } from 'peerio-translator';
 import contactStore from '../models/contacts/contact-store';
+import Message from '../models/chats/message';
 
 /**
  * Checks message object for system data and returns translated string to render for the system data.
- * @param {Message} msg
- * @returns {string} - translated string to render for this system message
+ * @returns translated string to render for the system message
  */
-function getSystemMessageText(msg) {
+function getSystemMessageText(msg: Message): string {
     switch (msg.systemData.action) {
         case 'rename':
             return msg.systemData.newName

@@ -4,30 +4,29 @@
 
 const urlRegex: RegExp = require('url-regex')();
 import config from '../config';
+
+type HeaderDict = { [headerName: string]: string };
 // url : headers
-const urlCache = {};
+export const urlCache: { [url: string]: HeaderDict } = {};
 // url : promise
-const urlsInProgress = {};
+const urlsInProgress: { [url: string]: Promise<HeaderDict> } = {};
 
 /**
  * Detects urls in a string and returns them.
- * @param {string} str
- * @returns {Array[string]}
+ * @param str - string containing zero or more urls
  */
-function getUrls(str) {
+export function getUrls(str: string): string[] {
     if (!str) return [];
     return str.match(urlRegex) || [];
 }
-
-function getContentHeaders(url) {
+export function getContentHeaders(url: string) {
     if (urlCache[url]) return Promise.resolve(urlCache[url]);
     if (urlsInProgress[url]) return urlsInProgress[url];
 
-    const promise = new Promise((resolve, reject) => {
+    const promise = new Promise<HeaderDict>((resolve, reject) => {
         const req = new XMLHttpRequest();
         let resolved = false;
         req.onreadystatechange = () => {
-            /* eslint-disable no-case-declarations */
             switch (req.readyState) {
                 case 1:
                     req.send();
@@ -46,7 +45,6 @@ function getContentHeaders(url) {
                 default:
                     break;
             }
-            /* eslint-enable no-case-declarations */
         };
         req.timeout = config.unfurlTimeout;
         req.open('GET', url);
@@ -56,7 +54,7 @@ function getContentHeaders(url) {
     return promise;
 }
 
-function parseResponseHeaders(headerStr) {
+function parseResponseHeaders(headerStr: string): { [key: string]: string } {
     const headers = {};
     if (!headerStr) {
         return headers;
@@ -75,5 +73,3 @@ function parseResponseHeaders(headerStr) {
     }
     return headers;
 }
-
-export default { getUrls, getContentHeaders, urlCache };

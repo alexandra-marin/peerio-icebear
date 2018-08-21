@@ -1,32 +1,38 @@
-import { computed, observable, action } from 'mobx';
+import { computed, observable, action, IObservableArray } from 'mobx';
 
+interface TaskInfo {
+    task: () => any;
+    context: {};
+    args: any[];
+    onSuccess: (result: any) => void;
+    onError: (err: any) => void;
+}
 /**
  * Observable task queue implementation
- * @param {number} [parallelism=1] - how many tasks can run(wait to be finished) at the same time
- * @param {number} [throttle=0] - how many milliseconds delay to make before running every task
- * @class TaskQueue
+ * @param parallelism - how many tasks can run(wait to be finished) at the same time
+ * @param throttle - how many milliseconds delay to make before running every task
  */
 class TaskQueue {
-    constructor(parallelism, throttle) {
-        this.parallelism = parallelism || 1;
-        this.throttle = throttle || 0;
+    constructor(parallelism = 1, throttle = 0) {
+        this.parallelism = parallelism;
+        this.throttle = throttle;
     }
+    parallelism: number;
+    throttle: number;
     /**
      */
     paused = false;
     /**
      * List of tasks in queue. Running tasks are not here.
-     * @type {ObservableArray<function>}
      */
-    @observable.shallow waitingTasks = [];
+    @observable.shallow waitingTasks = [] as IObservableArray<TaskInfo>;
     /**
      * Amount of currently running tasks
-     * @type {Observable<number>}
      */
     @observable runningTasks = 0;
     /**
      * Amount of currently running tasks + tasks in queue
-     * @type {Computed<number>}
+     * @type
      */
     @computed
     get length() {
@@ -37,28 +43,33 @@ class TaskQueue {
      * Adds task to the queue.
      * Depending on return value task will be considered finished right after exit from the function or
      * after returned promise is fulfilled.
-     * @param {function} task - function to run
-     * @param {Object} [context] - 'this' context to execute the task with
-     * @param {Array<any>} [args] - arguments to pass to the task
-     * @param {callback} [onSuccess] - callback will be executed as soon as task is finished without error
-     * @param {callback<Error>} [onError] - callback will be executed if task throws or rejects promise
-     * @returns {Promise}
+     * @param task - function to run
+     * @param context - 'this' context to execute the task with
+     * @param args - arguments to pass to the task
+     * @param onSuccess - callback will be executed as soon as task is finished without error
+     * @param onError - callback will be executed if task throws or rejects promise
+
      */
     @action
-    addTask(task, context, args, onSuccess, onError) {
-        return new Promise((resolve, reject) => {
+    addTask<T>(
+        task: () => any,
+        context?: {},
+        args?: any[],
+        onSuccess?: (result: T) => void,
+        onError?: (err) => void
+    ) {
+        return new Promise<T>((resolve, reject) => {
             this.waitingTasks.push({
                 task,
                 context,
                 args,
-                onSuccess: (...finishArgs) => {
-                    resolve(...finishArgs);
-                    if (onSuccess) onSuccess(...finishArgs);
+                onSuccess: result => {
+                    resolve(result);
+                    if (onSuccess) onSuccess(result);
                 },
-                onError: (...errArgs) => {
-                    // eslint-disable-next-line prefer-promise-reject-errors
-                    reject(...errArgs);
-                    if (onError) onError(...errArgs);
+                onError: err => {
+                    reject(err);
+                    if (onError) onError(err);
                 }
             });
             if (!this.paused) setTimeout(this.runTask, this.throttle);
@@ -86,7 +97,7 @@ class TaskQueue {
                 return;
             }
             // otherwise we assume the task was synchronous
-            if (t.onSuccess) t.onSuccess();
+            if (t.onSuccess) t.onSuccess(ret);
             this.onTaskComplete();
         } catch (ex) {
             // in case something went wrong we schedule next task

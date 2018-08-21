@@ -12,41 +12,41 @@ import Timer from '../helpers/observable-timer';
 import { getUser } from '../helpers/di-current-user';
 import TaskPacer from '../helpers/task-pacer';
 
-const STATES = {
-    open: 'open',
-    opening: 'opening',
-    closed: 'closed',
-    closing: 'closing'
-};
+enum STATES {
+    open = 'open',
+    opening = 'opening',
+    closed = 'closed',
+    closing = 'closing'
+}
 
 // socket.io event
-const SOCKET_EVENTS = {
-    connect: 'connect',
-    connect_error: 'connect_error',
-    connect_timeout: 'connect_timeout',
-    connecting: 'connecting',
-    disconnect: 'disconnect',
-    error: 'error',
-    reconnect: 'reconnect',
-    reconnect_attempt: 'reconnect_attempt',
-    reconnect_failed: 'reconnect_failed',
-    reconnect_error: 'reconnect_error',
-    reconnecting: 'reconnecting',
-    ping: 'ping',
-    pong: 'pong',
-    authenticated: 'authenticated'
-};
+enum SOCKET_EVENTS {
+    connect = 'connect',
+    connect_error = 'connect_error',
+    connect_timeout = 'connect_timeout',
+    connecting = 'connecting',
+    disconnect = 'disconnect',
+    error = 'error',
+    reconnect = 'reconnect',
+    reconnect_attempt = 'reconnect_attempt',
+    reconnect_failed = 'reconnect_failed',
+    reconnect_error = 'reconnect_error',
+    reconnecting = 'reconnecting',
+    ping = 'ping',
+    pong = 'pong',
+    authenticated = 'authenticated'
+}
 
 // application events sent by app server
-const APP_EVENTS = {
-    digestUpdate: 'digestUpdate',
-    serverWarning: 'serverWarning',
-    // clearWarning: 'clearWarning',
-    channelInvitesUpdate: 'channelInvitesUpdate',
-    channelDeleted: 'channelDeleted',
-    volumeDeleted: 'volumeDeleted',
-    fileMigrationUnlocked: 'fileMigrationUnlocked'
-};
+enum APP_EVENTS {
+    digestUpdate = 'digestUpdate',
+    serverWarning = 'serverWarning',
+    // clearWarning= 'clearWarning',
+    channelInvitesUpdate = 'channelInvitesUpdate',
+    channelDeleted = 'channelDeleted',
+    volumeDeleted = 'volumeDeleted',
+    fileMigrationUnlocked = 'fileMigrationUnlocked'
+}
 
 /**
  * Use socket.js to get the default instance of SocketClient, unless you do need a separate connection for some reason.
@@ -65,7 +65,7 @@ export default class SocketClient {
     /**
      * Socket.io client instance
      */
-    socket = null;
+    socket: SocketIOClientStatic = null;
     taskPacer = new TaskPacer(20); // todo: maybe move to config
     /**
      * Was socket started or not
@@ -77,40 +77,33 @@ export default class SocketClient {
     url = null;
     /**
      * Observable connection state.
-     * @type {boolean}
      */
     @observable connected = false;
     /**
      * This flag means that connection has technically been authenticated from server's perspective,
      * but client is still initializing, loading boot keg and other important data needed before starting any other
      * processes and setting socket.authenticated to true.
-     * @type {boolean}
      */
     preauthenticated = false;
     /**
      * Observable. Normally you want to use socket when it's authenticated rather then just connected.
-     * @type {boolean}
      */
     @observable authenticated = false;
     /**
      * Observable. Is the connection currently throttled by server.
-     * @type {boolean}
      */
     @observable throttled = false;
     /**
      * Observable. In case reconnection attempt failed, this property will reflect current attempt number.
-     * @type {number}
      */
     @observable reconnectAttempt = 0;
     /**
      * Observable. Shows current server response time in milliseconds. This is not a network ping,
      * this is a time needed for a websocket message to do a round trip.
-     * @type {number}
      */
     @observable latency = 0;
     /**
      * Countdown to the next reconnect attempt.
-     * @type {Timer}
      */
     reconnectTimer = new Timer();
 
@@ -120,12 +113,10 @@ export default class SocketClient {
     /**
      * Total amount of bytes received since socket was created.
      * Note that this is not including file downloads, because downloads go through https.
-     * @type {number}
      */
     bytesReceived = 0;
     /**
      * Total amount of bytes sent since socket was created.
-     * @type {number}
      */
     bytesSent = 0;
     /**
@@ -161,9 +152,8 @@ export default class SocketClient {
 
     /**
      * Initializes the SocketClient instance, creates wrapped socket.io instance and so on.
-     * @param {string} url
      */
-    start(url) {
+    start(url: string) {
         if (this.started) return;
         console.log(`Starting socket: ${url}`);
         if (!url) {
@@ -279,10 +269,9 @@ export default class SocketClient {
     }
 
     /**
-     * Returns connection state, one of {@link STATES}
-     * @type {string}
+     * Returns connection state
      */
-    get state() {
+    get state(): string {
         // unknown states translated to 'closed' for safety
         return STATES[this.socket.io.readyState] || STATES.closed;
     }
@@ -314,11 +303,11 @@ export default class SocketClient {
     }
     /**
      * Subscribes a listener to one of the socket or app events.
-     * @param {string} event - event name, one of SOCKET_EVENTS or APP_EVENTS
-     * @param {function} listener - event handler
-     * @returns {function} function you can call to unsubscribe
+     * @param event - event name, one of SOCKET_EVENTS or APP_EVENTS
+     * @param listener - event handler
+     * @returns function you can call to unsubscribe
      */
-    subscribe(event, listener) {
+    subscribe(event: SOCKET_EVENTS, listener: () => void): () => void {
         this.validateSubscription(event, listener);
         if (event === SOCKET_EVENTS.authenticated) {
             // maybe this listener was subscribed already
@@ -333,10 +322,10 @@ export default class SocketClient {
 
     /**
      * Unsubscribes socket or app events listener.
-     * @param {string} event - event name, one of SOCKET_EVENTS or APP_EVENTS
-     * @param {function} listener - event handler
+     * @param event - event name, one of SOCKET_EVENTS or APP_EVENTS
+     * @param listener - event handler
      */
-    unsubscribe(event, listener) {
+    unsubscribe(event: string, listener: () => void) {
         this.validateSubscription(event, listener);
         if (event === SOCKET_EVENTS.authenticated) {
             const ind = this.authenticatedEventListeners.indexOf(listener);
@@ -420,9 +409,8 @@ export default class SocketClient {
     /**
      * Executes a callback only once when socket will connect.
      * If socket is already connected, callback will be scheduled to run ASAP.
-     * @param {function} callback
      */
-    onceConnected(callback) {
+    onceConnected(callback: () => void) {
         if (this.socket.connected) {
             setTimeout(callback, 0);
             return;
@@ -437,9 +425,8 @@ export default class SocketClient {
     /**
      * Executes a callback only once when socket will authenticate.
      * If socket is already authenticated, callback will be scheduled to run ASAP.
-     * @param {function} callback
      */
-    onceAuthenticated(callback) {
+    onceAuthenticated(callback: () => void) {
         if (this.authenticated) {
             setTimeout(callback, 0);
             return;
@@ -450,7 +437,7 @@ export default class SocketClient {
         };
         this.subscribe(SOCKET_EVENTS.authenticated, handler);
     }
-    onceDisconnected(callback) {
+    onceDisconnected(callback: () => void) {
         if (!this.connected) {
             setTimeout(callback, 0);
             return;
@@ -465,9 +452,8 @@ export default class SocketClient {
     /**
      * Executes a callback once socket is started.
      * If socket is already started, callback will be scheduled to run ASAP.
-     * @param {function} callback
      */
-    onceStarted(callback) {
+    onceStarted(callback: () => void) {
         if (this.started) {
             setTimeout(callback, 0);
             return;
@@ -478,20 +464,18 @@ export default class SocketClient {
     /**
      * Shortcut to frequently used 'authenticated' subscription.
      * Does not call handler if socket is already authenticated, only subscribes to future events.
-     * @param {function} handler
-     * @returns {function} unsubscribe function
+     * @returns unsubscribe function
      */
-    onAuthenticated(handler) {
+    onAuthenticated(handler: () => void): () => void {
         return this.subscribe(SOCKET_EVENTS.authenticated, handler);
     }
 
     /**
      * Shortcut to frequently used 'disconnect' subscription.
      * Does not call handler if socket is already disconnected, only subscribes to future events.
-     * @param {function} handler
-     * @returns {function} unsubscribe function
+     * @returns unsubscribe function
      */
-    onDisconnect(handler) {
+    onDisconnect(handler: () => void): () => void {
         return this.subscribe(SOCKET_EVENTS.disconnect, handler);
     }
 

@@ -6,29 +6,27 @@ import config from '../config';
  * Provides clock.now property that is mobx observable and changes at specified time interval.
  * Doesn't tick when no one is observing.
  * Create your own clock or use default one.
- * @class Clock
- * @param {number} interval - clock update interval in seconds
+ * @param interval - clock update interval in seconds
  */
-class Clock {
-    constructor(interval) {
+export default class Clock {
+    constructor(interval: number) {
         this._atom = new Atom('Clock', this._startTicking, this._stopTicking);
         this._interval = interval;
     }
 
-    _atom;
-    _intervalHandler = null;
-    _lastTickValue;
+    _atom: Atom;
+    _intervalHandle: any = null;
+    _lastTickValue: number;
+    _interval: number;
     /**
      * Default clock instance with `config.observableClockEventFrequency` interval
-     * @type {Clock}
      */
-    static default;
+    static default: Clock;
 
     /**
      * Current timestamp. Observable. Updates every `this.interval` seconds
-     * @type {number}
      */
-    get now() {
+    get now(): number {
         if (this._atom.reportObserved()) {
             return this._lastTickValue;
         }
@@ -50,15 +48,13 @@ class Clock {
 
     _startTicking = () => {
         this._tick(); // initial tick
-        this._intervalHandler = setInterval(this._tick, this._interval * 1000);
+        this._intervalHandle = setInterval(this._tick, this._interval * 1000);
     };
 
     _stopTicking = () => {
-        clearInterval(this._intervalHandler);
-        this._intervalHandler = null;
+        clearInterval(this._intervalHandle);
+        this._intervalHandle = null;
     };
 }
 
 Clock.default = new Clock(config.observableClockEventFrequency);
-
-export default Clock;

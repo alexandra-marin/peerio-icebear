@@ -57,7 +57,7 @@
     "mkdirp": "0.5.1",
     "mobx": "3.5.1",
     "moment": "2.22.2",
-    "peerio-translator": "github:PeerioTechnologies/peerio-translator#v1.0.0",
+    "peerio-translator": "github:PeerioTechnologies/peerio-translator#v1.0.1",
     "rimraf": "2.6.2",
     "safe-json-stringify": "1.2.0",
     "scrypt-async": "2.0.0",

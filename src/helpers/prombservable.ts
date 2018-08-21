@@ -5,39 +5,36 @@ import { when } from 'mobx';
 
 /**
  * Makes a promise out of observable.
- * @param {Object} object - any object
- * @param {string} observableProperty - observable property name inside object
- * @param {any} expectedValue - resolve promise when observable property has this value (strict equality ===)
- * @returns {Promise}
+ * @param object - any object
+ * @param observableProperty - observable property name inside object
+ * @param expectedValue - resolve promise when observable property has this value (strict equality ===)
  */
-export function asPromise(object, observableProperty, expectedValue) {
-    return new Promise(resolve => {
+export function asPromise(object: {}, observableProperty: string, expectedValue: any) {
+    return new Promise<void>(resolve => {
         when(() => object[observableProperty] === expectedValue, () => setTimeout(resolve));
     });
 }
 
 /**
  * Makes a promise out of observable.
- * @param {Object} object - any object
- * @param {string} observableProperty - observable property name inside object
- * @param {any} unwantedValue - resolve promise when observable property doesn't have this value (strict equality !==)
- * @returns {Promise}
+ * @param object - any object
+ * @param observableProperty - observable property name inside object
+ * @param unwantedValue - resolve promise when observable property doesn't have this value (strict equality !==)
  */
-export function asPromiseNegative(object, observableProperty, unwantedValue) {
-    return new Promise(resolve => {
+export function asPromiseNegative(object: {}, observableProperty: string, unwantedValue: any) {
+    return new Promise<void>(resolve => {
         when(() => object[observableProperty] !== unwantedValue, () => setTimeout(resolve));
     });
 }
 
 /**
  * Makes a promise out of observable.
- * @param {Object} object - any object
- * @param {string} observableProperty - observable property name inside object
- * @param {Array<any>} expectedValue - resolve promise when observable property has one of this values ( strict === )
- * @returns {Promise}
+ * @param object - any object
+ * @param observableProperty - observable property name inside object
+ * @param expectedValue - resolve promise when observable property has one of this values ( strict === )
  */
-export function asPromiseMultiValue(object, observableProperty, expectedValues) {
-    return new Promise(resolve => {
+export function asPromiseMultiValue(object: {}, observableProperty: string, expectedValues: any[]) {
+    return new Promise<void>(resolve => {
         when(
             () => {
                 for (let i = 0; i < expectedValues.length; i++) {

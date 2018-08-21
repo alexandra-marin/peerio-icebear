@@ -1,31 +1,30 @@
+type Task = (() => any) & { __debugName: string };
 /**
  * Controls the execution rate of tasks by deferring execution.
  * Important notes:
  * - Tasks will always get executed asynchronously
  * - Execution order of the tasks will be the same
  * - It's ok for tasks to throw
- * @param {number} rate - how many tasks are allowed to execute in 1 second interval
- * @class TaskPacer
+ * @param rate - how many tasks are allowed to execute in 1 second interval
  */
 class TaskPacer {
-    constructor(rate) {
+    constructor(rate: number) {
         if (!rate) throw new Error('Task execution rate is not specified.');
         this.rate = rate;
     }
-
+    rate: number;
     // last task execution stat time, milliseconds will be set to 0
     lastRunTimestamp = 0;
     // how many tasks has been executed in the current second
     runCount = 0;
     // all tasks go through this queue
-    queue = [];
+    queue: Task[] = [];
     // to see if we need to restart task runner after it was stopped last time queue got empty
     taskRunnerIsUp = false;
     /**
      * Executes a task immediately or as soon as chosen execution pace allows it
-     * @param {function} task
      */
-    run(task, debugName) {
+    run(task: Task, debugName: string) {
         task.__debugName = debugName;
         this.queue.push(task);
         if (!this.taskRunnerIsUp) {

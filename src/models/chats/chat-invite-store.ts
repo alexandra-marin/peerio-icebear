@@ -105,7 +105,7 @@ class ChatInviteStore {
                             timestamp: item.invitees[username]
                         });
                     });
-                    arr.sort((i1, i2) => i1.username.localeCompare(i2.username));
+                    arr.((i1, i2) => i1.username.localeCompare(i2.username));
 
                     const rejectedUsernames = Object.keys(item.rejected);
                     this.rejected.set(item.kegDbId, rejectedUsernames);

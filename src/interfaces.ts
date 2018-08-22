@@ -1,9 +1,10 @@
-// TODO: undeclare these and make them regular exports
+// TODO: some of these could probably be split out and moved closer to their
+// usage sites
 
 /**
  * Object representing an asymmetric keypair.
  */
-declare interface KeyPair {
+export interface KeyPair {
     /** 32 bytes */
     publicKey: Uint8Array;
     /** 32 bytes, or 64 bytes in case of signing keypair */
@@ -13,7 +14,7 @@ declare interface KeyPair {
 /**
  * Object representing an address as server sends it.
  */
-declare interface Address {
+export interface Address {
     address: string;
     confirmed: boolean;
     primary: boolean;
@@ -25,7 +26,7 @@ declare interface Address {
  * Object representing an invited contact.
  * Username appears when invited contact joins Peerio.
  */
-declare interface InvitedContact {
+export interface InvitedContact {
     email: string;
     added: number;
     username?: string;
@@ -35,7 +36,7 @@ declare interface InvitedContact {
 /**
  * Object representing a 2fa UI request.
  */
-declare interface TwoFARequest {
+export interface TwoFARequest {
     type: 'login' | 'backupCodes' | 'disable';
     submit: (totpCode: string, trustThisDevice?: boolean) => void;
     cancel: () => void;

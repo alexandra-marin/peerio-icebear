@@ -1,10 +1,9 @@
-/* eslint-disable no-unused-vars */
-
-const { observable, when } = require('mobx');
+const { observable } = require('mobx');
 const { asPromise } = require('../helpers/prombservable');
 const { simpleHash } = require('../util');
 const config = require('../config');
 const { getUser } = require('../helpers/di-current-user');
+const TinyDb = require('../db/tiny-db');
 
 /**
  * @callback CacheEngineBase~cacheUpdateCallback
@@ -14,6 +13,12 @@ const { getUser } = require('../helpers/di-current-user');
  */
 
 const META_DB_NAME = 'peerio_cache_meta';
+
+// Increment this to reset cache in the next release
+const CACHE_RESET_COUNTER = 3;
+
+const CACHE_RESET_KEY = 'cacheResetCounter';
+
 /**
  * CacheEngineBase
  */
@@ -24,13 +29,54 @@ class CacheEngineBase {
      */
     constructor(shortName, keyPath) {
         if (!shortName || !keyPath) throw new Error('Invalid arguments');
-        this.name = shortName === META_DB_NAME ? META_DB_NAME : CacheEngineBase.getCacheDbFullName(shortName);
+        this.name =
+            shortName === META_DB_NAME
+                ? META_DB_NAME
+                : CacheEngineBase.getCacheDbFullName(shortName);
         this.keyPath = keyPath;
 
         if (shortName !== META_DB_NAME) CacheEngineBase.saveDbName(this.name);
     }
 
     static metaDb;
+    // exists and resolved if we already checked if cache needs resetting and did the reset (if needed)
+    static cacheResetPromise;
+
+    /**
+     * Resets cache between releases if cache-breaking changes have been introduced or bugs found
+     */
+    static async resetCacheIfNeeded() {
+        // no action taken if we already ensured the correct version
+        // otherwise returning same promise to prevent race condition with multiple databases being open
+        if (CacheEngineBase.cacheResetPromise) {
+            return CacheEngineBase.cacheResetPromise;
+        }
+        let resolve;
+        CacheEngineBase.cacheResetPromise = new Promise(r => {
+            resolve = r;
+        });
+        const version = await TinyDb.system.getValue(CACHE_RESET_KEY);
+        try {
+            if (version === CACHE_RESET_COUNTER) {
+                console.log('Cache reset not needed.');
+            } else {
+                console.log(`Cache reset is required. Resetting...`);
+                await CacheEngineBase.clearAllCache();
+                await TinyDb.system.setValue(
+                    CACHE_RESET_KEY,
+                    CACHE_RESET_COUNTER
+                );
+                console.log('Finished cache reset.');
+            }
+        } catch (e) {
+            console.error(e);
+            console.error('Failed to process cache reset.');
+        }
+        // resolving even in case of error hoping that app can continue,
+        // otherwise everything relying on cache will just wait forever
+        resolve();
+        return null;
+    }
 
     static async clearAllCache() {
         await CacheEngineBase.openMetaDatabase();
@@ -50,7 +96,10 @@ class CacheEngineBase {
 
     static async openMetaDatabase() {
         if (!CacheEngineBase.metaDb) {
-            CacheEngineBase.metaDb = new config.CacheEngine(META_DB_NAME, 'name');
+            CacheEngineBase.metaDb = new config.CacheEngine(
+                META_DB_NAME,
+                'name'
+            );
             return CacheEngineBase.metaDb.open();
         }
         if (!CacheEngineBase.metaDb.isOpen) {
@@ -61,7 +110,10 @@ class CacheEngineBase {
 
     static async saveDbName(name) {
         await CacheEngineBase.openMetaDatabase();
-        return CacheEngineBase.metaDb.setValue(name, { name, owner: getUser().username });
+        return CacheEngineBase.metaDb.setValue(name, {
+            name,
+            owner: getUser().username
+        });
     }
 
     static async removeDbName(name) {
@@ -74,12 +126,21 @@ class CacheEngineBase {
      */
     @observable isOpen;
 
+    async open() {
+        // not the best design, if we invoke reset for meta db it's gonna lock,
+        // but meta db is meta db, it's not a regular db, so it can have exceptions
+        if (this.name !== META_DB_NAME) {
+            await CacheEngineBase.resetCacheIfNeeded();
+        }
+        await this.openInternal();
+        this.isOpen = true;
+    }
+
     /**
      * Ensures database is open and ready (in case of async).
-     * (!) In your implementation, please set this.isOpen = true on success.
      * @returns {Promise}
      */
-    open() {
+    openInternal() {
         throw new Error('Method not implemented');
     }
 
@@ -88,6 +149,7 @@ class CacheEngineBase {
      * @param {string} key
      * @returns {Promise<Object>}
      */
+    // eslint-disable-next-line no-unused-vars
     getValue(key) {
         throw new Error('Method not implemented');
     }
@@ -100,6 +162,7 @@ class CacheEngineBase {
      *                                             read and write should be done in atomic/transactional way.
      * @returns {Promise}
      */
+    // eslint-disable-next-line no-unused-vars
     setValue(key, value, confirmUpdate) {
         throw new Error('Method not implemented');
     }
@@ -109,6 +172,7 @@ class CacheEngineBase {
      * @param {string} key - if key doesn't exist, just resolve promise.
      * @returns {Promise}
      */
+    // eslint-disable-next-line no-unused-vars
     removeValue(key) {
         throw new Error('Method not implemented');
     }
@@ -141,6 +205,7 @@ class CacheEngineBase {
      * Deletes any database by name
      * @param {string} fullName
      */
+    // eslint-disable-next-line no-unused-vars
     deleteDatabase(fullName) {
         throw new Error('Method not implemented');
     }

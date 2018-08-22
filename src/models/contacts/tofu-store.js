@@ -10,7 +10,8 @@ class TofuStore {
     @observable loaded = false;
     loading = false;
 
-    @action.bound async load() {
+    @action.bound
+    async load() {
         if (this.loading || this.loaded) return;
         this.loading = true;
         this.cache = new config.CacheEngine('tofu', 'username');
@@ -31,50 +32,70 @@ class TofuStore {
     }
 
     saveKnownUpdateId(updateId) {
-        return this.cacheMeta.setValue('knownUpdateId', { key: 'knownUpdateId', value: updateId });
+        return this.cacheMeta.setValue('knownUpdateId', {
+            key: 'knownUpdateId',
+            value: updateId
+        });
     }
 
     async loadTofuKegs() {
         let knownUpdateId = await this.getKnownUpdateId();
         let resp;
         try {
-            resp = await retryUntilSuccess(() => {
-                return socket.send('/auth/kegs/db/list-ext', {
-                    kegDbId: 'SELF',
-                    options: {
-                        type: 'tofu'
-                    },
-                    filter: { collectionVersion: { $gt: knownUpdateId } }
-                });
-            }, 'loading tofu kegs', 10);
+            resp = await retryUntilSuccess(
+                () => {
+                    return socket.send('/auth/kegs/db/list-ext', {
+                        kegDbId: 'SELF',
+                        options: {
+                            type: 'tofu'
+                        },
+                        filter: { collectionVersion: { $gt: knownUpdateId } }
+                    });
+                },
+                'loading tofu kegs',
+                10
+            );
         } catch (err) {
             console.error(err);
         }
         if (!resp || !resp.kegs || !resp.kegs.length) return false;
-        resp.kegs.forEach(keg => {
+        for (const keg of resp.kegs) {
             if (keg.collectionVersion > knownUpdateId) {
                 knownUpdateId = keg.collectionVersion;
             }
             const tofu = new Tofu(getUser().kegDb);
-            if (tofu.loadFromKeg(keg)) {
+            if (await tofu.loadFromKeg(keg)) {
                 this.cacheTofu(tofu);
             }
-        });
+        }
         await this.saveKnownUpdateId(knownUpdateId);
         return true;
     }
 
     // we don't need to wait for tofu keg to get signature verified, because it exists only in SELF
     cacheTofu(tofu) {
-        this.cache.setValue(tofu.username, tofu.serializeKegPayload())
+        if (!tofu.encryptionPublicKey || !tofu.signingPublicKey) {
+            // Broken keg? Don't cache.
+            return;
+        }
+        this.cache
+            .setValue(tofu.username, tofu.serializeKegPayload())
             .catch(this.processCacheUpdateError);
     }
     processCacheUpdateError(err) {
         console.error(err);
     }
 
-    getFromCache(username) {
-        return this.cache.getValue(username);
+    async getFromCache(username) {
+        const cached = await this.cache.getValue(username);
+        if (
+            cached &&
+            (!cached.encryptionPublicKey || !cached.signingPublicKey)
+        ) {
+            // Broken cached tofu.
+            return null;
+        }
+        return cached;
     }
 
     /**
@@ -82,7 +103,8 @@ class TofuStore {
      * @param {string} username
      * @returns {Promise<?Tofu>} tofu keg, if any
      */
-    @action.bound async getByUsername(username) {
+    @action.bound
+    async getByUsername(username) {
         if (!this.loaded) {
             await asPromise(this, 'loaded', true);
         }
@@ -94,16 +116,22 @@ class TofuStore {
         let resp;
         try {
             resp = await retryUntilSuccess(
-                () => socket.send('/auth/kegs/db/list-ext', {
-                    kegDbId: 'SELF',
-                    options: {
-                        type: 'tofu',
-                        reverse: false
-                    },
-                    filter: { username }
-                }, false),
+                () =>
+                    socket.send(
+                        '/auth/kegs/db/list-ext',
+                        {
+                            kegDbId: 'SELF',
+                            options: {
+                                type: 'tofu',
+                                reverse: false
+                            },
+                            filter: { username }
+                        },
+                        false
+                    ),
                 null,
-                10);
+                10
+            );
         } catch (err) {
             console.error(err);
             return null;
@@ -111,7 +139,11 @@ class TofuStore {
         if (!resp.kegs || !resp.kegs.length) return null;
 
         const tofu = new Tofu(getUser().kegDb);
-        tofu.loadFromKeg(resp.kegs[0]); // TODO: detect and delete excess? shouldn't really happen though
+        if (!(await tofu.loadFromKeg(resp.kegs[0]))) {
+            // TODO: detect and delete excess? shouldn't really happen though
+            console.error('Failed to load tofu keg');
+            return null;
+        }
         this.cacheTofu(tofu);
         return tofu;
     }

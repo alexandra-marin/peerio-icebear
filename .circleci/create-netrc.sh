@@ -1,3 +1,5 @@
+#!/bin/bash
+
 cat > ~/.netrc << EOF
 machine api.github.com
     login $GH_USER

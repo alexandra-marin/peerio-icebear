@@ -9,6 +9,5 @@ tests/config/.chrome_dev_user
 env.sh
 build
 .nyc_output
-.vscode
 .opt-in
 .package.json.md5

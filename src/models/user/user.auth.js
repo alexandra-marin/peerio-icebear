@@ -1,5 +1,10 @@
 const socket = require('../../network/socket');
-const { keys, publicCrypto, secret, cryptoUtil } = require('../../crypto/index');
+const {
+    keys,
+    publicCrypto,
+    secret,
+    cryptoUtil
+} = require('../../crypto/index');
 const util = require('../../util');
 const errors = require('../../errors');
 const TinyDb = require('../../db/tiny-db');
@@ -28,7 +33,11 @@ module.exports = function mixUserAuthModule() {
                         console.log('Server requested 2fa on login.');
                         return this._handle2faOnLogin()
                             .catch(err => {
-                                if (err && err.code === errors.ServerError.codes.invalid2FACode) {
+                                if (
+                                    err &&
+                                    err.code ===
+                                        errors.ServerError.codes.invalid2FACode
+                                ) {
                                     warnings.add('error_invalid2faCode');
                                     return Promise.resolve();
                                 }
@@ -44,11 +53,19 @@ module.exports = function mixUserAuthModule() {
     };
 
     this._deriveKeys = () => {
-        if (!this.username) return Promise.reject(new Error('Username is required to derive keys'));
-        if (!this.passphrase) return Promise.reject(new Error('Passphrase is required to derive keys'));
-        if (!this.authSalt) return Promise.reject(new Error('Salt is required to derive keys'));
+        if (!this.username)
+            return Promise.reject(
+                new Error('Username is required to derive keys')
+            );
+        if (!this.passphrase)
+            return Promise.reject(
+                new Error('Passphrase is required to derive keys')
+            );
+        if (!this.authSalt)
+            return Promise.reject(new Error('Salt is required to derive keys'));
         if (this.bootKey && this.authKeys) return Promise.resolve();
-        return keys.deriveAccountKeys(this.username, this.passphrase, this.authSalt)
+        return keys
+            .deriveAccountKeys(this.username, this.passphrase, this.authSalt)
             .then(keySet => {
                 this.bootKey = keySet.bootKey;
                 this.authKeys = keySet.authKeyPair;
@@ -58,81 +75,101 @@ module.exports = function mixUserAuthModule() {
     this._loadAuthSalt = () => {
         console.log('Loading auth salt');
         if (this.authSalt) return Promise.resolve();
-        return socket.send('/noauth/auth-salt/get', { username: this.username }, false)
-            .then((response) => {
+        return socket
+            .send('/noauth/auth-salt/get', { username: this.username }, false)
+            .then(response => {
                 this.authSalt = new Uint8Array(response.authSalt);
             });
     };
     this._getAuthToken = () => {
         console.log('Requesting auth token.');
-        return Promise.all([
-            this._getDeviceId(),
-            this._get2faCookieData()
-        ]).then(([deviceId, cookieData]) => {
-            const req = {
-                username: this.username,
-                authSalt: this.authSalt.buffer,
-                authPublicKeyHash: keys.getAuthKeyHash(this.authKeys.publicKey).buffer,
-                platform: config.platform,
-                arch: config.arch,
-                clientVersion: config.appVersion,
-                sdkVersion: config.sdkVersion,
-                // sending whatever string in the beginning to let server know we are
-                // a new, cool client which is gonna use sessions
-                sessionId: this.sessionId || 'initialize'
-            };
-            if (config.whiteLabel && config.whiteLabel.name) {
-                req.appLabel = config.whiteLabel.name;
-            }
-            if (deviceId) {
-                req.deviceId = deviceId;
-            }
-            if (cookieData && cookieData.cookie) {
-                this.trustedDevice = cookieData.trusted;
-                req.twoFACookie = cookieData.cookie;
-            }
-            return socket.send('/noauth/auth-token/get', req, true);
-        })
+        return Promise.all([this._getDeviceId(), this._get2faCookieData()])
+            .then(([deviceId, cookieData]) => {
+                const req = {
+                    username: this.username,
+                    authSalt: this.authSalt.buffer,
+                    authPublicKeyHash: keys.getAuthKeyHash(
+                        this.authKeys.publicKey
+                    ).buffer,
+                    platform: config.platform,
+                    arch: config.arch,
+                    clientVersion: config.appVersion,
+                    sdkVersion: config.sdkVersion,
+                    // sending whatever string in the beginning to let server know we are
+                    // a new, cool client which is gonna use sessions
+                    sessionId: this.sessionId || 'initialize'
+                };
+                if (config.whiteLabel && config.whiteLabel.name) {
+                    req.appLabel = config.whiteLabel.name;
+                }
+                if (deviceId) {
+                    req.deviceId = deviceId;
+                }
+                if (cookieData && cookieData.cookie) {
+                    this.trustedDevice = cookieData.trusted;
+                    req.twoFACookie = cookieData.cookie;
+                }
+                return socket.send('/noauth/auth-token/get', req, true);
+            })
             .then(resp => util.convertBuffers(resp));
     };
 
     this._authenticateAuthToken = data => {
         console.log('Sending auth token back.');
         const decrypted = publicCrypto.decryptCompat(
-            data.token, data.nonce,
-            data.ephemeralServerPK, this.authKeys.secretKey
+            data.token,
+            data.nonce,
+            data.ephemeralServerPK,
+            this.authKeys.secretKey
         );
         // 65 84 = 'AT' (access token)
-        if (decrypted[0] !== 65 || decrypted[1] !== 84 || decrypted.length !== 32) {
-            return Promise.reject(new Error('Auth token plaintext is of invalid format.'));
+        if (
+            decrypted[0] !== 65 ||
+            decrypted[1] !== 84 ||
+            decrypted.length !== 32
+        ) {
+            return Promise.reject(
+                new Error('Auth token plaintext is of invalid format.')
+            );
         }
-        return socket.send('/noauth/authenticate', { decryptedAuthToken: decrypted.buffer }, true)
+        return socket
+            .send(
+                '/noauth/authenticate',
+                { decryptedAuthToken: decrypted.buffer },
+                true
+            )
             .then(resp => {
                 if (this.sessionId && resp.sessionId !== this.sessionId) {
                     console.log('Digest session has expired.');
                     clientApp.clientSessionExpired = true;
-                    return Promise.reject(new Error('Digest session was expired, application restart is needed.'));
+                    return Promise.reject(
+                        new Error(
+                            'Digest session was expired, application restart is needed.'
+                        )
+                    );
                 }
                 this.sessionId = resp.sessionId;
                 return null;
             });
     };
 
-    this._checkForPasscode = (skipCache) => {
+    this._checkForPasscode = skipCache => {
         if (!skipCache && this.authKeys) {
             console.log('user.auth.js: auth keys already loaded');
             return Promise.resolve(true);
         }
-        return TinyDb.system.getValue(`${this.username}:passcode`)
-            .then((passcodeSecretArray) => {
+        return TinyDb.system
+            .getValue(`${this.username}:passcode`)
+            .then(passcodeSecretArray => {
                 if (passcodeSecretArray) {
                     return cryptoUtil.b64ToBytes(passcodeSecretArray);
                 }
                 return Promise.reject(new errors.NoPasscodeFoundError());
             })
-            .then((passcodeSecret) => {
+            .then(passcodeSecret => {
                 this.passcodeIsSet = true;
-                if (passcodeSecret) { // will be wiped after first login
+                if (passcodeSecret) {
+                    // will be wiped after first login
                     return this._derivePassphraseFromPasscode(passcodeSecret);
                 }
                 return false;
@@ -152,19 +189,24 @@ module.exports = function mixUserAuthModule() {
     // as a passphrase instead of a passcode, allowing users who have a passcode set to still
     // use their passphrases.
     //
-    this._derivePassphraseFromPasscode = (passcodeSecret) => {
+    this._derivePassphraseFromPasscode = passcodeSecret => {
         console.log('Deriving passphrase from passcode.');
         return this._getAuthDataFromPasscode(this.passphrase, passcodeSecret)
             .then(this.deserializeAuthData)
             .catch(() => {
-                console.log('Deriving passphrase from passcode failed, ' +
-                    'will ignore and retry login with passphrase');
+                console.log(
+                    'Deriving passphrase from passcode failed, ' +
+                        'will ignore and retry login with passphrase'
+                );
             });
     };
 
     this._getAuthDataFromPasscode = (passcode, passcodeSecret) => {
-        return keys.deriveKeyFromPasscode(this.username, passcode)
-            .then(passcodeKey => secret.decryptString(passcodeSecret, passcodeKey))
+        return keys
+            .deriveKeyFromPasscode(this.username, passcode)
+            .then(passcodeKey =>
+                secret.decryptString(passcodeSecret, passcodeKey)
+            )
             .then(authDataJSON => JSON.parse(authDataJSON));
     };
 
@@ -194,7 +236,7 @@ module.exports = function mixUserAuthModule() {
      * faster then when you just provide username and passphrase.
      * @param {string} data
      */
-    this.deserializeAuthData = (data) => {
+    this.deserializeAuthData = data => {
         // console.log(data);
         const { username, authSalt, bootKey, authKeys } = data;
         this.username = username;
@@ -221,9 +263,11 @@ module.exports = function mixUserAuthModule() {
      * @returns {Promise}
      */
     this.disablePasscode = () => {
-        return TinyDb.system.setValue(`${this.username}:passcode:disabled`, true)
+        return TinyDb.system
+            .setValue(`${this.username}:passcode:disabled`, true)
             .then(() => {
-                return TinyDb.system.removeValue(`${this.username}:passcode`)
+                return TinyDb.system
+                    .removeValue(`${this.username}:passcode`)
                     .catch(err => {
                         if (err.message === 'Invalid tinydb key') {
                             return true;
@@ -238,7 +282,8 @@ module.exports = function mixUserAuthModule() {
      * @returns {Promise<boolean>}
      */
     this.passcodeIsDisabled = () => {
-        return TinyDb.system.getValue(`${this.username}:passcode:disabled`)
+        return TinyDb.system
+            .getValue(`${this.username}:passcode:disabled`)
             .catch(() => false);
     };
 
@@ -249,21 +294,35 @@ module.exports = function mixUserAuthModule() {
      * @param {string} passcode
      * @returns {Promise}
      */
-    this.setPasscode = (passcode) => {
-        if (!this.username) return Promise.reject(new Error('Username is required to derive keys'));
-        if (!this.passphrase) return Promise.reject(new Error('Passphrase is required to derive keys'));
+    this.setPasscode = passcode => {
+        if (!this.username)
+            return Promise.reject(
+                new Error('Username is required to derive keys')
+            );
+        if (!this.passphrase)
+            return Promise.reject(
+                new Error('Passphrase is required to derive keys')
+            );
         console.log('Setting passcode');
-        return keys.deriveKeyFromPasscode(this.username, passcode)
+        return keys
+            .deriveKeyFromPasscode(this.username, passcode)
             .then(passcodeKey => {
-                return secret.encryptString(this.serializeAuthData(), passcodeKey);
+                return secret.encryptString(
+                    this.serializeAuthData(),
+                    passcodeKey
+                );
             })
             .then(passcodeSecretU8 => {
                 this.passcodeIsSet = true;
-                return TinyDb.system.setValue(`${this.username}:passcode`, cryptoUtil.bytesToB64(passcodeSecretU8));
+                return TinyDb.system.setValue(
+                    `${this.username}:passcode`,
+                    cryptoUtil.bytesToB64(passcodeSecretU8)
+                );
             })
             .then(() => {
                 // if the user had previously disabled passcodes, remove the pref
-                return TinyDb.system.removeValue(`${this.username}:passcode:disabled`)
+                return TinyDb.system
+                    .removeValue(`${this.username}:passcode:disabled`)
                     .catch(err => {
                         if (err.message === 'Invalid tinydb key') {
                             return true;
@@ -278,17 +337,18 @@ module.exports = function mixUserAuthModule() {
      * @param {string} passcode
      * @returns {Promise<boolean>}
      */
-    this.validatePasscode = (passcode) => {
+    this.validatePasscode = passcode => {
         // creating temporary user obj to do that without affecting current instance's state
-        const u = new this.constructor(); // eslint-disable-line
+        const u = new this.constructor();
         u.passphrase = passcode;
         u.username = this.username;
-        return u._checkForPasscode()
-            .then(() => {
-                return (u.passphrase && u.passphrase !== passcode)
-                    ? u.passphrase
-                    : Promise.reject(new Error('user.auth.js: passcode is not valid'));
-            });
+        return u._checkForPasscode().then(() => {
+            return u.passphrase && u.passphrase !== passcode
+                ? u.passphrase
+                : Promise.reject(
+                      new Error('user.auth.js: passcode is not valid')
+                  );
+        });
     };
 
     /**
@@ -296,7 +356,9 @@ module.exports = function mixUserAuthModule() {
      * @returns {Promise<boolean>}
      */
     this.hasPasscode = () => {
-        return TinyDb.system.getValue(`${this.username}:passcode`).then(result => !!result);
+        return TinyDb.system
+            .getValue(`${this.username}:passcode`)
+            .then(result => !!result);
     };
 
     /**
@@ -312,34 +374,38 @@ module.exports = function mixUserAuthModule() {
         //
         // On trusted devices, we preserve the cookie,
         // thus users won't be asked for 2fa code again.
-        return Promise.resolve().then(() => {
-            if (!this.trustedDevice || untrust) {
-                this.trustedDevice = false;
-                return this._delete2faCookieData();
-            }
-            return undefined; // for eslint
-        }).catch(err => {
-            // Failed to delete cookie, just log error
-            // and continue with server call. If server
-            // call succeeds, it will remove its copy of
-            // the cookie, invalidating ours.
-            console.error(err);
-        }).then(() => {
-            return socket.send('/auth/signout')
-                .timeout(3000)
-                .catch(err => {
-                    // Not a show stopper.
-                    // If on untrusted device we removed our 2fa cookie
-                    // successfully, it will invalidate 2fa session,
-                    // so that the next sign it will require 2fa even
-                    // if server still has the cookie.
-                    //
-                    // If both cookie removal and server call failed,
-                    // the user won't be asked for 2fa code during the
-                    // next sign it even on untrusted device.
-                    // But that's the best we could do.
-                    console.error(err);
-                });
-        });
+        return Promise.resolve()
+            .then(() => {
+                if (!this.trustedDevice || untrust) {
+                    this.trustedDevice = false;
+                    return this._delete2faCookieData();
+                }
+                return undefined; // for eslint
+            })
+            .catch(err => {
+                // Failed to delete cookie, just log error
+                // and continue with server call. If server
+                // call succeeds, it will remove its copy of
+                // the cookie, invalidating ours.
+                console.error(err);
+            })
+            .then(() => {
+                return socket
+                    .send('/auth/signout')
+                    .timeout(3000)
+                    .catch(err => {
+                        // Not a show stopper.
+                        // If on untrusted device we removed our 2fa cookie
+                        // successfully, it will invalidate 2fa session,
+                        // so that the next sign it will require 2fa even
+                        // if server still has the cookie.
+                        //
+                        // If both cookie removal and server call failed,
+                        // the user won't be asked for 2fa code during the
+                        // next sign it even on untrusted device.
+                        // But that's the best we could do.
+                        console.error(err);
+                    });
+            });
     };
 };

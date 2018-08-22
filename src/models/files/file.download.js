@@ -37,7 +37,9 @@ function downloadToTmpCache() {
             // XHR usually fails before socket detects disconnection
             if (socket.authenticated) {
                 socket.onceDisconnected(() => {
-                    socket.onceAuthenticated(() => this.tryToCacheTemporarily());
+                    socket.onceAuthenticated(() =>
+                        this.tryToCacheTemporarily()
+                    );
                 });
             } else {
                 socket.onceAuthenticated(() => this.tryToCacheTemporarily());
@@ -58,7 +60,13 @@ function download(filePath, resume, isTmpCacheDownload, suppressSnackbar) {
         filePath = `${filePath}${tempExt}`; // eslint-disable-line no-param-reassign
     }
     if (this.downloading || this.uploading) {
-        return Promise.reject(new Error(`File is already ${this.downloading ? 'downloading' : 'uploading'}`));
+        return Promise.reject(
+            new Error(
+                `File is already ${
+                    this.downloading ? 'downloading' : 'uploading'
+                }`
+            )
+        );
     }
     try {
         this.progress = 0;
@@ -67,8 +75,13 @@ function download(filePath, resume, isTmpCacheDownload, suppressSnackbar) {
         if (!isTmpCacheDownload) {
             this._saveDownloadStartFact(filePath);
         }
-        const nonceGen = new FileNonceGenerator(0, this.chunksCount - 1, cryptoUtil.b64ToBytes(this.blobNonce));
-        let stream, mode = 'write';
+        const nonceGen = new FileNonceGenerator(
+            0,
+            this.chunksCount - 1,
+            cryptoUtil.b64ToBytes(this.blobNonce)
+        );
+        let stream,
+            mode = 'write';
         let p = Promise.resolve(true);
         if (resume) {
             p = this._getDlResumeParams(filePath);
@@ -81,41 +94,56 @@ function download(filePath, resume, isTmpCacheDownload, suppressSnackbar) {
                 } else resumeParams = null; // eslint-disable-line no-param-reassign
 
                 stream = new config.FileStream(filePath, mode);
-                return stream.open()
-                    .then(() => {
-                        this.downloader = new FileDownloader(this, stream, nonceGen, resumeParams);
-                        return this.downloader.start();
-                    });
+                return stream.open().then(() => {
+                    this.downloader = new FileDownloader(
+                        this,
+                        stream,
+                        nonceGen,
+                        resumeParams
+                    );
+                    return this.downloader.start();
+                });
             })
             .then(() => {
                 if (!isTmpCacheDownload) {
                     this._saveDownloadEndFact();
                 }
                 this._resetDownloadState(stream);
-                const finalPath = filePath.substr(0, filePath.length - tempExt.length);
+                const finalPath = filePath.substr(
+                    0,
+                    filePath.length - tempExt.length
+                );
                 return config.FileStream.rename(filePath, finalPath);
             })
-            .then(action(() => {
-                if (!isTmpCacheDownload) {
-                    this.cached = true; // currently for mobile only
-                    if (!suppressSnackbar) warnings.add('snackbar_downloadComplete');
-                } else {
-                    this.tmpCached = true;
-                }
-            }))
+            .then(
+                action(() => {
+                    if (!isTmpCacheDownload) {
+                        this.cached = true; // currently for mobile only
+                        if (!suppressSnackbar)
+                            warnings.add('snackbar_downloadComplete');
+                    } else {
+                        this.tmpCached = true;
+                    }
+                })
+            )
             .catch(err => {
                 console.error(err);
                 if (err) {
                     if (err.name === 'UserCancelError') {
                         return Promise.reject(err);
                     }
-                    if (!socket.authenticated || err.name === 'DisconnectedError') {
+                    if (
+                        !socket.authenticated ||
+                        err.name === 'DisconnectedError'
+                    ) {
                         this._resetDownloadState();
                         return Promise.reject(err);
                     }
                 }
                 if (!isTmpCacheDownload) {
-                    warnings.addSevere('error_downloadFailed', 'title_error', { fileName: this.name });
+                    warnings.addSevere('error_downloadFailed', 'title_error', {
+                        fileName: this.name
+                    });
                 }
                 this.cancelDownload();
                 return Promise.reject(err || new Error('Download failed.'));
@@ -141,15 +169,17 @@ function cancelDownload() {
  * @returns {Promise}
  */
 function removeCache() {
-    return Promise.resolve((async () => {
-        if (!this.tmpCached) return;
-        try {
-            await config.FileStream.delete(this.tmpCachePath);
-        } catch (e) {
-            console.error(e);
-        }
-        this.tmpCached = false;
-    })());
+    return Promise.resolve(
+        (async () => {
+            if (!this.tmpCached) return;
+            try {
+                await config.FileStream.delete(this.tmpCachePath);
+            } catch (e) {
+                console.error(e);
+            }
+            this.tmpCached = false;
+        })()
+    );
 }
 
 function _saveDownloadStartFact(path) {

@@ -12,14 +12,19 @@
 require('./helpers/performance-polyfill');
 
 // replacing native Promise with bluebird implementation
-const Promise = require('bluebird');
+const Bluebird = require('bluebird');
 const globalContext = require('./helpers/global-context');
 
 // @ts-ignore
-globalContext.Promise = Promise;
+globalContext.Promise = Bluebird;
+
+// @ts-ignore
+Bluebird.coroutine.addYieldHandler(function(value) {
+    return Bluebird.resolve(value);
+});
 
 // Enables all warnings except forgotten return statements.
-Promise.config({ warnings: { wForgottenReturn: false } });
+Bluebird.config({ warnings: { wForgottenReturn: false } });
 
 // @ts-ignore
 // extending native classes

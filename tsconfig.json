@@ -4,9 +4,13 @@
     "experimentalDecorators": true,
     "allowJs": true,
     "moduleResolution": "node",
-    "lib": [
-      "dom",
-      "esnext"
-    ]
-  }
+    "esModuleInterop": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitAny": false, // TODO: enable (default enabled under `strict`, so just remove this line)
+    "strictNullChecks": false, // TODO: enable (default enabled under `strict`, so just remove this line)
+    "lib": ["dom", "esnext"]
+  },
+  "include": ["src/**/*", "test/**/*"]
 }

@@ -45,8 +45,6 @@ class App {
         const os = require('os');
         const FileStream = require('~/models/files/node-file-stream');
         const StorageEngine = require('~/models/storage/node-json-storage');
-        const MemoryCacheEngine = require('~/db/memory-cache-engine');
-        MemoryCacheEngine.setStorage(this.world.cacheStorage);
         const cfg = this.world.ice.config;
         // todo: make special test platform?
         cfg.appVersion = '2.37.1';
@@ -57,13 +55,22 @@ class App {
         cfg.os = os.type();
         cfg.FileStream = FileStream;
         cfg.StorageEngine = StorageEngine;
-        cfg.StorageEngine.storageFolder = path.join(os.homedir(),
-            process.env.CUCUMBOT ? '.peerio-icebear-tests-cucumbot' : '.peerio-icebear-tests');
-        cfg.CacheEngine = MemoryCacheEngine;
+        cfg.StorageEngine.storageFolder = path.join(
+            os.homedir(),
+            process.env.CUCUMBOT
+                ? '.peerio-icebear-tests-cucumbot'
+                : '.peerio-icebear-tests'
+        );
         cfg.socketServerUrl = testConfig.socketServerUrl;
         if (testConfig.logSocketMessages) {
-            cfg.debug = { trafficReportInterval: 15000, socketLogEnabled: true };
+            cfg.debug = {
+                trafficReportInterval: 15000,
+                socketLogEnabled: true
+            };
         }
+        const MemoryCacheEngine = require('~/db/memory-cache-engine');
+        MemoryCacheEngine.setStorage(this.world.cacheStorage);
+        cfg.CacheEngine = MemoryCacheEngine;
     }
 
     // Add additional modules you want to expose to tests in here.
@@ -97,10 +104,11 @@ class App {
             // out disconnection event from socket client log.
             // Sometimes it goes through console.log or warn in the app so we
             // have to catch it in here.
-            if (args &&
-                (args[0] && args[0].name === 'DisconnectedError')
-                || (args[1] && args[1].name === 'DisconnectedError')
-            ) return;
+            if (
+                (args && (args[0] && args[0].name === 'DisconnectedError')) ||
+                (args[1] && args[1].name === 'DisconnectedError')
+            )
+                return;
             const d = new Date();
             let line = `${type}${d.getMinutes()}:${d.getSeconds()}.${d.getMilliseconds()}: `;
             for (let i = 0; i < args.length; i++) {
@@ -144,7 +152,11 @@ class App {
     // This function emulates application start and should be run before any scenario.
     start() {
         if (this.started) throw new Error('The test app is already started.');
-        console.log(`===== STARTING TEST APP ${process.env.CUCUMBOT ? 'CUCUMBOT' : ''} =====`);
+        console.log(
+            `===== STARTING TEST APP ${
+                process.env.CUCUMBOT ? 'CUCUMBOT' : ''
+            } =====`
+        );
         App.lastInstanceDisposed = false;
         this._setupChai();
         global.ice = this.world.ice = require('~/');
@@ -180,21 +192,25 @@ class App {
         // closing connections
         console.log('closing connection');
         this.world.ice.socket.close();
-        return new Promise((resolve) => {
-            when(() => !this.world.ice.socket.connected, async () => {
-                this.world.ice.socket.dispose();
-                console.log('clearing tinydb');
-                // delete TinyDbs
-                if (this.world.ice.TinyDb.user) await this.world.ice.TinyDb.user.clear();
-                await this.world.ice.TinyDb.system.clear();
-                console.log('clearing modules');
-                this._clearModuleCache();
-                console.log('invoking GC');
-                // hell, yeah
-                if (global.gc) global.gc();
-                this.started = false;
-                resolve();
-            });
+        return new Promise(resolve => {
+            when(
+                () => !this.world.ice.socket.connected,
+                async () => {
+                    this.world.ice.socket.dispose();
+                    console.log('clearing tinydb');
+                    // delete TinyDbs
+                    if (this.world.ice.TinyDb.user)
+                        await this.world.ice.TinyDb.user.clear();
+                    await this.world.ice.TinyDb.system.clear();
+                    console.log('clearing modules');
+                    this._clearModuleCache();
+                    console.log('invoking GC');
+                    // hell, yeah
+                    if (global.gc) global.gc();
+                    this.started = false;
+                    resolve();
+                }
+            );
         });
     }
 

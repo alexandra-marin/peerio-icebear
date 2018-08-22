@@ -12,7 +12,10 @@ const { when } = require('mobx');
  */
 function asPromise(object, observableProperty, expectedValue) {
     return new Promise(resolve => {
-        when(() => object[observableProperty] === expectedValue, () => setTimeout(resolve));
+        when(
+            () => object[observableProperty] === expectedValue,
+            () => setTimeout(resolve)
+        );
     });
 }
 
@@ -25,10 +28,12 @@ function asPromise(object, observableProperty, expectedValue) {
  */
 function asPromiseNegative(object, observableProperty, unwantedValue) {
     return new Promise(resolve => {
-        when(() => object[observableProperty] !== unwantedValue, () => setTimeout(resolve));
+        when(
+            () => object[observableProperty] !== unwantedValue,
+            () => setTimeout(resolve)
+        );
     });
 }
-
 
 /**
  * Makes a promise out of observable.
@@ -42,7 +47,8 @@ function asPromiseMultiValue(object, observableProperty, expectedValues) {
         when(
             () => {
                 for (let i = 0; i < expectedValues.length; i++) {
-                    if (object[observableProperty] === expectedValues[i]) return true;
+                    if (object[observableProperty] === expectedValues[i])
+                        return true;
                 }
                 return false;
             },

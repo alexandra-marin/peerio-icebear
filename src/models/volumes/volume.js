@@ -28,19 +28,26 @@ class Volume extends FileFolder {
 
     compareContacts = (c1, c2) => {
         return c1.fullNameAndUsername.localeCompare(c2.fullNameAndUsername);
-    }
+    };
 
-    @computed get allParticipants() {
+    @computed
+    get allParticipants() {
         if (!this.db.boot || !this.db.boot.participants) return [];
         return this.db.boot.participants.sort(this.compareContacts);
     }
 
-    @computed get otherParticipants() {
-        return this.allParticipants.filter(p => p.username !== getUser().username);
+    @computed
+    get otherParticipants() {
+        return this.allParticipants.filter(
+            p => p.username !== getUser().username
+        );
     }
 
-    @computed get name() {
-        return this.chatHead && this.chatHead.loaded ? this.chatHead.chatName : '';
+    @computed
+    get name() {
+        return this.chatHead && this.chatHead.loaded
+            ? this.chatHead.chatName
+            : '';
     }
 
     set name(value) {
@@ -55,9 +62,13 @@ class Volume extends FileFolder {
         if (this.chatHead.chatName === validated) {
             return Promise.resolve(); // nothing to rename
         }
-        return this.chatHead.save(() => {
-            this.chatHead.chatName = validated;
-        }, null, 'error_chatRename');
+        return this.chatHead.save(
+            () => {
+                this.chatHead.chatName = validated;
+            },
+            null,
+            'error_chatRename'
+        );
     }
 
     async loadMetadata() {
@@ -80,7 +91,9 @@ class Volume extends FileFolder {
 
     async addParticipants(participants) {
         if (!participants || !participants.length) return Promise.resolve();
-        const contacts = participants.map(p => (typeof p === 'string' ? contactStore.getContactAndSave(p) : p));
+        const contacts = participants.map(
+            p => (typeof p === 'string' ? contactStore.getContactAndSave(p) : p)
+        );
         await Contact.ensureAllLoaded(contacts);
 
         const { boot } = this.db;
@@ -95,7 +108,9 @@ class Volume extends FileFolder {
             'error_addParticipant'
         );
         warnings.add('title_addedToVolume');
-        return contacts.forEach(c => getChatStore().startChatAndShareVolume(c, this));
+        return contacts.forEach(c =>
+            getChatStore().startChatAndShareVolume(c, this)
+        );
     }
 
     async removeParticipant(participant) {
@@ -107,21 +122,22 @@ class Volume extends FileFolder {
         const boot = this.db.boot;
         const wasAdmin = boot.admins.includes(contact);
 
-        await contact.ensureLoaded()
-            .then(() => {
-                return boot.save(
-                    () => {
-                        if (wasAdmin) boot.unassignRole(contact, 'admin');
-                        boot.removeParticipant(contact);
-                        return true;
-                    },
-                    () => {
-                        boot.addParticipant(contact);
-                        if (wasAdmin) boot.assignRole(contact, 'admin');
-                    },
-                    'error_removeParticipant'
-                );
-            });
+        await contact.ensureLoaded().then(() => {
+            return boot.save(
+                () => {
+                    if (wasAdmin) boot.unassignRole(contact, 'admin');
+                    boot.removeParticipant(contact);
+                    boot.addKey();
+                    return true;
+                },
+                () => {
+                    boot.addParticipant(contact);
+                    boot.removeUnsavedKey();
+                    if (wasAdmin) boot.assignRole(contact, 'admin');
+                },
+                'error_removeParticipant'
+            );
+        });
         warnings.add('title_removedFromVolume');
     }
 

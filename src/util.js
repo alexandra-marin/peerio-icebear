@@ -2,17 +2,16 @@
  * Various utility functions that didn't fit anywhere else.
  */
 
-
 /**
  * Finds all ArrayBuffer type properties recursively and changes them to Uint8Array created with the same ArrayBuffer.
  * @param {Object} obj - object to check for ArrayBuffers.
  * @returns {Object} same object that was passed but with some property values changed.
  */
 function convertBuffers(obj) {
-    if (typeof (obj) !== 'object') return obj;
+    if (typeof obj !== 'object') return obj;
 
     for (const prop in obj) {
-        const type = typeof (obj[prop]);
+        const type = typeof obj[prop];
         if (type !== 'object') {
             continue;
         }
@@ -61,11 +60,10 @@ function simpleHash(str) {
     }
     for (let i = 0; i < str.length; i++) {
         const char = str.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
+        hash = (hash << 5) - hash + char;
         hash &= hash; // Convert to 32bit integer
     }
     return hash;
 }
 
 module.exports = { convertBuffers, formatBytes, tryToGet, simpleHash };
-

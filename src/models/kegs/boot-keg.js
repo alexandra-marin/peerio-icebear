@@ -1,3 +1,4 @@
+const { observable, when } = require('mobx');
 const Keg = require('./keg');
 const util = require('../../crypto/util');
 
@@ -7,7 +8,7 @@ const util = require('../../crypto/util');
  * @param {Uint8Array} bootKey
  */
 class BootKeg extends Keg {
-    keys = {};
+    @observable.shallow keys = {};
     kegKey;
     kegKeyId = '0';
 
@@ -16,6 +17,29 @@ class BootKeg extends Keg {
         super('boot', 'boot', db);
         this.overrideKey = bootKey;
         this.version = 1; // pre-created named keg
+    }
+
+    /**
+     * Waits until keyId is available and resolves with it.
+     * If the key will not appear in the timeout time, resolves to undefined.
+     *
+     * @param {string} keyId
+     * @param {number} timeout
+     */
+    async getKey(keyId, timeout = 120000) {
+        if (this.keys[keyId]) {
+            // quick path
+            return this.keys[keyId];
+        }
+        let resolve;
+        const promise = new Promise(_resolve => {
+            resolve = _resolve;
+        });
+        const disposeReaction = when(() => this.keys[keyId], resolve);
+        await promise.timeout(timeout).catch(() => {
+            disposeReaction();
+        });
+        return this.keys[keyId];
     }
 
     deserializeKegPayload(data) {
@@ -29,8 +53,12 @@ class BootKeg extends Keg {
          * @type {KeyPair}
          */
         this.encryptionKeys = {};
-        this.encryptionKeys.publicKey = util.b64ToBytes(data.encryptionKeys.publicKey);
-        this.encryptionKeys.secretKey = util.b64ToBytes(data.encryptionKeys.secretKey);
+        this.encryptionKeys.publicKey = util.b64ToBytes(
+            data.encryptionKeys.publicKey
+        );
+        this.encryptionKeys.secretKey = util.b64ToBytes(
+            data.encryptionKeys.secretKey
+        );
         /**
          * @type {Uint8Array}
          */

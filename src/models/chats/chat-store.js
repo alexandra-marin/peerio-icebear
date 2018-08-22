@@ -1,4 +1,12 @@
-const { observable, action, computed, reaction, autorunAsync, isObservableArray, when } = require('mobx');
+const {
+    observable,
+    action,
+    computed,
+    reaction,
+    autorunAsync,
+    isObservableArray,
+    when
+} = require('mobx');
 const Chat = require('./chat');
 const ChatStorePending = require('./chat-store.pending.js');
 const ChatStoreSpaces = require('./chat-store.spaces.js');
@@ -32,23 +40,34 @@ class ChatStore {
         this.spaces = new ChatStoreSpaces(this);
         this.cache = new ChatStoreCache(this);
 
-        reaction(() => this.activeChat, chat => {
-            if (chat) chat.loadMessages();
-        });
+        reaction(
+            () => this.activeChat,
+            chat => {
+                if (chat) chat.loadMessages();
+            }
+        );
 
         autorunAsync(() => {
             this.sortChats();
         }, 500);
         socket.onceAuthenticated(async () => {
-            this.unreadChatsAlwaysOnTop = !!(await TinyDb.user.getValue('pref_unreadChatsAlwaysOnTop'));
+            this.unreadChatsAlwaysOnTop = !!(await TinyDb.user.getValue(
+                'pref_unreadChatsAlwaysOnTop'
+            ));
             autorunAsync(() => {
-                TinyDb.user.setValue('pref_unreadChatsAlwaysOnTop', this.unreadChatsAlwaysOnTop);
+                TinyDb.user.setValue(
+                    'pref_unreadChatsAlwaysOnTop',
+                    this.unreadChatsAlwaysOnTop
+                );
             }, 2000);
             await this.cache.open();
             this.loadAllChats();
         });
         socket.onceStarted(() => {
-            socket.subscribe(socket.APP_EVENTS.channelDeleted, this.processChannelDeletedEvent);
+            socket.subscribe(
+                socket.APP_EVENTS.channelDeleted,
+                this.processChannelDeletedEvent
+            );
         });
     }
 
@@ -95,7 +114,8 @@ class ChatStore {
      * True when all chats has been updated after reconnect
      * @type {boolean}
      */
-    @computed get updatedAfterReconnect() {
+    @computed
+    get updatedAfterReconnect() {
         return this.chats.every(c => c.updatedAfterReconnect);
     }
 
@@ -119,7 +139,8 @@ class ChatStore {
      * Total unread messages in all chats.
      * @type {number}
      */
-    @computed get unreadMessages() {
+    @computed
+    get unreadMessages() {
         return this.chats.reduce((acc, curr) => acc + curr.unreadCount, 0);
     }
 
@@ -127,7 +148,8 @@ class ChatStore {
      * Subset of ChatStore#chats, contains direct message chats and pending DMs
      * @type {Array<Chat>}
      */
-    @computed get directMessages() {
+    @computed
+    get directMessages() {
         return this.chats.filter(chat => !chat.isChannel);
     }
 
@@ -135,7 +157,8 @@ class ChatStore {
      * Subset of ChatStore#chats, contains only channel chats
      * @type {Array<Chat>}
      */
-    @computed get channels() {
+    @computed
+    get channels() {
         return this.chats.filter(chat => chat.isChannel && chat.headLoaded);
     }
 
@@ -143,7 +166,8 @@ class ChatStore {
      * Does chat store have any channels or not.
      * @type {boolean}
      */
-    @computed get hasChannels() {
+    @computed
+    get hasChannels() {
         return !!this.channels.length;
     }
 
@@ -193,8 +217,12 @@ class ChatStore {
             const item = array[i];
             let indexHole = i;
             while (
-                indexHole > 0
-                && ChatStore.compareChats(array[indexHole - 1], item, this.unreadChatsAlwaysOnTop) > 0
+                indexHole > 0 &&
+                ChatStore.compareChats(
+                    array[indexHole - 1],
+                    item,
+                    this.unreadChatsAlwaysOnTop
+                ) > 0
             ) {
                 array[indexHole] = array[--indexHole];
             }
@@ -266,17 +294,18 @@ class ChatStore {
         const chat = this.chatMap[data.kegDbId];
         if (!chat) return;
         if (!chat.deletedByMyself) {
-            warnings.addSevere('title_kickedFromChannel', '', { name: chat.name });
+            warnings.addSevere('title_kickedFromChannel', '', {
+                name: chat.name
+            });
         }
         this.unloadChat(chat);
-        this.switchToFirstChat();
     };
 
-    onNewMessages = _.throttle((props) => {
+    onNewMessages = _.throttle(props => {
         this.events.emit(this.EVENT_TYPES.messagesReceived, props);
     }, 1000);
 
-    onInvitedToChannel = (props) => {
+    onInvitedToChannel = props => {
         this.events.emit(this.EVENT_TYPES.invitedToChannel, props);
     };
 
@@ -289,19 +318,26 @@ class ChatStore {
      * Adds chat to the list.
      * @param {string | Chat} chat - chat id or Chat instance
      */
-    @action.bound addChat(chat, noActivate) {
+    @action.bound
+    addChat(chat, noActivate) {
         if (!chat) throw new Error(`Invalid chat id. ${chat}`);
         let c;
         if (typeof chat === 'string') {
-            if (chat === 'SELF' || this.chatMap[chat]
-                || !(chat.startsWith('channel:') || chat.startsWith('chat:'))) {
+            if (
+                chat === 'SELF' ||
+                this.chatMap[chat] ||
+                !(chat.startsWith('channel:') || chat.startsWith('chat:'))
+            ) {
                 return this.chatMap[chat];
             }
             c = new Chat(chat, undefined, this, chat.startsWith('channel:'));
         } else {
             c = chat;
             if (this.chatMap[c.id]) {
-                console.error('Trying to add a copy of an instance of a chat that already exists.', c.id);
+                console.error(
+                    'Trying to add a copy of an instance of a chat that already exists.',
+                    c.id
+                );
                 return this.chatMap[c.id];
             }
         }
@@ -312,7 +348,8 @@ class ChatStore {
         c.added = true;
         // console.log('Added chat ', c.id);
         if (this.myChats.hidden.includes(c.id)) c.unhide();
-        c.loadMetadata().then(() => c.loadMostRecentMessage())
+        c.loadMetadata()
+            .then(() => c.loadMostRecentMessage())
             .then(() => this.pending.onChatAdded(c));
         if (this.loaded && !this.activeChat && !noActivate) this.activate(c.id);
         return c;
@@ -320,9 +357,12 @@ class ChatStore {
 
     // takes current fav/hidden lists and makes sure store.chats reflect it
     // at first login this class and chat list loader will call this function once each making sure data is applied
-    @action.bound applyMyChatsData() {
+    @action.bound
+    applyMyChatsData() {
         // resetting fav state for every chat
-        this.chats.forEach(chat => { chat.isFavorite = false; });
+        this.chats.forEach(chat => {
+            chat.isFavorite = false;
+        });
         // marking favs as such
         this.myChats.favorites.forEach(id => {
             const favchat = this.chatMap[id];
@@ -342,7 +382,6 @@ class ChatStore {
         }, 2000);
     }
 
-
     /**
      * Initial chats list loading, call once after login.
      *
@@ -354,7 +393,8 @@ class ChatStore {
      * ORDER OF THE STEPS IS IMPORTANT ON MANY LEVELS
      * @returns {Promise}
      */
-    @action async loadAllChats() {
+    @action
+    async loadAllChats() {
         if (this.loaded || this.loading) return;
         this.loading = true;
 
@@ -376,7 +416,8 @@ class ChatStore {
         channels.forEach(this.addChat);
 
         // checking how many more chats we can load
-        let chatsLeft = config.chat.maxInitialChats - this.myChats.favorites.length;
+        let chatsLeft =
+            config.chat.maxInitialChats - this.myChats.favorites.length;
         // loading the rest unhidden chats
         const dms = await dbListProvider.getDMs();
         for (const id of dms) {
@@ -388,13 +429,17 @@ class ChatStore {
         }
 
         // waiting for most chats to load but up to a reasonable time
-        await Promise.map(this.chats,
-            chat => chat.isChannel
-                ? asPromise(chat, 'headLoaded', true)
-                : asPromise(chat, 'metaLoaded', true)
+        await Promise.map(
+            this.chats,
+            chat =>
+                chat.isChannel
+                    ? asPromise(chat, 'headLoaded', true)
+                    : asPromise(chat, 'metaLoaded', true)
         )
             .timeout(5000)
-            .catch(() => { /* well, the rest will trigger re-render */ });
+            .catch(() => {
+                /* well, the rest will trigger re-render */
+            });
 
         // 8. find out which chat to activate.
         const lastUsed = await TinyDb.user.getValue('lastUsedChat');
@@ -426,7 +471,11 @@ class ChatStore {
         }
         for (const p of participants) {
             if (p.loading || p.notFound) {
-                throw new Error(`Invalid participant: ${p.username}, loading:${p.loading}, found:${!p.notFound}`);
+                throw new Error(
+                    `Invalid participant: ${p.username}, loading:${
+                        p.loading
+                    }, found:${!p.notFound}`
+                );
             }
         }
         // we don't want our own user in participants, it's handled on the lowest level only.
@@ -444,8 +493,13 @@ class ChatStore {
      */
     @action.bound
     switchToFirstChat() {
-        if (config.whiteLabel.name === 'medcryptor' && this.spaces.activeSpaceId) {
-            const active = this.spaces.spacesList.find(x => x.spaceId === this.spaces.activeSpaceId);
+        if (
+            config.whiteLabel.name === 'medcryptor' &&
+            this.spaces.activeSpaceId
+        ) {
+            const active = this.spaces.spacesList.find(
+                x => x.spaceId === this.spaces.activeSpaceId
+            );
             const chats = active.internalRooms.concat(active.patientRooms);
             const chatId = chats.length ? chats[0].id : null;
             if (chatId) {
@@ -456,7 +510,8 @@ class ChatStore {
         for (let i = 0; i < this.chats.length; i++) {
             const chat = this.chats[i];
             if (chat.leaving) continue;
-            if (config.whiteLabel.name === 'medcryptor' && chat.isInSpace) continue;
+            if (config.whiteLabel.name === 'medcryptor' && chat.isInSpace)
+                continue;
             this.activate(chat.id);
             return;
         }
@@ -472,8 +527,18 @@ class ChatStore {
      * @param {object=} space - only to create a space
      * @returns {?Chat} - can return null in case of paywall
      */
-    @action async startChat(participants = [], isChannel = false, name, purpose, noActivate, space = null) {
-        const cached = isChannel ? null : this.findCachedChatWithParticipants(participants);
+    @action
+    async startChat(
+        participants = [],
+        isChannel = false,
+        name,
+        purpose,
+        noActivate,
+        space = null
+    ) {
+        const cached = isChannel
+            ? null
+            : this.findCachedChatWithParticipants(participants);
         if (cached) {
             if (!noActivate) this.activate(cached.id);
             return cached;
@@ -485,7 +550,12 @@ class ChatStore {
         try {
             // we can't add participants before setting channel name because
             // server will trigger invites and send empty chat name to user
-            let chat = new Chat(null, isChannel ? [] : this.getSelflessParticipants(participants), this, isChannel);
+            let chat = new Chat(
+                null,
+                isChannel ? [] : this.getSelflessParticipants(participants),
+                this,
+                isChannel
+            );
             await chat.loadMetadata();
             // There's a concurrency situation, because 'addChat' can be called before this
             // by the event from server (db added).
@@ -500,7 +570,9 @@ class ChatStore {
             if (space) await chat.setSpace(space);
             if (purpose) await chat.changePurpose(purpose);
             if (isChannel) {
-                chat.addParticipants(this.getSelflessParticipants(participants));
+                chat.addParticipants(
+                    this.getSelflessParticipants(participants)
+                );
             }
             return chat;
         } catch (err) {
@@ -513,7 +585,8 @@ class ChatStore {
      * Activates the chat.
      * @param {string} id - chat id
      */
-    @action activate(id) {
+    @action
+    activate(id) {
         const chat = this.chatMap[id];
         if (!chat) return;
         TinyDb.user.setValue('lastUsedChat', id);
@@ -527,7 +600,8 @@ class ChatStore {
     /**
      * Deactivates currently active chat.
      */
-    @action deactivateCurrentChat() {
+    @action
+    deactivateCurrentChat() {
         if (!this.activeChat) return;
         this.activeChat.active = false;
         this.activeChat = null;
@@ -539,8 +613,12 @@ class ChatStore {
      * @param {File|Array<File>} fileOrFiles
      * @returns {Promise}
      */
-    @action async startChatAndShareFiles(participants, fileOrFiles) {
-        const files = (Array.isArray(fileOrFiles) || isObservableArray(fileOrFiles)) ? fileOrFiles : [fileOrFiles];
+    @action
+    async startChatAndShareFiles(participants, fileOrFiles) {
+        const files =
+            Array.isArray(fileOrFiles) || isObservableArray(fileOrFiles)
+                ? fileOrFiles
+                : [fileOrFiles];
         const chat = await this.startChat(participants);
         if (!chat) return Promise.reject(new Error('Failed to create chat'));
         return chat.loadMetadata().then(() => {
@@ -549,7 +627,8 @@ class ChatStore {
         });
     }
 
-    @action async startChatAndShareVolume(participant, volume) {
+    @action
+    async startChatAndShareVolume(participant, volume) {
         const chat = await this.startChat([participant]);
         if (!chat) return Promise.reject(new Error('Failed to create chat'));
         await chat.loadMetadata();
@@ -560,13 +639,16 @@ class ChatStore {
      * Removes chat from working set.
      * @param {Chat} chat
      */
-    @action.bound unloadChat(chat) {
+    @action.bound
+    unloadChat(chat) {
         if (typeof chat === 'string') {
             chat = this.chatMap[chat]; // eslint-disable-line no-param-reassign
             if (!chat) return;
         }
         if (chat.active) {
             this.deactivateCurrentChat();
+            // if not in timeout it will set activeChat again
+            setTimeout(() => this.switchToFirstChat());
         }
         chat.dispose();
         delete this.chatMap[chat.id];
@@ -579,7 +661,7 @@ class ChatStore {
      * @returns {Promise<Chat>}
      */
     getChatWhenReady(id) {
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
             when(
                 () => {
                     const chat = this.chats.find(c => c.id === id);

@@ -54,7 +54,8 @@ class FileNonceGenerator {
      * @throws if called after nonce for maxChunkId was generated
      */
     getNextNonce() {
-        if (this.eof) throw new Error('Attempt to generate nonce past maxChunkId.');
+        if (this.eof)
+            throw new Error('Attempt to generate nonce past maxChunkId.');
         this._writeChunkNum();
         if (this.chunkId === this.maxChunkId) {
             this._writeLastChunkFlag();
@@ -64,6 +65,5 @@ class FileNonceGenerator {
         return this.nonce;
     }
 }
-
 
 module.exports = FileNonceGenerator;

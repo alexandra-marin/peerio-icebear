@@ -1,0 +1,10 @@
+{
+    "root": true,
+    "parser": "typescript-eslint-parser",
+    "extends": ["./.eslintrc"],
+    "rules": {
+      "no-undef": 0,
+      "no-unused-vars": 0,
+      "import/export": 0
+    }
+}

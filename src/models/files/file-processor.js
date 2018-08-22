@@ -1,4 +1,3 @@
-
 const errors = require('../../errors');
 const cryptoUtil = require('../../crypto/util');
 
@@ -35,7 +34,9 @@ class FileProcessor {
      * @returns {Promise}
      */
     start() {
-        console.log(`starting ${this.processType} for file id: ${this.file.id}`);
+        console.log(
+            `starting ${this.processType} for file id: ${this.file.id}`
+        );
         this._tick();
         return new Promise((resolve, reject) => {
             this.resolve = resolve;
@@ -47,7 +48,9 @@ class FileProcessor {
      * Cancels process.
      */
     cancel() {
-        this._finishProcess(new errors.UserCancelError(`${this.processType} cancelled`));
+        this._finishProcess(
+            new errors.UserCancelError(`${this.processType} cancelled`)
+        );
     }
 
     // stops process and resolves or rejects promise
@@ -55,22 +58,36 @@ class FileProcessor {
         if (this.processFinished) return;
         this.processFinished = true;
         this.stopped = true; // bcs in case of error some calls might be scheduled
-        this.stream.close()
+        this.stream
+            .close()
             .then(() => {
                 this.cleanup();
                 if (err) {
-                    console.log(`Failed to ${this.processType} file ${this.file.fileId}.`, err);
+                    console.log(
+                        `Failed to ${this.processType} file ${
+                            this.file.fileId
+                        }.`,
+                        err
+                    );
                     this.reject(errors.normalize(err));
                     return;
                 }
-                console.log(`${this.processType} success: ${this.file.fileId}`, this.toString());
+                console.log(
+                    `${this.processType} success: ${this.file.fileId}`,
+                    this.toString()
+                );
                 this.resolve();
             })
             .catch(closeErr => {
                 this.cleanup();
                 if (closeErr) {
                     // File may be not written completely.
-                    console.log(`Failed to ${this.processType} file ${this.file.fileId}.`, err);
+                    console.log(
+                        `Failed to ${this.processType} file ${
+                            this.file.fileId
+                        }.`,
+                        err
+                    );
                     this.reject(errors.normalize(closeErr));
                 }
             });
@@ -85,9 +102,7 @@ class FileProcessor {
      * Override in child classes if cleanup is needed on finish.
      * @abstract
      */
-    cleanup() {
-    }
+    cleanup() {}
 }
-
 
 module.exports = FileProcessor;

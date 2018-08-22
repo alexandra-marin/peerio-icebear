@@ -32,26 +32,32 @@ class ServerSettings {
     @observable maintenanceWindow;
 
     constructor() {
-        reaction(() => socket.authenticated, (authenticated) => {
-            if (authenticated) this.loadSettings();
-        }, true);
+        reaction(
+            () => socket.authenticated,
+            authenticated => {
+                if (authenticated) this.loadSettings();
+            },
+            true
+        );
     }
     /**
      * (Re)loads server settings from server.
      */
     loadSettings() {
         retryUntilSuccess(() => {
-            return socket.send('/auth/server/settings')
-                .then(res => {
-                    this.avatarServer = res.fileBaseUrl;
-                    this.acceptableClientVersions = res.acceptsClientVersions;
-                    this.tag = res.tag;
-                    this.maintenanceWindow = res.maintenance;
-                    console.log(
-                        'Server settings retrieved.', this.tag,
-                        this.avatarServer, this.acceptableClientVersions, this.maintenanceWindow
-                    );
-                });
+            return socket.send('/auth/server/settings').then(res => {
+                this.avatarServer = res.fileBaseUrl;
+                this.acceptableClientVersions = res.acceptsClientVersions;
+                this.tag = res.tag;
+                this.maintenanceWindow = res.maintenance;
+                console.log(
+                    'Server settings retrieved.',
+                    this.tag,
+                    this.avatarServer,
+                    this.acceptableClientVersions,
+                    this.maintenanceWindow
+                );
+            });
         }, 'Server Settings Load');
     }
 }

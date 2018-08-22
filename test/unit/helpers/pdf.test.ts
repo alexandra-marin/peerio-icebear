@@ -1,7 +1,7 @@
 import saveAccountKeyBackup from '~/helpers/pdf';
 import { getTempFileName } from '../../e2e/code/helpers/files.js'; // TODO: create shared helpers folder
 
-describe.only('PDF module', () => {
+describe('PDF module', () => {
     it('generates account key backup file', () => {
         const dest = `${getTempFileName()}.pdf`;
         console.log('Saving pdf file', dest);

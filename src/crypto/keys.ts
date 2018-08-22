@@ -11,6 +11,7 @@ import {
     getRandomBytes
 } from './util';
 import * as errors from '../errors';
+import { KeyPair } from '../interfaces';
 
 // ------------------------------------------------------------------------------------------
 // WARNING: changing scrypt params will break compatibility with older scrypt-generated data

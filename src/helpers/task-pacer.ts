@@ -1,4 +1,4 @@
-type Task = (() => any) & { __debugName: string };
+type Task = (() => any) & { __debugName?: string };
 /**
  * Controls the execution rate of tasks by deferring execution.
  * Important notes:

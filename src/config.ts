@@ -91,11 +91,6 @@ const config = new class {
 
     debug = {
         /**
-         * Traffic stat summary will be logged with this interval (ms.)
-         * @type {number}
-         */
-        trafficReportInterval: 60 * 60 * 1000,
-        /**
          * All socket messages will be logged if set to `true` before socket is started.
          * @type {boolean}
          */

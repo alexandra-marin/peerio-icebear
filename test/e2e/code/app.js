@@ -62,7 +62,6 @@ class App {
         cfg.socketServerUrl = testConfig.socketServerUrl;
         if (testConfig.logSocketMessages) {
             cfg.debug = {
-                trafficReportInterval: 15000,
                 socketLogEnabled: true
             };
         }

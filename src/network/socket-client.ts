@@ -7,10 +7,23 @@ import { ServerError, serverErrorCodes, DisconnectedError, NotAuthenticatedError
 import io from 'socket.io-client/dist/socket.io';
 import { observable } from 'mobx';
 import config from '../config';
-import * as util from '../util';
 import Timer from '../helpers/observable-timer';
 import { getUser } from '../helpers/di-current-user';
 import TaskPacer from '../helpers/task-pacer';
+
+interface ManagerExt extends SocketIOClient.Manager {
+    backoff: any; // usage of this should go away with reconnect logic fix
+    engine: any; // this is used only for debugging
+}
+
+interface SocketExt extends SocketIOClient.Socket {
+    // We need access to these internals bcs socket.io thinks it can queue messages and send them right
+    // after reconnect. In our reality those messages are likely to need an authenticated connection.
+    sendBuffer: any[];
+    receiveBuffer: any[];
+    io: ManagerExt;
+    binary: (hasBinaryProps: boolean) => SocketExt;
+}
 
 enum STATES {
     open = 'open',
@@ -65,7 +78,7 @@ export default class SocketClient {
     /**
      * Socket.io client instance
      */
-    socket: SocketIOClientStatic = null;
+    socket: SocketExt = null;
     taskPacer = new TaskPacer(20); // todo: maybe move to config
     /**
      * Was socket started or not
@@ -107,18 +120,6 @@ export default class SocketClient {
      */
     reconnectTimer = new Timer();
 
-    // for debug (if enabled)
-    // DON'T MAKE THIS OBSERVABLE
-    // At some conditions it creates cyclic reactions with autorun
-    /**
-     * Total amount of bytes received since socket was created.
-     * Note that this is not including file downloads, because downloads go through https.
-     */
-    bytesReceived = 0;
-    /**
-     * Total amount of bytes sent since socket was created.
-     */
-    bytesSent = 0;
     /**
      * Just an incrementing with every request number to be able to identify server responses.
      */
@@ -150,6 +151,10 @@ export default class SocketClient {
      */
     APP_EVENTS = APP_EVENTS;
 
+    backoffAttempts: number;
+    _originalWSSend: typeof WebSocket.prototype.send;
+    handleReconnectError: () => void;
+    resetting: boolean;
     /**
      * Initializes the SocketClient instance, creates wrapped socket.io instance and so on.
      */
@@ -160,36 +165,23 @@ export default class SocketClient {
             console.error('Socket server url missing, can not start');
             return;
         }
-        const self = this;
         this.url = url;
         this.started = true;
         this.preauthenticated = false;
         this.authenticated = false;
         // <DEBUG>
-        if (config.debug && config.debug.trafficReportInterval > 0) {
+        if (config.debug && config.debug.socketLogEnabled) {
             const s = (this._originalWSSend = WebSocket.prototype.send);
             WebSocket.prototype.send = function(msg) {
-                self.bytesSent += msg.length || msg.byteLength || 0;
                 if (config.debug.socketLogEnabled && typeof msg === 'string') {
                     console.log('⬆️ OUT MSG:', msg);
                 }
                 return s.call(this, msg);
             };
-            this.statInterval = setInterval(() => {
-                console.log(
-                    'socket stat',
-                    'sent:',
-                    util.formatBytes(self.bytesSent),
-                    'received:',
-                    util.formatBytes(self.bytesReceived),
-                    'id:',
-                    this.socket.id
-                );
-            }, config.debug.trafficReportInterval);
         }
         // </DEBUG>
 
-        const socket = (this.socket = io.connect(
+        this.socket = io.connect(
             url,
             {
                 reconnection: true,
@@ -202,22 +194,22 @@ export default class SocketClient {
                 transports: ['websocket'],
                 forceNew: true
             }
-        ));
+        );
         // socket.io is weird, it caches data sometimes to send it to listeners after reconnect
         // but this is not working with authenticate-first connections.
         const clearBuffers = () => {
-            socket.sendBuffer = [];
-            socket.receiveBuffer = [];
+            this.socket.sendBuffer = [];
+            this.socket.receiveBuffer = [];
         };
 
-        socket.on('connect', () => {
+        this.socket.on('connect', () => {
             console.log('\ud83d\udc9a Socket connected.');
             clearBuffers();
             this.configureDebugLogger();
             this.connected = true;
         });
 
-        socket.on('disconnect', () => {
+        this.socket.on('disconnect', () => {
             console.log('\ud83d\udc94 Socket disconnected.');
             this.preauthenticated = false;
             this.authenticated = false;
@@ -226,17 +218,17 @@ export default class SocketClient {
             this.cancelAwaitingRequests();
         });
 
-        socket.on('reconnect_attempt', num => {
-            if (this.backupAttempts) {
-                this.reconnectAttempt = this.backupAttempts;
-                this.socket.io.backoff.attempts = this.backupAttempts;
-                this.backupAttempts = 0;
+        this.socket.on('reconnect_attempt', num => {
+            if (this.backoffAttempts) {
+                this.reconnectAttempt = this.backoffAttempts;
+                this.socket.io.backoff.attempts = this.backoffAttempts;
+                this.backoffAttempts = 0;
             } else {
                 this.reconnectAttempt = num;
             }
         });
 
-        socket.on('pong', latency => {
+        this.socket.on('pong', latency => {
             this.latency = latency;
         });
 
@@ -244,23 +236,22 @@ export default class SocketClient {
             // HACK: backoff.duration() will increase attempt count, so we balance that
             this.socket.io.backoff.attempts--;
             this.reconnectTimer.countDown(this.socket.io.backoff.duration() / 1000);
-            socket.open();
+            this.socket.open();
         };
 
-        socket.on('connect_error', this.handleReconnectError);
-        socket.on('reconnect_error', this.handleReconnectError);
-        socket.on('error', this.handleReconnectError);
+        this.socket.on('connect_error', this.handleReconnectError);
+        this.socket.on('reconnect_error', this.handleReconnectError);
+        this.socket.on('error', this.handleReconnectError);
 
-        socket.open();
+        this.socket.open();
 
         this.startedEventListeners.forEach(l => setTimeout(l));
         this.startedEventListeners = [];
     }
 
     configureDebugLogger() {
-        if (config.debug && config.debug.trafficReportInterval > 0) {
+        if (config.debug && config.debug.socketLogEnabled) {
             this.socket.io.engine.addEventListener('message', msg => {
-                this.bytesReceived += msg.length || msg.byteLength || 0;
                 if (config.debug.socketLogEnabled && typeof msg === 'string') {
                     console.log('⬇️ IN MSG:', msg);
                 }
@@ -338,12 +329,12 @@ export default class SocketClient {
 
     /**
      * Send a message to server
-     * @param {string} name - api method name
-     * @param {any=} data - data to send
-     * @param {?bool} hasBinaryData - if you know for sure, set this to true/false to increase performance
+     * @param name - api method name
+     * @param data - data to send
+     * @param hasBinaryData - if you know for sure, set this to true/false to increase performance
      * @returns - server response, always returns `{}` if response is empty
      */
-    send(name, data?, hasBinaryData = null) {
+    send(name: string, data?: {}, hasBinaryData: boolean = null) {
         const id = this.requestId++;
         return new Promise((resolve, reject) => {
             this.awaitingRequests[id] = { name, data, reject };
@@ -390,7 +381,7 @@ export default class SocketClient {
             .timeout(60000)
             .finally(() => {
                 delete this.awaitingRequests[id];
-            }) as Promise<any>;
+            });
     }
 
     /**
@@ -498,7 +489,7 @@ export default class SocketClient {
      */
     resetReconnectTimer = () => {
         if (this.connected) return;
-        this.backupAttempts = this.socket.io.backoff.attempts;
+        this.backoffAttempts = this.socket.io.backoff.attempts;
         this.reset();
     };
 
@@ -521,7 +512,6 @@ export default class SocketClient {
     };
 
     dispose() {
-        clearInterval(this.statInterval);
         this.taskPacer.clear();
         if (this._originalWSSend) WebSocket.prototype.send = this._originalWSSend;
     }

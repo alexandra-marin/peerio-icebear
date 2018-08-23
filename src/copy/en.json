@@ -85,7 +85,7 @@
   "title_demoUsername": "Hey <username>username</>, you can tag people like this in conversations to get their attention.",
   "title_generatingAk": "Generating Account Key",
   "title_generatingAkDescription": "You will use this to sign in to your account.",
-  "title_generatingAkExplanation": "Research shows that computers make stronger passwords than humans.<br/><br/><b>Fun fact:</b> This account key will be so strong, 1,000,000 King Kongs on bicycle generators wouldn't create enough power to crack it.",
+  "title_generatingAkExplanation": "Research shows that computers make stronger passwords than humans.<br/><br/><b>Fun fact:</> This account key will be so strong, 1,000,000 King Kongs on bicycle generators wouldn't create enough power to crack it.",
   "title_akBackupDescription": "<b>Important:</> Download this recovery document, and store it somewhere safe to ensure you don't lose access to your account.",
   "title_demoPdfUsernameLabel": "Your Peerio <b>USERNAME</>:",
   "title_demoPdfAkLabel": "Your Peerio <b>ACCOUNT KEY</>:",

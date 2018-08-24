@@ -77,7 +77,7 @@
   "button_logIn": "Sign in",
   "title_createYourAccount": "Create your account",
   "title_nameHeading": "Enter your name.",
-  "title_usernameHeading": "Enter a unique username",
+  "title_nameHint": "Letters A-z, accents, dashes and spaces are allowed.",
   "title_whatIsYourEmail": "Enter your email address",
   "title_subscribeNewsletter": "Subscribe to monthly Peerio Newsletter",
   "title_available": "Available:",

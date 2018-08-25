@@ -30,6 +30,7 @@
  *
  */
 const socket = require('../../network/socket');
+const { getFirstLetter } = require('../string');
 
 const VALIDATION_THROTTLING_PERIOD_MS = 400;
 const usernameRegex = /^\w{1,16}$/;
@@ -152,6 +153,33 @@ const mcrDoctorAhpraAvailability = pair(
 );
 const mcrAdminAhpraAvailability = pair(isValidMcrAdminAhpra, 'mcr_error_ahrpa');
 
+const suggestUsername = async (firstName, lastName) => {
+    const initial = getFirstLetter(firstName);
+    const maxSuggestions = 3;
+    const suggestions = [];
+
+    const options = [
+        `${firstName}`,
+        `${firstName}${lastName}`,
+        `${firstName}_${lastName}`,
+        `${lastName}`,
+        `${firstName}${initial}${lastName}`,
+        `${firstName}${lastName}${initial}`,
+        `${firstName}${lastName}_${lastName}`,
+        `${firstName}_${lastName}${lastName}`
+    ];
+
+    for (const option of options) {
+        if (suggestions.length >= maxSuggestions) break;
+        const available = await isValidSignupUsername(option);
+        if (available) {
+            suggestions.push(option);
+        }
+    }
+
+    return suggestions;
+};
+
 const validators = {
     /* available validators:
      * {
@@ -178,7 +206,8 @@ const validators = {
     isValidSignupEmail,
     isValidSignupFirstName,
     isValidSignupLastName,
-    isValidLoginUsername
+    isValidLoginUsername,
+    suggestUsername
 };
 
 module.exports = validators;

@@ -32,11 +32,22 @@ module.exports = function mixUserProfileModule() {
         loadSimpleKeg(this.settings);
     };
 
-    this.saveSettings = () => {
-        return this.settings.saveToServer().tapCatch(err => {
-            console.error(err);
-            warnings.add('error_saveSettings');
-        });
+    this.saveSettings = updateFunction => {
+        const { settings } = this;
+        return new Promise(resolve =>
+            when(
+                () => !settings.loading,
+                () => {
+                    if (updateFunction) updateFunction(settings);
+                    resolve(
+                        settings.saveToServer().tapCatch(err => {
+                            console.error(err);
+                            warnings.add('error_saveSettings');
+                        })
+                    );
+                }
+            )
+        );
     };
 
     this.loadProfile = () => {

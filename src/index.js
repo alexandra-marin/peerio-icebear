@@ -62,6 +62,7 @@ const Contact = require('./models/contacts/contact');
 const prombservable = require('./helpers/prombservable');
 const tracker = require('./models/update-tracker');
 const CacheEngineBase = require('./db/cache-engine-base');
+const saveAccountKeyBackup = require('./helpers/pdf').default;
 const telemetry = require('./telemetry');
 
 // MEMO: Do NOT export NodeJsonStorage and NodeFileStream here for compatibility reasons
@@ -96,6 +97,7 @@ module.exports = {
     Contact, // mostly for its utility static functions
     prombservable,
     CacheEngineBase,
+    saveAccountKeyBackup,
     __: {
         tracker
     },

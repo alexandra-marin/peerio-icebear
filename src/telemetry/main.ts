@@ -18,8 +18,8 @@ const baseObj: { properties: propertyTypes } = {
     }
 };
 
-async function getUserId() {
-    const userId = await TinyDb.system.getValue('telemetryUserId');
+async function getUserId(): Promise<string> {
+    const userId: Promise<string> = await TinyDb.system.getValue('telemetryUserId');
 
     if (!userId) {
         const newId = cryptoUtil.getRandomGlobalShortIdHex().toString();
@@ -38,7 +38,7 @@ export async function init() {
     baseObj.properties['App Version'] = config.appVersion;
 }
 
-function camelToTitleCase(text) {
+function camelToTitleCase(text: string): string {
     return (text[0].toUpperCase() + text.slice(1)).split(/(?=[A-Z])/).join(' ');
 }
 

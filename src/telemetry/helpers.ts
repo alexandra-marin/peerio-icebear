@@ -24,7 +24,13 @@ interface textInputProps {
     state: string;
     errorType?: string;
 }
-export function textInput(item, location, sublocation, state, errorMsg) {
+export function textInput(
+    item: string,
+    location: string,
+    sublocation: string,
+    state: string,
+    errorMsg: string
+) {
     let properties: textInputProps = { item, state };
 
     if (location) properties.location = location;

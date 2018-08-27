@@ -1,41 +1,34 @@
 import Keg from '../kegs/keg';
 import { observable } from 'mobx';
+import User from './user';
 
+interface ISettingsPayload {
+    contactNotifications: boolean;
+    contactRequestNotifications: boolean;
+    messageNotifications: boolean;
+    errorTrackingOptIn: boolean;
+    dataCollectionOptIn: boolean;
+    subscribeToPromoEmails: boolean;
+}
+interface ISettingsProps {}
 /**
  * Plaintext named system keg, server controlled.
  * User can update this keg, but server verifies contract.
- * @extends {Keg}
- * @param {User} user
+ * @param  user
  */
-class Settings extends Keg {
-    constructor(user) {
+class Settings extends Keg<ISettingsPayload, ISettingsProps> {
+    constructor(user: User) {
         super('settings', 'settings', user.kegDb, true);
         this.user = user;
     }
 
-    /**
-     * @type {boolean}
-     */
+    user: User;
+
     @observable contactNotifications = false;
-    /**
-     * @type {boolean}
-     */
     @observable contactRequestNotifications = false;
-    /**
-     * @type {boolean}
-     */
     @observable messageNotifications = false;
-    /**
-     * @type {boolean}
-     */
     @observable errorTracking = false;
-    /**
-     * @type {boolean}
-     */
     @observable dataCollection = false;
-    /**
-     * @type {boolean}
-     */
     @observable subscribeToPromoEmails = false;
 
     @observable loaded = false;

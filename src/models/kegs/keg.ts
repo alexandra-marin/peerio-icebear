@@ -1,8 +1,8 @@
 import { observable, action, when } from 'mobx';
 
-import KegDb from './keg-db';
-
-import { secret, sign, cryptoUtil } from '../../crypto';
+import * as secret from '../../crypto/secret';
+import * as sign from '../../crypto/sign';
+import * as cryptoUtil from '../../crypto/util';
 import socket from '../../network/socket';
 
 import { getContactStore } from '../../helpers/di-contact-store';
@@ -10,6 +10,7 @@ import { getUser } from '../../helpers/di-current-user';
 import { asPromise } from '../../helpers/prombservable';
 
 import { AntiTamperError, DecryptionError, serverErrorCodes } from '../../errors';
+import IKegDb from '../../defs/IKegDb';
 
 let temporaryKegId = 0;
 function getTemporaryKegId() {
@@ -80,7 +81,7 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
     constructor(
         id: string | null,
         type: string,
-        db: KegDb,
+        db: IKegDb,
         plaintext = false,
         forceSign = false,
         allowEmpty = false,
@@ -103,7 +104,7 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
     /**
      * Owner KegDb instance
      */
-    protected readonly db: KegDb;
+    protected readonly db: IKegDb;
 
     /**
      * Is the payload of this keg encrypted or not
@@ -189,7 +190,7 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
     /**
      * Some kegs don't need anti-tamper checks.
      */
-    ignoreAntiTamperProtection: boolean;
+    protected ignoreAntiTamperProtection: boolean;
 
     /**
      * Kegs with version==1 were just created and don't have any data
@@ -215,7 +216,7 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
     /**
      * Saves keg to server, creates keg (reserves id) first if needed
      */
-    saveToServer(): Promise<unknown> {
+    saveToServer() {
         if (this.loading) {
             console.warn(`Keg ${this.id} ${this.type} is trying to save while already loading.`);
         }
@@ -328,7 +329,7 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
     /**
      * (Re)populates this keg instance with data from server
      */
-    load(): Promise<this> {
+    load() {
         if (this.saving) {
             return asPromise(this, 'saving', false).then(() => this.load());
         }
@@ -376,7 +377,7 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
     /**
      * Deletes the keg.
      */
-    protected remove(): Promise<unknown> {
+    protected remove() {
         return socket.send(
             '/auth/kegs/delete',
             {
@@ -440,7 +441,7 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
 
             let binPayload: Uint8Array;
             let stringPayload: string;
-            let payloadKey = null;
+            let payloadKey: Uint8Array = null;
 
             if (this.plaintext) {
                 stringPayload = keg.payload as string;
@@ -454,14 +455,12 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
                 this.signatureError = false;
             }
             if (!this.plaintext) {
-                let decryptionKey = payloadKey || this.overrideKey;
+                let decryptionKey: Uint8Array = payloadKey || this.overrideKey;
                 if (!decryptionKey) {
-                    decryptionKey = this.db.boot.keys[keg.keyId || '0']; // optimization, avoids async
+                    const keyObj = this.db.boot.keys[keg.keyId || '0']; // optimization, avoids async
+                    if (keyObj) decryptionKey = keyObj.key;
                     if (!decryptionKey) {
                         decryptionKey = await this.db.boot.getKey(keg.keyId || '0');
-                    }
-                    if (decryptionKey) {
-                        decryptionKey = decryptionKey.key;
                     }
                     if (!decryptionKey) {
                         throw new Error(`Failed to resolve decryption key for ${this.id}`);

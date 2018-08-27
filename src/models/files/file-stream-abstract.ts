@@ -21,26 +21,19 @@ class FileStreamAbstract {
         this.pos = 0;
     }
 
-    /**
-     * @type {string}
-     */
-    filePath;
-    /**
-     * @type {string}
-     */
-    mode;
+    filePath: string;
+    mode: string;
     /**
      * File stream pointer
-     * @type {number}
      */
-    pos;
+    pos: number;
 
     /**
      * Reads a chunk of data from file stream.
-     * @param {number} size - amount of bytes to read (if possible)
-     * @return {Promise<Uint8Array>} - resolves with a number of bytes written to buffer
+     * @param size - amount of bytes to read (if possible)
+     * @return resolves with a number of bytes written to buffer
      */
-    read = size => {
+    read = (size: number) => {
         if (this.mode !== 'read') {
             return Promise.reject(new Error('Attempt to read from write stream.'));
         }

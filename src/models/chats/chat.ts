@@ -1,4 +1,4 @@
-import { observable, computed, action, when, reaction } from 'mobx';
+import { observable, computed, action, when, reaction, IObservableArray } from 'mobx';
 import Message from './message';
 import ChatKegDb from '../kegs/chat-keg-db';
 import User from '../user/user';
@@ -20,6 +20,7 @@ import tracker from '../update-tracker';
 import { getFileStore } from '../../helpers/di-file-store';
 import { retryUntilSuccess } from '../../helpers/retry';
 import { getVolumeStore } from '../../helpers/di-volume-store';
+import FileFolder from '../files/file-folder';
 
 // to assign when sending a message and don't have an id yet
 let temporaryChatId = 0;
@@ -72,20 +73,17 @@ class Chat {
 
     /**
      * Chat id
-     * @type {?string}
      */
-    @observable id = null;
+    @observable id: string = null;
 
     /**
      * Render these messages.
-     * @type {ObservableArray<Message>}
      */
-    @observable.shallow messages = [];
+    @observable.shallow messages = [] as IObservableArray<Message>;
     /**
      * Render these messages at the bottom of the chat, they don't have Id yet, you can use tempId.
-     * @type {ObservableArray<Message>}
      */
-    @observable.shallow limboMessages = [];
+    @observable.shallow limboMessages = [] as IObservableArray<Message>;
 
     // performance helper, to lookup messages by id and avoid duplicates
     _messageMap = {};
@@ -99,7 +97,6 @@ class Chat {
     /**
      * All participants, including awaiting for invite accept or removal after leave.
      * Including current user.
-     * @type {ObservableArray<Contact>}
      */
     @computed
     get allParticipants() {
@@ -110,7 +107,6 @@ class Chat {
     /**
      * Participants, including awaiting for invite accept or removal after leave.
      * Excluding current user.
-     * @type {ObservableArray<Contact>}
      */
     @computed
     get otherParticipants() {
@@ -119,7 +115,6 @@ class Chat {
 
     /**
      * The username of the person you're having a DM with
-     * @type {string}
      */
     @computed
     get dmPartnerUsername() {
@@ -136,7 +131,6 @@ class Chat {
      * Room api. For DM will work too, but doesn't make sense, just use 'allParticipants'
      * Includes only currently joined room participants and current user.
      * Excludes users awaiting to accept invite or get removed after leave.
-     * @type {Array<Contact>}
      */
     @computed
     get allJoinedParticipants() {
@@ -157,104 +151,79 @@ class Chat {
 
     /**
      * If true - chat is not ready for anything yet.
-     * @type {boolean}
      */
     @observable loadingMeta = false;
-    /**
-     * @type {boolean}
-     */
     @observable metaLoaded = false;
 
     /**
      * This can happen when chat was just added or after reset()
-     * @type {boolean}
      */
     @observable loadingInitialPage = false;
     /**
      * Ready to render messages.
-     * @type {boolean}
      */
     @observable initialPageLoaded = false;
     /**
      * Ready to render most recent message contents in chat list.
-     * @type {boolean}
      */
     @observable mostRecentMessageLoaded = false;
-    /**
-     * @type {boolean}
-     */
     @observable loadingTopPage = false;
-    /**
-     * @type {boolean}
-     */
     @observable loadingBottomPage = false;
 
     /**
      * can we go back in history from where we are? (load older messages)
-     * @type {boolean}
      */
     @observable canGoUp = false;
     /**
      * can we go forward in history or we have the most recent data loaded
-     * @type {boolean}
      */
     @observable canGoDown = false;
 
     /**
      * currently selected/focused in UI
-     * @type {boolean}
      */
     @observable active = false;
 
     /**
      * Is this chat instance added to chat list already or not
-     * @type {boolean}
      */
     @observable added = false;
 
     /**
-     * @type {boolean}
      */
     @observable isFavorite = false;
 
     /**
      * Prevent spamming 'Favorite' button in GUI.
-     * @type {boolean}
      */
     @observable changingFavState = false;
 
     /**
      * Will be set to `true` after leave() is called on the channel so UI can react until channel is actually removed.
-     * @type {boolean}
      */
     @observable leaving = false;
 
     /**
      * Will be set to `true` after update logic is done on reconnect.
-     * @type {boolean}
      */
     @observable updatedAfterReconnect = true;
 
     /**
      * list of files being uploaded to this chat.
-     * @type {ObservableArray<File>}
      */
-    @observable.shallow uploadQueue = [];
+    @observable.shallow uploadQueue = [] as IObservableArray<File>;
 
     /**
      * list of folders being converted to volumes to share to this chat.
-     * @type {ObservableArray<FileFolder>}
      */
-    @observable.shallow folderShareQueue = [];
+    @observable.shallow folderShareQueue = [] as IObservableArray<FileFolder>;
     /**
      * Unread message count in this chat.
-     * @type {number}
      */
     @observable unreadCount = 0;
     /**
      * when user is not looking but chat is active and receiving updates,
      * chat briefly sets this value to the id of last seen message so client can render separator marker.
-     * @type {string}
      */
     @observable newMessagesMarkerPos = '';
 
@@ -263,7 +232,6 @@ class Chat {
     recentFilesLoaded = false;
     /**
      * List of recent file ids for this chat.
-     * @type {Array<string>}
      */
     @computed
     get recentFiles() {
@@ -284,9 +252,8 @@ class Chat {
     /**
      * Chat head keg.
      * Observable, because `this.name` relies on it
-     * @type {?ChatHead}
      */
-    @observable.ref chatHead;
+    @observable.ref chatHead: ChatHead;
     _messageHandler = null;
     _receiptHandler = null;
     _fileHandler = null;
@@ -295,9 +262,7 @@ class Chat {
     _addMessageQueue = new TaskQueue(1, config.chat.decryptQueueThrottle || 0);
 
     _reactionsToDispose = [];
-    /**
-     * @type {boolean}
-     */
+
     @computed
     get isReadOnly() {
         if (this.isChannel) return false;
@@ -309,16 +274,12 @@ class Chat {
 
     /**
      * Includes current user.
-     * @type {Array<string>}
      */
     @computed
     get participantUsernames() {
         return this.allParticipants.map(p => p.username);
     }
 
-    /**
-     * @type {string}
-     */
     @computed
     get name() {
         if (this.isChannel && this.chatHead && this.chatHead.chatName)
@@ -328,34 +289,22 @@ class Chat {
             : this.otherParticipants.map(p => p.fullName || p.username).join(', ');
     }
 
-    /**
-     * @type {string}
-     */
     @computed
     get nameInSpace() {
         if (this.chatHead && this.chatHead.chatName) return this.chatHead.nameInSpace;
         return '';
     }
 
-    /**
-     * @type {string}
-     */
     @computed
     get purpose() {
         return (this.chatHead && this.chatHead.purpose) || '';
     }
 
-    /**
-     * @type {bool}
-     */
     @computed
     get isInSpace() {
         return !!this.chatHead && !!this.chatHead.spaceId;
     }
 
-    /**
-     * @type {string}
-     */
     @computed
     get headLoaded() {
         return !!(this.chatHead && this.chatHead.loaded);
@@ -363,7 +312,6 @@ class Chat {
 
     /**
      * User should not be able to send multiple ack messages in a row. We don't limit it on SDK level, but GUIs should.
-     * @type {boolean}
      */
     @computed
     get canSendAck() {
@@ -383,7 +331,6 @@ class Chat {
 
     /**
      * User should not be able to send multiple video call messages in a row. Similar setup to ack throttling.
-     * @type {boolean}
      */
     @computed
     get canSendJitsi() {

@@ -4,22 +4,23 @@ import { retryUntilSuccess } from '../../helpers/retry';
 import TaskQueue from '../../helpers/task-queue';
 import Keg from './keg';
 import warnings from '../warnings';
+import IKegDb from '../../defs/IKegDb';
 
 /**
  * This class allows named kegs to share sync/save logic.
  * This is for named kegs only! Named kegs assume there's just one instance of it.
- * @param {string} kegName - kegName === kegType currently
- * @param {KegDb|ChatKegDb} db - this keg owner database
- * @param {boolean} [plaintext=false] - encrypted or not
- * @param {boolean} [forceSign=false] - force signature of plaintext kegs or not
+ * @param kegName - kegName === kegType currently
+ * @param db - this keg owner database
+ * @param plaintext - encrypted or not
+ * @param forceSign - force signature of plaintext kegs or not
  * @param noSync - in rare cases we want to use some keg that extends synced keg out of normal flow,
  *                 like one-time decryption, for that we need to disable synced keg sync automation.
  * @extends {Keg}
  */
-class SyncedKeg extends Keg {
+class SyncedKeg<TPayload, TProps> extends Keg<TPayload, TProps> {
     constructor(
-        kegName,
-        db,
+        kegName: string,
+        db: IKegDb,
         plaintext = false,
         forceSign = false,
         allowEmpty = true,

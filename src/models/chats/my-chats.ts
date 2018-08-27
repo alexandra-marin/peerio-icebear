@@ -11,14 +11,12 @@ class MyChats extends SyncedKeg {
     }
     /**
      * Favorite chat ids
-     * @type {Array<string>}
      */
-    favorites = [];
+    favorites: string[] = [];
     /**
      * Hidden chat ids
-     * @type {Array<string>}
      */
-    hidden = [];
+    hidden: string[] = [];
 
     serializeKegPayload() {
         return {

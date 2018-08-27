@@ -5,20 +5,20 @@ import socket from '../../network/socket';
 import tracker from '../update-tracker';
 import { getUser } from '../../helpers/di-current-user';
 import File from '../files/file';
+import Chat from './chat';
 
 /**
  * File handling module for Chat. Extracted for readability.
- * @param {Chat} chat - chat creates an instance and passes itself to it.
+ * @param  chat - chat creates an instance and passes itself to it.
  */
 class ChatFileHandler {
-    constructor(chat) {
-        /**
-         * @type {Chat}
-         */
+    constructor(chat: Chat) {
         this.chat = chat;
         tracker.subscribeToKegUpdates(chat.id, 'file', this.onFileDigestUpdate);
         tracker.onUpdated(this.onFileDigestUpdate, true);
     }
+
+    chat: Chat;
 
     knownUpdateId = '';
     maxUpdateId = '';

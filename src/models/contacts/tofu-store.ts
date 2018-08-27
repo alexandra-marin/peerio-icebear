@@ -97,11 +97,11 @@ export class TofuStore {
 
     /**
      * Finds Tofu keg by username property.
-     * @param {string} username
-     * @returns {Promise<?Tofu>} tofu keg, if any
+     * @param  username
+     * @returns tofu keg, if any
      */
     @action.bound
-    async getByUsername(username): Tofu {
+    async getByUsername(username: string): Promise<Tofu> {
         if (!this.loaded) {
             await asPromise(this, 'loaded', true);
         }

@@ -20,25 +20,21 @@ class ServerSettings {
     }
     /**
      * Observable base url for avatars https service
-     * @type {string}
      */
     @observable avatarServer = '';
     /**
      * Observable client version range this server can work with.
-     * @type {string}
      */
-    @observable.ref acceptableClientVersions;
+    @observable acceptableClientVersions: string[];
     /**
      * Observable git tag for this server build
-     * @type {string}
      */
-    @observable tag;
+    @observable tag: string;
 
     /**
      * Observable array of timestamps for maintenance begin and end, if applicable.
-     * @type {Array}
      */
-    @observable maintenanceWindow;
+    @observable maintenanceWindow: number[];
 
     /**
      * (Re)loads server settings from server.

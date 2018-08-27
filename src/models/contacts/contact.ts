@@ -1,6 +1,6 @@
 import socket from '../../network/socket';
 import { observable, action, when, computed, reaction } from 'mobx';
-import { cryptoUtil } from '../../crypto/index';
+import * as cryptoUtil from '../../crypto/util';
 import { getUser } from './../../helpers/di-current-user';
 import Tofu from './tofu';
 import tofuStore from './tofu-store';

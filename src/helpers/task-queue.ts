@@ -32,7 +32,6 @@ class TaskQueue {
     @observable runningTasks = 0;
     /**
      * Amount of currently running tasks + tasks in queue
-     * @type
      */
     @computed
     get length() {

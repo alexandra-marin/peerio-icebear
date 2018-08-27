@@ -11,40 +11,15 @@ export default class ChatHead extends SyncedKeg {
         super('chat_head', db, undefined, undefined, undefined, undefined, noSync);
     }
 
-    /**
-     * @type {string}
-     */
     @observable chatName = '';
-    /**
-     * @type {string}
-     */
     @observable purpose = '';
 
     /** SPACE PROPERTIES */
-    /**
-     * @type {string}
-     */
-    @observable spaceId = null;
-
-    /**
-     * @type {string}
-     */
-    @observable spaceName = null;
-
-    /**
-     * @type {string}
-     */
-    @observable nameInSpace = null;
-
-    /**
-     * @type {string}
-     */
-    @observable spaceDescription = null;
-
-    /**
-     * @type {enum: internal / patient}
-     */
-    @observable spaceRoomType = null;
+    @observable spaceId: string = null;
+    @observable spaceName: string = null;
+    @observable nameInSpace: string = null;
+    @observable spaceDescription: string = null;
+    @observable spaceRoomType: 'internal' | 'patient' = null;
 
     serializeKegPayload() {
         return {

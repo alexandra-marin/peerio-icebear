@@ -13,14 +13,12 @@ class ReadReceipt extends Keg {
     }
     /**
      * Id of the last read message
-     * @type {number}
      */
-    @observable chatPosition;
+    @observable chatPosition: number;
     /**
      * true if this receipt's name doesn't match keg owner.
-     * @type {bool}
      */
-    receiptError;
+    receiptError: boolean;
 
     serializeKegPayload() {
         return { chatPosition: +this.chatPosition };

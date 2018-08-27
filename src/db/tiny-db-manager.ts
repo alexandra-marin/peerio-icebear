@@ -14,9 +14,8 @@ class TinyDbManager {
 
     /**
      * Instance of unencrypted system collection.
-     * @type {TinyDbCollection}
      */
-    get system() {
+    get system(): TinyDbCollection {
         if (!this.systemCollection) this.openSystem();
         return this.systemCollection;
     }
@@ -24,9 +23,8 @@ class TinyDbManager {
     /**
      * Instance of encrypted user collection.
      * Only values are encrypted.
-     * @const {TinyDb}
      */
-    get user() {
+    get user(): TinyDb {
         return this.userCollection;
     }
 

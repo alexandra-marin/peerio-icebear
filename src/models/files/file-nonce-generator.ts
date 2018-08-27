@@ -1,4 +1,4 @@
-import util from '../../crypto/util';
+import * as util from '../../crypto/util';
 
 /**
  * Helper class to generate sequential nonces for file chunks.
@@ -10,30 +10,22 @@ import util from '../../crypto/util';
  * 2-5  - chunk counter
  * 6-24 - random
  * ```
- * @param {number} startChunkId - chunk id to start with (next nonce will use this id)
- * @param {number} maxChunkId
- * @param {Uint8Array} nonce - leave empty to generate random one
+ * @param startChunkId - chunk id to start with (next nonce will use this id)
+ * @param nonce - leave empty to generate random one
  */
 class FileNonceGenerator {
-    constructor(startChunkId, maxChunkId, nonce = util.getRandomNonce()) {
-        /**
-         * @type {Uint8Array}
-         */
+    constructor(startChunkId: number, maxChunkId: number, nonce = util.getRandomNonce()) {
         this.nonce = nonce;
-        /**
-         * @type {number}
-         */
         this.chunkId = startChunkId;
-        /**
-         * @type {number}
-         */
         this.maxChunkId = maxChunkId;
         this._resetControlBytes();
-        /**
-         * @type {boolean}
-         */
         this.eof = false;
     }
+
+    nonce: Uint8Array;
+    chunkId: number;
+    maxChunkId: number;
+    eof: boolean;
 
     _resetControlBytes() {
         this.nonce.set([0, 0, 0, 0, 0]);

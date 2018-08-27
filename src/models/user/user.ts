@@ -29,7 +29,7 @@ let currentUser;
  */
 export default class User {
     constructor() {
-        this.kegDb = new KegDb('SELF');
+        this.kegDb = new KegDb();
         // this is not really extending prototype, but we don't care because User is almost a singleton
         // (new instance created on every initial login attempt only)
         mixUserProfileModule.call(this);
@@ -38,6 +38,7 @@ export default class User {
         mixUser2faModule.call(this);
     }
 
+    kegDb: KegDb;
     _username = '';
     /**
      * @type {string}

@@ -5,7 +5,8 @@ import {
     reaction,
     autorunAsync,
     isObservableArray,
-    when
+    when,
+    IObservableArray
 } from 'mobx';
 import Chat from './chat';
 import ChatStorePending from './chat-store.pending.js';
@@ -70,43 +71,31 @@ export class ChatStore {
         messagesReceived: 'messagesReceived',
         invitedToChannel: 'invitedToChannel'
     };
-    /**
-     * Events emitter.
-     * @type {EventEmitter}
-     */
+
     events = new EventEmitter();
 
     /**
      * Working set of chats. Server might have more, but we display only these at any time.
-     * @type {ObservableArray<Chat>}
      */
-    @observable.shallow chats = [];
-
-    /**
-     * @type {boolean}
-     */
+    @observable.shallow chats = [] as IObservableArray<Chat>;
     @observable unreadChatsAlwaysOnTop = false;
 
     /**
      * MyChats Keg
-     * @type {MyChats}
      */
-    myChats;
+    myChats: MyChats;
 
     /**
      * To prevent duplicates
-     * @type {{[chatId : string]: Chat}}
      */
-    chatMap = {};
+    chatMap: { [chatId: string]: Chat } = {};
     /**
      * True when chat list loading is in progress.
-     * @type {boolean}
      */
     @observable loading = false;
 
     /**
      * True when all chats has been updated after reconnect
-     * @type {boolean}
      */
     @computed
     get updatedAfterReconnect() {
@@ -115,23 +104,19 @@ export class ChatStore {
 
     /**
      * currently selected/focused chat.
-     * @type {Chat}
      */
-    @observable activeChat = null;
+    @observable activeChat: Chat = null;
     /**
      * Chats set this flag and UI should use it to prevent user from spam-clicking the 'hide' button
-     * @type {boolean}
      */
     @observable hidingChat = false;
     /**
      * True when loadAllChats() was called and finished once already.
-     * @type {boolean}
      */
     @observable loaded = false;
 
     /**
      * Total unread messages in all chats.
-     * @type {number}
      */
     @computed
     get unreadMessages() {
@@ -140,7 +125,6 @@ export class ChatStore {
 
     /**
      * Subset of ChatStore#chats, contains direct message chats and pending DMs
-     * @type {Array<Chat>}
      */
     @computed
     get directMessages() {
@@ -149,7 +133,6 @@ export class ChatStore {
 
     /**
      * Subset of ChatStore#chats, contains only channel chats
-     * @type {Array<Chat>}
      */
     @computed
     get channels() {
@@ -158,7 +141,6 @@ export class ChatStore {
 
     /**
      * Does chat store have any channels or not.
-     * @type {boolean}
      */
     @computed
     get hasChannels() {
@@ -167,7 +149,6 @@ export class ChatStore {
 
     /**
      * Number of unread messages and invitations
-     * @type {number}
      */
     @computed
     get badgeCount() {
@@ -176,7 +157,6 @@ export class ChatStore {
 
     /**
      * List of user's channels and invites
-     * @type {Array}
      */
     @computed
     get allRooms() {
@@ -192,7 +172,6 @@ export class ChatStore {
 
     /**
      * List of chats that don't belong to a space
-     * @type {Array}
      */
     @computed
     get nonSpaceRooms() {
@@ -222,12 +201,8 @@ export class ChatStore {
 
     /**
      * Chat comparison function. Takes into account favorite status of the chat, timestamp and user preferences.
-     * @param {Chat} a
-     * @param {Chat} b
-     * @param {boolean} unreadOnTop
-     * @returns {number} -1, 0 or 1
      */
-    static compareChats(a, b, unreadOnTop) {
+    static compareChats(a: Chat, b: Chat, unreadOnTop: boolean): -1 | 0 | 1 {
         if (a.isChannel && !b.isChannel) {
             return -1;
         }

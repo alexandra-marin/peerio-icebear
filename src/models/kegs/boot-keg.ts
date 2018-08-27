@@ -3,7 +3,9 @@ import KegDb from './keg-db';
 
 import { observable, when } from 'mobx';
 
-import util from '../../crypto/util';
+import * as util from '../../crypto/util';
+import IBootKeg from '../../defs/IBootKeg';
+import { KeyPair } from '../../defs/interfaces';
 
 interface BootKegPayload {
     kegKey: string;
@@ -20,7 +22,7 @@ interface BootKegPayload {
 /**
  * Named plaintext Boot keg for 'SELF' databases.
  */
-export default class BootKeg extends Keg<BootKegPayload> {
+export default class BootKeg extends Keg<BootKegPayload> implements IBootKeg {
     constructor(db: KegDb, bootKey: Uint8Array) {
         // named kegs are pre-created, so we know the id already and only going to update boot keg
         super('boot', 'boot', db);
@@ -39,10 +41,10 @@ export default class BootKeg extends Keg<BootKegPayload> {
      * Waits until keyId is available and resolves with it.
      * If the key will not appear in the timeout time, resolves to undefined.
      */
-    async getKey(keyId: string, timeout = 120000) {
+    async getKey(keyId: string, timeout = 120000): Promise<Uint8Array> {
         if (this.keys[keyId]) {
             // quick path
-            return this.keys[keyId];
+            return this.keys[keyId].key;
         }
         let resolve;
         const promise = new Promise(_resolve => {
@@ -52,7 +54,7 @@ export default class BootKeg extends Keg<BootKegPayload> {
         await promise.timeout(timeout).catch(() => {
             disposeReaction();
         });
-        return this.keys[keyId];
+        return this.keys[keyId] ? this.keys[keyId].key : null;
     }
 
     deserializeKegPayload(data: BootKegPayload) {

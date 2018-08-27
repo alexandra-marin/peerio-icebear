@@ -50,17 +50,14 @@ class PhraseDictionary {
     }
     /**
      * Last chosen dictionary.
-     * @type {PhraseDictionary}
      */
-    static current;
+    static current: PhraseDictionary;
 
     /**
      * Simple management of dictionaries: this function sets the PhraseDictionary.current property so it's accessible
      * whenever you need without re-creating the dictionary every time.
-     * @param {string} localeCode
-     * @param {string} rawData
      */
-    static setDictionary(localeCode, rawData) {
+    static setDictionary(localeCode: string, rawData: string) {
         if (PhraseDictionary.current) PhraseDictionary.current.dispose();
         PhraseDictionary.current = new PhraseDictionary(localeCode, rawData);
     }

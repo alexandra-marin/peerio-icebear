@@ -1,11 +1,12 @@
 import BootKeg from './boot-keg';
 import tracker from '../../models/update-tracker';
+import IKegDb from '../../defs/IKegDb';
 
 /**
  * Keg database.
  * This class is for user's own database ('SELF')
  */
-export default class KegDb {
+export default class KegDb implements IKegDb {
     /**
      * Always equals 'SELF'
      */

@@ -1,8 +1,35 @@
-import { cryptoUtil, publicCrypto, keys } from '../../crypto';
+import * as cryptoUtil from '../../crypto/util';
+import * as publicCrypto from '../../crypto/public';
+import * as cryptoKeys from '../../crypto/keys';
 import { action, observable, when } from 'mobx';
 import { getContactStore } from '../../helpers/di-contact-store';
 import SyncedKeg from '../kegs/synced-keg';
+import IBootKeg from '../../defs/IBootKeg';
+import User from '../user/user';
+import SharedKegDb from './shared-keg-db';
+import Contact from '../contacts/contact';
+import { IObservableArray } from 'mobx/lib/types/observablearray';
 
+interface ISharedDbBootKegPayload {
+    publicKey: string;
+    roles: {
+        [roleName: string]: string[];
+    };
+    encryptedKeys: IEncryptedKeys;
+}
+interface ISharedDbBootKegProps {}
+
+interface IEncryptedKeys {
+    [keyId: string]: {
+        createdAt: number;
+        keys: {
+            [username: string]: {
+                key: string; //b64
+                publicKey: string; //b64
+            };
+        };
+    };
+}
 /**
  * Named plaintext Boot keg for shared keg databases.
  *
@@ -70,11 +97,12 @@ import SyncedKeg from '../kegs/synced-keg';
  * }
  * ```
  *
- * @param {KegDb} db - owner instance
- * @param {User} user - currently authenticated user
+ * @param db - owner instance
+ * @param user - currently authenticated user
  */
-class SharedDbBootKeg extends SyncedKeg {
-    constructor(db, user) {
+class SharedDbBootKeg extends SyncedKeg<ISharedDbBootKegPayload, ISharedDbBootKegProps>
+    implements IBootKeg {
+    constructor(db: SharedKegDb, user: User) {
         // named kegs are pre-created, so we know the id already and only going to update boot keg
         super('boot', db, true, true, true, true);
         this.ignoreAntiTamperProtection = true;
@@ -84,51 +112,49 @@ class SharedDbBootKeg extends SyncedKeg {
         this.latestFormat = this.format;
     }
 
+    encryptedKeys: IEncryptedKeys;
+    publicKey: Uint8Array;
+
+    latestFormat: number;
+    user: User;
     /**
      * Extracted from payload, most recent key to use for encryption.
      * The trick here is that this property will only get updated after new keg key
      * if it was added, is successfully saved to server.
-     * @type {Uint8Array}
      */
-    kegKey;
+    kegKey: Uint8Array;
     /**
      * Most recent key id
-     * @type {string}
      */
-    kegKeyId;
+    kegKeyId: string;
     /**
      * Extracted from payload to use for decryption.
-     * @type {{keyId: { createdAt: number, key: Uint8Array } }}
      */
-    @observable.shallow keys = {};
+    @observable.shallow keys: { [keyId: string]: { createdAt: number; key: Uint8Array } } = {};
 
     /**
      * List of usernames who have access to the shared DB currently.
      * This includes users pending join confirmation.
-     * @type {Array<Contact>}
      */
-    @observable.shallow participants = [];
+    @observable.shallow participants = [] as IObservableArray<Contact>;
 
     /**
      * Subset of `this.participants`.
-     * @type {Array<Contact>}
      */
-    @observable.shallow admins = [];
+    @observable.shallow admins = [] as IObservableArray<Contact>;
 
     /**
      * Gives access to shared DB keys to a contact.
-     * @param {Contact} contact
      */
-    addParticipant(contact) {
+    addParticipant(contact: Contact) {
         if (this.participants.includes(contact)) return;
         this.participants.push(contact);
     }
 
     /**
      * Gives access to shared DB keys to a contact.
-     * @param {Contact} contact
      */
-    removeParticipant(contact) {
+    removeParticipant(contact: Contact) {
         this.participants.remove(contact);
     }
 
@@ -141,7 +167,7 @@ class SharedDbBootKeg extends SyncedKeg {
         // NOTE: if this is not the first key, we intentionally do not update `this.kegKey` and `this.kegKeyId`,
         // because it's dangerous to encrypt with the key that has not been saved yet.
         // Fields will get updated after boot keg is saved and reloaded.
-        const key = keys.generateEncryptionKey();
+        const key = cryptoKeys.generateEncryptionKey();
         const ids = Object.keys(this.keys).map(id => +id);
         const maxId = (ids.length ? Math.max(...ids) + 1 : 0).toString();
         this.keys[maxId] = {
@@ -170,24 +196,21 @@ class SharedDbBootKeg extends SyncedKeg {
     /**
      * Waits until keyId is available and resolves with it.
      * If the key will not appear in the timeout time, resolves to undefined.
-     *
-     * @param {string} keyId
-     * @param {number} timeout
      */
-    async getKey(keyId, timeout = 120000) {
+    async getKey(keyId: string, timeout = 120000): Promise<Uint8Array> {
         if (this.keys[keyId]) {
             // quick path
-            return this.keys[keyId];
+            return this.keys[keyId].key;
         }
         let resolve;
         const promise = new Promise(_resolve => {
             resolve = _resolve;
         });
-        const disposeReaction = when(() => this.keys[keyId], resolve);
+        const disposeReaction = when(() => !!this.keys[keyId], resolve);
         await promise.timeout(timeout).catch(() => {
             disposeReaction();
         });
-        return this.keys[keyId];
+        return this.keys[keyId] ? this.keys[keyId].key : null;
     }
 
     /**
@@ -202,10 +225,10 @@ class SharedDbBootKeg extends SyncedKeg {
 
     /**
      * Assigns a role to shared db participant
-     * @param {Contact} contact - contact to assign a role to
-     * @param {string} role - currently can be only 'admin'
+     * @param contact - contact to assign a role to
+     * @param role - currently can be only 'admin'
      */
-    assignRole(contact, role) {
+    assignRole(contact: Contact, role: string) {
         if (role !== 'admin') throw new Error('Only admin role is currently supported');
         if (!this.admins.includes(contact)) {
             // should not happen, but just to be safe
@@ -217,10 +240,8 @@ class SharedDbBootKeg extends SyncedKeg {
     }
     /**
      * Removes role from a participant
-     * @param {Contact} contact
-     * @param {string} role
      */
-    unassignRole(contact, role) {
+    unassignRole(contact: Contact, role: string) {
         if (role !== 'admin') throw new Error('Only admin role is currently supported.');
         // we do it this way to prevent potential errors around contacts that failed to load for whatever reason,
         if (!this.admins.includes(contact)) return;
@@ -287,20 +308,20 @@ class SharedDbBootKeg extends SyncedKeg {
         }
         // we find max key id to assign current key to use for encryption
         const maxKeyId = Math.max(...Object.keys(data.encryptedKeys).map(id => +id)).toString();
-        this.kegKey = this.keys[maxKeyId];
+        const kegKeyObj = this.keys[maxKeyId];
         // todo: throw fatal error to stop retries
-        if (this.kegKey) this.kegKey = this.kegKey.key;
+        if (kegKeyObj) this.kegKey = kegKeyObj.key;
         this.kegKeyId = maxKeyId;
         // we extract participant list from the current key object
         this.participants = Object.keys(data.encryptedKeys[maxKeyId].keys).map(username =>
             getContactStore().getContactAndSave(username)
-        );
+        ) as IObservableArray<Contact>;
     }
 
     serializeKegPayload() {
         this.format = this.latestFormat || this.format;
-        const ephemeralKeyPair = keys.generateEncryptionKeyPair();
-        const ret = {};
+        const ephemeralKeyPair = cryptoKeys.generateEncryptionKeyPair();
+        const ret = {} as ISharedDbBootKegPayload;
         ret.publicKey = cryptoUtil.bytesToB64(ephemeralKeyPair.publicKey);
         ret.roles = { admin: this.admins.map(c => c.username) };
         const k = (ret.encryptedKeys = {});
@@ -311,7 +332,7 @@ class SharedDbBootKeg extends SyncedKeg {
                 keys: {}
             };
             this.participants.forEach(c => {
-                if (c.deleted || c.notFound) return;
+                if (c.isDeleted || c.notFound) return;
                 if (c.loading) {
                     throw new Error(
                         `Can not save boot keg because participant Contact (${

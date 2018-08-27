@@ -1,5 +1,6 @@
 import { computed, observable } from 'mobx';
 import config from '../../config';
+import Chat from './chat';
 
 class Space {
     constructor(store) {
@@ -51,10 +52,9 @@ class ChatStoreSpaces {
 
     /**
      * Subset of ChatStore#chats, contains all spaces
-     * @type {Array<Chat>}
      */
     @computed
-    get spacesList() {
+    get spacesList(): Chat[] {
         if (config.whiteLabel.name !== 'medcryptor') {
             return [];
         }
@@ -96,16 +96,10 @@ class ChatStoreSpaces {
         return chat;
     };
 
-    /**
-     * @type {string}
-     */
-    @observable activeSpaceId = null;
+    @observable activeSpaceId: string = null;
 
-    /**
-     * @type {Space}
-     */
     @computed
-    get currentSpace() {
+    get currentSpace(): Space {
         if (!this.spacesList || !this.activeSpaceId) return null;
         return this.spacesList.find(x => x.spaceId === this.activeSpaceId);
     }

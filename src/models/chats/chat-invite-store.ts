@@ -1,4 +1,4 @@
-import { observable, action, when } from 'mobx';
+import { observable, action, when, IObservableArray } from 'mobx';
 import socket from '../../network/socket';
 import warnings from '../warnings';
 import { getChatStore } from '../../helpers/di-chat-store';
@@ -29,30 +29,28 @@ class ChatInviteStore {
     }
     /**
      * List of channel ids current user has been invited to.
-     * @type {ObservableArray<{kegDbId: string, username: string, timestamp: number}>}
      */
-    @observable.shallow received = [];
+    @observable.shallow received = [] as IObservableArray<{kegDbId: string, username: string, timestamp: number};
 
     /**
      * List of channel invites admins of current channel have sent.
-     * @type {Map<kegDbId: string, [{username: string, timestamp: number}]>}
+     * key - kegDbId
      */
-    @observable sent = observable.shallowMap();
+    @observable sent = observable.shallowMap<[{username: string, timestamp: number}]>();
 
     /**
      * List of users requested to leave channels. This is normally for internal icebear use.
      * Icebear will monitor this list and remove keys from boot keg for leavers
      * if current user is an admin of specific channel. Then icebear will remove an item from this list.
-     * todo: the whole system smells a bit, maybe think of something better
-     * @type {Map<{kegDbId: string, username: string}>}
+     * key - kegDbId
      */
-    @observable left = observable.shallowMap();
+    @observable left = observable.shallowMap<[{username:string}]>();
 
     /**
      * List of users who rejected invites and are pending to be removed from boot keg.
-     * @type {Map<{kegDbId: string, username: string}>}
+     * key - kegDbId
      */
-    @observable rejected = observable.shallowMap();
+    @observable rejected = observable.shallowMap<string[]>();
 
     updating = false;
     updateAgain = false;
@@ -65,10 +63,9 @@ class ChatInviteStore {
 
     /**
      * Activate invite by id
-     * @param {string}
      */
     @action.bound
-    activateInvite(kegDbId) {
+    activateInvite(kegDbId:string) {
         const invite = this.received.find(obj => {
             return obj.kegDbId === kegDbId;
         });

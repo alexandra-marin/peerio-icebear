@@ -401,7 +401,7 @@ export class ContactStore {
      * @param {Object} [prefetchedData]
      * @returns {Contact}
      */
-    getContact(usernameOrEmail, prefetchedData) {
+    getContact(usernameOrEmail, prefetchedData?) {
         const existing =
             this._contactMap[usernameOrEmail] ||
             this._requestMap[usernameOrEmail] ||
@@ -429,7 +429,7 @@ export class ContactStore {
      * effectively adding it to the contact list
      * @param {string} username
      */
-    getContactAndSave(usernameOrEmail) {
+    getContactAndSave(usernameOrEmail): Contact {
         let c = this.getContact(usernameOrEmail);
         when(
             () => !c.loading,

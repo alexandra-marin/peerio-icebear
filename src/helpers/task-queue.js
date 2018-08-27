@@ -73,11 +73,7 @@ class TaskQueue {
     runTask() {
         if (this.paused) return;
         // if reached the limit of parallel running tasks or no tasks left - doing nothing
-        if (
-            this.parallelism <= this.runningTasks ||
-            this.waitingTasks.length === 0
-        )
-            return;
+        if (this.parallelism <= this.runningTasks || this.waitingTasks.length === 0) return;
         this.runningTasks++;
         let t;
         try {

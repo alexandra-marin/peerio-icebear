@@ -49,19 +49,12 @@ const { observable, computed } = require('mobx');
  * @param {bool} [isChannel=false] - does this db belong to a DM or Channel
  */
 class SharedKegDb {
-    constructor(
-        id,
-        participants = [],
-        isChannel = false,
-        onBootKegLoadedFromKeg
-    ) {
+    constructor(id, participants = [], isChannel = false, onBootKegLoadedFromKeg) {
         this.id = id;
         this.onBootKegLoadedFromKeg = onBootKegLoadedFromKeg;
         const usernames = _.uniq(participants.map(p => p.username));
         if (usernames.length !== participants.length) {
-            console.warn(
-                'ChatKegDb constructor received participant list containing duplicates.'
-            );
+            console.warn('ChatKegDb constructor received participant list containing duplicates.');
         }
         const ind = usernames.indexOf(User.current.username);
         if (ind >= 0) {
@@ -70,9 +63,7 @@ class SharedKegDb {
                 'ChatKegDb constructor received participant list containing current user.'
             );
         }
-        this.participantsToCreateWith = usernames.map(p =>
-            contactStore.getContactAndSave(p)
-        );
+        this.participantsToCreateWith = usernames.map(p => contactStore.getContactAndSave(p));
 
         this.isChannel = isChannel;
         // Just to prevent parallel load routines. We can't use chat id because we don't always have it.
@@ -168,11 +159,7 @@ class SharedKegDb {
     async _loadExistingMeta(cachedMeta, cachedBootKeg) {
         let meta = cachedMeta;
         if (!meta) {
-            meta = await socket.send(
-                '/auth/kegs/db/meta',
-                { kegDbId: this.id },
-                false
-            );
+            meta = await socket.send('/auth/kegs/db/meta', { kegDbId: this.id }, false);
         }
         this._parseMeta(meta);
         return this._resolveBootKeg(cachedBootKeg);
@@ -202,8 +189,8 @@ class SharedKegDb {
         this.rawMeta = meta;
         this.id = meta.id;
         if (!this.isChannel && meta.permissions && meta.permissions.users) {
-            this._metaParticipants = Object.keys(meta.permissions.users).map(
-                username => contactStore.getContactAndSave(username)
+            this._metaParticipants = Object.keys(meta.permissions.users).map(username =>
+                contactStore.getContactAndSave(username)
             );
         }
     };
@@ -244,9 +231,7 @@ class SharedKegDb {
      */
     createBootKeg() {
         console.log(
-            `Creating ${this.urlName} boot keg for ${this.id}, isChannel:${
-                this.isChannel
-            }`
+            `Creating ${this.urlName} boot keg for ${this.id}, isChannel:${this.isChannel}`
         );
         const participants = this.participantsToCreateWith.slice();
         participants.push(contactStore.currentUser);

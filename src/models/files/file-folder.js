@@ -74,10 +74,7 @@ class FileFolder {
                     return true;
                 }
                 // items with deleted or unmounted parents also go to the root (this)
-                if (
-                    f.parent.isDeleted ||
-                    !this.store.folderStore.getById(f.parent.id)
-                ) {
+                if (f.parent.isDeleted || !this.store.folderStore.getById(f.parent.id)) {
                     return true;
                 }
                 return false;
@@ -90,8 +87,7 @@ class FileFolder {
     @computed
     get parent() {
         if (this.isRoot) {
-            if (this.isShared && this.folderId === 'root')
-                return getFileStore().folderStore.root;
+            if (this.isShared && this.folderId === 'root') return getFileStore().folderStore.root;
             return null;
         }
         const p = this.store.folderStore.getById(this.folderId);
@@ -130,9 +126,7 @@ class FileFolder {
 
     @computed
     get foldersSortedByName() {
-        return this.folders.sort(
-            (f1, f2) => f1.normalizedName > f2.normalizedName
-        );
+        return this.folders.sort((f1, f2) => f1.normalizedName > f2.normalizedName);
     }
 
     @computed
@@ -212,22 +206,14 @@ class FileFolder {
         let promise = Promise.resolve();
         this.folders.forEach(folder => {
             promise = promise.then(async () => {
-                await folder.download(
-                    downloadPath,
-                    pickPathSelector,
-                    createDirFunctor
-                );
+                await folder.download(downloadPath, pickPathSelector, createDirFunctor);
                 this.progress++;
             });
         });
         this.files.forEach(file => {
             promise = promise.then(async () => {
                 await file.download(
-                    pickPathSelector(
-                        downloadPath,
-                        file.nameWithoutExtension,
-                        file.ext
-                    )
+                    pickPathSelector(downloadPath, file.nameWithoutExtension, file.ext)
                 );
                 this.progress++;
             });
@@ -240,8 +226,7 @@ class FileFolder {
     @computed
     get hasLegacyFiles() {
         return !!(
-            this.folders.find(hasLegacyFilesPredicate) ||
-            this.files.find(isLegacyFilePredicate)
+            this.folders.find(hasLegacyFilesPredicate) || this.files.find(isLegacyFilePredicate)
         );
     }
 
@@ -264,11 +249,7 @@ class FileFolder {
                 return Promise.resolve();
             }
             // this is an inter-volume operation!
-            await file.copyTo(
-                this.store.kegDb,
-                this.store,
-                this.isRoot ? null : this.id
-            );
+            await file.copyTo(this.store.kegDb, this.store, this.isRoot ? null : this.id);
             // if file was shared not from SELF - remove it
             // file kegs in SELF will get hidden by server
             if (!file.store.isMainStore) {
@@ -297,10 +278,7 @@ class FileFolder {
         if (folder === this) return Promise.resolve();
         if (folder.store !== this.store) {
             // 1. we copy folder structure to another kegdb
-            const map = await folder.copyFolderStructureTo(
-                this,
-                skipRootFolder
-            );
+            const map = await folder.copyFolderStructureTo(this, skipRootFolder);
             // 2. we copy files
             await folder.copyFilesTo(this, map);
             // 3. we remove original folders, files have been removed individually already
@@ -325,9 +303,7 @@ class FileFolder {
             src.allFiles,
             file => {
                 src.progress = ++dst.progress;
-                const dstFolder =
-                    dst.store.folderStore.getById(folderIdMap[file.folderId]) ||
-                    dst;
+                const dstFolder = dst.store.folderStore.getById(folderIdMap[file.folderId]) || dst;
                 return dstFolder.attachFile(file);
             },
             { concurrency: 1 }
@@ -395,17 +371,13 @@ class FileFolder {
     serialize() {
         // folderId is same as this.id, due to historical reasons.
         const { name, id, createdAt } = this;
-        const folders = this.folders
-            .filter(f => !f.isShared)
-            .map(f => f.serialize());
+        const folders = this.folders.filter(f => !f.isShared).map(f => f.serialize());
         return { name, folderId: id, createdAt, folders };
     }
 
     deserialize(data, parentId) {
         if (this.id && data.folderId !== this.id) {
-            throw new Error(
-                'Trying to deserialize folder from a different folder data'
-            );
+            throw new Error('Trying to deserialize folder from a different folder data');
         }
         this.id = data.folderId; // 'folderId' is legacy name, don't want to migrate
         this.name = data.name;

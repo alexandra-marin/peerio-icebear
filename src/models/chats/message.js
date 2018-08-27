@@ -125,11 +125,7 @@ class Message extends Keg {
             (this.files && this.files.length) ||
             (this.folders && this.folders.length)
         ) {
-            promise = retryUntilSuccess(
-                () => this.saveToServer(),
-                undefined,
-                5
-            );
+            promise = retryUntilSuccess(() => this.saveToServer(), undefined, 5);
         } else {
             promise = this.saveToServer();
         }
@@ -291,10 +287,7 @@ class Message extends Keg {
                         () => {
                             const queue = Message.unfurlQueue;
                             if (!queue.paused) {
-                                when(
-                                    () => socket.connected,
-                                    () => queue.resume()
-                                );
+                                when(() => socket.connected, () => queue.resume());
                                 queue.pause();
                             }
                             this._queueUnfurl(url);

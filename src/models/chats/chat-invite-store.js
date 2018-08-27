@@ -122,17 +122,14 @@ class ChatInviteStore {
                             timestamp: item.invitees[username]
                         });
                     });
-                    arr.sort((i1, i2) =>
-                        i1.username.localeCompare(i2.username)
-                    );
+                    arr.sort((i1, i2) => i1.username.localeCompare(i2.username));
 
                     const rejectedUsernames = Object.keys(item.rejected);
                     this.rejected.set(item.kegDbId, rejectedUsernames);
 
                     Promise.map(
                         rejectedUsernames,
-                        username =>
-                            this.revokeInvite(item.kegDbId, username, true),
+                        username => this.revokeInvite(item.kegDbId, username, true),
                         { concurrency: 1 }
                     );
                 });
@@ -205,11 +202,9 @@ class ChatInviteStore {
                         .getChatWhenReady(kegDbId)
                         .then(chat => {
                             if (!chat.canIAdmin) return;
-                            Promise.map(
-                                leavers,
-                                l => chat.removeParticipant(l, false),
-                                { concurrency: 1 }
-                            );
+                            Promise.map(leavers, l => chat.removeParticipant(l, false), {
+                                concurrency: 1
+                            });
                         })
                         .catch(err => {
                             console.error(err);
@@ -238,10 +233,7 @@ class ChatInviteStore {
             bootKeg.payload = JSON.parse(bootKeg.payload);
             const keyId = (chatHeadKeg.keyId || 0).toString();
             const publicKey = cryptoUtil.b64ToBytes(bootKeg.payload.publicKey);
-            let encKegKey =
-                bootKeg.payload.encryptedKeys[keyId].keys[
-                    User.current.username
-                ];
+            let encKegKey = bootKeg.payload.encryptedKeys[keyId].keys[User.current.username];
             encKegKey = cryptoUtil.b64ToBytes(encKegKey);
 
             const kegKey = publicCrypto.decrypt(
@@ -307,9 +299,7 @@ class ChatInviteStore {
                 return new Promise(resolve => {
                     when(
                         () => {
-                            const chat = getChatStore().chats.find(
-                                c => c.id === kegDbId
-                            );
+                            const chat = getChatStore().chats.find(c => c.id === kegDbId);
                             if (!chat) return false;
                             return chat.metaLoaded;
                         },
@@ -335,20 +325,16 @@ class ChatInviteStore {
         const invite = this.received.find(i => i.kegDbId === kegDbId);
         if (!invite) {
             return Promise.reject(
-                new Error(
-                    `Can not reject invite for ${kegDbId} because it is not found`
-                )
+                new Error(`Can not reject invite for ${kegDbId} because it is not found`)
             );
         }
         invite.declined = true;
         return Promise.delay(500).then(() =>
-            socket
-                .send('/auth/kegs/channel/invite/reject', { kegDbId })
-                .catch(err => {
-                    console.error('Failed to reject invite', kegDbId, err);
-                    warnings.add('error_rejectChannelInvite');
-                    return Promise.reject(err);
-                })
+            socket.send('/auth/kegs/channel/invite/reject', { kegDbId }).catch(err => {
+                console.error('Failed to reject invite', kegDbId, err);
+                warnings.add('error_rejectChannelInvite');
+                return Promise.reject(err);
+            })
         );
     }
 

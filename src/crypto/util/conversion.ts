@@ -10,8 +10,7 @@
 // the slash.
 import { Buffer } from 'buffer/';
 
-const HAS_TEXT_ENCODER =
-    typeof TextEncoder !== 'undefined' && typeof TextDecoder !== 'undefined';
+const HAS_TEXT_ENCODER = typeof TextEncoder !== 'undefined' && typeof TextDecoder !== 'undefined';
 
 // TextEncoder only supports UTF-8, so the constructor has no params
 const textEncoder = HAS_TEXT_ENCODER ? new TextEncoder() : null;
@@ -41,11 +40,9 @@ export function bytesToStr(bytes: Uint8Array): string {
     if (HAS_TEXT_ENCODER) {
         return textDecoder.decode(bytes);
     }
-    return Buffer.from(
-        bytes.buffer as ArrayBuffer,
-        bytes.byteOffset,
-        bytes.byteLength
-    ).toString('utf-8');
+    return Buffer.from(bytes.buffer as ArrayBuffer, bytes.byteOffset, bytes.byteLength).toString(
+        'utf-8'
+    );
 }
 
 /**

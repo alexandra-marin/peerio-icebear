@@ -1,9 +1,5 @@
 const { When, Then } = require('cucumber');
-const {
-    createRandomTempFile,
-    getTempFileName,
-    filesEqual
-} = require('../helpers/files');
+const { createRandomTempFile, getTempFileName, filesEqual } = require('../helpers/files');
 const { startDmWithCucumbot } = require('./dm.helpers');
 
 When('I upload a {int} byte file', async function(int) {
@@ -19,9 +15,7 @@ When('I rename uploaded file to {string}', async function(string) {
 });
 
 function hasFileNamed(string) {
-    return this.waitFor(
-        () => !!ice.fileStore.files.find(f => f.name === string)
-    );
+    return this.waitFor(() => !!ice.fileStore.files.find(f => f.name === string));
 }
 
 Then('I have a file named {string}', hasFileNamed);
@@ -54,10 +48,8 @@ Then('Cucumbot can see the uploaded file in his drive', fileExistInDrive);
 Then('Cucumbot can not see the uploaded file in the room', async function() {
     return this.waitFor(
         () =>
-            ice.fileStore.getByIdInChat(
-                this.uploadedFile.fileId,
-                ice.chatStore.channels[0].id
-            ).deleted
+            ice.fileStore.getByIdInChat(this.uploadedFile.fileId, ice.chatStore.channels[0].id)
+                .deleted
     );
 });
 
@@ -83,10 +75,7 @@ When('I download the uploaded file', function() {
 });
 
 Then('the uploaded and the downloaded files are the same', async function() {
-    const same = await filesEqual(
-        this.uploadedFile.name,
-        this.downloadedFile.name
-    );
+    const same = await filesEqual(this.uploadedFile.name, this.downloadedFile.name);
     same.should.be.true;
 });
 
@@ -97,9 +86,7 @@ When('I share the uploaded file with Cucumbot', async function() {
 });
 
 When('I unshare the uploaded file with Cucumbot', async function() {
-    return ice.chatStore.directMessages[0].unshareFile(
-        this.uploadedFile.fileId
-    );
+    return ice.chatStore.directMessages[0].unshareFile(this.uploadedFile.fileId);
 });
 
 When('I unshare the uploaded file with the room', async function() {

@@ -974,5 +974,6 @@
   "mcr_title_internalRoomNotice": "This Room is intended for internal discussion about the patient. <toAddMembers>Add members</> to start the conversation.",
   "mcr_title_consultation": "Consultation",
   "mcr_warning_addContact": "This invite is intended for <b>medical practitioners</> only. Invite your patients via MedCryptor Desktop.",
+  "mcr_title_practitionerDetails": "Medical practitioner details",
   "mcr_error_ahrpa": "Please enter a valid AHPRA number"
 }

@@ -77,12 +77,7 @@ class UpdateTracker {
             socket.subscribe(socket.APP_EVENTS.digestUpdate, data => {
                 this.processDigestEvent(
                     data.kegDbId || data.path,
-                    [
-                        data.type,
-                        data.maxUpdateId,
-                        data.knownUpdateId,
-                        data.newKegsCount
-                    ],
+                    [data.type, data.maxUpdateId, data.knownUpdateId, data.newKegsCount],
                     true
                 );
             });
@@ -124,9 +119,7 @@ class UpdateTracker {
      */
     subscribeToKegDbAdded(handler) {
         if (this.dbAddedHandlers.includes(handler)) {
-            console.error(
-                'This handler already subscribed to subscribeToKegDbAdded'
-            );
+            console.error('This handler already subscribed to subscribeToKegDbAdded');
             return;
         }
         this.dbAddedHandlers.push(handler);
@@ -147,9 +140,7 @@ class UpdateTracker {
             this.updateHandlers[kegDbId][kegType] = [];
         }
         if (this.updateHandlers[kegDbId][kegType].includes(handler)) {
-            console.error(
-                'This handler already subscribed to subscribeToKegUpdates'
-            );
+            console.error('This handler already subscribed to subscribeToKegUpdates');
             return;
         }
         this.updateHandlers[kegDbId][kegType].push(handler);
@@ -207,10 +198,10 @@ class UpdateTracker {
             }
             typeDigest.newKegsCount = newKegsCount;
 
-            if (isFromEvent || this.loadedOnce)
-                this.emitKegTypeUpdatedEvent(kegDbId, kegType);
+            if (isFromEvent || this.loadedOnce) this.emitKegTypeUpdatedEvent(kegDbId, kegType);
         } else {
             const d = this.globalDigest[kegDbId];
+            if (!d) return; // unknown global digest type
             d.maxUpdateId = maxUpdateId;
             if (isFromEvent) {
                 this.emitKegTypeUpdatedEvent(kegDbId, 'global');
@@ -242,10 +233,7 @@ class UpdateTracker {
      */
     emitKegTypeUpdatedEvent(id, type) {
         if (!this.loadedOnce) {
-            when(
-                () => this.loadedOnce,
-                () => this.emitKegDbAddedEvent(id, type)
-            );
+            when(() => this.loadedOnce, () => this.emitKegDbAddedEvent(id, type));
             return;
         }
         if (!this.updateHandlers[id] || !this.updateHandlers[id][type]) return;
@@ -308,11 +296,7 @@ class UpdateTracker {
             );
             this.processDigestResponse(resp);
 
-            resp = await socket.send(
-                '/auth/updates/digest',
-                { unread: true },
-                false
-            );
+            resp = await socket.send('/auth/updates/digest', { unread: true }, false);
             this.processDigestResponse(resp);
 
             if (!this.loadedOnce) {
@@ -329,11 +313,7 @@ class UpdateTracker {
 
     // call this to make sure db digest is loaded disregarding its unread status
     async loadDigestFor(kegDbId) {
-        const resp = await socket.send(
-            '/auth/updates/digest',
-            { prefixes: [kegDbId] },
-            false
-        );
+        const resp = await socket.send('/auth/updates/digest', { prefixes: [kegDbId] }, false);
         this.processDigestResponse(resp);
     }
 
@@ -375,16 +355,7 @@ class UpdateTracker {
             } else this.seenThisQueue[id] = {};
             this.seenThisQueue[id][type] = updateId;
             // scheduling a run
-            setTimeout(
-                () =>
-                    this.seenThis(
-                        id,
-                        type,
-                        this.seenThisQueue[id][type],
-                        false
-                    ),
-                4000
-            );
+            setTimeout(() => this.seenThis(id, type, this.seenThisQueue[id][type], false), 4000);
             return;
         }
 
@@ -418,8 +389,7 @@ class UpdateTracker {
                 false
             )
             .then(() => {
-                if (digest.knownUpdateId < updateId)
-                    digest.knownUpdateId = updateId;
+                if (digest.knownUpdateId < updateId) digest.knownUpdateId = updateId;
             })
             .catch(this.logSeenThisError);
     }

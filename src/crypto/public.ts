@@ -80,8 +80,5 @@ export function decrypt(
  * @param mySecretKey - current user's secret key
  * @returns 32 bytes shared key
  */
-export const computeSharedKey: (
-    theirPublicKey: Uint8Array,
-    mySecretKey: Uint8Array
-) => Uint8Array =
+export const computeSharedKey: (theirPublicKey: Uint8Array, mySecretKey: Uint8Array) => Uint8Array =
     nacl.box.before;

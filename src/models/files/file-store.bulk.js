@@ -28,9 +28,7 @@ class FileStoreBulk {
 
     @computed
     get canMove() {
-        return !getFileStore().selectedFilesOrFolders.some(
-            f => f.isFolder && f.isShared
-        );
+        return !getFileStore().selectedFilesOrFolders.some(f => f.isFolder && f.isShared);
     }
     @computed
     get canShare() {
@@ -47,8 +45,7 @@ class FileStoreBulk {
 
     async removeOne(i, batch) {
         if (i.isFolder && this.deleteFolderConfirmator) {
-            if (!(await this.deleteFolderConfirmator(i)))
-                return Promise.reject();
+            if (!(await this.deleteFolderConfirmator(i))) return Promise.reject();
         }
         return i.remove(batch);
     }
@@ -59,11 +56,7 @@ class FileStoreBulk {
         if (this.deleteFilesConfirmator) {
             const files = items.filter(i => !i.isFolder);
             const sharedFiles = items.filter(i => i.shared);
-            if (
-                files.length &&
-                !(await this.deleteFilesConfirmator(files, sharedFiles))
-            )
-                return;
+            if (files.length && !(await this.deleteFilesConfirmator(files, sharedFiles))) return;
         }
         let promise = Promise.resolve();
         items.forEach(i => {
@@ -96,9 +89,7 @@ class FileStoreBulk {
                 i.selected = false;
             });
             if (i.isFolder) {
-                promise = promise.then(() =>
-                    getVolumeStore().shareFolder(i, usernamesAccessList)
-                );
+                promise = promise.then(() => getVolumeStore().shareFolder(i, usernamesAccessList));
             } else {
                 usernamesAccessList.forEach(contact => {
                     promise = promise.then(async () =>
@@ -164,11 +155,7 @@ class FileStoreBulk {
         );
         // TODO: maybe run in parallel?
         if (item.isFolder) {
-            await item.download(
-                path,
-                this.pickPathSelector,
-                config.FileStream.createDir
-            );
+            await item.download(path, this.pickPathSelector, config.FileStream.createDir);
         } else {
             await item.download(downloadPath, false, false, suppressSnackbar);
         }

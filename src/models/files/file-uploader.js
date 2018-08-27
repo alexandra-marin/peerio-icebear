@@ -18,9 +18,7 @@ class FileUploader extends FileProcessor {
         // amount of bytes to read and to send
         this.file.progressMax = file.size;
         if (startFromChunk != null) {
-            console.log(
-                `Resuming upload. Starting with chunk ${startFromChunk}`
-            );
+            console.log(`Resuming upload. Starting with chunk ${startFromChunk}`);
             nonceGenerator.chunkId = startFromChunk;
             this.lastReadChunkId = startFromChunk - 1;
             this.file.progress = startFromChunk * file.chunkSize;
@@ -67,27 +65,18 @@ class FileUploader extends FileProcessor {
 
     get _isEncryptQueueFull() {
         return (
-            (this.encryptQueue.length + 1) * this.file.chunkSize >
-            config.upload.encryptBufferSize
+            (this.encryptQueue.length + 1) * this.file.chunkSize > config.upload.encryptBufferSize
         );
     }
 
     get _isUploadQueueFull() {
         // chunk overhead neglecting is ok, too small
-        return (
-            (this.uploadQueue.length + 1) * this.file.chunkSize >
-            config.upload.uploadBufferSize
-        );
+        return (this.uploadQueue.length + 1) * this.file.chunkSize > config.upload.uploadBufferSize;
     }
 
     // reads chunk from fs and puts it in encryption queue
     _readChunk() {
-        if (
-            this.readingChunk ||
-            this.stopped ||
-            this.eofReached ||
-            this._isEncryptQueueFull
-        )
+        if (this.readingChunk || this.stopped || this.eofReached || this._isEncryptQueueFull)
             return;
         this.readingChunk = true;
         this.stream
@@ -109,22 +98,11 @@ class FileUploader extends FileProcessor {
     };
 
     _encryptChunk = () => {
-        if (
-            this.stopped ||
-            this._isUploadQueueFull ||
-            !this.encryptQueue.length
-        )
-            return;
+        if (this.stopped || this._isUploadQueueFull || !this.encryptQueue.length) return;
         try {
             const chunk = this.encryptQueue.shift();
             const nonce = this.nonceGenerator.getNextNonce();
-            chunk.buffer = secret.encrypt(
-                chunk.buffer,
-                this.fileKey,
-                nonce,
-                false,
-                false
-            );
+            chunk.buffer = secret.encrypt(chunk.buffer, this.fileKey, nonce, false, false);
             this.uploadQueue.push(chunk);
             this._tick();
         } catch (err) {

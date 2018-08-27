@@ -37,9 +37,7 @@ function downloadToTmpCache() {
             // XHR usually fails before socket detects disconnection
             if (socket.authenticated) {
                 socket.onceDisconnected(() => {
-                    socket.onceAuthenticated(() =>
-                        this.tryToCacheTemporarily()
-                    );
+                    socket.onceAuthenticated(() => this.tryToCacheTemporarily());
                 });
             } else {
                 socket.onceAuthenticated(() => this.tryToCacheTemporarily());
@@ -61,11 +59,7 @@ function download(filePath, resume, isTmpCacheDownload, suppressSnackbar) {
     }
     if (this.downloading || this.uploading) {
         return Promise.reject(
-            new Error(
-                `File is already ${
-                    this.downloading ? 'downloading' : 'uploading'
-                }`
-            )
+            new Error(`File is already ${this.downloading ? 'downloading' : 'uploading'}`)
         );
     }
     try {
@@ -95,12 +89,7 @@ function download(filePath, resume, isTmpCacheDownload, suppressSnackbar) {
 
                 stream = new config.FileStream(filePath, mode);
                 return stream.open().then(() => {
-                    this.downloader = new FileDownloader(
-                        this,
-                        stream,
-                        nonceGen,
-                        resumeParams
-                    );
+                    this.downloader = new FileDownloader(this, stream, nonceGen, resumeParams);
                     return this.downloader.start();
                 });
             })
@@ -109,18 +98,14 @@ function download(filePath, resume, isTmpCacheDownload, suppressSnackbar) {
                     this._saveDownloadEndFact();
                 }
                 this._resetDownloadState(stream);
-                const finalPath = filePath.substr(
-                    0,
-                    filePath.length - tempExt.length
-                );
+                const finalPath = filePath.substr(0, filePath.length - tempExt.length);
                 return config.FileStream.rename(filePath, finalPath);
             })
             .then(
                 action(() => {
                     if (!isTmpCacheDownload) {
                         this.cached = true; // currently for mobile only
-                        if (!suppressSnackbar)
-                            warnings.add('snackbar_downloadComplete');
+                        if (!suppressSnackbar) warnings.add('snackbar_downloadComplete');
                     } else {
                         this.tmpCached = true;
                     }
@@ -132,10 +117,7 @@ function download(filePath, resume, isTmpCacheDownload, suppressSnackbar) {
                     if (err.name === 'UserCancelError') {
                         return Promise.reject(err);
                     }
-                    if (
-                        !socket.authenticated ||
-                        err.name === 'DisconnectedError'
-                    ) {
+                    if (!socket.authenticated || err.name === 'DisconnectedError') {
                         this._resetDownloadState();
                         return Promise.reject(err);
                     }

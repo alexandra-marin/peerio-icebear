@@ -66,8 +66,7 @@ class Warnings {
             () => this.current.state === SystemWarning.STATES.DISMISSED,
             () => setTimeout(this.assignNextItem)
         );
-        if (this.current.level === 'medium' && clientApp.isFocused)
-            this.current.autoDismiss();
+        if (this.current.level === 'medium' && clientApp.isFocused) this.current.autoDismiss();
         this.current.show();
     };
 
@@ -82,9 +81,7 @@ class Warnings {
      */
     @action
     add(content, title, data, level = 'medium', callback) {
-        this.queueItem(
-            new SystemWarning(content, title, data, level, callback)
-        );
+        this.queueItem(new SystemWarning(content, title, data, level, callback));
     }
 
     /**
@@ -122,8 +119,6 @@ class Warnings {
 
 const w = new Warnings();
 
-socket.onceStarted(() =>
-    socket.subscribe(socket.APP_EVENTS.serverWarning, w.addServerWarning)
-);
+socket.onceStarted(() => socket.subscribe(socket.APP_EVENTS.serverWarning, w.addServerWarning));
 
 module.exports = w;

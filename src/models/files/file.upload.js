@@ -19,18 +19,10 @@ function _getUlResumeParams(path) {
                 warnings.addSevere('error_fileSizeChanged', 'title_error', {
                     fileName: this.name
                 });
-                throw new Error(
-                    `Upload file size mismatch. Was ${this.size} now ${
-                        stat.size
-                    }`
-                );
+                throw new Error(`Upload file size mismatch. Was ${this.size} now ${stat.size}`);
             }
             // check file state on server
-            return socket.send(
-                '/auth/file/state',
-                { fileId: this.fileId },
-                false
-            );
+            return socket.send('/auth/file/state', { fileId: this.fileId }, false);
         })
         .then(state => {
             console.log(state);
@@ -58,11 +50,7 @@ function _getUlResumeParams(path) {
 function upload(filePath, fileName, resume) {
     if (this.downloading || this.uploading) {
         return Promise.reject(
-            new Error(
-                `File is already ${
-                    this.downloading ? 'downloading' : 'uploading'
-                }`
-            )
+            new Error(`File is already ${this.downloading ? 'downloading' : 'uploading'}`)
         );
     }
     try {
@@ -84,16 +72,9 @@ function upload(filePath, fileName, resume) {
                 // no need to set values when it's a resume
                 if (nextChunkId === null) {
                     this.uploadedAt = new Date(); // todo: should we update this when upload actually finishes?
-                    this.name =
-                        fileName ||
-                        this.name ||
-                        fileHelper.getFileName(filePath);
-                    this.descriptorKey = cryptoUtil.bytesToB64(
-                        keys.generateEncryptionKey()
-                    );
-                    this.blobKey = cryptoUtil.bytesToB64(
-                        keys.generateEncryptionKey()
-                    );
+                    this.name = fileName || this.name || fileHelper.getFileName(filePath);
+                    this.descriptorKey = cryptoUtil.bytesToB64(keys.generateEncryptionKey());
+                    this.blobKey = cryptoUtil.bytesToB64(keys.generateEncryptionKey());
                 }
                 stream = new config.FileStream(filePath, 'read');
                 return stream.open();
@@ -101,20 +82,13 @@ function upload(filePath, fileName, resume) {
             .then(
                 // eslint-disable-next-line consistent-return
                 async () => {
-                    console.log(
-                        `File read stream open. File size: ${stream.size}`
-                    );
+                    console.log(`File read stream open. File size: ${stream.size}`);
                     if (nextChunkId === null) {
                         this.size = stream.size;
                         if (!this.size)
-                            return Promise.reject(
-                                new Error('Can not upload zero size file.')
-                            );
+                            return Promise.reject(new Error('Can not upload zero size file.'));
                         this.chunkSize = config.upload.getChunkSize(this.size);
-                        nonceGen = new FileNonceGenerator(
-                            0,
-                            this.chunksCount - 1
-                        );
+                        nonceGen = new FileNonceGenerator(0, this.chunksCount - 1);
                         this.blobNonce = cryptoUtil.bytesToB64(nonceGen.nonce);
                         try {
                             await this.createDescriptor();
@@ -134,12 +108,7 @@ function upload(filePath, fileName, resume) {
             )
             .then(() => {
                 if (nextChunkId === null) this._saveUploadStartFact(filePath);
-                this.uploader = new FileUploader(
-                    this,
-                    stream,
-                    nonceGen,
-                    nextChunkId
-                );
+                this.uploader = new FileUploader(this, stream, nonceGen, nextChunkId);
                 return this.uploader.start();
             })
             .then(() => {
@@ -153,10 +122,7 @@ function upload(filePath, fileName, resume) {
                     if (err.name === 'UserCancelError') {
                         return Promise.reject(err);
                     }
-                    if (
-                        !socket.authenticated ||
-                        err.name === 'DisconnectedError'
-                    ) {
+                    if (!socket.authenticated || err.name === 'DisconnectedError') {
                         this._resetUploadState();
                         return Promise.reject(err);
                     }
@@ -180,9 +146,7 @@ function upload(filePath, fileName, resume) {
  */
 function cancelUpload() {
     if (this.readyForDownload) {
-        return Promise.reject(
-            new Error('Can not cancel upload because file is already uploaded')
-        );
+        return Promise.reject(new Error('Can not cancel upload because file is already uploaded'));
     }
     console.log('file.uploads.js: upload cancelled');
     this._saveUploadEndFact();

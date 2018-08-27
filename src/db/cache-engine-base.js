@@ -62,10 +62,7 @@ class CacheEngineBase {
             } else {
                 console.log(`Cache reset is required. Resetting...`);
                 await CacheEngineBase.clearAllCache();
-                await TinyDb.system.setValue(
-                    CACHE_RESET_KEY,
-                    CACHE_RESET_COUNTER
-                );
+                await TinyDb.system.setValue(CACHE_RESET_KEY, CACHE_RESET_COUNTER);
                 console.log('Finished cache reset.');
             }
         } catch (e) {
@@ -96,10 +93,7 @@ class CacheEngineBase {
 
     static async openMetaDatabase() {
         if (!CacheEngineBase.metaDb) {
-            CacheEngineBase.metaDb = new config.CacheEngine(
-                META_DB_NAME,
-                'name'
-            );
+            CacheEngineBase.metaDb = new config.CacheEngine(META_DB_NAME, 'name');
             return CacheEngineBase.metaDb.open();
         }
         if (!CacheEngineBase.metaDb.isOpen) {

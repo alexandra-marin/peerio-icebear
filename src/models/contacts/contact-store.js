@@ -1,11 +1,4 @@
-const {
-    observable,
-    when,
-    action,
-    computed,
-    intercept,
-    isObservableArray
-} = require('mobx');
+const { observable, when, action, computed, intercept, isObservableArray } = require('mobx');
 const socket = require('../../network/socket');
 const Contact = require('./contact');
 const { setContactStore } = require('../../helpers/di-contact-store');
@@ -114,10 +107,7 @@ class ContactStore {
             case 'username':
                 return change;
             default:
-                console.error(
-                    'Invalid contact sorting property:',
-                    change.newValue
-                );
+                console.error('Invalid contact sorting property:', change.newValue);
                 return null;
         }
     }
@@ -128,10 +118,7 @@ class ContactStore {
             case 'all':
                 return change;
             default:
-                console.error(
-                    'Invalid contact filter property:',
-                    change.newValue
-                );
+                console.error('Invalid contact filter property:', change.newValue);
                 return null;
         }
     }
@@ -213,10 +200,7 @@ class ContactStore {
     applyInvitesData = action(() => {
         this.pendingContacts = this.invites.issued;
         when(
-            () =>
-                this.invites.loaded &&
-                tofuStore.loaded &&
-                getChatStore().loaded,
+            () => this.invites.loaded && tofuStore.loaded && getChatStore().loaded,
             () => {
                 try {
                     this.pendingContacts.forEach(async c => {
@@ -225,18 +209,11 @@ class ContactStore {
                             // But, if same username isn't in tofuStore, current user doesn't yet know this,
                             // so emit `onInviteAccepted` event (on desktop this shows a notification).
                             if (!(await tofuStore.getByUsername(c.username))) {
-                                setTimeout(() =>
-                                    this.onInviteAccepted({ contact: c })
-                                );
+                                setTimeout(() => this.onInviteAccepted({ contact: c }));
                             }
 
                             this.getContactAndSave(c.username);
-                            getChatStore().pending.add(
-                                c.username,
-                                c.email,
-                                false,
-                                c.isAutoImport
-                            );
+                            getChatStore().pending.add(c.username, c.email, false, c.isAutoImport);
                         }
                         return null;
                     });
@@ -317,9 +294,7 @@ class ContactStore {
     importContacts(emails) {
         if (!Array.isArray(emails) && !isObservableArray(emails)) {
             return Promise.reject(
-                new Error(
-                    `importContact(emails) argument should be an Array<string>`
-                )
+                new Error(`importContact(emails) argument should be an Array<string>`)
             );
         }
         return new Promise((resolve, reject) => {
@@ -339,10 +314,7 @@ class ContactStore {
                                 ret.notFound.push(emails[pos + i]);
                                 continue;
                             }
-                            const c = this.getContact(
-                                item[0].profile.username,
-                                [item]
-                            );
+                            const c = this.getContact(item[0].profile.username, [item]);
                             toAdd.push(c);
                         }
                         pos += res.length;
@@ -360,11 +332,7 @@ class ContactStore {
 
     _getBatchPage(emails, pos) {
         if (pos >= emails.length) return Promise.resolve([]);
-        return socket.send(
-            '/auth/user/lookup',
-            { string: emails.slice(pos, pos + 15) },
-            false
-        );
+        return socket.send('/auth/user/lookup', { string: emails.slice(pos, pos + 15) }, false);
     }
 
     /**
@@ -402,8 +370,7 @@ class ContactStore {
      */
     removeInvite(email) {
         return retryUntilSuccess(
-            () =>
-                socket.send('/auth/contacts/issued-invites/remove', { email }),
+            () => socket.send('/auth/contacts/issued-invites/remove', { email }),
             Math.random(),
             10
         );
@@ -450,11 +417,7 @@ class ContactStore {
             () => {
                 delete this._requestMap[usernameOrEmail];
                 if (c.notFound) return;
-                if (
-                    this._contactMap[c.username] ||
-                    this._cachedContacts[c.username]
-                )
-                    return;
+                if (this._contactMap[c.username] || this._cachedContacts[c.username]) return;
                 this._cachedContacts[c.username] = c;
             }
         );
@@ -555,9 +518,7 @@ class ContactStore {
             if (removeUnavailable) {
                 if (c.loading || c.notFound) return false;
             }
-            return (
-                c.username.includes(token) || c.fullNameLower.includes(token)
-            );
+            return c.username.includes(token) || c.fullNameLower.includes(token);
         });
         if (nosort) return ret;
         return ret.sort((c1, c2) => {

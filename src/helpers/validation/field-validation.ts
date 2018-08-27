@@ -111,7 +111,7 @@ function addValidation(
                     const result = await action(value, fieldName);
                     if (result === true) return true;
                     const errorMessage =
-                        result === false
+                        result === false ? message : result && (result.message || result);
                             ? message
                             : typeof result === 'object'
                                 ? result.message

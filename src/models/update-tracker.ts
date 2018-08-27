@@ -201,6 +201,7 @@ class UpdateTracker {
             if (isFromEvent || this.loadedOnce) this.emitKegTypeUpdatedEvent(kegDbId, kegType);
         } else {
             const d = this.globalDigest[kegDbId];
+            if (!d) return; // unknown global digest type
             d.maxUpdateId = maxUpdateId;
             if (isFromEvent) {
                 this.emitKegTypeUpdatedEvent(kegDbId, 'global');

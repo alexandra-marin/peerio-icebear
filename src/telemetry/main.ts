@@ -6,7 +6,7 @@ const g = require('../helpers/global-context');
 
 interface propertyTypes {
     'Version Number'?: number;
-    distinct_id?: string;
+    distinct_id?: string; // eslint-disable-line
     token?: string;
     Device?: 'Mobile' | 'Desktop';
     'App Version'?: string;

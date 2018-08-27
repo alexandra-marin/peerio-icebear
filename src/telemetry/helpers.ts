@@ -31,7 +31,7 @@ export function textInput(
     state: string,
     errorMsg: string
 ) {
-    let properties: textInputProps = { item, state };
+    const properties: textInputProps = { item, state };
 
     if (location) properties.location = location;
     if (sublocation) properties.sublocation = sublocation;
@@ -50,7 +50,7 @@ interface durationProps {
 export function duration(item: string, location: string, sublocation: string, startTime: number) {
     const totalTime = Math.round((Date.now() - startTime) / 1000);
 
-    let properties: durationProps = { totalTime };
+    const properties: durationProps = { totalTime };
 
     if (item) properties.item = item;
     if (location) properties.location = location;

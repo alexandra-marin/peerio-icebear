@@ -4,11 +4,7 @@
 //
 
 const io = require('socket.io-client/dist/socket.io');
-const {
-    ServerError,
-    DisconnectedError,
-    NotAuthenticatedError
-} = require('../errors');
+const { ServerError, DisconnectedError, NotAuthenticatedError } = require('../errors');
 const { observable } = require('mobx');
 const config = require('../config');
 const util = require('../util');
@@ -257,9 +253,7 @@ class SocketClient {
         this.handleReconnectError = () => {
             // HACK: backoff.duration() will increase attempt count, so we balance that
             this.socket.io.backoff.attempts--;
-            this.reconnectTimer.countDown(
-                this.socket.io.backoff.duration() / 1000
-            );
+            this.reconnectTimer.countDown(this.socket.io.backoff.duration() / 1000);
             socket.open();
         };
 
@@ -312,9 +306,7 @@ class SocketClient {
      */
     validateSubscription(event, listener) {
         if (!SOCKET_EVENTS[event] && !APP_EVENTS[event]) {
-            throw new Error(
-                'Attempt to un/subscribe from/to unknown socket event.'
-            );
+            throw new Error('Attempt to un/subscribe from/to unknown socket event.');
         }
         if (!listener || typeof listener !== 'function') {
             throw new Error('Invalid listener type.');
@@ -377,23 +369,18 @@ class SocketClient {
                     return;
                 }
                 if (name.startsWith('/auth/') && !this.preauthenticated) {
-                    console.error(
-                        `Attempt to send ${name} while not authenticated`
-                    );
+                    console.error(`Attempt to send ${name} while not authenticated`);
                     reject(new NotAuthenticatedError());
                     return;
                 }
                 const handler = resp => {
-                    this.throttled =
-                        resp.error === ServerError.codes.accountThrottled;
+                    this.throttled = resp.error === ServerError.codes.accountThrottled;
                     if (resp && resp.error) {
                         if (resp.error === ServerError.codes.accountClosed) {
                             getUser().deleted = true;
                             this.close();
                         }
-                        if (
-                            resp.error === ServerError.codes.accountBlacklisted
-                        ) {
+                        if (resp.error === ServerError.codes.accountBlacklisted) {
                             getUser().blacklisted = true;
                             this.close();
                         }
@@ -552,8 +539,7 @@ class SocketClient {
     dispose() {
         clearInterval(this.statInterval);
         this.taskPacer.clear();
-        if (this._originalWSSend)
-            WebSocket.prototype.send = this._originalWSSend;
+        if (this._originalWSSend) WebSocket.prototype.send = this._originalWSSend;
     }
 }
 

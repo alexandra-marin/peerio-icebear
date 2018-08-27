@@ -67,13 +67,11 @@ export function encrypt(
     const m = new Uint8Array(fullMsgLength);
     for (let i = 32; i < fullMsgLength; i++) m[i] = msgBytes[i - 32];
 
-    const lengthAdded =
-        (appendNonce ? NONCE_SIZE : 0) + (prependLength ? 4 : 0);
+    const lengthAdded = (appendNonce ? NONCE_SIZE : 0) + (prependLength ? 4 : 0);
     // container for cipher bytes
     const c = new Uint8Array(m.length + lengthAdded);
     if (appendNonce) {
-        for (let i = 0; i < NONCE_SIZE; i++)
-            c[c.length - NONCE_SIZE + i] = nonce[i];
+        for (let i = 0; i < NONCE_SIZE; i++) c[c.length - NONCE_SIZE + i] = nonce[i];
     }
     if (prependLength) {
         const l = util.numberToByteArray(c.length - 4);

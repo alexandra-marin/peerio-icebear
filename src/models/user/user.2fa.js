@@ -13,9 +13,7 @@ module.exports = function mixUser2faModule() {
     this.setup2fa = () => {
         console.log('Starting 2fa setup.');
         if (this.twoFAEnabled)
-            return Promise.reject(
-                new Error('2fa already enabled on this account.')
-            );
+            return Promise.reject(new Error('2fa already enabled on this account.'));
         return socket.send('/auth/2fa/enable').then(res => {
             return res.TOTPSecret;
         });
@@ -133,20 +131,16 @@ module.exports = function mixUser2faModule() {
                         const req = {
                             username: this.username,
                             deviceId,
-                            [code.length === 6
-                                ? 'TOTPCode'
-                                : 'backupCode']: code,
+                            [code.length === 6 ? 'TOTPCode' : 'backupCode']: code,
                             trustDevice
                         };
-                        return socket
-                            .send('/noauth/2fa/authenticate', req)
-                            .then(resp => {
-                                if (!resp.twoFACookie) return null;
-                                return this._set2faCookieData({
-                                    cookie: resp.twoFACookie,
-                                    trusted: trustDevice
-                                });
+                        return socket.send('/noauth/2fa/authenticate', req).then(resp => {
+                            if (!resp.twoFACookie) return null;
+                            return this._set2faCookieData({
+                                cookie: resp.twoFACookie,
+                                trusted: trustDevice
                             });
+                        });
                     })
                     .then(resolve)
                     .catch(reject);
@@ -170,10 +164,7 @@ module.exports = function mixUser2faModule() {
                         .catch(reject);
                 },
                 () => {
-                    console.log(
-                        'User cancelled protected 2fa operation:',
-                        type
-                    );
+                    console.log('User cancelled protected 2fa operation:', type);
                 }
             );
         });

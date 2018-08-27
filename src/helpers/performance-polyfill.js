@@ -27,10 +27,7 @@ try {
                 entry;
             while (i--) {
                 entry = _entries[i];
-                if (
-                    entry.entryType === type &&
-                    (name === void 0 || entry.name === name)
-                ) {
+                if (entry.entryType === type && (name === void 0 || entry.name === name)) {
                     _entries.splice(i, 1);
                 }
             }

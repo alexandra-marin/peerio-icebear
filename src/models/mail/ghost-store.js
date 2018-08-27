@@ -60,9 +60,7 @@ class GhostStore {
                     console.log('there are mail kegs', kegs.length);
                     for (const keg of kegs) {
                         const ghost = new Ghost(User.current.kegDb);
-                        if (
-                            keg.collectionVersion > this.knownCollectionVersion
-                        ) {
+                        if (keg.collectionVersion > this.knownCollectionVersion) {
                             this.knownCollectionVersion = keg.collectionVersion;
                         }
                         if (await ghost.loadFromKeg(keg)) {
@@ -73,11 +71,7 @@ class GhostStore {
                     this.sort(this.selectedSort);
                     this.loading = false;
                     this.loaded = true;
-                    tracker.subscribeToKegUpdates(
-                        'SELF',
-                        'ghost',
-                        this.updateGhosts
-                    );
+                    tracker.subscribeToKegUpdates('SELF', 'ghost', this.updateGhosts);
                 })
             )
             .catch(err => {
@@ -101,10 +95,8 @@ class GhostStore {
                         this.knownCollectionVersion = keg.collectionVersion;
                     }
                     if (!(await g.loadFromKeg(keg)) || g.isEmpty) continue;
-                    if (!g.deleted && !inCollection)
-                        this.ghostMap.set(g.ghostId, g);
-                    if (g.deleted && inCollection)
-                        this.ghostMap.delete(keg.ghostId);
+                    if (!g.deleted && !inCollection) this.ghostMap.set(g.ghostId, g);
+                    if (g.deleted && inCollection) this.ghostMap.delete(keg.ghostId);
                 }
                 this.sort(this.selectedSort);
                 this.updating = false;
@@ -133,10 +125,7 @@ class GhostStore {
             .send(text)
             .catch(() => {
                 // TODO: global error handling
-                warnings.addSevere(
-                    'error_mailQuotaExceeded',
-                    'error_sendingMail'
-                );
+                warnings.addSevere('error_mailQuotaExceeded', 'error_sendingMail');
             })
             .finally(() => g.sendError && this.remove(g));
     }

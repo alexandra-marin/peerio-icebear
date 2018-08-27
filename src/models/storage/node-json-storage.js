@@ -73,9 +73,7 @@ class NodeJsonStorage {
             }
             this._createDbFile();
         } catch (err) {
-            return Promise.reject(
-                errors.normalize(err, 'Failed to delete database')
-            );
+            return Promise.reject(errors.normalize(err, 'Failed to delete database'));
         }
         return Promise.resolve();
     }

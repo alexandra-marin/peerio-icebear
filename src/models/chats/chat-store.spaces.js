@@ -19,16 +19,12 @@ class Space {
 
     @computed
     get internalRooms() {
-        return this.allRooms.filter(
-            c => c.chatHead.spaceRoomType === 'internal'
-        );
+        return this.allRooms.filter(c => c.chatHead.spaceRoomType === 'internal');
     }
 
     @computed
     get patientRooms() {
-        return this.allRooms.filter(
-            c => c.chatHead.spaceRoomType === 'patient'
-        );
+        return this.allRooms.filter(c => c.chatHead.spaceRoomType === 'patient');
     }
 
     @observable isNew = false;
@@ -36,14 +32,8 @@ class Space {
     countUnread = (count, room) => count + room.unreadCount;
     @computed
     get unreadCount() {
-        const internalRoomsUnread = this.internalRooms.reduce(
-            this.countUnread,
-            0
-        );
-        const patientRoomsUnread = this.patientRooms.reduce(
-            this.countUnread,
-            0
-        );
+        const internalRoomsUnread = this.internalRooms.reduce(this.countUnread, 0);
+        const patientRoomsUnread = this.patientRooms.reduce(this.countUnread, 0);
 
         return internalRoomsUnread + patientRoomsUnread;
     }
@@ -101,14 +91,7 @@ class ChatStoreSpaces {
         space.nameInSpace = roomName;
         space.spaceRoomType = roomType;
         const name = `${space.spaceName} - ${roomName}`;
-        const chat = await this.store.startChat(
-            participants,
-            true,
-            name,
-            '',
-            true,
-            space
-        );
+        const chat = await this.store.startChat(participants, true, name, '', true, space);
 
         return chat;
     };
@@ -135,28 +118,16 @@ class ChatStoreSpaces {
 
     @computed
     get isPatientRoomOpen() {
-        if (
-            !this.store.activeChat ||
-            !this.currentSpace ||
-            !this.currentSpace.patientRooms
-        )
+        if (!this.store.activeChat || !this.currentSpace || !this.currentSpace.patientRooms)
             return null;
-        return this.currentSpace.patientRooms.some(
-            r => r.id === this.store.activeChat.id
-        );
+        return this.currentSpace.patientRooms.some(r => r.id === this.store.activeChat.id);
     }
 
     @computed
     get isInternalRoomOpen() {
-        if (
-            !this.store.activeChat ||
-            !this.currentSpace ||
-            !this.currentSpace.internalRooms
-        )
+        if (!this.store.activeChat || !this.currentSpace || !this.currentSpace.internalRooms)
             return null;
-        return this.currentSpace.internalRooms.some(
-            r => r.id === this.store.activeChat.id
-        );
+        return this.currentSpace.internalRooms.some(r => r.id === this.store.activeChat.id);
     }
 
     @computed

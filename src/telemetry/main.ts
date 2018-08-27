@@ -22,7 +22,7 @@ async function getUserId(): Promise<string> {
     const userId: Promise<string> = await TinyDb.system.getValue('telemetryUserId');
 
     if (!userId) {
-        const newId: any = cryptoUtil.getRandomGlobalShortIdHex().toString();
+        const newId: any = cryptoUtil.getRandomGlobalShortIdHex();
         await TinyDb.system.setValue('telemetryUserId', newId);
         return newId;
     }
@@ -30,12 +30,14 @@ async function getUserId(): Promise<string> {
 }
 
 export async function init() {
-    const uuid: string = await getUserId();
-
-    baseObj.properties.distinct_id = uuid; // eslint-disable-line
-    baseObj.properties.token = config.telemetry.token;
-    baseObj.properties.Device = config.isMobile ? 'Mobile' : 'Desktop';
-    baseObj.properties['App Version'] = config.appVersion;
+    try {
+        baseObj.properties.distinct_id = await getUserId(); // eslint-disable-line
+        baseObj.properties.token = config.telemetry.token;
+        baseObj.properties.Device = config.isMobile ? 'Mobile' : 'Desktop';
+        baseObj.properties['App Version'] = config.appVersion;
+    } catch (e) {
+        console.error('Could not initialize telemetry.', e);
+    }
 }
 
 function camelToTitleCase(text: string): string {
@@ -43,27 +45,29 @@ function camelToTitleCase(text: string): string {
 }
 
 export function send(eventObj) {
-    // Marketing wants all items (property names and values) to be in Title Case, but this breaks code style.
-    // So we still write props in camelCase when sending events from client, and convert them here.
-    let properties = {};
-    Object.keys(eventObj.properties).forEach(itemInCamel => {
-        const item = camelToTitleCase(itemInCamel);
-        properties[item] = eventObj.properties[itemInCamel];
-    });
+    try {
+        // Marketing wants all items (property names and values) to be in Title Case, but this breaks code style.
+        // So we still write props in camelCase when sending events from client, and convert them here.
+        let properties = {};
+        Object.keys(eventObj.properties).forEach(itemInCamel => {
+            const item = camelToTitleCase(itemInCamel);
+            properties[item] = eventObj.properties[itemInCamel];
+        });
 
-    // `properties` will be overwritten if you directly assign eventObj to baseObj or vice versa.
-    // This song-and-dance merges the properties first, assigns the object, then assigns the object's properties
-    properties = Object.assign(properties, baseObj.properties);
-    const object = Object.assign({}, eventObj, baseObj);
-    object.properties = properties;
+        // `properties` will be overwritten if you directly assign eventObj to baseObj or vice versa.
+        // This song-and-dance merges the properties first, assigns the object, then assigns the object's properties
+        properties = Object.assign(properties, baseObj.properties);
+        const object = Object.assign({}, eventObj, baseObj);
+        object.properties = properties;
 
-    const data = g.btoa(JSON.stringify(object));
-    const url = `${config.telemetry.baseUrl}${data}`;
+        const data = g.btoa(JSON.stringify(object));
+        const url = `${config.telemetry.baseUrl}${data}`;
 
-    // TODO: this makes it easier to see tracking events for testing purposes. Remove before release.
-    console.log(object);
-
-    window.fetch(url, {
-        method: 'POST'
-    });
+        console.log(object);
+        g.fetch(url, {
+            method: 'POST'
+        });
+    } catch (e) {
+        console.error('Could not send telemetry event.', e);
+    }
 }

@@ -239,10 +239,7 @@ const config = new class {
      * Server premium plans ids
      * @type {Array<string>}
      */
-    serverPlansPremium = [
-        SERVER_PLAN_PREMIUM_MONTHLY,
-        SERVER_PLAN_PREMIUM_YEARLY
-    ];
+    serverPlansPremium = [SERVER_PLAN_PREMIUM_MONTHLY, SERVER_PLAN_PREMIUM_YEARLY];
 
     /**
      * Server pro plans ids

@@ -37,11 +37,7 @@ class ChatFileHandler {
     };
 
     copyFileKegs() {
-        if (
-            !this.maxUpdateId ||
-            this.maxUpdateId === this.knownUpdateId ||
-            this.copyingFiles
-        )
+        if (!this.maxUpdateId || this.maxUpdateId === this.knownUpdateId || this.copyingFiles)
             return;
         this.copyingFiles = true;
         socket
@@ -75,11 +71,7 @@ class ChatFileHandler {
                                 return;
                             }
                             // it's our own file, no need to copy to SELF
-                            if (
-                                keg.props.descriptor.owner ===
-                                getUser().username
-                            )
-                                return;
+                            if (keg.props.descriptor.owner === getUser().username) return;
                             // Not waiting for this to resolve. Internally it will do retries,
                             // but on larger scale it's too complicated to handle recovery
                             // from non-connection related errors
@@ -162,9 +154,7 @@ class ChatFileHandler {
         }
         if (file.db.id !== this.chat.id) {
             return Promise.reject(
-                new Error(
-                    'Attempt to unshare file from kegdb it does not belong to.'
-                )
+                new Error('Attempt to unshare file from kegdb it does not belong to.')
             );
         }
         return file.remove();

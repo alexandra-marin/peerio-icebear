@@ -18,10 +18,7 @@ function medcryptorContactFilter(contact, context) {
         case 'patientroom':
         case 'addcontact':
         case 'sharefiles':
-            return (
-                contact.appLabel === 'peerio' ||
-                contact.appLabel === 'medcryptor'
-            );
+            return contact.appLabel === 'peerio' || contact.appLabel === 'medcryptor';
 
         case 'newpatientspace':
             return contact.appLabel === 'peerio';

@@ -137,9 +137,7 @@ class SharedDbBootKeg extends SyncedKeg {
      */
     addKey() {
         if (this.dirty)
-            throw new Error(
-                'Can not add key to shared db boot keg because unsaved key exists.'
-            );
+            throw new Error('Can not add key to shared db boot keg because unsaved key exists.');
         // NOTE: if this is not the first key, we intentionally do not update `this.kegKey` and `this.kegKeyId`,
         // because it's dangerous to encrypt with the key that has not been saved yet.
         // Fields will get updated after boot keg is saved and reloaded.
@@ -208,13 +206,10 @@ class SharedDbBootKeg extends SyncedKeg {
      * @param {string} role - currently can be only 'admin'
      */
     assignRole(contact, role) {
-        if (role !== 'admin')
-            throw new Error('Only admin role is currently supported');
+        if (role !== 'admin') throw new Error('Only admin role is currently supported');
         if (!this.admins.includes(contact)) {
             // should not happen, but just to be safe
-            const duplicate = this.admins.filter(
-                d => d.username === contact.username
-            );
+            const duplicate = this.admins.filter(d => d.username === contact.username);
             duplicate.forEach(d => this.admins.remove(d));
 
             this.admins.push(contact);
@@ -226,12 +221,10 @@ class SharedDbBootKeg extends SyncedKeg {
      * @param {string} role
      */
     unassignRole(contact, role) {
-        if (role !== 'admin')
-            throw new Error('Only admin role is currently supported.');
+        if (role !== 'admin') throw new Error('Only admin role is currently supported.');
         // we do it this way to prevent potential errors around contacts that failed to load for whatever reason,
         if (!this.admins.includes(contact)) return;
-        if (this.admins.length < 2)
-            throw new Error('Can not remove last admin from boot keg.');
+        if (this.admins.length < 2) throw new Error('Can not remove last admin from boot keg.');
         this.admins.remove(contact);
     }
 
@@ -251,11 +244,7 @@ class SharedDbBootKeg extends SyncedKeg {
         // decrypting keg key that was encrypted for me
         let kegKey = data.encryptedKeys[this.user.username];
         kegKey = cryptoUtil.b64ToBytes(kegKey);
-        kegKey = publicCrypto.decrypt(
-            kegKey,
-            this.publicKey,
-            this.user.encryptionKeys.secretKey
-        );
+        kegKey = publicCrypto.decrypt(kegKey, this.publicKey, this.user.encryptionKeys.secretKey);
         if (kegKey === false) {
             console.error('Failed to decrypt shared db key for myself.');
             // todo: mark as invalid to prevent message loading attempts?
@@ -297,16 +286,14 @@ class SharedDbBootKeg extends SyncedKeg {
             this.keys[keyId] = { key: kegKey, createdAt: keyObj.createdAt };
         }
         // we find max key id to assign current key to use for encryption
-        const maxKeyId = Math.max(
-            ...Object.keys(data.encryptedKeys).map(id => +id)
-        ).toString();
+        const maxKeyId = Math.max(...Object.keys(data.encryptedKeys).map(id => +id)).toString();
         this.kegKey = this.keys[maxKeyId];
         // todo: throw fatal error to stop retries
         if (this.kegKey) this.kegKey = this.kegKey.key;
         this.kegKeyId = maxKeyId;
         // we extract participant list from the current key object
-        this.participants = Object.keys(data.encryptedKeys[maxKeyId].keys).map(
-            username => getContactStore().getContactAndSave(username)
+        this.participants = Object.keys(data.encryptedKeys[maxKeyId].keys).map(username =>
+            getContactStore().getContactAndSave(username)
         );
     }
 

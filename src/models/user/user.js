@@ -425,9 +425,7 @@ class User {
         // TODO[backlog]: this should be stored in server
         const bonusPerUser = 50 * 1024 * 1024;
         const limit = tryToGet(
-            () =>
-                User.current.quota.quotas.userInviteOnboardingBonus.bonus.file
-                    .limit,
+            () => User.current.quota.quotas.userInviteOnboardingBonus.bonus.file.limit,
             0
         );
         return Math.ceil(limit / bonusPerUser);
@@ -484,11 +482,7 @@ class User {
                     backupOnboardingBonus,
                     confirmedEmailBonus,
                     userInviteOnboardingBonus
-                ].reduce(
-                    (sum, value) =>
-                        sum + Math.ceil(value.bonus.file.limit / 1024 / 1024),
-                    0
-                ),
+                ].reduce((sum, value) => sum + Math.ceil(value.bonus.file.limit / 1024 / 1024), 0),
             0
         );
     }
@@ -515,10 +509,7 @@ class User {
 
     @computed
     get hasAvatarUploadedBonus() {
-        return tryToGet(
-            () => !!this.quota.quotas.avatarOnboardingBonus.bonus.file.limit,
-            false
-        );
+        return tryToGet(() => !!this.quota.quotas.avatarOnboardingBonus.bonus.file.limit, false);
     }
 
     @computed
@@ -529,8 +520,7 @@ class User {
     @computed
     get hasCreatedRoomBonus() {
         return tryToGet(
-            () =>
-                !!this.quota.quotas.createRoomOnboardingBonus.bonus.file.limit,
+            () => !!this.quota.quotas.createRoomOnboardingBonus.bonus.file.limit,
             false
         );
     }
@@ -538,47 +528,34 @@ class User {
     @computed
     get hasInvitedFriendsBonus() {
         return tryToGet(
-            () =>
-                !!this.quota.quotas.userInviteOnboardingBonus.bonus.file.limit,
+            () => !!this.quota.quotas.userInviteOnboardingBonus.bonus.file.limit,
             false
         );
     }
 
     @computed
     get hasTwoFABonus() {
-        return tryToGet(
-            () => !!this.quota.quotas.twofaOnboardingBonus.bonus.file.limit,
-            false
-        );
+        return tryToGet(() => !!this.quota.quotas.twofaOnboardingBonus.bonus.file.limit, false);
     }
 
     @computed
     get hasInstallBonus() {
-        return tryToGet(
-            () => !!this.quota.quotas.installsOnboardingBonus.bonus.file.limit,
-            false
-        );
+        return tryToGet(() => !!this.quota.quotas.installsOnboardingBonus.bonus.file.limit, false);
     }
 
     @computed
     get hasAccountKeyBackedUpBonus() {
-        return tryToGet(
-            () => !!this.quota.quotas.backupOnboardingBonus.bonus.file.limit,
-            false
-        );
+        return tryToGet(() => !!this.quota.quotas.backupOnboardingBonus.bonus.file.limit, false);
     }
 
     @computed
     get isPremiumUser() {
-        return !!this.activePlans.filter(s =>
-            config.serverPlansPremium.includes(s)
-        ).length;
+        return !!this.activePlans.filter(s => config.serverPlansPremium.includes(s)).length;
     }
 
     @computed
     get isProUser() {
-        return !!this.activePlans.filter(s => config.serverPlansPro.includes(s))
-            .length;
+        return !!this.activePlans.filter(s => config.serverPlansPro.includes(s)).length;
     }
 
     @computed
@@ -667,9 +644,7 @@ class User {
             when(
                 () => this.profileLoaded,
                 () => {
-                    this.setAsLastAuthenticated().catch(err =>
-                        console.error(err)
-                    ); // not critical, we can ignore this error
+                    this.setAsLastAuthenticated().catch(err => console.error(err)); // not critical, we can ignore this error
                 }
             );
         }
@@ -678,10 +653,7 @@ class User {
     setReauthOnReconnect = () => {
         // only need to set reauth listener once
         if (this.stopReauthenticator) return;
-        this.stopReauthenticator = socket.subscribe(
-            socket.SOCKET_EVENTS.connect,
-            this.login
-        );
+        this.stopReauthenticator = socket.subscribe(socket.SOCKET_EVENTS.connect, this.login);
     };
 
     /**
@@ -736,24 +708,18 @@ class User {
      * @return {Uint8Array}
      */
     getSharedKey(theirPublicKey) {
-        if (!(theirPublicKey instanceof Uint8Array))
-            throw new Error('Invalid argument type');
+        if (!(theirPublicKey instanceof Uint8Array)) throw new Error('Invalid argument type');
         const cacheKey = theirPublicKey.join(',');
         let cachedValue = this._sharedKeyCache[cacheKey];
         if (cachedValue) return cachedValue;
-        cachedValue = publicCrypto.computeSharedKey(
-            theirPublicKey,
-            this.encryptionKeys.secretKey
-        );
+        cachedValue = publicCrypto.computeSharedKey(theirPublicKey, this.encryptionKeys.secretKey);
         this._sharedKeyCache[cacheKey] = cachedValue;
         return cachedValue;
     }
 
     deleteAccount(username) {
         if (username !== this.username) {
-            return Promise.reject(
-                new Error('Pass username to delete current user account.')
-            );
+            return Promise.reject(new Error('Pass username to delete current user account.'));
         }
         if (!this.primaryAddressConfirmed) {
             warnings.addSevere('error_deletingAccountNoConfirmedEmail');
@@ -767,10 +733,7 @@ class User {
     }
 
     clearFromTinyDb() {
-        return Promise.all([
-            TinyDb.user.clear(),
-            User.removeLastAuthenticated()
-        ]);
+        return Promise.all([TinyDb.user.clear(), User.removeLastAuthenticated()]);
     }
 }
 

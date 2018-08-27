@@ -32,7 +32,7 @@ async function getUserId(): Promise<string> {
 export async function init() {
     const uuid: string = await getUserId();
 
-    baseObj.properties['distinct_id'] = uuid;
+    baseObj.properties.distinct_id = uuid; // eslint-disable-line
     baseObj.properties.token = config.telemetry.token;
     baseObj.properties.Device = config.isMobile ? 'Mobile' : 'Desktop';
     baseObj.properties['App Version'] = config.appVersion;

@@ -618,10 +618,7 @@ class Chat {
         }
         // sort
         this.sortMessages();
-        this.onNewMessageLoad(
-            newMentionCount,
-            newMessageCount /* , lastMentionId */
-        );
+        this.onNewMessageLoad(newMentionCount, newMessageCount /* , lastMentionId */);
         if (!prepend) {
             // updating most recent message
             for (let i = this.messages.length - 1; i >= 0; i--) {

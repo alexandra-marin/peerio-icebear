@@ -19,7 +19,6 @@ const clientApp = require('../client-app');
 const { asPromise } = require('../../helpers/prombservable');
 const TaskQueue = require('../../helpers/task-queue');
 const { relativeTimestamp } = require('../../helpers/time-formatting');
-const Clock = require('../../helpers/observable-clock');
 
 // every unique file (fileId) has a set of properties we want to be shared between all the file kegs
 // representing this file
@@ -189,16 +188,11 @@ class File extends Keg {
         this.data.uploadedAt = val;
     }
 
-    minuteClock = new Clock(60);
     /**
      * @type {number}
      */
     @computed
     get uploadTimeFormatted() {
-        // If file was uploaded in the past hour, refresh timestamp every minute using `minuteClock` subscription
-        if (this.minuteClock.now - this.uploadedAt < 60 * 60 * 1000) {
-            return relativeTimestamp(this.uploadedAt);
-        }
         return relativeTimestamp(this.uploadedAt);
     }
 

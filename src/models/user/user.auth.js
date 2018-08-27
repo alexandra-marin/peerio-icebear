@@ -1,10 +1,5 @@
 const socket = require('../../network/socket');
-const {
-    keys,
-    publicCrypto,
-    secret,
-    cryptoUtil
-} = require('../../crypto/index');
+const { keys, publicCrypto, secret, cryptoUtil } = require('../../crypto/index');
 const util = require('../../util');
 const errors = require('../../errors');
 const TinyDb = require('../../db/tiny-db');
@@ -33,11 +28,7 @@ module.exports = function mixUserAuthModule() {
                         console.log('Server requested 2fa on login.');
                         return this._handle2faOnLogin()
                             .catch(err => {
-                                if (
-                                    err &&
-                                    err.code ===
-                                        errors.ServerError.codes.invalid2FACode
-                                ) {
+                                if (err && err.code === errors.ServerError.codes.invalid2FACode) {
                                     warnings.add('error_invalid2faCode');
                                     return Promise.resolve();
                                 }
@@ -53,16 +44,10 @@ module.exports = function mixUserAuthModule() {
     };
 
     this._deriveKeys = () => {
-        if (!this.username)
-            return Promise.reject(
-                new Error('Username is required to derive keys')
-            );
+        if (!this.username) return Promise.reject(new Error('Username is required to derive keys'));
         if (!this.passphrase)
-            return Promise.reject(
-                new Error('Passphrase is required to derive keys')
-            );
-        if (!this.authSalt)
-            return Promise.reject(new Error('Salt is required to derive keys'));
+            return Promise.reject(new Error('Passphrase is required to derive keys'));
+        if (!this.authSalt) return Promise.reject(new Error('Salt is required to derive keys'));
         if (this.bootKey && this.authKeys) return Promise.resolve();
         return keys
             .deriveAccountKeys(this.username, this.passphrase, this.authSalt)
@@ -88,9 +73,7 @@ module.exports = function mixUserAuthModule() {
                 const req = {
                     username: this.username,
                     authSalt: this.authSalt.buffer,
-                    authPublicKeyHash: keys.getAuthKeyHash(
-                        this.authKeys.publicKey
-                    ).buffer,
+                    authPublicKeyHash: keys.getAuthKeyHash(this.authKeys.publicKey).buffer,
                     platform: config.platform,
                     arch: config.arch,
                     clientVersion: config.appVersion,
@@ -123,29 +106,17 @@ module.exports = function mixUserAuthModule() {
             this.authKeys.secretKey
         );
         // 65 84 = 'AT' (access token)
-        if (
-            decrypted[0] !== 65 ||
-            decrypted[1] !== 84 ||
-            decrypted.length !== 32
-        ) {
-            return Promise.reject(
-                new Error('Auth token plaintext is of invalid format.')
-            );
+        if (decrypted[0] !== 65 || decrypted[1] !== 84 || decrypted.length !== 32) {
+            return Promise.reject(new Error('Auth token plaintext is of invalid format.'));
         }
         return socket
-            .send(
-                '/noauth/authenticate',
-                { decryptedAuthToken: decrypted.buffer },
-                true
-            )
+            .send('/noauth/authenticate', { decryptedAuthToken: decrypted.buffer }, true)
             .then(resp => {
                 if (this.sessionId && resp.sessionId !== this.sessionId) {
                     console.log('Digest session has expired.');
                     clientApp.clientSessionExpired = true;
                     return Promise.reject(
-                        new Error(
-                            'Digest session was expired, application restart is needed.'
-                        )
+                        new Error('Digest session was expired, application restart is needed.')
                     );
                 }
                 this.sessionId = resp.sessionId;
@@ -204,9 +175,7 @@ module.exports = function mixUserAuthModule() {
     this._getAuthDataFromPasscode = (passcode, passcodeSecret) => {
         return keys
             .deriveKeyFromPasscode(this.username, passcode)
-            .then(passcodeKey =>
-                secret.decryptString(passcodeSecret, passcodeKey)
-            )
+            .then(passcodeKey => secret.decryptString(passcodeSecret, passcodeKey))
             .then(authDataJSON => JSON.parse(authDataJSON));
     };
 
@@ -263,18 +232,14 @@ module.exports = function mixUserAuthModule() {
      * @returns {Promise}
      */
     this.disablePasscode = () => {
-        return TinyDb.system
-            .setValue(`${this.username}:passcode:disabled`, true)
-            .then(() => {
-                return TinyDb.system
-                    .removeValue(`${this.username}:passcode`)
-                    .catch(err => {
-                        if (err.message === 'Invalid tinydb key') {
-                            return true;
-                        }
-                        return Promise.reject(err);
-                    });
+        return TinyDb.system.setValue(`${this.username}:passcode:disabled`, true).then(() => {
+            return TinyDb.system.removeValue(`${this.username}:passcode`).catch(err => {
+                if (err.message === 'Invalid tinydb key') {
+                    return true;
+                }
+                return Promise.reject(err);
             });
+        });
     };
 
     /**
@@ -282,9 +247,7 @@ module.exports = function mixUserAuthModule() {
      * @returns {Promise<boolean>}
      */
     this.passcodeIsDisabled = () => {
-        return TinyDb.system
-            .getValue(`${this.username}:passcode:disabled`)
-            .catch(() => false);
+        return TinyDb.system.getValue(`${this.username}:passcode:disabled`).catch(() => false);
     };
 
     /**
@@ -295,22 +258,14 @@ module.exports = function mixUserAuthModule() {
      * @returns {Promise}
      */
     this.setPasscode = passcode => {
-        if (!this.username)
-            return Promise.reject(
-                new Error('Username is required to derive keys')
-            );
+        if (!this.username) return Promise.reject(new Error('Username is required to derive keys'));
         if (!this.passphrase)
-            return Promise.reject(
-                new Error('Passphrase is required to derive keys')
-            );
+            return Promise.reject(new Error('Passphrase is required to derive keys'));
         console.log('Setting passcode');
         return keys
             .deriveKeyFromPasscode(this.username, passcode)
             .then(passcodeKey => {
-                return secret.encryptString(
-                    this.serializeAuthData(),
-                    passcodeKey
-                );
+                return secret.encryptString(this.serializeAuthData(), passcodeKey);
             })
             .then(passcodeSecretU8 => {
                 this.passcodeIsSet = true;
@@ -345,9 +300,7 @@ module.exports = function mixUserAuthModule() {
         return u._checkForPasscode().then(() => {
             return u.passphrase && u.passphrase !== passcode
                 ? u.passphrase
-                : Promise.reject(
-                      new Error('user.auth.js: passcode is not valid')
-                  );
+                : Promise.reject(new Error('user.auth.js: passcode is not valid'));
         });
     };
 
@@ -356,9 +309,7 @@ module.exports = function mixUserAuthModule() {
      * @returns {Promise<boolean>}
      */
     this.hasPasscode = () => {
-        return TinyDb.system
-            .getValue(`${this.username}:passcode`)
-            .then(result => !!result);
+        return TinyDb.system.getValue(`${this.username}:passcode`).then(result => !!result);
     };
 
     /**

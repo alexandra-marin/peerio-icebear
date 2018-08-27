@@ -19,10 +19,7 @@ class ContactsHelper {
 
     inviteRandomEmailWithTemplate = async template => {
         this.world.invitedEmail = getRandomEmail();
-        await this.world.ice.contactStore.invite(
-            this.world.invitedEmail,
-            template
-        );
+        await this.world.ice.contactStore.invite(this.world.invitedEmail, template);
     };
 }
 

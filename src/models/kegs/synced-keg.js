@@ -23,22 +23,13 @@ class SyncedKeg extends Keg {
         allowEmpty = true,
         storeSignerData = false
     ) {
-        super(
-            kegName,
-            kegName,
-            db,
-            plaintext,
-            forceSign,
-            allowEmpty,
-            storeSignerData
-        );
+        super(kegName, kegName, db, plaintext, forceSign, allowEmpty, storeSignerData);
 
         // this will load initial data
         tracker.onceUpdated(() => {
             // this is hacky, but there's no better way unless we refactor login seriously
             // the problem is with failed login leaving synced keg instances behind without cleaning up subscription
-            if (this.db.id === 'SELF' && (!this.db.boot || !this.db.boot.keys))
-                return;
+            if (this.db.id === 'SELF' && (!this.db.boot || !this.db.boot.keys)) return;
             // this will make sure we'll update every time server sends a new digest
             // it will also happen after reconnect, because digest is always refreshed on reconnect
             tracker.subscribeToKegUpdates(db.id, kegName, this._enqueueLoad);
@@ -56,10 +47,7 @@ class SyncedKeg extends Keg {
         retryUntilSuccess(() => {
             // do we even need to update?
             const digest = tracker.getDigest(this.db.id, this.type);
-            if (
-                this.collectionVersion !== null &&
-                this.collectionVersion >= digest.maxUpdateId
-            ) {
+            if (this.collectionVersion !== null && this.collectionVersion >= digest.maxUpdateId) {
                 this.loaded = true;
                 return Promise.resolve();
             }
@@ -116,11 +104,7 @@ class SyncedKeg extends Keg {
 
                     return this.saveToServer()
                         .then(() => {
-                            tracker.seenThis(
-                                this.db.id,
-                                this.type,
-                                this.collectionVersion
-                            );
+                            tracker.seenThis(this.db.id, this.type, this.collectionVersion);
                             this.onSaved();
                         })
                         .catch(err => {
@@ -129,13 +113,8 @@ class SyncedKeg extends Keg {
                             if (ver === this.version) {
                                 dataRestoreFn();
                             }
-                            if (
-                                err &&
-                                err.code === ServerError.codes.malformedRequest
-                            ) {
-                                return this.reload().then(() =>
-                                    Promise.reject(err)
-                                );
+                            if (err && err.code === ServerError.codes.malformedRequest) {
+                                return this.reload().then(() => Promise.reject(err));
                             }
                             return Promise.reject(err);
                         });

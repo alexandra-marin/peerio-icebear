@@ -34,20 +34,14 @@ function addValidation(store, fName, validatorOrArray, positionInForm) {
     const fDirty = `${fName}Dirty`;
     const fOnChange = `${fName}OnChange`;
     const fOnBlur = `${fName}OnBlur`;
-    const fieldValidators = Array.isArray(validatorOrArray)
-        ? validatorOrArray
-        : [validatorOrArray];
+    const fieldValidators = Array.isArray(validatorOrArray) ? validatorOrArray : [validatorOrArray];
 
     store.validatedFields = store.validatedFields || [];
     store.validatedFields.push(fName);
 
     store.isValid =
         store.isValid ||
-        (() =>
-            store.validatedFields.reduce(
-                (acc, field) => acc && !!store[`${field}Valid`],
-                true
-            ));
+        (() => store.validatedFields.reduce((acc, field) => acc && !!store[`${field}Valid`], true));
 
     store.resetValidationState =
         store.resetValidationState ||
@@ -107,9 +101,7 @@ function addValidation(store, fName, validatorOrArray, positionInForm) {
                     const result = await action(value, fName);
                     if (result === true) return true;
                     const errorMessage =
-                        result === false
-                            ? message
-                            : result && (result.message || result);
+                        result === false ? message : result && (result.message || result);
                     throw new Error(errorMessage);
                 };
                 validationPromises.push(executor());

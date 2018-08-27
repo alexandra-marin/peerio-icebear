@@ -64,14 +64,9 @@ class ChatMessageHandler {
                     if (userIsReading) {
                         this.markAllAsSeen();
                         this.removeMaker();
-                    } else if (
-                        !this.chat.newMessagesMarkerPos &&
-                        this.chat.messages.length
-                    ) {
+                    } else if (!this.chat.newMessagesMarkerPos && this.chat.messages.length) {
                         this.cancelTimers();
-                        const lastId = this.chat.messages[
-                            this.chat.messages.length - 1
-                        ].id;
+                        const lastId = this.chat.messages[this.chat.messages.length - 1].id;
                         this.chat.newMessagesMarkerPos = lastId;
                     }
                 }
@@ -95,21 +90,11 @@ class ChatMessageHandler {
     }
 
     removeMaker() {
-        if (
-            !clientApp.isFocused ||
-            !clientApp.isInChatsView ||
-            !this.chat.active
-        )
-            return;
+        if (!clientApp.isFocused || !clientApp.isInChatsView || !this.chat.active) return;
         if (this._removeMarkerTimer) clearTimeout(this._removeMarkerTimer);
         this._removeMarkerTimer = setTimeout(() => {
             this._removeMarkerTimer = null;
-            if (
-                !clientApp.isFocused ||
-                !clientApp.isInChatsView ||
-                !this.chat.active
-            )
-                return;
+            if (!clientApp.isFocused || !clientApp.isInChatsView || !this.chat.active) return;
             this.chat.newMessagesMarkerPos = null;
         }, 15000);
     }
@@ -123,16 +108,11 @@ class ChatMessageHandler {
 
     loadUpdates() {
         if (
-            !(
-                this.chat.mostRecentMessageLoaded || this.chat.initialPageLoaded
-            ) ||
+            !(this.chat.mostRecentMessageLoaded || this.chat.initialPageLoaded) ||
             !socket.authenticated
         )
             return;
-        if (
-            this.chat.canGoDown ||
-            this.downloadedUpdateId >= this.maxUpdateId
-        ) {
+        if (this.chat.canGoDown || this.downloadedUpdateId >= this.maxUpdateId) {
             this.chat.updatedAfterReconnect = true;
             return;
         }
@@ -174,10 +154,7 @@ class ChatMessageHandler {
                     }
                     this.setDownloadedUpdateId(resp.kegs);
                     this.markAllAsSeen();
-                    console.log(
-                        `Got ${resp.kegs.length} updates for chat`,
-                        this.chat.id
-                    );
+                    console.log(`Got ${resp.kegs.length} updates for chat`, this.chat.id);
                     await this.chat.addMessages(resp.kegs);
                     this.onMessageDigestUpdate();
                     this.chat.updatedAfterReconnect = true;
@@ -202,18 +179,8 @@ class ChatMessageHandler {
             return;
         this._markAsSeenTimer = setTimeout(() => {
             this._markAsSeenTimer = null;
-            if (
-                !clientApp.isFocused ||
-                !clientApp.isInChatsView ||
-                !this.chat.active
-            )
-                return;
-            tracker.seenThis(
-                this.chat.id,
-                'message',
-                this.downloadedUpdateId,
-                false
-            );
+            if (!clientApp.isFocused || !clientApp.isInChatsView || !this.chat.active) return;
+            tracker.seenThis(this.chat.id, 'message', this.downloadedUpdateId, false);
         }, this._getTimeoutValue(this.chat.unreadCount));
     }
 
@@ -292,10 +259,7 @@ class ChatMessageHandler {
                     this.chat._cancelBottomPageLoad = false;
                     this.setDownloadedUpdateId(resp.kegs);
                     if (!this.chat.canGoDown) this.markAllAsSeen();
-                    console.log(
-                        `got initial ${resp.kegs.length} for this.chat`,
-                        this.chat.id
-                    );
+                    console.log(`got initial ${resp.kegs.length} for this.chat`, this.chat.id);
                     return this.chat.addMessages(resp.kegs).finally(() => {
                         this.chat.loadingInitialPage = false;
                         this.chat.initialPageLoaded = true;
@@ -345,9 +309,7 @@ class ChatMessageHandler {
                             reverse: pagingUp,
                             fromKegId:
                                 startingKegId ||
-                                this.chat.messages[
-                                    pagingUp ? 0 : this.chat.messages.length - 1
-                                ].id,
+                                this.chat.messages[pagingUp ? 0 : this.chat.messages.length - 1].id,
                             count: config.chat.pageSize
                         }
                     },

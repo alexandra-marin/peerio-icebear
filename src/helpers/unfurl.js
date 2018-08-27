@@ -34,9 +34,7 @@ function getContentHeaders(url) {
                     break;
                 case 2:
                     resolved = true;
-                    const res = parseResponseHeaders(
-                        req.getAllResponseHeaders()
-                    );
+                    const res = parseResponseHeaders(req.getAllResponseHeaders());
                     req.abort();
                     urlCache[url] = res;
                     resolve(res);

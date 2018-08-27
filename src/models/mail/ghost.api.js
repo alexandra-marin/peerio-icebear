@@ -19,10 +19,7 @@ const ghostAPI = {};
  */
 ghostAPI.deriveKeys = function(ghost) {
     return keys
-        .deriveEphemeralKeys(
-            cryptoUtil.hexToBytes(ghost.ghostId),
-            ghost.passphrase
-        )
+        .deriveEphemeralKeys(cryptoUtil.hexToBytes(ghost.ghostId), ghost.passphrase)
         .then(kp => {
             ghost.ephemeralKeypair = kp;
         });
@@ -48,11 +45,7 @@ ghostAPI.serialize = function(ghost, user) {
         body: ghost.body,
         files: _.map(ghost.files, fileId => {
             const file = fileStore.getById(fileId);
-            return _.assign(
-                {},
-                file.serializeProps(),
-                file.serializeKegPayload()
-            );
+            return _.assign({}, file.serializeProps(), file.serializeKegPayload());
         }),
         timestamp: ghost.timestamp
     });
@@ -69,10 +62,7 @@ ghostAPI.encrypt = function(ghost, user, serializedGhost) {
     const res = {};
     try {
         const body = JSON.stringify(serializedGhost);
-        res.body = secret.encryptString(
-            body,
-            user.getSharedKey(ghost.ephemeralKeypair.publicKey)
-        );
+        res.body = secret.encryptString(body, user.getSharedKey(ghost.ephemeralKeypair.publicKey));
         return sign
             .signDetached(res.body, user.signKeys.secretKey)
             .then(cryptoUtil.bytesToB64)
@@ -112,11 +102,9 @@ ghostAPI.send = function(ghost, asymEncryptionRes) {
  * @returns {Promise}
  */
 ghostAPI.revoke = function(ghost) {
-    return socket
-        .send('/auth/ghost/delete', { ghostId: ghost.ghostId })
-        .then(() => {
-            ghost.revoked = true;
-        });
+    return socket.send('/auth/ghost/delete', { ghostId: ghost.ghostId }).then(() => {
+        ghost.revoked = true;
+    });
 };
 
 module.exports = ghostAPI;

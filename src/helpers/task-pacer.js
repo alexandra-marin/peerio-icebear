@@ -53,9 +53,7 @@ class TaskPacer {
             if (++this.runCount > this.rate) {
                 console.log(
                     'Task pacer hit. Next task: ',
-                    this.queue.length
-                        ? this.queue[0].__debugName
-                        : 'queue empty',
+                    this.queue.length ? this.queue[0].__debugName : 'queue empty',
                     '. Next run in',
                     1000 - diff,
                     'ms'

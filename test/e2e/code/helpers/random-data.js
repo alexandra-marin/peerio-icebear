@@ -8,8 +8,7 @@ const numbers = '0123456789';
 const getRandomUsername = () => {
     let username = '';
     for (let i = 0; i < 16; i++) {
-        username +=
-            usernameChars[Math.floor(Math.random() * usernameChars.length)];
+        username += usernameChars[Math.floor(Math.random() * usernameChars.length)];
     }
     return username;
 };
@@ -25,8 +24,7 @@ const getRandomMcrId = () => {
 const getRandomEmail = () => {
     let email = 'email_';
     for (let i = 0; i < 20; i++) {
-        email +=
-            usernameChars[Math.floor(Math.random() * usernameChars.length)];
+        email += usernameChars[Math.floor(Math.random() * usernameChars.length)];
     }
     return `${email}@${testConfig.emailDomain}`;
 };

@@ -55,19 +55,13 @@ class ChatStore {
                 'pref_unreadChatsAlwaysOnTop'
             ));
             autorunAsync(() => {
-                TinyDb.user.setValue(
-                    'pref_unreadChatsAlwaysOnTop',
-                    this.unreadChatsAlwaysOnTop
-                );
+                TinyDb.user.setValue('pref_unreadChatsAlwaysOnTop', this.unreadChatsAlwaysOnTop);
             }, 2000);
             await this.cache.open();
             this.loadAllChats();
         });
         socket.onceStarted(() => {
-            socket.subscribe(
-                socket.APP_EVENTS.channelDeleted,
-                this.processChannelDeletedEvent
-            );
+            socket.subscribe(socket.APP_EVENTS.channelDeleted, this.processChannelDeletedEvent);
         });
     }
 
@@ -218,11 +212,7 @@ class ChatStore {
             let indexHole = i;
             while (
                 indexHole > 0 &&
-                ChatStore.compareChats(
-                    array[indexHole - 1],
-                    item,
-                    this.unreadChatsAlwaysOnTop
-                ) > 0
+                ChatStore.compareChats(array[indexHole - 1], item, this.unreadChatsAlwaysOnTop) > 0
             ) {
                 array[indexHole] = array[--indexHole];
             }
@@ -416,8 +406,7 @@ class ChatStore {
         channels.forEach(this.addChat);
 
         // checking how many more chats we can load
-        let chatsLeft =
-            config.chat.maxInitialChats - this.myChats.favorites.length;
+        let chatsLeft = config.chat.maxInitialChats - this.myChats.favorites.length;
         // loading the rest unhidden chats
         const dms = await dbListProvider.getDMs();
         for (const id of dms) {
@@ -472,9 +461,7 @@ class ChatStore {
         for (const p of participants) {
             if (p.loading || p.notFound) {
                 throw new Error(
-                    `Invalid participant: ${p.username}, loading:${
-                        p.loading
-                    }, found:${!p.notFound}`
+                    `Invalid participant: ${p.username}, loading:${p.loading}, found:${!p.notFound}`
                 );
             }
         }
@@ -493,10 +480,7 @@ class ChatStore {
      */
     @action.bound
     switchToFirstChat() {
-        if (
-            config.whiteLabel.name === 'medcryptor' &&
-            this.spaces.activeSpaceId
-        ) {
+        if (config.whiteLabel.name === 'medcryptor' && this.spaces.activeSpaceId) {
             const active = this.spaces.spacesList.find(
                 x => x.spaceId === this.spaces.activeSpaceId
             );
@@ -510,8 +494,7 @@ class ChatStore {
         for (let i = 0; i < this.chats.length; i++) {
             const chat = this.chats[i];
             if (chat.leaving) continue;
-            if (config.whiteLabel.name === 'medcryptor' && chat.isInSpace)
-                continue;
+            if (config.whiteLabel.name === 'medcryptor' && chat.isInSpace) continue;
             this.activate(chat.id);
             return;
         }
@@ -528,17 +511,8 @@ class ChatStore {
      * @returns {?Chat} - can return null in case of paywall
      */
     @action
-    async startChat(
-        participants = [],
-        isChannel = false,
-        name,
-        purpose,
-        noActivate,
-        space = null
-    ) {
-        const cached = isChannel
-            ? null
-            : this.findCachedChatWithParticipants(participants);
+    async startChat(participants = [], isChannel = false, name, purpose, noActivate, space = null) {
+        const cached = isChannel ? null : this.findCachedChatWithParticipants(participants);
         if (cached) {
             if (!noActivate) this.activate(cached.id);
             return cached;
@@ -570,9 +544,7 @@ class ChatStore {
             if (space) await chat.setSpace(space);
             if (purpose) await chat.changePurpose(purpose);
             if (isChannel) {
-                chat.addParticipants(
-                    this.getSelflessParticipants(participants)
-                );
+                chat.addParticipants(this.getSelflessParticipants(participants));
             }
             return chat;
         } catch (err) {

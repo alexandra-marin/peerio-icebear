@@ -16,8 +16,7 @@ if (typeof Uint8Array.prototype.slice === 'undefined') {
         /* eslint-disable no-param-reassign */
         begin = begin || 0;
         if (begin < 0) begin = Math.max(0, this.length + begin);
-        end =
-            typeof end === 'number' ? Math.min(this.length, end) : this.length;
+        end = typeof end === 'number' ? Math.min(this.length, end) : this.length;
         if (end < 0) end = this.length + end;
         /* eslint-enable no-param-reassign */
 

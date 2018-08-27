@@ -48,11 +48,7 @@ class FileStoreMigration {
      * migration will auto-start next time, if interrupted.
      */
     confirmMigration = async () => {
-        if (
-            this.started ||
-            this.performedByAnotherClient ||
-            this.migrationKeg.accountVersion === 1
-        )
+        if (this.started || this.performedByAnotherClient || this.migrationKeg.accountVersion === 1)
             return;
         this.started = true;
         await this.waitForStores();
@@ -71,8 +67,7 @@ class FileStoreMigration {
                     console.error(err);
                     // concurrency issue, other client managed to save first
                     if (err && err.error === errorCodes.malformedRequest) {
-                        if (this.migrationKeg.accountVersion === 1)
-                            return Promise.resolve();
+                        if (this.migrationKeg.accountVersion === 1) return Promise.resolve();
                         this.legacySharedFiles = this.migrationKeg.migration.files;
                         return Promise.resolve();
                     }
@@ -101,9 +96,7 @@ class FileStoreMigration {
                 socket.APP_EVENTS.fileMigrationUnlocked,
                 async () => {
                     unsubscribe();
-                    console.log(
-                        'Received file migration unlocked event from server'
-                    );
+                    console.log('Received file migration unlocked event from server');
                     // Migrated?
                     try {
                         await this.migrationKeg.reload();
@@ -131,10 +124,7 @@ class FileStoreMigration {
             return;
         }
 
-        when(
-            () => this.migrationKeg.accountVersion === 1,
-            this.finishMigration
-        );
+        when(() => this.migrationKeg.accountVersion === 1, this.finishMigration);
 
         // in case we already have file list stored - no confirmation is needed
         if (this.migrationKeg.migration.files) {
@@ -170,9 +160,9 @@ class FileStoreMigration {
      * @returns {Promise<boolean>}
      */
     canStartMigration() {
-        return retryUntilSuccess(() =>
-            socket.send('/auth/file/migration/start')
-        ).then(res => res.success);
+        return retryUntilSuccess(() => socket.send('/auth/file/migration/start')).then(
+            res => res.success
+        );
     }
 
     async doMigrate() {
@@ -180,9 +170,7 @@ class FileStoreMigration {
 
         for (let i = 0; i < this.legacySharedFiles.length; i++) {
             if (!this.pending) return; // it was ended externally
-            this.progress = Math.floor(
-                i / (this.legacySharedFiles.length / 100)
-            );
+            this.progress = Math.floor(i / (this.legacySharedFiles.length / 100));
             const item = this.legacySharedFiles[i];
             console.log('migrating', item);
             // verify file
@@ -204,42 +192,24 @@ class FileStoreMigration {
                 const contact = getContactStore().getContact(item.username);
                 await contact.ensureLoaded();
                 if (contact.notFound) {
-                    console.error(
-                        `Contact ${item.username} not found can't share ${
-                            item.fileId
-                        }`
-                    );
+                    console.error(`Contact ${item.username} not found can't share ${item.fileId}`);
                     continue;
                 }
                 if (contact.isDeleted) {
-                    console.error(
-                        `Contact ${item.username} deleted can't share ${
-                            item.fileId
-                        }`
-                    );
+                    console.error(`Contact ${item.username} deleted can't share ${item.fileId}`);
                     continue;
                 }
                 // load and verify DM
                 let chat = null;
                 await retryUntilSuccess(
                     async () => {
-                        chat = await getChatStore().startChat(
-                            [contact],
-                            false,
-                            '',
-                            '',
-                            true
-                        );
+                        chat = await getChatStore().startChat([contact], false, '', '', true);
                         return chat.loadMetadata();
                     },
                     null,
                     10
                 ).catch(() => {
-                    console.error(
-                        `Can't create DM with ${item.username} to share ${
-                            item.fileId
-                        }`
-                    );
+                    console.error(`Can't create DM with ${item.username} to share ${item.fileId}`);
                 });
                 if (!chat || !chat.metaLoaded) {
                     continue;
@@ -275,14 +245,12 @@ class FileStoreMigration {
             this.migrationKeg.migration.files = [];
             this.migrationKeg.accountVersion = 1;
         });
-        if (this.legacySharedFiles.length)
-            warnings.add('title_fileUpdateComplete');
+        if (this.legacySharedFiles.length) warnings.add('title_fileUpdateComplete');
     }
 
     // [ { kegDbId: string, fileId: string }, ... ]
     getLegacySharedFiles() {
-        if (this.legacySharedFiles)
-            return Promise.resolve(this.legacySharedFiles);
+        if (this.legacySharedFiles) return Promise.resolve(this.legacySharedFiles);
         return retryUntilSuccess(() =>
             socket.send('/auth/file/legacy/channel/list').then(res => {
                 this.legacySharedFiles = [];
@@ -335,8 +303,7 @@ class FileStoreMigration {
             if (!recipient) {
                 const chat = getChatStore().chatMap[item.kegDbId];
                 if (chat) {
-                    if (chat.isChannel)
-                        await asPromise(chat, 'headLoaded', true);
+                    if (chat.isChannel) await asPromise(chat, 'headLoaded', true);
                     recipient = chat.name;
                 } else {
                     recipient = item.kegDbId;

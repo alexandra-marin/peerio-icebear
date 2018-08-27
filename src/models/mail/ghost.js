@@ -56,9 +56,7 @@ class Ghost extends Keg {
 
     @computed
     get expired() {
-        return (
-            this.timestamp + this.lifeSpanInSeconds * 1000 < defaultClock.now
-        );
+        return this.timestamp + this.lifeSpanInSeconds * 1000 < defaultClock.now;
     }
 
     get ephemeralKeypair() {
@@ -82,9 +80,7 @@ class Ghost extends Keg {
             this.DEFAULT_GHOST_PASSPHRASE_LENGTH
         );
         // encode user-specific ID in hex
-        this.ghostId = cryptoUtil.getRandomUserSpecificIdHex(
-            User.current.username
-        );
+        this.ghostId = cryptoUtil.getRandomUserSpecificIdHex(User.current.username);
     }
 
     /*
@@ -151,9 +147,7 @@ class Ghost extends Keg {
         return ghostAPI
             .deriveKeys(this)
             .then(() => ghostAPI.serialize(this, User.current))
-            .then(serializedGhost =>
-                ghostAPI.encrypt(this, User.current, serializedGhost)
-            )
+            .then(serializedGhost => ghostAPI.encrypt(this, User.current, serializedGhost))
             .then(res => ghostAPI.send(this, res))
             .then(() => this.saveToServer())
             .then(() => {

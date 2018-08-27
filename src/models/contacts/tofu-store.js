@@ -88,10 +88,7 @@ class TofuStore {
 
     async getFromCache(username) {
         const cached = await this.cache.getValue(username);
-        if (
-            cached &&
-            (!cached.encryptionPublicKey || !cached.signingPublicKey)
-        ) {
+        if (cached && (!cached.encryptionPublicKey || !cached.signingPublicKey)) {
             // Broken cached tofu.
             return null;
         }

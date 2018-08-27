@@ -42,9 +42,7 @@ class FileStreamAbstract {
      */
     read = size => {
         if (this.mode !== 'read') {
-            return Promise.reject(
-                new Error('Attempt to read from write stream.')
-            );
+            return Promise.reject(new Error('Attempt to read from write stream.'));
         }
         return this.readInternal(size).then(this._increasePosition);
     };
@@ -72,11 +70,7 @@ class FileStreamAbstract {
     write = buffer => {
         if (this.mode !== 'write' && this.mode !== 'append') {
             return Promise.reject(
-                new Error(
-                    `file-stream.js: Attempt to write to read stream. ${
-                        this.mode
-                    }`
-                )
+                new Error(`file-stream.js: Attempt to write to read stream. ${this.mode}`)
             );
         }
         this._increasePosition(buffer);

@@ -44,9 +44,7 @@ const quotedPrintable = require('quoted-printable');
  */
 function getInbox(name) {
     console.log(`maildrop: requesting inbox ${name}`);
-    return getUrl(`https://maildrop.peerio.com/api/inbox/${name}`).then(
-        JSON.parse
-    );
+    return getUrl(`https://maildrop.peerio.com/api/inbox/${name}`).then(JSON.parse);
 }
 
 /**

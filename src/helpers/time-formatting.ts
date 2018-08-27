@@ -14,7 +14,7 @@ const relativeTimeDisplayLimit = 21 * hour;
  * < 7 days passed  => day of week
  * > 7 days passed  => full date
  */
-export default function relativeTimestamp(time): string {
+export default function relativeTimestamp(time: number): string {
     let timeFromNow = Date.now() - time;
     if (timeFromNow < hour) {
         // Subscribe to defaultClock only if the time is within the past hour.

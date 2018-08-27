@@ -49,10 +49,7 @@ class Chat {
                 this.store.cache.saveBootKeg(this.id, keg);
                 return;
             }
-            when(
-                () => this.id,
-                () => this.store.cache.saveBootKeg(this.id, keg)
-            );
+            when(() => this.id, () => this.store.cache.saveBootKeg(this.id, keg));
         });
         this._reactionsToDispose.push(
             reaction(
@@ -65,10 +62,7 @@ class Chat {
                     if (shouldSendReceipt) this._sendReceipt();
                 }
             ),
-            reaction(
-                () => clientApp.uiUserPrefs.externalContentEnabled,
-                this.resetExternalContent
-            ),
+            reaction(() => clientApp.uiUserPrefs.externalContentEnabled, this.resetExternalContent),
             reaction(
                 () => clientApp.uiUserPrefs.externalContentJustForFavs,
                 this.resetExternalContent
@@ -120,9 +114,7 @@ class Chat {
      */
     @computed
     get otherParticipants() {
-        return this.allParticipants.filter(
-            p => p.username !== User.current.username
-        );
+        return this.allParticipants.filter(p => p.username !== User.current.username);
     }
 
     /**
@@ -135,8 +127,7 @@ class Chat {
             console.error(`Should not call dmPartnerUsername for channel`);
             return null;
         }
-        const participant =
-            this.otherParticipants.length && this.otherParticipants[0];
+        const participant = this.otherParticipants.length && this.otherParticipants[0];
         if (participant) return participant.username;
         return null;
     }
@@ -312,8 +303,7 @@ class Chat {
         if (this.isChannel) return false;
         return (
             this.otherParticipants.length > 0 &&
-            this.otherParticipants.filter(p => p.isDeleted).length ===
-                this.otherParticipants.length
+            this.otherParticipants.filter(p => p.isDeleted).length === this.otherParticipants.length
         );
     }
 
@@ -335,9 +325,7 @@ class Chat {
             return this.chatHead.chatName;
         return this.otherParticipants.length === 0
             ? User.current.fullName || User.current.username
-            : this.otherParticipants
-                  .map(p => p.fullName || p.username)
-                  .join(', ');
+            : this.otherParticipants.map(p => p.fullName || p.username).join(', ');
     }
 
     /**
@@ -345,8 +333,7 @@ class Chat {
      */
     @computed
     get nameInSpace() {
-        if (this.chatHead && this.chatHead.chatName)
-            return this.chatHead.nameInSpace;
+        if (this.chatHead && this.chatHead.chatName) return this.chatHead.nameInSpace;
         return '';
     }
 
@@ -415,8 +402,7 @@ class Chat {
         if (!this.messages.length) return true;
         const lastmsg = this.messages[this.messages.length - 1];
         if (lastmsg.sender.username !== User.current.username) return true;
-        if (lastmsg.systemData && lastmsg.systemData.action === 'videoCall')
-            return false;
+        if (lastmsg.systemData && lastmsg.systemData.action === 'videoCall') return false;
         return true;
     }
 
@@ -432,8 +418,7 @@ class Chat {
             i >= 0 && this.messages[i].id !== this.newMessagesMarkerPos;
             i--
         ) {
-            if (this.messages[i].sender.username !== User.current.username)
-                return true;
+            if (this.messages[i].sender.username !== User.current.username) return true;
         }
         return false;
     }
@@ -445,10 +430,7 @@ class Chat {
     @computed
     get canIAdmin() {
         if (!this.isChannel) return true;
-        if (
-            !this.db.boot ||
-            !this.db.boot.admins.includes(contactStore.currentUser)
-        ) {
+        if (!this.db.boot || !this.db.boot.admins.includes(contactStore.currentUser)) {
             return false;
         }
         return true;
@@ -493,8 +475,7 @@ class Chat {
 
         this.loadingMeta = true;
         // retry is handled inside db.loadMeta()
-        const cachedData =
-            (this.id && (await this.store.cache.loadData(this.id))) || {};
+        const cachedData = (this.id && (await this.store.cache.loadData(this.id))) || {};
         const { justCreated, rawMeta } = await this.db.loadMeta(
             cachedData.rawMeta,
             cachedData.bootKeg
@@ -517,8 +498,7 @@ class Chat {
                 this.store.cache.saveChatHead(this.id, chatHeadKeg);
             };
         }
-        if (!cachedData.rawMeta)
-            await this.store.cache.saveMeta(this.id, rawMeta);
+        if (!cachedData.rawMeta) await this.store.cache.saveMeta(this.id, rawMeta);
         this.loadingMeta = false;
         this.metaLoaded = true;
         if (justCreated) {
@@ -542,10 +522,7 @@ class Chat {
             // we need this because we don't want to add messages one by one causing too many renders
             const accumulator = [];
             for (let i = 0; i < kegs.length; i++) {
-                this._addMessageQueue.addTask(this._parseMessageKeg, this, [
-                    kegs[i],
-                    accumulator
-                ]);
+                this._addMessageQueue.addTask(this._parseMessageKeg, this, [kegs[i], accumulator]);
             }
             this._addMessageQueue.addTask(
                 this._finishAddMessages,
@@ -574,11 +551,7 @@ class Chat {
      * @param {number} freshBatchMessageCount -- # of new/freshly loaded mentions
      * @param {number} lastMentionId -- id of last mention message, if exists
      */
-    onNewMessageLoad(
-        freshBatchMentionCount,
-        freshBatchMessageCount,
-        lastMentionId
-    ) {
+    onNewMessageLoad(freshBatchMentionCount, freshBatchMessageCount, lastMentionId) {
         // fresh batch could mean app/page load rather than unreads,
         // but we don't care about unread count if there aren't *new* unreads
         if (this.unreadCount && freshBatchMessageCount) {
@@ -599,9 +572,7 @@ class Chat {
         const startPoint = prepend ? Math.min(...ids) : Math.max(...ids);
         // protection against infinite loop in result of weird data
         if (!startPoint) return;
-        setTimeout(() =>
-            this._messageHandler.getPage(prepend, startPoint.toString())
-        );
+        setTimeout(() => this._messageHandler.getPage(prepend, startPoint.toString()));
     }
 
     // all kegs are decrypted and parsed, now we just push them to the observable array
@@ -655,10 +626,7 @@ class Chat {
             // updating most recent message
             for (let i = this.messages.length - 1; i >= 0; i--) {
                 const msg = this.messages[i];
-                if (
-                    !this.mostRecentMessage ||
-                    +this.mostRecentMessage.id < +msg.id
-                ) {
+                if (!this.mostRecentMessage || +this.mostRecentMessage.id < +msg.id) {
                     this.mostRecentMessage = msg;
                 }
                 break;
@@ -668,11 +636,7 @@ class Chat {
         const excess = this.messages.length - config.chat.maxLoadedMessages;
         if (excess > 0) {
             if (prepend) {
-                for (
-                    let i = this.messages.length - excess;
-                    i < this.messages.length;
-                    i++
-                ) {
+                for (let i = this.messages.length - excess; i < this.messages.length; i++) {
                     delete this._messageMap[this.messages[i].id];
                 }
                 this.messages.splice(-excess);
@@ -702,10 +666,7 @@ class Chat {
         for (let i = 1; i < array.length; i++) {
             const item = array[i];
             let indexHole = i;
-            while (
-                indexHole > 0 &&
-                Chat.compareMessages(array[indexHole - 1], item) > 0
-            ) {
+            while (indexHole > 0 && Chat.compareMessages(array[indexHole - 1], item) > 0) {
                 array[indexHole] = array[--indexHole];
             }
             array[indexHole] = item;
@@ -820,12 +781,7 @@ class Chat {
      * @returns {Promise}
      */
     uploadAndShareFile(path, name, deleteAfterUpload = false, message = null) {
-        return this._fileHandler.uploadAndShare(
-            path,
-            name,
-            deleteAfterUpload,
-            message
-        );
+        return this._fileHandler.uploadAndShare(path, name, deleteAfterUpload, message);
     }
 
     /**
@@ -902,10 +858,7 @@ class Chat {
     rename(name) {
         let validated = name || '';
         validated = validated.trim().substr(0, config.chat.maxChatNameLength);
-        if (
-            this.chatHead.chatName === validated ||
-            (!this.chatHead.chatName && !validated)
-        ) {
+        if (this.chatHead.chatName === validated || (!this.chatHead.chatName && !validated)) {
             return Promise.resolve(); // nothing to rename
         }
         return this.chatHead
@@ -929,10 +882,7 @@ class Chat {
     renameInSpace(name = '') {
         const validated = name.trim().substr(0, config.chat.maxChatNameLength);
 
-        if (
-            this.chatHead.nameInSpace === validated ||
-            (!this.chatHead.nameInSpace && !validated)
-        ) {
+        if (this.chatHead.nameInSpace === validated || (!this.chatHead.nameInSpace && !validated)) {
             return Promise.resolve(); // nothing to rename
         }
         return this.chatHead.save(
@@ -949,13 +899,8 @@ class Chat {
      */
     changePurpose(purpose) {
         let validated = purpose || '';
-        validated = validated
-            .trim()
-            .substr(0, config.chat.maxChatPurposeLength);
-        if (
-            this.chatHead.purpose === validated ||
-            (!this.chatHead.purpose && !validated)
-        ) {
+        validated = validated.trim().substr(0, config.chat.maxChatPurposeLength);
+        if (this.chatHead.purpose === validated || (!this.chatHead.purpose && !validated)) {
             return Promise.resolve(); // nothing to change
         }
         return this.chatHead
@@ -981,12 +926,8 @@ class Chat {
         if (!space.spaceId) {
             validated.spaceId = cryptoUtil.getRandomGlobalShortIdHex();
         }
-        validated.spaceName = space.spaceName
-            .trim()
-            .substr(0, config.chat.maxChatNameLength);
-        validated.nameInSpace = space.nameInSpace
-            .trim()
-            .substr(0, config.chat.maxChatNameLength);
+        validated.spaceName = space.spaceName.trim().substr(0, config.chat.maxChatNameLength);
+        validated.nameInSpace = space.nameInSpace.trim().substr(0, config.chat.maxChatNameLength);
         validated.spaceDescription = space.spaceDescription
             .trim()
             .substr(0, config.chat.maxChatPurposeLength);
@@ -1011,14 +952,10 @@ class Chat {
         myChats
             .save(
                 () => {
-                    newVal
-                        ? myChats.addFavorite(this.id)
-                        : myChats.removeFavorite(this.id);
+                    newVal ? myChats.addFavorite(this.id) : myChats.removeFavorite(this.id);
                 },
                 () => {
-                    newVal
-                        ? myChats.removeFavorite(this.id)
-                        : myChats.addFavorite(this.id);
+                    newVal ? myChats.removeFavorite(this.id) : myChats.addFavorite(this.id);
                 }
             )
             .then(() => {
@@ -1074,9 +1011,7 @@ class Chat {
 
         for (let i = 1; i < this.messages.length; i++) {
             const current = this.messages[i];
-            if (
-                this.messages[i - 1].dayFingerprint !== current.dayFingerprint
-            ) {
+            if (this.messages[i - 1].dayFingerprint !== current.dayFingerprint) {
                 current.firstOfTheDay = true;
             } else {
                 current.firstOfTheDay = false;
@@ -1106,13 +1041,9 @@ class Chat {
 
     _detectLimboGrouping() {
         if (!this.limboMessages.length) return;
-        const prev = this.messages.length
-            ? this.messages[this.messages.length - 1]
-            : null;
+        const prev = this.messages.length ? this.messages[this.messages.length - 1] : null;
         const current = this.limboMessages[0];
-        current.groupWithPrevious = !!(
-            prev && prev.sender.username === current.sender.username
-        );
+        current.groupWithPrevious = !!(prev && prev.sender.username === current.sender.username);
         for (let i = 1; i < this.limboMessages.length; i++) {
             this.limboMessages[i].groupWithPrevious = true;
         }
@@ -1121,12 +1052,9 @@ class Chat {
     _sendReceipt() {
         // messages are sorted at this point ;)
         if (!this.messages.length) return;
-        if (!clientApp.isFocused || !clientApp.isInChatsView || !this.active)
-            return;
+        if (!clientApp.isFocused || !clientApp.isInChatsView || !this.active) return;
 
-        this._receiptHandler.sendReceipt(
-            +this.messages[this.messages.length - 1].id
-        );
+        this._receiptHandler.sendReceipt(+this.messages[this.messages.length - 1].id);
     }
 
     /**
@@ -1134,8 +1062,7 @@ class Chat {
      * @returns {Promise}
      */
     delete() {
-        if (!this.isChannel)
-            return Promise.reject(new Error('Can not delete DM chat.'));
+        if (!this.isChannel) return Promise.reject(new Error('Can not delete DM chat.'));
         // this is an ugly-ish flag to prevent chat store from creating a warning about user being kicked from channel
         this.deletedByMyself = true;
         console.log(`Deleting channel ${this.id}.`);
@@ -1164,9 +1091,7 @@ class Chat {
     addParticipants(participants) {
         if (!participants || !participants.length) return Promise.resolve();
         if (!this.isChannel)
-            return Promise.reject(
-                new Error('Can not add participants to a DM chat')
-            );
+            return Promise.reject(new Error('Can not add participants to a DM chat'));
         const contacts = participants.map(
             p => (typeof p === 'string' ? contactStore.getContactAndSave(p) : p)
         );
@@ -1200,14 +1125,10 @@ class Chat {
      */
     promoteToAdmin(contact) {
         if (!this.otherParticipants.includes(contact)) {
-            return Promise.reject(
-                new Error('Attempt to promote user who is not a participant')
-            );
+            return Promise.reject(new Error('Attempt to promote user who is not a participant'));
         }
         if (this.db.admins.includes(contact)) {
-            return Promise.reject(
-                new Error('Attempt to promote user who is already an admin.')
-            );
+            return Promise.reject(new Error('Attempt to promote user who is already an admin.'));
         }
         const { boot } = this.db;
         return boot
@@ -1235,14 +1156,10 @@ class Chat {
      */
     demoteAdmin(contact) {
         if (!this.otherParticipants.includes(contact)) {
-            return Promise.reject(
-                new Error('Attempt to demote user who is not a participant')
-            );
+            return Promise.reject(new Error('Attempt to demote user who is not a participant'));
         }
         if (!this.db.admins.includes(contact)) {
-            return Promise.reject(
-                new Error('Attempt to demote user who is not an admin.')
-            );
+            return Promise.reject(new Error('Attempt to demote user who is not an admin.'));
         }
 
         const { boot } = this.db;
@@ -1323,9 +1240,7 @@ class Chat {
         const m = new Message(this.db);
         m.setChannelLeaveFact();
         return this._sendMessage(m)
-            .then(() =>
-                socket.send('/auth/kegs/channel/leave', { kegDbId: this.id })
-            )
+            .then(() => socket.send('/auth/kegs/channel/leave', { kegDbId: this.id }))
             .tapCatch(err => {
                 console.error('Failed to leave channel.', this.id, err);
                 warnings.add('error_channelLeave');
@@ -1359,10 +1274,7 @@ class Chat {
     resetExternalContent = () => {
         if (this.resetScheduled) return;
         this.resetScheduled = true;
-        when(
-            () => this.active && clientApp.isInChatsView,
-            this._doResetExternalContent
-        );
+        when(() => this.active && clientApp.isInChatsView, this._doResetExternalContent);
     };
 
     @action.bound

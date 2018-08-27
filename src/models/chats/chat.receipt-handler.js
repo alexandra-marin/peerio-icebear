@@ -23,11 +23,7 @@ class ChatReceiptHandler {
         this.chat = chat;
         // receipts cache {username: ReadReceipt}
         this.chat.receipts = observable.shallowMap();
-        tracker.subscribeToKegUpdates(
-            chat.id,
-            'read_receipt',
-            this.onDigestUpdate
-        );
+        tracker.subscribeToKegUpdates(chat.id, 'read_receipt', this.onDigestUpdate);
         this.onDigestUpdate();
         this._reactionsToDispose.push(
             reaction(
@@ -54,11 +50,7 @@ class ChatReceiptHandler {
     onDigestUpdate = () => {
         const digest = tracker.getDigest(this.chat.id, 'read_receipt');
         if (digest.maxUpdateId < this.downloadedCollectionVersion) {
-            tracker.seenThis(
-                this.chat.id,
-                'read_receipt',
-                this.downloadedCollectionVersion
-            );
+            tracker.seenThis(this.chat.id, 'read_receipt', this.downloadedCollectionVersion);
         }
         if (!this.chat.active) return;
         this.loadQueue.addTask(this.loadReceipts);
@@ -124,18 +116,14 @@ class ChatReceiptHandler {
         if (this._ownReceipt) return Promise.resolve(this._ownReceipt);
         this._ownReceipt = new ReadReceipt(User.current.username, this.chat.db);
         return retryUntilSuccess(() => this._ownReceipt.load()).then(() => {
-            if (!this._ownReceipt.chatPosition)
-                this._ownReceipt.chatPosition = 0;
+            if (!this._ownReceipt.chatPosition) this._ownReceipt.chatPosition = 0;
             return this._ownReceipt;
         });
     };
 
     loadReceipts = () => {
         let digest = tracker.getDigest(this.chat.id, 'read_receipt');
-        if (
-            digest.maxUpdateId &&
-            digest.maxUpdateId <= this.downloadedCollectionVersion
-        )
+        if (digest.maxUpdateId && digest.maxUpdateId <= this.downloadedCollectionVersion)
             return null;
         const filter = this.downloadedCollectionVersion
             ? { minCollectionVersion: this.downloadedCollectionVersion }
@@ -157,21 +145,14 @@ class ChatReceiptHandler {
                 const { kegs } = res;
                 if (!kegs || !kegs.length) return;
                 for (let i = 0; i < kegs.length; i++) {
-                    if (
-                        kegs[i].collectionVersion >
-                        this.downloadedCollectionVersion
-                    ) {
-                        this.downloadedCollectionVersion =
-                            kegs[i].collectionVersion;
+                    if (kegs[i].collectionVersion > this.downloadedCollectionVersion) {
+                        this.downloadedCollectionVersion = kegs[i].collectionVersion;
                     }
                     try {
                         const r = new ReadReceipt(null, this.chat.db);
                         await r.loadFromKeg(kegs[i]);
                         if (r.owner === User.current.username) {
-                            if (
-                                this._ownReceipt &&
-                                this._ownReceipt.version < r.version
-                            ) {
+                            if (this._ownReceipt && this._ownReceipt.version < r.version) {
                                 this._ownReceipt = r;
                             }
                         } else {
@@ -183,10 +164,7 @@ class ChatReceiptHandler {
                     }
                 }
                 digest = tracker.getDigest(this.chat.id, 'read_receipt');
-                if (
-                    digest.knownUpdateId < digest.maxUpdateId ||
-                    !digest.maxUpdateId
-                ) {
+                if (digest.knownUpdateId < digest.maxUpdateId || !digest.maxUpdateId) {
                     tracker.seenThis(
                         this.chat.id,
                         'read_receipt',

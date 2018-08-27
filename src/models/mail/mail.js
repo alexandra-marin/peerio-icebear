@@ -164,9 +164,7 @@ class Mail extends Keg {
                 this.sent = true;
                 // Save an outgoing copy, changing ids.
                 this.sentId = this.messageId;
-                this.messageId = cryptoUtil.getRandomUserSpecificIdB64(
-                    this.sender
-                );
+                this.messageId = cryptoUtil.getRandomUserSpecificIdB64(this.sender);
                 return retryUntilSuccess(() => this.saveToServer());
             })
             .finally(
@@ -178,10 +176,7 @@ class Mail extends Keg {
 
     remove() {
         if (!this.id) return Promise.resolve();
-        return retryUntilSuccess(
-            () => super.remove(),
-            `remove mail ${this.id}`
-        ).then(() => {
+        return retryUntilSuccess(() => super.remove(), `remove mail ${this.id}`).then(() => {
             this.deleted = true;
         });
     }

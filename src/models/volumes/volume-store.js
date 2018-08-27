@@ -11,10 +11,7 @@ class VolumeStore {
     constructor() {
         tracker.onceUpdated(this.loadAllVolumes);
         socket.onceStarted(() => {
-            socket.subscribe(
-                socket.APP_EVENTS.volumeDeleted,
-                this.processVolumeDeletedEvent
-            );
+            socket.subscribe(socket.APP_EVENTS.volumeDeleted, this.processVolumeDeletedEvent);
         });
     }
 
@@ -40,11 +37,7 @@ class VolumeStore {
         if (!volume) throw new Error(`Invalid volume id. ${volume}`);
         let v;
         if (typeof volume === 'string') {
-            if (
-                volume === 'SELF' ||
-                this.volumeMap[volume] ||
-                !volume.startsWith('volume:')
-            ) {
+            if (volume === 'SELF' || this.volumeMap[volume] || !volume.startsWith('volume:')) {
                 return this.volumeMap[volume];
             }
             v = new Volume(volume);
@@ -134,9 +127,7 @@ class VolumeStore {
 
     @computed
     get sortedVolumes() {
-        return this.volumes.sort(
-            (f1, f2) => f1.normalizedName > f2.normalizedName
-        );
+        return this.volumes.sort((f1, f2) => f1.normalizedName > f2.normalizedName);
     }
 
     @action.bound
@@ -144,13 +135,9 @@ class VolumeStore {
         if (folder.isShared && participants) {
             return folder.addParticipants(participants);
         }
-        if (folder.store.id !== 'main')
-            throw new Error('Can only share local folders');
+        if (folder.store.id !== 'main') throw new Error('Can only share local folders');
         return this.shareQueue.addTask(async () => {
-            const newFolder = await this.createVolume(
-                participants,
-                folder.name
-            );
+            const newFolder = await this.createVolume(participants, folder.name);
             folder.convertingToVolume = true;
             newFolder.convertingFromFolder = true;
             await newFolder.attach(folder, false, true);

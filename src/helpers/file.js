@@ -166,12 +166,8 @@ function sanitizeBidirectionalFilename(filename) {
     // won't "corrupt" extension, and vice versa.
     const dotIndex = filename.lastIndexOf('.');
     if (dotIndex >= 0) {
-        const name = sanitizeBidirectionalFilePart(
-            filename.substring(0, dotIndex)
-        );
-        const ext = sanitizeBidirectionalFilePart(
-            filename.substring(dotIndex + 1)
-        );
+        const name = sanitizeBidirectionalFilePart(filename.substring(0, dotIndex));
+        const ext = sanitizeBidirectionalFilePart(filename.substring(dotIndex + 1));
         return `${name}.${ext}`;
     }
     return sanitizeBidirectionalFilePart(filename);

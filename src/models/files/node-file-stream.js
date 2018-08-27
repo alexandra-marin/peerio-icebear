@@ -34,8 +34,7 @@ class NodeFileStream extends FileStreamAbstract {
     }
 
     close() {
-        if (this.fileDescriptor == null || this.closed)
-            return Promise.resolve();
+        if (this.fileDescriptor == null || this.closed) return Promise.resolve();
         this.closed = true;
         return new Promise((resolve, reject) => {
             fs.close(this.fileDescriptor, err => {
@@ -69,17 +68,10 @@ class NodeFileStream extends FileStreamAbstract {
 
     writeInternal(buffer) {
         return new Promise((resolve, reject) => {
-            fs.write(
-                this.fileDescriptor,
-                Buffer.from(buffer),
-                0,
-                buffer.length,
-                null,
-                err => {
-                    if (this.checkForError(err, reject)) return;
-                    resolve(buffer);
-                }
-            );
+            fs.write(this.fileDescriptor, Buffer.from(buffer), 0, buffer.length, null, err => {
+                if (this.checkForError(err, reject)) return;
+                resolve(buffer);
+            });
         });
     }
 
@@ -156,9 +148,7 @@ class NodeFileStream extends FileStreamAbstract {
 
     static deleteTempCache() {
         console.log(`Deleting temporary path ${this.storageFolder}`);
-        return this.removeDir(this.storageFolder).catch(
-            e => void console.error(e)
-        );
+        return this.removeDir(this.storageFolder).catch(e => void console.error(e));
     }
 }
 

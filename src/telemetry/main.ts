@@ -22,7 +22,7 @@ async function getUserId(): Promise<string> {
     const userId: Promise<string> = await TinyDb.system.getValue('telemetryUserId');
 
     if (!userId) {
-        const newId = cryptoUtil.getRandomGlobalShortIdHex().toString();
+        const newId: any = cryptoUtil.getRandomGlobalShortIdHex().toString();
         await TinyDb.system.setValue('telemetryUserId', newId);
         return newId;
     }
@@ -30,7 +30,7 @@ async function getUserId(): Promise<string> {
 }
 
 export async function init() {
-    const uuid = await getUserId();
+    const uuid: string = await getUserId();
 
     baseObj.properties.distinct_id = uuid;
     baseObj.properties.token = config.telemetry.token;

@@ -704,6 +704,8 @@
   "dialog_chatZeroState": "Use the <plusIcon>+</> to start a direct message, or create a Room to meet with a group.",
   "title_descriptionZeroChatState": "All chats and shared files in Peerio are\n automatically protected with true\n end-to-end encryption",
   "title_startSecureChat": "Start a secure chat",
+  "title_zeroFirstLoginTitle": "Thanks for joining!",
+  "title_zeroFirstLoginMessage": "Welcome to your all encrypted environment",
   "title_zeroChatRoomDescription": "For group discussions",
   "title_zeroChatDmHeading": "Direct Messages",
   "title_zeroChatDmDescription": "For 1-on-1 conversations",

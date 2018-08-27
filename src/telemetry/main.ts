@@ -2,8 +2,17 @@
 const config = require('../config');
 const TinyDb = require('../db/tiny-db');
 const { cryptoUtil } = require('../crypto');
+const g = require('../helpers/global-context');
 
-const baseObj = {
+interface propertyTypes {
+    'Version Number'?: number;
+    distinct_id?: string;
+    token?: string;
+    Device?: 'Mobile' | 'Desktop';
+    'App Version'?: string;
+}
+
+const baseObj: { properties: propertyTypes } = {
     properties: {
         'Version Number': 1 // refers to our own tracker library versioning
     }
@@ -20,7 +29,7 @@ async function getUserId() {
     return userId;
 }
 
-async function init() {
+export async function init() {
     const uuid = await getUserId();
 
     baseObj.properties.distinct_id = uuid;
@@ -33,7 +42,7 @@ function camelToTitleCase(text) {
     return (text[0].toUpperCase() + text.slice(1)).split(/(?=[A-Z])/).join(' ');
 }
 
-function send(eventObj) {
+export function send(eventObj) {
     // Marketing wants all items (property names and values) to be in Title Case, but this breaks code style.
     // So we still write props in camelCase when sending events from client, and convert them here.
     let properties = {};
@@ -48,7 +57,7 @@ function send(eventObj) {
     const object = Object.assign({}, eventObj, baseObj);
     object.properties = properties;
 
-    const data = global.btoa(JSON.stringify(object));
+    const data = g.btoa(JSON.stringify(object));
     const url = `${config.telemetry.baseUrl}${data}`;
 
     // TODO: this makes it easier to see tracking events for testing purposes. Remove before release.
@@ -58,8 +67,3 @@ function send(eventObj) {
         method: 'POST'
     });
 }
-
-module.exports = {
-    init,
-    send
-};

@@ -59,4 +59,4 @@ const S = {
     WHERE_ACCOUNT_KEY: 'Where to find Account Key'
 };
 
-module.exports = S;
+export default S;

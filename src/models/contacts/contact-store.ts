@@ -518,7 +518,11 @@ export class ContactStore {
             if (removeUnavailable) {
                 if (c.loading || c.notFound) return false;
             }
-            return c.username.includes(token) || c.fullNameLower.includes(token);
+            return (
+                c.username.includes(token) ||
+                c.fullNameLower.includes(token) ||
+                c.addresses.some(x => x.includes(token))
+            );
         });
         if (nosort) return ret;
         return ret.sort((c1, c2) => {

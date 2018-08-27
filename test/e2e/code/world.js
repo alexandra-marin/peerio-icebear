@@ -1,7 +1,5 @@
 const { setWorldConstructor } = require('cucumber');
-const { getUrl } = require('./helpers/https');
 const { getRandomUsername } = require('./helpers/random-data');
-const { waitForEmail } = require('./helpers/maildrop');
 const testConfig = require('./test-config');
 const ContactsHelper = require('./helpers/contacts');
 
@@ -60,10 +58,15 @@ class PeerioAppWorld {
         await ice.contactStore.currentUser.ensureLoaded();
     };
 
-    confirmPrimaryEmail = async emailAddress => {
-        const email = await waitForEmail(emailAddress, testConfig.primaryEmailConfirmSubject);
-        const url = testConfig.emailConfirmUrlRegex.exec(email.body)[1];
-        await getUrl(url);
+    confirmEmail = (username, address) => {
+        console.log('Confirming email via test api: ', username, address);
+        return ice.socket.send('/noauth/dev/address/confirm', {
+            username,
+            address: {
+                type: 'email',
+                value: address
+            }
+        });
     };
 
     createAccount = async (username, email, isTestAccount = false, extraProps = null) => {

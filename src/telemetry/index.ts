@@ -1,11 +1,11 @@
-const S = require('./strings');
-const { init, send } = require('./main');
-const { textInput, duration } = require('./helpers');
+import S from './strings';
+import { init, send } from './main';
+import { textInput, duration } from './helpers';
 
 module.exports = {
-    duration,
-    init,
     S,
+    init,
     send,
-    textInput
+    textInput,
+    duration
 };

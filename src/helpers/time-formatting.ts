@@ -1,6 +1,6 @@
+import { t } from 'peerio-translator';
 const moment = require('moment');
 const defaultClock = require('./observable-clock').default;
-const { t } = require('peerio-translator');
 
 // 21 hour limit for displaying relative timestamp (because moment.js says '1 day' starting from 21h)
 const hour = 60 * 60 * 1000;
@@ -13,10 +13,8 @@ const relativeTimeDisplayLimit = 21 * hour;
  * < 48hr passed    => "Yesterday"
  * < 7 days passed  => day of week
  * > 7 days passed  => full date
- * @param {number} time
- * @returns {string}
  */
-function relativeTimestamp(time) {
+export function relativeTimestamp(time): string {
     let timeFromNow = Date.now() - time;
     if (timeFromNow < hour) {
         // Subscribe to defaultClock only if the time is within the past hour.
@@ -33,8 +31,3 @@ function relativeTimestamp(time) {
     }
     return moment(time).fromNow();
 }
-
-module.exports = {
-    relativeTimeDisplayLimit,
-    relativeTimestamp
-};

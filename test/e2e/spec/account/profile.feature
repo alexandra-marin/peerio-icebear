@@ -29,7 +29,6 @@ Feature: User profile
 
     Scenario: Resend comfirmation email
         Given I add a new email
-        And   I delete confirmation email
         When  I request confirmation email resend
         And   I confirm my new email
         Then  my new email is confirmed

@@ -3,7 +3,7 @@ const { getRandomEmail, getRandomUsername } = require('../helpers/random-data');
 const otplib = require('otplib');
 
 Given('I confirm the primary email', { timeout: 4000000 }, async function() {
-    await this.confirmPrimaryEmail(ice.User.current.addresses[0].address);
+    await this.confirmEmail(ice.User.current.username, ice.User.current.addresses[0].address);
     // giving confirmed status a chance to propagate
     return this.waitFor(() => ice.User.current.primaryAddressConfirmed === true);
 });
@@ -71,26 +71,24 @@ When('I invite other users and they sign up', { timeout: 1000000 }, async functi
     // Get userCount random emails
     const invitedEmails = Array(userCount)
         .fill()
-        .map(getRandomEmail);
+        .map(() => {
+            return { email: getRandomEmail(), username: getRandomUsername() };
+        });
+    console.log(invitedEmails);
 
     // Invite them all to join
-    await Promise.map(invitedEmails, invited => ice.contactStore.invite(invited));
+    await Promise.map(invitedEmails, invited => ice.contactStore.invite(invited.email));
 
     // Create accounts for all
     await Promise.map(
         invitedEmails,
         async invited => {
             await this.app.restart();
-            await this.createTestAccount(getRandomUsername(), invited);
+            await this.createTestAccount(invited.username, invited.email);
+            await this.confirmEmail(invited.username, invited.email);
         },
         { concurrency: 1 }
     );
-
-    // confirmPrimaryEmail is an independent from current context/world helper method
-    // so it's safe to call it here for all the users
-    await Promise.map(invitedEmails, invited => this.confirmPrimaryEmail(invited), {
-        concurrency: userCount
-    });
 
     await this.app.restart();
     await this.login();

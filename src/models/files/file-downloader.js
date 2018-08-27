@@ -23,18 +23,14 @@ class FileDownloader extends FileProcessor {
         this.getUrlParams = { fileId: file.fileId };
         this.chunkSizeWithOverhead = file.chunkSize + CHUNK_OVERHEAD;
         this.downloadChunkSize =
-            Math.floor(
-                config.download.maxDownloadChunkSize /
-                    this.chunkSizeWithOverhead
-            ) * this.chunkSizeWithOverhead;
+            Math.floor(config.download.maxDownloadChunkSize / this.chunkSizeWithOverhead) *
+            this.chunkSizeWithOverhead;
 
         if (resumeParams) {
             this.partialChunkSize = resumeParams.partialChunkSize;
             nonceGenerator.chunkId = resumeParams.wholeChunks;
-            this.file.progress =
-                this.chunkSizeWithOverhead * resumeParams.wholeChunks;
-            this.downloadPos =
-                this.chunkSizeWithOverhead * resumeParams.wholeChunks;
+            this.file.progress = this.chunkSizeWithOverhead * resumeParams.wholeChunks;
+            this.downloadPos = this.chunkSizeWithOverhead * resumeParams.wholeChunks;
         }
     }
 
@@ -95,21 +91,13 @@ class FileDownloader extends FileProcessor {
     }
 
     _downloadChunk() {
-        if (
-            this.stopped ||
-            this.noMoreChunks ||
-            this.downloadEof ||
-            this._isDecryptQueueFull
-        )
+        if (this.stopped || this.noMoreChunks || this.downloadEof || this._isDecryptQueueFull)
             return;
 
         if (this.activeDownloads >= config.download.parallelism) return;
 
         const pos = this.downloadPos;
-        const size = Math.min(
-            this.downloadChunkSize,
-            this.file.sizeWithOverhead - pos
-        );
+        const size = Math.min(this.downloadChunkSize, this.file.sizeWithOverhead - pos);
         if (size === 0) {
             this.noMoreChunks = true;
             this.downloadChain = this.downloadChain.then(() => {
@@ -138,18 +126,11 @@ class FileDownloader extends FileProcessor {
                 if (dlChunk.byteLength === 0) {
                     throw new Error('Unexpected zero-length chunk');
                 }
-                for (
-                    let i = 0;
-                    i < dlChunk.byteLength;
-                    i += this.chunkSizeWithOverhead
-                ) {
+                for (let i = 0; i < dlChunk.byteLength; i += this.chunkSizeWithOverhead) {
                     const chunk = new Uint8Array(
                         dlChunk,
                         i,
-                        Math.min(
-                            this.chunkSizeWithOverhead,
-                            dlChunk.byteLength - i
-                        )
+                        Math.min(this.chunkSizeWithOverhead, dlChunk.byteLength - i)
                     );
                     this.decryptQueue.push(chunk);
                 }
@@ -227,11 +208,7 @@ class FileDownloader extends FileProcessor {
                 // had to do this bcs uploaded blob takes some time to propagate through cloud
                 if (retryCount++ >= 5) return false;
                 if (retryCount > 0) {
-                    console.log(
-                        'Blob download retry attempt: ',
-                        retryCount,
-                        url
-                    );
+                    console.log('Blob download retry attempt: ', retryCount, url);
                 }
                 setTimeout(() => {
                     xhr.open('GET', url);
@@ -295,8 +272,7 @@ class FileDownloader extends FileProcessor {
             };
 
             xhr.ontimeout = xhr.onabort = xhr.onerror = function() {
-                if (!p.isRejected() && !trySend())
-                    reject(new Error(`Blob download error: ${url}`));
+                if (!p.isRejected() && !trySend()) reject(new Error(`Blob download error: ${url}`));
             };
 
             trySend();

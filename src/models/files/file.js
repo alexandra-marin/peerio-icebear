@@ -87,9 +87,7 @@ class FileData {
 
     @computed
     get tmpCachePath() {
-        return config.FileStream.getTempCachePath(
-            `${this.fsSafeUid}.${this.ext}`
-        );
+        return config.FileStream.getTempCachePath(`${this.fsSafeUid}.${this.ext}`);
     }
 
     @computed
@@ -565,15 +563,9 @@ class File extends Keg {
             blobNonce: this.blobNonce
         };
         payload = JSON.stringify(payload);
-        payload = secret.encryptString(
-            payload,
-            cryptoUtil.b64ToBytes(this.descriptorKey)
-        );
+        payload = secret.encryptString(payload, cryptoUtil.b64ToBytes(this.descriptorKey));
 
-        let signature = await signDetached(
-            payload,
-            getUser().signKeys.secretKey
-        );
+        let signature = await signDetached(payload, getUser().signKeys.secretKey);
         signature = cryptoUtil.bytesToB64(signature);
 
         const descriptor = {
@@ -590,8 +582,7 @@ class File extends Keg {
         if (!this.fileId) {
             this.fileId = d.fileId;
         }
-        if (this.fileId !== d.fileId)
-            throw new Error('Descriptor fileId mismatch');
+        if (this.fileId !== d.fileId) throw new Error('Descriptor fileId mismatch');
         if (this.descriptorVersion >= d.version) return;
         if (!this.descriptorKey) {
             // this is a legacy file, owner migrated it and by default descriptorKey == blobKey during migration
@@ -614,10 +605,7 @@ class File extends Keg {
         // BUT once we have some feature that allows uploading new blob version with
         // existing blob key - we need to verify
         let payload = new Uint8Array(d.payload);
-        payload = secret.decryptString(
-            payload,
-            cryptoUtil.b64ToBytes(this.descriptorKey)
-        );
+        payload = secret.decryptString(payload, cryptoUtil.b64ToBytes(this.descriptorKey));
         payload = JSON.parse(payload);
         this.name = payload.name;
         this.blobKey = payload.blobKey;
@@ -635,14 +623,12 @@ class File extends Keg {
         const descriptor = await this.serializeDescriptor();
         const version = this.descriptorVersion + 1;
         descriptor.version = version;
-        return socket
-            .send('/auth/file/descriptor/update', descriptor, true)
-            .then(() => {
-                // in case descriptor was updated while waiting for response
-                if (this.descriptorVersion + 1 === version) {
-                    this.descriptorVersion = version;
-                }
-            });
+        return socket.send('/auth/file/descriptor/update', descriptor, true).then(() => {
+            // in case descriptor was updated while waiting for response
+            if (this.descriptorVersion + 1 === version) {
+                this.descriptorVersion = version;
+            }
+        });
     }
 
     /**
@@ -704,10 +690,7 @@ class File extends Keg {
             () => {
                 this.name = newName;
                 return this.updateDescriptor().catch(err => {
-                    if (
-                        err &&
-                        err.code === ServerError.codes.malformedRequest
-                    ) {
+                    if (err && err.code === ServerError.codes.malformedRequest) {
                         return this.load(); // mitigating optimistic concurrency issues
                     }
                     return Promise.reject(err);
@@ -765,14 +748,12 @@ class File extends Keg {
      */
     copyTo(db, store, folderId) {
         // TODO: ugly, refactor when chats get their own file stores
-        const dstIsChat =
-            db.id.startsWith('channel:') || db.id.startsWith('chat:');
+        const dstIsChat = db.id.startsWith('channel:') || db.id.startsWith('chat:');
         const dstIsSELF = db.id === 'SELF';
         const dstIsVolume = db.id.startsWith('volume:');
         if (dstIsChat) {
             const chatFile = store.getByIdInChat(db.id, this.fileId);
-            if (chatFile && chatFile.loaded && !chatFile.deleted)
-                return Promise.resolve();
+            if (chatFile && chatFile.loaded && !chatFile.deleted) return Promise.resolve();
         } else if (store.getById(this.fileId)) {
             return Promise.resolve();
         }
@@ -811,10 +792,7 @@ class File extends Keg {
                             store.files.unshift(file);
                         }
                     } catch (err) {
-                        if (
-                            err &&
-                            err.code === ServerError.codes.fileKegAlreadyExists
-                        ) {
+                        if (err && err.code === ServerError.codes.fileKegAlreadyExists) {
                             // need to delete empty keg
                             return file.remove();
                         }

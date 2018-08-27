@@ -38,16 +38,12 @@ class Volume extends FileFolder {
 
     @computed
     get otherParticipants() {
-        return this.allParticipants.filter(
-            p => p.username !== getUser().username
-        );
+        return this.allParticipants.filter(p => p.username !== getUser().username);
     }
 
     @computed
     get name() {
-        return this.chatHead && this.chatHead.loaded
-            ? this.chatHead.chatName
-            : '';
+        return this.chatHead && this.chatHead.loaded ? this.chatHead.chatName : '';
     }
 
     set name(value) {
@@ -108,9 +104,7 @@ class Volume extends FileFolder {
             'error_addParticipant'
         );
         warnings.add('title_addedToVolume');
-        return contacts.forEach(c =>
-            getChatStore().startChatAndShareVolume(c, this)
-        );
+        return contacts.forEach(c => getChatStore().startChatAndShareVolume(c, this));
     }
 
     async removeParticipant(participant) {

@@ -56,10 +56,7 @@ function retryUntilSuccess(
                 if (err.code === errors.ServerError.codes.notFound) {
                     callInfo.fatalErrorCount++;
                 }
-                if (
-                    errorHandler &&
-                    err.code === errors.ServerError.codes.malformedRequest
-                ) {
+                if (errorHandler && err.code === errors.ServerError.codes.malformedRequest) {
                     try {
                         const res = errorHandler();
                         if (res && res.then) {
@@ -79,10 +76,7 @@ function retryUntilSuccess(
 // todo: don't retry if throttled
 function scheduleRetry(fn, id) {
     const callInfo = callsInProgress[id];
-    if (
-        ++callInfo.retryCount > callInfo.maxRetries ||
-        callInfo.fatalErrorCount > 2
-    ) {
+    if (++callInfo.retryCount > callInfo.maxRetries || callInfo.fatalErrorCount > 2) {
         console.error(
             `Maximum retry count reached for action id ${id}. Giving up, rejecting promise.`
         );
@@ -92,21 +86,12 @@ function scheduleRetry(fn, id) {
     }
     const delay =
         minRetryInterval +
-        Math.min(
-            maxRetryInterval,
-            callInfo.retryCount * retryIntervalMultFactor
-        );
+        Math.min(maxRetryInterval, callInfo.retryCount * retryIntervalMultFactor);
     console.debug(`Retrying ${id} in ${delay} second`);
     setTimeout(
         () =>
             tracker.onceUpdated(() =>
-                retryUntilSuccess(
-                    fn,
-                    id,
-                    callInfo.maxRetries,
-                    callInfo.errorHandler,
-                    true
-                )
+                retryUntilSuccess(fn, id, callInfo.maxRetries, callInfo.errorHandler, true)
             ),
         delay
     );

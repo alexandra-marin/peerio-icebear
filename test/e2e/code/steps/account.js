@@ -5,9 +5,7 @@ const otplib = require('otplib');
 Given('I confirm the primary email', { timeout: 4000000 }, async function() {
     await this.confirmPrimaryEmail(ice.User.current.addresses[0].address);
     // giving confirmed status a chance to propagate
-    return this.waitFor(
-        () => ice.User.current.primaryAddressConfirmed === true
-    );
+    return this.waitFor(() => ice.User.current.primaryAddressConfirmed === true);
 });
 
 Then('my primary email is confirmed', function() {
@@ -68,43 +66,35 @@ When('I save my account key as PDF document', async function() {
     await ice.User.current.setAccountKeyBackedUp();
 });
 
-When(
-    'I invite other users and they sign up',
-    { timeout: 1000000 },
-    async function() {
-        const userCount = 5;
-        // Get userCount random emails
-        const invitedEmails = Array(userCount)
-            .fill()
-            .map(getRandomEmail);
+When('I invite other users and they sign up', { timeout: 1000000 }, async function() {
+    const userCount = 5;
+    // Get userCount random emails
+    const invitedEmails = Array(userCount)
+        .fill()
+        .map(getRandomEmail);
 
-        // Invite them all to join
-        await Promise.map(invitedEmails, invited =>
-            ice.contactStore.invite(invited)
-        );
+    // Invite them all to join
+    await Promise.map(invitedEmails, invited => ice.contactStore.invite(invited));
 
-        // Create accounts for all
-        await Promise.map(
-            invitedEmails,
-            async invited => {
-                await this.app.restart();
-                await this.createTestAccount(getRandomUsername(), invited);
-            },
-            { concurrency: 1 }
-        );
+    // Create accounts for all
+    await Promise.map(
+        invitedEmails,
+        async invited => {
+            await this.app.restart();
+            await this.createTestAccount(getRandomUsername(), invited);
+        },
+        { concurrency: 1 }
+    );
 
-        // confirmPrimaryEmail is an independent from current context/world helper method
-        // so it's safe to call it here for all the users
-        await Promise.map(
-            invitedEmails,
-            invited => this.confirmPrimaryEmail(invited),
-            { concurrency: userCount }
-        );
+    // confirmPrimaryEmail is an independent from current context/world helper method
+    // so it's safe to call it here for all the users
+    await Promise.map(invitedEmails, invited => this.confirmPrimaryEmail(invited), {
+        concurrency: userCount
+    });
 
-        await this.app.restart();
-        await this.login();
-    }
-);
+    await this.app.restart();
+    await this.login();
+});
 
 When('I enable two-step verification', async function() {
     this.TOTPSecret = await ice.User.current.setup2fa();
@@ -120,10 +110,7 @@ When('I install the mobile app', async function() {
 });
 
 Then('I unlock {int}MB of storage', async function(int) {
-    await this.waitFor(
-        () =>
-            ice.User.current.currentOnboardingBonus === this.previousBonus + int
-    );
+    await this.waitFor(() => ice.User.current.currentOnboardingBonus === this.previousBonus + int);
     this.previousBonus = ice.User.current.currentOnboardingBonus;
 });
 

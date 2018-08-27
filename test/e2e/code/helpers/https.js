@@ -13,9 +13,7 @@ function getUrl(url) {
                 const { statusCode } = res;
                 let error;
                 if (statusCode !== 200) {
-                    error = new Error(
-                        `${url} request fail. Status Code: ${statusCode}`
-                    );
+                    error = new Error(`${url} request fail. Status Code: ${statusCode}`);
                 }
                 if (error) {
                     console.error(error.message);

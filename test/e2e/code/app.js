@@ -57,9 +57,7 @@ class App {
         cfg.StorageEngine = StorageEngine;
         cfg.StorageEngine.storageFolder = path.join(
             os.homedir(),
-            process.env.CUCUMBOT
-                ? '.peerio-icebear-tests-cucumbot'
-                : '.peerio-icebear-tests'
+            process.env.CUCUMBOT ? '.peerio-icebear-tests-cucumbot' : '.peerio-icebear-tests'
         );
         cfg.socketServerUrl = testConfig.socketServerUrl;
         if (testConfig.logSocketMessages) {
@@ -152,11 +150,7 @@ class App {
     // This function emulates application start and should be run before any scenario.
     start() {
         if (this.started) throw new Error('The test app is already started.');
-        console.log(
-            `===== STARTING TEST APP ${
-                process.env.CUCUMBOT ? 'CUCUMBOT' : ''
-            } =====`
-        );
+        console.log(`===== STARTING TEST APP ${process.env.CUCUMBOT ? 'CUCUMBOT' : ''} =====`);
         App.lastInstanceDisposed = false;
         this._setupChai();
         global.ice = this.world.ice = require('~/');
@@ -199,8 +193,7 @@ class App {
                     this.world.ice.socket.dispose();
                     console.log('clearing tinydb');
                     // delete TinyDbs
-                    if (this.world.ice.TinyDb.user)
-                        await this.world.ice.TinyDb.user.clear();
+                    if (this.world.ice.TinyDb.user) await this.world.ice.TinyDb.user.clear();
                     await this.world.ice.TinyDb.system.clear();
                     console.log('clearing modules');
                     this._clearModuleCache();

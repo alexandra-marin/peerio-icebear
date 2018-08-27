@@ -57,10 +57,7 @@ module.exports = function mixUserProfileModule() {
             }
         }
         console.log(`Loading ${keg.type} keg`);
-        retryUntilSuccess(
-            () => keg.load().then(() => loadSimpleKeg(keg)),
-            `${keg.type} Load`
-        );
+        retryUntilSuccess(() => keg.load().then(() => loadSimpleKeg(keg)), `${keg.type} Load`);
     }
 
     // will be triggered first time after login
@@ -128,9 +125,7 @@ module.exports = function mixUserProfileModule() {
         return validators.emailAvailability.action(email).then(available => {
             if (!available) {
                 warnings.addSevere('error_emailTaken', 'title_error');
-                return Promise.reject(
-                    new Error(`Email ${email} already taken`)
-                );
+                return Promise.reject(new Error(`Email ${email} already taken`));
             }
             return socket
                 .send('/auth/address/add', {
@@ -185,20 +180,14 @@ module.exports = function mixUserProfileModule() {
      */
     this.saveAvatar = function(blobs) {
         if (this.savingAvatar)
-            return Promise.reject(
-                new Error('Already saving avatar, wait for it to finish.')
-            );
+            return Promise.reject(new Error('Already saving avatar, wait for it to finish.'));
 
         if (blobs) {
             if (blobs.length !== 2)
-                return Promise.reject(
-                    new Error('Blobs array length should be 2.')
-                );
+                return Promise.reject(new Error('Blobs array length should be 2.'));
             for (let i = 0; i < blobs.length; i++) {
                 if (blobs[i] instanceof ArrayBuffer) continue;
-                return Promise.reject(
-                    new Error('Blobs should be of ArrayBuffer type')
-                );
+                return Promise.reject(new Error('Blobs should be of ArrayBuffer type'));
             }
         }
         this.savingAvatar = true;
@@ -227,8 +216,6 @@ module.exports = function mixUserProfileModule() {
      * @returns {Promise}
      */
     this.setAccountKeyBackedUp = function() {
-        return retryUntilSuccess(() =>
-            socket.send('/auth/account-key/backed-up')
-        );
+        return retryUntilSuccess(() => socket.send('/auth/account-key/backed-up'));
     };
 };

@@ -129,6 +129,7 @@
   "title_whyRequiredExplanation": "Our commitment and terms of service are intended to help everyone in Peerio better understand what to expect from us, and what we expect from them. <br/>Learn more about our <openPrivacy>Privacy policy</> and <openTerms>Terms of Use</>.",
   "title_signupAgain": "If you want to sign up again.",
   "title_signupAgainExplanation": "If you change your mind, you can accept our terms of use  and finish signing up for an account on Peerio.",
+  "button_yesCancel": "Yes, cancel",
   "title_shareUsageData": "Share anonymous usage data?",
   "title_shareUsageDataDescription": "Sharing anonymous usage data and error reports helps improve Peerio and your experience with the app. This will never reveal any of your messages, files, or other private information to Peerio or anyone else.<br/><br/>You can change this setting at anytime by going to <i>Settings > Privacy</>.",
   "title_TOSRequestText": "By creating a Peerio account, you agree to our <tosButton>terms of use.</>",

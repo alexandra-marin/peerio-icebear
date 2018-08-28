@@ -32,6 +32,10 @@ class Settings extends Keg {
      * @type {boolean}
      */
     @observable subscribeToPromoEmails = false;
+    /**
+     * @type {string}
+     */
+    @observable soundSchema;
 
     @observable loaded = false;
 
@@ -47,7 +51,8 @@ class Settings extends Keg {
             messageNotifications: this.messageNotifications,
             errorTrackingOptIn: this.errorTracking,
             dataCollectionOptIn: this.dataCollection,
-            subscribeToPromoEmails: this.subscribeToPromoEmails
+            subscribeToPromoEmails: this.subscribeToPromoEmails,
+            soundSchema: this.soundSchema
         };
     }
 
@@ -58,6 +63,7 @@ class Settings extends Keg {
         this.errorTracking = data.errorTrackingOptIn;
         this.dataCollection = data.dataCollectionOptIn;
         this.subscribeToPromoEmails = data.subscribeToPromoEmails;
+        this.soundSchema = data.soundSchema;
         this.loaded = true;
     }
 }

@@ -27,8 +27,7 @@ class Profile extends Keg {
         this.user.locale = data.locale;
         this.user.isDeleted = data.deleted;
         this.user.email = data.primaryAddressValue;
-        const props = data.props || {};
-        this.user.props = props;
+        this.user.props = data.props;
         // don't needs this currently
         // this.user.primaryAddressType = data.primaryAddressType;
         (data.addresses || []).forEach(a => {
@@ -45,7 +44,6 @@ class Profile extends Keg {
         }
         this.user.isBlacklisted = data.isBlackListed;
         this.user.twoFAEnabled = data.use2fa;
-        this.user.notificationSound = props.notificationSound;
         this.user.profileLoaded = true;
     }
 }

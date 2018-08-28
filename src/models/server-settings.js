@@ -31,11 +31,16 @@ class ServerSettings {
      */
     @observable maintenanceWindow;
 
+    /**
+     * Mixpanel auth token
+     */
+    @observable mixPanelClientToken;
+
     constructor() {
         reaction(
-            () => socket.authenticated,
-            authenticated => {
-                if (authenticated) this.loadSettings();
+            () => socket.connected,
+            connected => {
+                if (connected) this.loadSettings();
             },
             true
         );
@@ -45,17 +50,19 @@ class ServerSettings {
      */
     loadSettings() {
         retryUntilSuccess(() => {
-            return socket.send('/auth/server/settings').then(res => {
+            return socket.send('/noauth/server/settings').then(res => {
                 this.avatarServer = res.fileBaseUrl;
                 this.acceptableClientVersions = res.acceptsClientVersions;
                 this.tag = res.tag;
                 this.maintenanceWindow = res.maintenance;
+                this.mixPanelClientToken = res.mixPanelClientToken;
                 console.log(
                     'Server settings retrieved.',
                     this.tag,
                     this.avatarServer,
                     this.acceptableClientVersions,
-                    this.maintenanceWindow
+                    this.maintenanceWindow,
+                    this.mixPanelClientToken
                 );
             });
         }, 'Server Settings Load');

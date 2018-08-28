@@ -39,9 +39,7 @@ module.exports = function mixUserProfileModule() {
                 () => !settings.loading,
                 () => {
                     if (!updateFunction)
-                        throw new Error(
-                            'Must provide update function to saveSettings'
-                        );
+                        throw new Error('Must provide update function to saveSettings');
                     updateFunction(settings);
                     resolve(
                         settings.saveToServer().tapCatch(err => {

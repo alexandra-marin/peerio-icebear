@@ -212,6 +212,7 @@
   "title_sharedFilesUnshared": "All shared files were unshared.",
   "error_fieldRequired": "Required",
   "error_usernameBadFormat": "Only letters, numbers or underscore allowed.",
+  "error_usernameLengthExceeded": "Usernames must not have more than 16 characters",
   "error_usernameNotAvailable": "This username is already taken. Try suggested.",
   "error_invalidName": "Name is not allowed.",
   "error_invalidEmail": "Enter a valid email.",

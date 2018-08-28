@@ -14,9 +14,7 @@ async function startDmWithCucumbot() {
 }
 
 async function sendMessage(string) {
-    await this.waitFor(
-        () => ice.chatStore.activeChat && ice.chatStore.activeChat.metaLoaded
-    );
+    await this.waitFor(() => ice.chatStore.activeChat && ice.chatStore.activeChat.metaLoaded);
     return ice.chatStore.activeChat.sendMessage(string);
 }
 
@@ -33,9 +31,7 @@ function findIncomingMessage(string) {
 function findAnyMessage(string) {
     return this.waitFor(() => {
         if (!ice.chatStore.activeChat) return false;
-        const msg = ice.chatStore.activeChat.messages.find(
-            m => m.text === string
-        );
+        const msg = ice.chatStore.activeChat.messages.find(m => m.text === string);
         return !!msg;
     });
 }

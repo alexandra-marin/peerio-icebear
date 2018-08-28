@@ -142,10 +142,7 @@ class MailStore {
     loadAllMails() {
         if (this.loading || this.loaded) return;
         this.loading = true;
-        retryUntilSuccess(
-            () => this._getMails(),
-            'Initial mail list loading'
-        ).then(
+        retryUntilSuccess(() => this._getMails(), 'Initial mail list loading').then(
             action(async kegs => {
                 for (const keg of kegs.kegs) {
                     const mail = new Mail(User.current.kegDb);
@@ -173,11 +170,7 @@ class MailStore {
         if (!this.loaded || this.updating) return;
         // eslint-disable-next-line no-param-reassign
         if (!maxId) maxId = this.maxUpdateId;
-        console.log(
-            `Proceeding to mail update. Known collection version: ${
-                this.knownUpdateId
-            }`
-        );
+        console.log(`Proceeding to mail update. Known collection version: ${this.knownUpdateId}`);
         this.updating = true;
         retryUntilSuccess(() => this._getMails(), 'Updating mail list').then(
             action(async resp => {
@@ -192,18 +185,14 @@ class MailStore {
                         this.mails.remove(existing);
                         continue;
                     }
-                    if (!(await mail.loadFromKeg(keg)) || mail.isEmpty)
-                        continue;
+                    if (!(await mail.loadFromKeg(keg)) || mail.isEmpty) continue;
                     if (!mail.deleted && !existing) this.mails.unshift(mail);
                 }
                 this.updating = false;
                 // need this bcs if u delete all mails knownUpdateId won't be set at all after initial load
                 if (this.knownUpdateId < maxId) this.knownUpdateId = maxId;
                 // in case we missed another event while updating
-                if (
-                    kegs.length ||
-                    (this.maxUpdateId && this.knownUpdateId < this.maxUpdateId)
-                ) {
+                if (kegs.length || (this.maxUpdateId && this.knownUpdateId < this.maxUpdateId)) {
                     setTimeout(this.updateMails);
                 } else {
                     setTimeout(this.onMailDigestUpdate);

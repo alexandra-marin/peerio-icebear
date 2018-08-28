@@ -53,19 +53,14 @@ module.exports = function mixUserRegisterModule() {
             !(cng.encryptionKey.token instanceof ArrayBuffer) ||
             !(cng.encryptionKey.nonce instanceof ArrayBuffer)
         ) {
-            throw new Error(
-                'Invalid account creation challenge received from server',
-                cng
-            );
+            throw new Error('Invalid account creation challenge received from server', cng);
         }
 
         util.convertBuffers(cng);
 
         if (cng.username !== this.username) {
             return Promise.reject(
-                new Error(
-                    'User.username and account creation challenge username do not match.'
-                )
+                new Error('User.username and account creation challenge username do not match.')
             );
         }
 

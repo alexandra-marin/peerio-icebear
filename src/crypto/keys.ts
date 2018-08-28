@@ -4,12 +4,7 @@
 import BLAKE2s from 'blake2s-js';
 import * as nacl from 'tweetnacl';
 import { scryptPromise } from './scrypt-proxy';
-import {
-    bytesToHex,
-    strToBytes,
-    concatTypedArrays,
-    getRandomBytes
-} from './util';
+import { bytesToHex, strToBytes, concatTypedArrays, getRandomBytes } from './util';
 import * as errors from '../errors';
 import { KeyPair } from '../interfaces';
 
@@ -64,19 +59,15 @@ export function deriveAccountKeys(
         const salt = concatTypedArrays(strToBytes(username), randomSalt);
         const pass = prehashPass(passphrase, 'PeerioPH');
 
-        return scryptPromise(pass, salt, scryptOptions).then(
-            derivedByteArray => {
-                const secretKey = new Uint8Array(
-                    derivedByteArray.slice(32, 64)
-                );
-                return {
-                    // first 32 bytes - symmetric boot key
-                    bootKey: new Uint8Array(derivedByteArray.slice(0, 32)),
-                    // second 32 bytes - secret key of the auth key pair
-                    authKeyPair: nacl.box.keyPair.fromSecretKey(secretKey)
-                };
-            }
-        );
+        return scryptPromise(pass, salt, scryptOptions).then(derivedByteArray => {
+            const secretKey = new Uint8Array(derivedByteArray.slice(32, 64));
+            return {
+                // first 32 bytes - symmetric boot key
+                bootKey: new Uint8Array(derivedByteArray.slice(0, 32)),
+                // second 32 bytes - secret key of the auth key pair
+                authKeyPair: nacl.box.keyPair.fromSecretKey(secretKey)
+            };
+        });
     } catch (ex) {
         return Promise.reject(errors.normalize(ex));
     }
@@ -86,10 +77,7 @@ export function deriveAccountKeys(
  * Derive keys for a ghost/ephemeral user.
  * @param salt e.g. ephemeral ID
  */
-export function deriveEphemeralKeys(
-    salt: Uint8Array,
-    passphrase: string
-): Promise<KeyPair> {
+export function deriveEphemeralKeys(salt: Uint8Array, passphrase: string): Promise<KeyPair> {
     try {
         const pass = prehashPass(passphrase);
         return scryptPromise(pass, salt, {
@@ -104,10 +92,7 @@ export function deriveEphemeralKeys(
     }
 }
 
-export function deriveKeyFromPasscode(
-    username: string,
-    passcode: string
-): Promise<Uint8Array> {
+export function deriveKeyFromPasscode(username: string, passcode: string): Promise<Uint8Array> {
     try {
         const salt = strToBytes(username);
         const pass = prehashPass(passcode);

@@ -19,10 +19,7 @@ export function getHashObject(
 ): BLAKE2s {
     const blake2sOptions = personalizationString
         ? {
-              personalization: padding.padBytes(
-                  strToBytes(personalizationString),
-                  8
-              )
+              personalization: padding.padBytes(strToBytes(personalizationString), 8)
           }
         : undefined;
     const h = new BLAKE2s(length, blake2sOptions);
@@ -62,10 +59,7 @@ export function getByteHash(
  * Returns user fingerprint string.
  * @returns fingerprint. Example: `51823-23479-94038-76454-79776-13778`
  */
-export function getFingerprint(
-    username: string,
-    publicKey: Uint8Array
-): Promise<string> {
+export function getFingerprint(username: string, publicKey: Uint8Array): Promise<string> {
     return scryptPromise(publicKey, strToBytes(username), {
         N: 4096,
         r: 8,

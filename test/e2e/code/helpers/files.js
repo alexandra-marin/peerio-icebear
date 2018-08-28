@@ -24,10 +24,7 @@ const deleteFile = filename => {
  * @returns {string}
  */
 const getTempFileName = (suffix = '.tmp') => {
-    return path.join(
-        os.tmpdir(),
-        crypto.randomBytes(10).toString('hex') + suffix
-    );
+    return path.join(os.tmpdir(), crypto.randomBytes(10).toString('hex') + suffix);
 };
 
 /**

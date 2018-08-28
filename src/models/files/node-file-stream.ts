@@ -1,15 +1,15 @@
-import FileStreamAbstract from './file-stream-abstract';
-import errors from '../../errors';
-import fs from 'fs';
-import path from 'path';
-import mkdirp from 'mkdirp';
-import rimraf from 'rimraf';
+import FileStreamBase from '~/models/files/file-stream-base';
+import * as errors from '../../errors';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as mkdirp from 'mkdirp';
+import * as rimraf from 'rimraf';
 
 /**
- * FileStreamAbstract implementation for nodejs, see {@link FileStreamAbstract} for docs.
- * @extends {FileStreamAbstract}
+ * FileStreamBase implementation for nodejs, see {@link FileStreamBase} for docs.
+ * @extends {FileStreamBase}
  */
-class NodeFileStream extends FileStreamAbstract {
+class NodeFileStream extends FileStreamBase {
     checkForError(err, rejectFn) {
         if (err) {
             rejectFn(errors.normalize(err));

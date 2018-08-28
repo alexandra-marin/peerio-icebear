@@ -1,6 +1,5 @@
 import pdfform from 'pdfform.js';
-import { FileStream, assetPathResolver } from '../config';
-
+import config from '../config';
 /**
  * Generates and saves a pdf file with account recovery information
  * @param destination file path
@@ -12,10 +11,10 @@ export default async function saveAccountKeyBackup(
     accountKey: string
 ) {
     // getting template file as a buffer to later process it and perform substitutions
-    const templatePath = assetPathResolver('account_key_backup.pdf');
-    const templateStream = new FileStream(templatePath, 'read');
+    const templatePath = config.assetPathResolver('account_key_backup.pdf');
+    const templateStream = new config.FileStream(templatePath, 'read');
     await templateStream.open();
-    const { size } = await FileStream.getStat(templatePath);
+    const { size } = await config.FileStream.getStat(templatePath);
     const template = await templateStream.read(size);
     templateStream.close();
     // performing substitution (filling pdf form fields)

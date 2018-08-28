@@ -1,6 +1,6 @@
 import errors from '../../errors';
 import cryptoUtil from '../../crypto/util';
-import FileStreamAbstract from '~/models/files/file-stream-abstract';
+import FileStreamBase from '~/models/files/file-stream-base';
 import FileNonceGenerator from '~/models/files/file-nonce-generator';
 
 /**
@@ -9,7 +9,7 @@ import FileNonceGenerator from '~/models/files/file-nonce-generator';
 class FileProcessor {
     constructor(
         file: File,
-        stream: FileStreamAbstract,
+        stream: FileStreamBase,
         nonceGenerator: FileNonceGenerator,
         processType: 'upload' | 'download'
     ) {

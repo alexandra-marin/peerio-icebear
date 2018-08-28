@@ -1,4 +1,4 @@
-import IBootKeg from './IBootKeg';
+import IBootKeg from '~/defs/boot-keg';
 
 export default interface IKegDb {
     id: string;

@@ -1,7 +1,7 @@
-import { StorageEngineInterface } from './db/storage-engine-interface';
-
 import _sdkVersion from './__sdk';
-import MemoryCacheEngine from './db/memory-cache-engine';
+import FileStreamBase from '~/models/files/file-stream-base';
+import CacheEngineBase from '~/db/cache-engine-base';
+import { TinyDBStorageEngineConstructor } from '~/defs/tiny-db';
 
 const SERVER_PLAN_PREMIUM_MONTHLY = 'icebear_premium_monthly';
 const SERVER_PLAN_PREMIUM_YEARLY = 'icebear_premium_yearly';
@@ -82,7 +82,7 @@ class UploadConfig {
     maxResponseQueue = 2;
 }
 
-const config = new class {
+export default new class {
     sdkVersion = _sdkVersion;
 
     debug = {
@@ -182,19 +182,19 @@ const config = new class {
      *
      * **Client app is required to set this property before using Icebear SDK.**
      */
-    FileStream: FileStreamAbstract = null;
+    FileStream: FileStreamBase = null;
     /**
      * Storage engine implementation class.
      *
      * **Client app is required to set this property before using Icebear SDK.**
      */
-    StorageEngine: StorageEngineInterface = null;
+    StorageEngine: TinyDBStorageEngineConstructor = null;
     /**
      * Storage engine implementation class.
      *
      * **Client app is required to set this property before using Icebear SDK.**
      */
-    CacheEngine: StorageEngineInterface = MemoryCacheEngine;
+    CacheEngine: CacheEngineBase;
     /**
      * Frequency (seconds) at which default observable clock will be changing its value.
      * Default clock can be used for refreshing timestamps and other time counters.
@@ -299,5 +299,3 @@ const config = new class {
         return `./src/assets/${fileName}`;
     };
 }();
-
-export default config;

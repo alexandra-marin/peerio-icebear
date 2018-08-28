@@ -4,7 +4,7 @@ import KegDb from './keg-db';
 import { observable, when } from 'mobx';
 
 import * as util from '../../crypto/util';
-import IBootKeg from '../../defs/IBootKeg';
+import IBootKeg from '~/defs/boot-keg';
 import { KeyPair } from '../../defs/interfaces';
 
 interface BootKegPayload {

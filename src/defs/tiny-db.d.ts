@@ -1,23 +1,24 @@
 /**
- * This is a contract for the actual client-specific StorageEngine client has to implement and set to config module.
- * TinyDb will get the implementation from config module and use it.
+ * Interface for TinyDB storage engine implemented by every client and set in config for sdk to use.
  */
-export interface StorageEngineInterface {
+export interface TinyDBStorageEngineConstructor {
     /**
      * @param namespace - unique namespace will be passed to storage engine when instantiating.
      */
-    new (namespace: string, keyPath?: string): StorageEngineInterface;
-
+    new (namespace: string): TinyDBStorageEngine;
+}
+export interface TinyDBStorageEngine {
     /**
      * Asynchronously gets a value from storage.
+     * If key doesn't exist - return null
      */
-    getValue(key: string): Promise<string>;
+    getValue(key: string): Promise<string | null>;
 
     /**
      * Asynchronously saves a value to storage.
      * @param key - if key already exists - overwrite.
      */
-    setValue(key: string, value: object): Promise<void>;
+    setValue(key: string, value: string): Promise<void>;
 
     /**
      * Asynchronously removes key/value from store.

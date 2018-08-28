@@ -1,17 +1,17 @@
 /* eslint-disable no-unused-vars */
-import { AbstractCallError } from '../../errors';
+import { AbstractCallError } from '~/errors';
 
 /**
  * Abstract File Stream class. Icebear wants to read/write files,
  * but doesn't know how exactly that would work on your platform.
  *
- * 1. create you own class and inherit from FileStreamAbstract.
+ * 1. create you own class and inherit from FileStreamBase.
  * 2. override required functions.
  * 3. set config.FileStream = YourFileStreamImplementation.
  * @param filePath - will be used by 'open' function
  * @param mode - 'read' or 'write' or 'append'
  */
-class FileStreamAbstract {
+class FileStreamBase {
     constructor(filePath: string, mode: 'read' | 'write' | 'append') {
         this.filePath = filePath;
         if (mode !== 'read' && mode !== 'write' && mode !== 'append') {
@@ -40,7 +40,7 @@ class FileStreamAbstract {
         return this.readInternal(size).then(this._increasePosition);
     };
 
-    _increasePosition = buf => {
+    _increasePosition = (buf: Uint8Array) => {
         this.pos += buf.length;
         return buf;
     };
@@ -49,7 +49,7 @@ class FileStreamAbstract {
      * Override this in your implementation.
      * @param size - bytes
      */
-    readInternal(size: number): Promise<Uint8Array> {
+    readInternal(_size: number): Promise<Uint8Array> {
         throw new AbstractCallError();
     }
 
@@ -72,7 +72,7 @@ class FileStreamAbstract {
      * Override this in your implementation.
      * @returns buffer, same one as was passed
      */
-    writeInternal(buffer: Uint8Array): Promise<Uint8Array> {
+    writeInternal(_buffer: Uint8Array): Promise<Uint8Array> {
         throw new AbstractCallError();
     }
 
@@ -89,21 +89,21 @@ class FileStreamAbstract {
      * Override this in your implementation. Move file position pointer.
      * @returns new position
      */
-    seekInternal(pos: number): number {
+    seekInternal(_pos: number): number {
         throw new AbstractCallError();
     }
 
     /**
      * Override. This function has to set 'size' property.
      */
-    open(): Promise<FileStreamAbstract> {
+    open(): Promise<FileStreamBase> {
         throw new AbstractCallError();
     }
 
     /**
      * Override. Called when done working with file, should flush all buffers and dispose resources.
      */
-    close() {
+    close(): Promise<void> {
         throw new AbstractCallError();
     }
 
@@ -114,7 +114,7 @@ class FileStreamAbstract {
      * @param name - human-readable file name
      * @returns actual device path for file
      */
-    static getFullPath(uid: string, name: string): string {
+    static getFullPath(_uid: string, _name: string): string {
         throw new AbstractCallError();
     }
 
@@ -122,7 +122,7 @@ class FileStreamAbstract {
      * Override.
      * @returns true if path exists on device
      */
-    static exists(path: string): boolean {
+    static exists(_path: string): boolean {
         throw new AbstractCallError();
     }
 
@@ -130,7 +130,7 @@ class FileStreamAbstract {
      * Override. Launch external viewer.
      * @param path - file path to open in a viewer.
      */
-    static launchViewer(path: string) {
+    static launchViewer(_path: string): Promise<void> {
         throw new AbstractCallError();
     }
 
@@ -152,37 +152,37 @@ class FileStreamAbstract {
     /**
      * Override. Removes file by path.
      */
-    static delete(path: string): Promise {
+    static delete(_path: string): Promise<void> {
         throw new AbstractCallError();
     }
 
     /**
      * Override. Renames old path to new path.
      */
-    static rename(oldPath: string, newPath: string): Promise {
+    static rename(_oldPath: string, _newPath: string): Promise<void> {
         throw new AbstractCallError();
     }
 
     /**
      * Override. Returns a path for storing temporarily downloaded(cached) files.
      */
-    static getTempCachePath(name: string) {
+    static getTempCachePath(_name: string): string {
         throw new AbstractCallError();
     }
 
     /**
      * Override. Creates a directory at "path".
      */
-    static createDir(path: string) {
+    static createDir(_path: string): Promise<void> {
         throw new AbstractCallError();
     }
 
     /**
      * Override. Empties and them removes a directory at "path".
      */
-    static removeDir(path: string) {
+    static removeDir(_path: string): Promise<void> {
         throw new AbstractCallError();
     }
 }
 
-export default FileStreamAbstract;
+export default FileStreamBase;

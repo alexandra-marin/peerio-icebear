@@ -1,4 +1,6 @@
-class MemoryCacheEngine {
+import CacheEngineBase from '~/db/cache-engine-base';
+
+class MemoryCacheEngine implements CacheEngineBase {
     // pass an empty(or existing) object as storage - MemoryCacheEngine will read and write objects to it
     constructor(name) {
         this.name = name;
@@ -14,6 +16,9 @@ class MemoryCacheEngine {
         MemoryCacheEngine.defaultStorage = val;
     }
 
+    name: string;
+    storage: { [key: string]: {} };
+
     get db() {
         return this.storage[this.name];
     }
@@ -23,7 +28,7 @@ class MemoryCacheEngine {
         return Promise.resolve();
     }
 
-    getValue(key) {
+    getValue(key: string) {
         return new Promise(resolve => {
             setTimeout(() => resolve(this.db[key]));
         });

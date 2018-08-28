@@ -1,7 +1,8 @@
-import path from 'path';
-import fs from 'fs';
-import os from 'os';
-import errors from '../../errors';
+import * as path from 'path';
+import * as fs from 'fs';
+import * as os from 'os';
+import { normalize } from '../../errors';
+import { TinyDBStorageEngine } from '~/defs/tiny-db';
 
 const fileOptions = { encoding: 'utf8' };
 
@@ -10,13 +11,19 @@ const fileOptions = { encoding: 'utf8' };
  *
  * It uses os.homedir() or NodeJsonStorage.storageFolder to store JSON files.
  */
-class NodeJsonStorage {
-    constructor(name) {
+export default class NodeJsonStorage implements TinyDBStorageEngine {
+    constructor(name: string) {
         this.name = name;
         this.folder = path.join(NodeJsonStorage.storageFolder || os.homedir());
         this.filePath = path.join(this.folder, `${name}_tinydb.json`);
         this._createDbFile();
     }
+
+    name: string;
+    folder: string;
+    filePath: string;
+
+    static storageFolder: string = null;
 
     _createDbFile() {
         if (!fs.existsSync(this.filePath)) {
@@ -73,10 +80,8 @@ class NodeJsonStorage {
             }
             this._createDbFile();
         } catch (err) {
-            return Promise.reject(errors.normalize(err, 'Failed to delete database'));
+            return Promise.reject(normalize(err, 'Failed to delete database'));
         }
         return Promise.resolve();
     }
 }
-
-export default NodeJsonStorage;

@@ -1,5 +1,3 @@
-import { StorageEngineInterface } from './storage-engine-interface';
-
 import { observable } from 'mobx';
 import { asPromise } from '../helpers/prombservable';
 import { simpleHash } from '../util';
@@ -24,7 +22,7 @@ const CACHE_RESET_KEY = 'cacheResetCounter';
  * @param shortName - unique(per user) database short name (will be converted to longer and safer name)
  * @param keyPath - how to find the key in saved objects
  */
-class CacheEngineBase implements StorageEngineInterface {
+class CacheEngineBase {
     constructor(shortName: string, keyPath: string) {
         if (!shortName || !keyPath) throw new Error('Invalid arguments');
         this.name =
@@ -113,6 +111,8 @@ class CacheEngineBase implements StorageEngineInterface {
         return CacheEngineBase.metaDb.removeValue(name);
     }
 
+    name: string;
+    keyPath: string;
     /**
      * {boolean}
      */

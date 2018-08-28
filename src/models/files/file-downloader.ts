@@ -3,7 +3,7 @@ import secret from '../../crypto/secret';
 import config from '../../config';
 import FileProcessor from './file-processor';
 import { DisconnectedError } from '../../errors';
-import FileStreamAbstract from '~/models/files/file-stream-abstract';
+import FileStreamBase from '~/models/files/file-stream-base';
 import FileNonceGenerator from '~/models/files/file-nonce-generator';
 
 const { CHUNK_OVERHEAD } = config;
@@ -14,7 +14,7 @@ const { CHUNK_OVERHEAD } = config;
 class FileDownloader extends FileProcessor {
     constructor(
         file: File,
-        stream: FileStreamAbstract,
+        stream: FileStreamBase,
         nonceGenerator: FileNonceGenerator,
         resumeParams?: { partialChunkSize: number; wholeChunks: number }
     ) {

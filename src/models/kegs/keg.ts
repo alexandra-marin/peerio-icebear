@@ -10,7 +10,7 @@ import { getUser } from '../../helpers/di-current-user';
 import { asPromise } from '../../helpers/prombservable';
 
 import { AntiTamperError, DecryptionError, serverErrorCodes } from '../../errors';
-import IKegDb from '../../defs/IKegDb';
+import IKegDb from '~/defs/keg-db';
 
 let temporaryKegId = 0;
 function getTemporaryKegId() {

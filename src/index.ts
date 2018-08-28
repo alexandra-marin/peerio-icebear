@@ -40,7 +40,7 @@ import volumeStore from './models/volumes/volume-store';
 //import ghostStore from './models/mail/ghost-store';
 //import mailStore from './models/mail/mail-store';
 import validation from './helpers/validation/field-validation';
-import FileStreamAbstract from './models/files/file-stream-abstract';
+import FileStreamBase from '~/models/files/file-stream-base';
 import FileNonceGenerator from './models/files/file-nonce-generator';
 import * as util from './util';
 import warnings from './models/warnings';
@@ -77,7 +77,7 @@ export default {
     //ghostStore,
     //mailStore,
     validation,
-    FileStreamAbstract,
+    FileStreamBase,
     FileNonceGenerator,
     util,
     warnings,

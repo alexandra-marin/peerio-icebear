@@ -6,7 +6,7 @@ import { uniq } from 'lodash';
 import { retryUntilSuccess } from '../../helpers/retry';
 import Contact from '../contacts/contact';
 import { observable, computed, IObservableArray } from 'mobx';
-import IKegDb from '../../defs/IKegDb';
+import IKegDb from '~/defs/keg-db';
 /**
  * Class for shared keg databases.
  * Model is not really created until boot keg is updated for the first time.

@@ -4,7 +4,7 @@ import * as cryptoKeys from '../../crypto/keys';
 import { action, observable, when } from 'mobx';
 import { getContactStore } from '../../helpers/di-contact-store';
 import SyncedKeg from '../kegs/synced-keg';
-import IBootKeg from '../../defs/IBootKeg';
+import IBootKeg from '~/defs/boot-keg';
 import User from '../user/user';
 import SharedKegDb from './shared-keg-db';
 import Contact from '../contacts/contact';

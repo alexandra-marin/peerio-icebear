@@ -3,7 +3,7 @@ import errors from '../../errors';
 import secret from '../../crypto/secret';
 import config from '../../config';
 import FileProcessor from './file-processor';
-import FileStreamAbstract from '~/models/files/file-stream-abstract';
+import FileStreamBase from '~/models/files/file-stream-base';
 import FileNonceGenerator from '~/models/files/file-nonce-generator';
 
 /**
@@ -13,7 +13,7 @@ import FileNonceGenerator from '~/models/files/file-nonce-generator';
 class FileUploader extends FileProcessor {
     constructor(
         file: File,
-        stream: FileStreamAbstract,
+        stream: FileStreamBase,
         nonceGenerator: FileNonceGenerator,
         startFromChunk?: number
     ) {

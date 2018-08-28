@@ -1,61 +1,66 @@
-import TinyDbCollection from './tiny-db-collection';
+import TinyDbImplementation from '~/db/tiny-db-implementation';
+import { TinyDBStorageEngine } from '~/defs/tiny-db';
 
 /**
- * TinyDbManager manages system and user collections, and allows opening
- * other collections.
+ * TinyDbManager manages system and user instances, and allows opening
+ * other instances.
  * @param createStorageEngine - function returning a new storage engine for the name
  */
 class TinyDbManager {
-    constructor(createStorageEngine: () => StorageEngine) {
+    constructor(createStorageEngine: (name: string) => TinyDBStorageEngine) {
         this.createStorageEngine = createStorageEngine;
-        this.systemCollection = null;
-        this.userCollection = null;
+        this.systemInstance = null;
+        this.userInstance = null;
     }
 
+    createStorageEngine: (name: string) => TinyDBStorageEngine;
+    systemInstance: TinyDbImplementation;
+    userInstance: TinyDbImplementation;
+
     /**
-     * Instance of unencrypted system collection.
+     * Instance of unencrypted system instance.
      */
-    get system(): TinyDbCollection {
-        if (!this.systemCollection) this.openSystem();
-        return this.systemCollection;
+    get system() {
+        if (!this.systemInstance) this.openSystem();
+        return this.systemInstance;
     }
 
     /**
-     * Instance of encrypted user collection.
+     * Instance of encrypted user instance.
      * Only values are encrypted.
      */
-    get user(): TinyDb {
-        return this.userCollection;
+    get user() {
+        return this.userInstance;
     }
 
     /**
-     * Creates a collection instance.
+     * Creates a instance instance.
      * @param name - database name
      * @param encryptionKey - optional encryption key
      */
-    open(name: string, encryptionKey?: Uint8Array): TinyDbCollection {
+    open(name: string, encryptionKey?: Uint8Array): TinyDbImplementation {
         const engine = this.createStorageEngine(name);
-        return new TinyDbCollection(engine, name, encryptionKey);
+        return new TinyDbImplementation(engine, name, encryptionKey);
     }
 
     /**
-     * Creates system collection instance and assigns it to {@link system} property
-     * @returns system collection
+     * Creates system instance instance and assigns it to {@link system} property
+     * @returns system instance
      */
-    openSystem(): TinyDbCollection {
-        this.systemCollection = this.open('$system$');
-        return this.systemCollection;
+    openSystem(): TinyDbImplementation {
+        this.systemInstance = this.open('$system$');
+        return this.systemInstance;
     }
 
     /**
-     * Creates user collection instance and assigns it to {@link user} property
+     * Creates user instance instance and assigns it to {@link user} property
      * @param  username
      * @param  encryptionKey - database key
-     * @returns user collection
+     * @returns user instance
      */
-    openUser(username: string, encryptionKey: Uint8Array): TinyDbCollection {
-        this.userCollection = this.open(username, encryptionKey);
-        return this.userCollection;
+    openUser(username: string, encryptionKey: Uint8Array): TinyDbImplementation {
+        this.userInstance = this.open(username, encryptionKey);
+        return this.userInstance;
     }
 }
 

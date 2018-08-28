@@ -1,6 +1,6 @@
 import BootKeg from './boot-keg';
 import tracker from '../../models/update-tracker';
-import IKegDb from '../../defs/IKegDb';
+import IKegDb from '~/defs/keg-db';
 
 /**
  * Keg database.

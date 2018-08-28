@@ -23,10 +23,6 @@ class Settings extends Keg {
     /**
      * @type {boolean}
      */
-    @observable errorTracking = false;
-    /**
-     * @type {boolean}
-     */
     @observable dataCollection = false;
     /**
      * @type {boolean}
@@ -45,7 +41,6 @@ class Settings extends Keg {
             contactNotifications: this.contactNotifications,
             contactRequestNotifications: this.contactRequestNotifications,
             messageNotifications: this.messageNotifications,
-            errorTrackingOptIn: this.errorTracking,
             dataCollectionOptIn: this.dataCollection,
             subscribeToPromoEmails: this.subscribeToPromoEmails
         };
@@ -55,7 +50,6 @@ class Settings extends Keg {
         this.contactNotifications = data.contactNotifications;
         this.contactRequestNotifications = data.contactRequestNotifications;
         this.messageNotifications = data.messageNotifications;
-        this.errorTracking = data.errorTrackingOptIn;
         this.dataCollection = data.dataCollectionOptIn;
         this.subscribeToPromoEmails = data.subscribeToPromoEmails;
         this.loaded = true;

@@ -410,6 +410,7 @@
   "button_emojis": "Emojis",
   "button_thumbsUp": "Thumbs up",
   "title_shareFromFiles": "Share from Peerio files",
+  "title_preparingForUpload": "Preparing for upload...",
   "title_uploadAndShare": "Upload and share file",
   "title_uploadAndShareCount": "Upload and share file ({current} of {total})",
   "title_labelText": "Label text",

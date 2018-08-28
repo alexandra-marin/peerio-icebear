@@ -136,7 +136,7 @@ const emailFormat = pair(isValidEmail, 'error_invalidEmail');
 const medicalIdFormat = pair(isValidMedicalId, 'mcr_error_ahrpa');
 const emailAvailability = pair(isValidSignupEmail, 'error_addressNotAvailable');
 const usernameFormat = pair(isValidUsername, 'error_usernameBadFormat');
-const usernameLength = pair(isValidUsernameLength, 'error_usernameLengthExceeded');
+const usernameLengthCheck = pair(isValidUsernameLength, 'error_usernameLengthExceeded');
 const usernameAvailability = pair(isValidSignupUsername, 'error_usernameNotAvailable');
 const usernameExistence = pair(isValidLoginUsername, 'error_usernameNotFound');
 const stringExists = pair(isNonEmptyString, 'error_fieldRequired');
@@ -197,7 +197,7 @@ const validators = {
     firstNameReserved,
     lastNameReserved,
     email: [emailFormat, emailAvailability],
-    username: [usernameLength, usernameFormat, usernameAvailability],
+    username: [usernameLengthCheck, usernameFormat, usernameAvailability],
     usernameLogin: [usernameFormat, usernameExistence],
     firstName: [stringExists, firstNameReserved],
     lastName: [stringExists, lastNameReserved],

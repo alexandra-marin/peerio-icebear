@@ -1092,7 +1092,6 @@ class Chat {
 
     /**
      * Removes participant from the channel.
-     * @param participant
      * @param isUserKick - this function is called in case admin kicks the user and in case user left and
      *                                admin needs to remove their keys. Method wants to know which case is it.
      */

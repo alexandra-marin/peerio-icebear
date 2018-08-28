@@ -44,8 +44,8 @@ const serverValidationStore = { request: {} };
  * @param context - context for field, e.g "signup"
  * @param name - field name
  */
-function _callServer(context: string, name: string, value: string | number): Promise<boolean> {
-    const key = `${context}::${name}`;
+function _callServer(context: string, name: string, value: string | number, subkey: string): Promise<boolean> {
+    const key = `${context}::${name}::${subkey}`;
     const pending = serverValidationStore.request[key];
     if (pending) {
         clearTimeout(pending.timeout);
@@ -82,8 +82,9 @@ function isValidMedicalId(val) {
     return Promise.resolve(medicalIdRegex.test(val));
 }
 
-function isValid(context, name) {
-    return (value, n?) => (value ? _callServer(context, name || n, value) : Promise.resolve(false));
+function isValid(context, name, subKey) {
+    return (value, n) =>
+        value ? _callServer(context, name || n, value, subKey) : Promise.resolve(false);
 }
 
 function isNonEmptyString(name) {
@@ -122,6 +123,7 @@ function pair(action, message) {
 
 const isValidSignupEmail = isValid('signup', 'email');
 const isValidSignupUsername = isValid('signup', 'username');
+const isValidSignupUsernameSuggestion = isValid('signup', 'username', 'suggestion');
 const isValidSignupFirstName = isValid('signup', 'firstName');
 const isValidSignupLastName = isValid('signup', 'lastName');
 const emailFormat = pair(isValidEmail, 'error_invalidEmail');
@@ -149,17 +151,16 @@ const suggestUsername = async (firstName, lastName) => {
         `${firstName}${lastName}`,
         `${firstName}_${lastName}`,
         `${lastName}`,
-        `${firstName}${initial}${lastName}`,
-        `${firstName}${lastName}${initial}`,
-        `${firstName}${lastName}_${lastName}`,
-        `${firstName}_${lastName}${lastName}`
+        `${initial}${lastName}`,
+        `${lastName}${initial}`
     ];
 
     for (const option of options) {
         if (suggestions.length >= maxSuggestions) break;
-        const available = await isValidSignupUsername(option);
+        const normalized = option.toLocaleLowerCase();
+        const available = await isValidSignupUsernameSuggestion(normalized);
         if (available) {
-            suggestions.push(option);
+            suggestions.push(normalized);
         }
     }
 

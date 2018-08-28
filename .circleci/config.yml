@@ -1,7 +1,7 @@
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
 test_defaults: &test_defaults
   docker:
-    - image: circleci/node:9.8
+    - image: circleci/node:10.7
   working_directory: ~/repo
 
 version: 2

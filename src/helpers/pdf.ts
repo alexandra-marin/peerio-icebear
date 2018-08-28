@@ -4,7 +4,6 @@ import { FileStream, assetPathResolver } from '../config';
 /**
  * Generates and saves a pdf file with account recovery information
  * @param destination file path
- * @param username
  */
 export default async function saveAccountKeyBackup(
     destination: string,

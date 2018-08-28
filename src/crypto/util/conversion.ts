@@ -55,7 +55,6 @@ export function b64ToBytes(str: string): Uint8Array {
 
 /**
  * Converts Uint8Array or ArrayBuffer to Base64 string.
- * @param bytes
  * @returns B64 string encoded bytes
  */
 export function bytesToB64(bytes: Uint8Array | ArrayBuffer): string {

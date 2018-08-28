@@ -49,7 +49,7 @@ class Chat {
                 this.store.cache.saveBootKeg(this.id, keg);
                 return;
             }
-            when(() => this.id, () => this.store.cache.saveBootKeg(this.id, keg));
+            when(() => !!this.id, () => this.store.cache.saveBootKeg(this.id, keg));
         });
         this._reactionsToDispose.push(
             reaction(
@@ -69,6 +69,10 @@ class Chat {
             )
         );
     }
+
+    db: ChatKegDb;
+    isChannel: boolean;
+    tempId: string;
 
     store: ChatStore;
 

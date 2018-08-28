@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.17.0"></a>
+# [5.17.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.16.0...v5.17.0) (2018-08-27)
+
+
+### Bug Fixes
+
+* format ([9028b0b](https://github.com/PeerioTechnologies/peerio-icebear/commit/9028b0b))
+
+
+### Features
+
+* contact search should work with emails ([c901d7c](https://github.com/PeerioTechnologies/peerio-icebear/commit/c901d7c))
+
+
+
 <a name="5.16.0"></a>
 # [5.16.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.15.2...v5.16.0) (2018-08-27)
 

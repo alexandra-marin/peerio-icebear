@@ -36,6 +36,7 @@ const VALIDATION_THROTTLING_PERIOD_MS = 400;
 const usernameRegex = /^\w{1,16}$/;
 const emailRegex = /^[^ ]+@[^ ]+/i;
 const medicalIdRegex = /MED\d{10}/i;
+const usernameLength = 16;
 // const phoneRegex =
 //     /^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$/i;
 
@@ -73,7 +74,7 @@ function _callServer(context, name, value) {
 
 function isValidUsernameLength(name) {
     if (name) {
-        return Promise.resolve(name.length < 16);
+        return Promise.resolve(name.length < usernameLength);
     }
     return Promise.resolve(false);
 }
@@ -100,10 +101,6 @@ function isValid(context, name) {
 function isNonEmptyString(name) {
     return Promise.resolve(name.length > 0);
 }
-
-// function isValidPhone(val) {
-//     return Promise.resolve(phoneRegex.test(val));
-// }
 
 function isValidLoginUsername(name) {
     return (
@@ -167,9 +164,14 @@ const suggestUsername = async (firstName, lastName) => {
         `${firstName}_${lastName}${lastName}`
     ];
 
-    // options.forEach(x => x.trim());
+    const validOptions = options.map(x => x
+        .trim()
+        .replace(/[^a-z|A-Z|0-9|_]/g, '')
+        .substring(0, usernameLength - 1)
+        .toLocaleLowerCase()
+    );
 
-    for (const option of options) {
+    for (const option of validOptions) {
         if (suggestions.length >= maxSuggestions) break;
         const available = await isValidSignupUsername(option);
         if (available) {

@@ -88,9 +88,7 @@ function isValidMedicalId(val) {
 
 function isValid(context, name, subKey) {
     return (value, n) =>
-        value
-            ? _callServer(context, name || n, value, subKey)
-            : Promise.resolve(false);
+        value ? _callServer(context, name || n, value, subKey) : Promise.resolve(false);
 }
 
 function isNonEmptyString(name) {
@@ -110,10 +108,7 @@ function isValidLoginUsername(name) {
 }
 
 function areEqualValues(value, additionalArguments) {
-    if (
-        additionalArguments.required !== false &&
-        (!value || value.length === 0)
-    ) {
+    if (additionalArguments.required !== false && (!value || value.length === 0)) {
         return Promise.resolve({
             result: false,
             message: 'error_fieldRequired'
@@ -132,21 +127,14 @@ function pair(action, message) {
 
 const isValidSignupEmail = isValid('signup', 'email');
 const isValidSignupUsername = isValid('signup', 'username');
-const isValidSignupUsernameSuggestion = isValid(
-    'signup',
-    'username',
-    'suggestion'
-);
+const isValidSignupUsernameSuggestion = isValid('signup', 'username', 'suggestion');
 const isValidSignupFirstName = isValid('signup', 'firstName');
 const isValidSignupLastName = isValid('signup', 'lastName');
 const emailFormat = pair(isValidEmail, 'error_invalidEmail');
 const medicalIdFormat = pair(isValidMedicalId, 'mcr_error_ahrpa');
 const emailAvailability = pair(isValidSignupEmail, 'error_addressNotAvailable');
 const usernameFormat = pair(isValidUsername, 'error_usernameBadFormat');
-const usernameAvailability = pair(
-    isValidSignupUsername,
-    'error_usernameNotAvailable'
-);
+const usernameAvailability = pair(isValidSignupUsername, 'error_usernameNotAvailable');
 const usernameExistence = pair(isValidLoginUsername, 'error_usernameNotFound');
 const stringExists = pair(isNonEmptyString, 'error_fieldRequired');
 const firstNameReserved = pair(isValidSignupFirstName, 'error_invalidName');
@@ -154,10 +142,7 @@ const lastNameReserved = pair(isValidSignupLastName, 'error_invalidName');
 const valueEquality = pair(areEqualValues, 'error_mustMatch');
 const isValidMcrDoctorAhpra = isValid('medcryptor_doctor', 'ahpra');
 const isValidMcrAdminAhpra = isValid('medcryptor_admin', 'ahpra');
-const mcrDoctorAhpraAvailability = pair(
-    isValidMcrDoctorAhpra,
-    'mcr_error_ahrpa'
-);
+const mcrDoctorAhpraAvailability = pair(isValidMcrDoctorAhpra, 'mcr_error_ahrpa');
 const mcrAdminAhpraAvailability = pair(isValidMcrAdminAhpra, 'mcr_error_ahrpa');
 
 const suggestUsername = async (firstName, lastName) => {

@@ -5,11 +5,7 @@
 import * as nacl from 'tweetnacl';
 
 type SignFunc = (msg: Uint8Array, secretKey: Uint8Array) => Uint8Array;
-type VerifyFunc = (
-    msg: Uint8Array,
-    sig: Uint8Array,
-    publicKey: Uint8Array
-) => boolean;
+type VerifyFunc = (msg: Uint8Array, sig: Uint8Array, publicKey: Uint8Array) => boolean;
 
 let sign: SignFunc = nacl.sign.detached;
 let verify: VerifyFunc = nacl.sign.detached.verify;
@@ -20,10 +16,7 @@ let verify: VerifyFunc = nacl.sign.detached.verify;
  * @param secretKey - 64 bytes secret key from the signing user's signing key pair.
  * @returns 64 bytes signature
  */
-export function signDetached(
-    message: Uint8Array,
-    secretKey: Uint8Array
-): Promise<Uint8Array> {
+export function signDetached(message: Uint8Array, secretKey: Uint8Array): Promise<Uint8Array> {
     // this makes it work for both sync and async implementations of sign
     return Promise.resolve(sign(message, secretKey));
 }

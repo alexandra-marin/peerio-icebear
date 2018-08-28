@@ -74,7 +74,7 @@ function _callServer(context, name, value) {
 
 function isValidUsernameLength(name) {
     if (name) {
-        return Promise.resolve(name.length < usernameLength);
+        return Promise.resolve(name.length <= usernameLength);
     }
     return Promise.resolve(false);
 }

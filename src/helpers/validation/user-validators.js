@@ -71,6 +71,13 @@ function _callServer(context, name, value) {
     });
 }
 
+function isValidUsernameLength(name) {
+    if (name) {
+        return Promise.resolve(name.length < 16);
+    }
+    return Promise.resolve(false);
+}
+
 function isValidUsername(name) {
     if (name) {
         return Promise.resolve(!!name.match(usernameRegex));
@@ -132,6 +139,7 @@ const emailFormat = pair(isValidEmail, 'error_invalidEmail');
 const medicalIdFormat = pair(isValidMedicalId, 'mcr_error_ahrpa');
 const emailAvailability = pair(isValidSignupEmail, 'error_addressNotAvailable');
 const usernameFormat = pair(isValidUsername, 'error_usernameBadFormat');
+const usernameLength = pair(isValidUsernameLength, 'error_usernameLengthExceeded');
 const usernameAvailability = pair(isValidSignupUsername, 'error_usernameNotAvailable');
 const usernameExistence = pair(isValidLoginUsername, 'error_usernameNotFound');
 const stringExists = pair(isNonEmptyString, 'error_fieldRequired');
@@ -159,6 +167,8 @@ const suggestUsername = async (firstName, lastName) => {
         `${firstName}_${lastName}${lastName}`
     ];
 
+    // options.forEach(x => x.trim());
+
     for (const option of options) {
         if (suggestions.length >= maxSuggestions) break;
         const available = await isValidSignupUsername(option);
@@ -185,7 +195,7 @@ const validators = {
     firstNameReserved,
     lastNameReserved,
     email: [emailFormat, emailAvailability],
-    username: [usernameFormat, usernameAvailability],
+    username: [usernameLength, usernameFormat, usernameAvailability],
     usernameLogin: [usernameFormat, usernameExistence],
     firstName: [stringExists, firstNameReserved],
     lastName: [stringExists, lastNameReserved],

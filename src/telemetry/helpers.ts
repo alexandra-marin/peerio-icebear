@@ -26,10 +26,10 @@ interface textInputProps {
 }
 export function textInput(
     item: string,
-    location: string,
-    sublocation: string,
     state: string,
-    errorMsg: string
+    location?: string,
+    sublocation?: string,
+    errorMsg?: string
 ) {
     const properties: textInputProps = { item, state };
 

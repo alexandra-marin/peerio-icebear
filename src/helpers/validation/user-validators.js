@@ -164,11 +164,12 @@ const suggestUsername = async (firstName, lastName) => {
         `${firstName}_${lastName}${lastName}`
     ];
 
-    const validOptions = options.map(x => x
-        .trim()
-        .replace(/[^a-z|A-Z|0-9|_]/g, '')
-        .substring(0, usernameLength - 1)
-        .toLocaleLowerCase()
+    const validOptions = options.map(x =>
+        x
+            .trim()
+            .replace(/[^a-z|A-Z|0-9|_]/g, '')
+            .substring(0, usernameLength - 1)
+            .toLocaleLowerCase()
     );
 
     for (const option of validOptions) {

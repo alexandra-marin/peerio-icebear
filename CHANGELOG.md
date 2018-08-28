@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.18.0"></a>
+# [5.18.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.17.1...v5.18.0) (2018-08-28)
+
+
+### Bug Fixes
+
+* bold tag ([044132b](https://github.com/PeerioTechnologies/peerio-icebear/commit/044132b))
+* fix suggestion validator ([30a8fc8](https://github.com/PeerioTechnologies/peerio-icebear/commit/30a8fc8))
+* fix suggestion validator ([be6ceef](https://github.com/PeerioTechnologies/peerio-icebear/commit/be6ceef))
+
+
+### Features
+
+* title_usernameHeading ([1c0239c](https://github.com/PeerioTechnologies/peerio-icebear/commit/1c0239c))
+* title_usernameHeading ([1ed4133](https://github.com/PeerioTechnologies/peerio-icebear/commit/1ed4133))
+
+
+
 <a name="5.17.1"></a>
 ## [5.17.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.17.0...v5.17.1) (2018-08-28)
 

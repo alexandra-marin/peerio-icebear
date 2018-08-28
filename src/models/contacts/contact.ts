@@ -39,12 +39,12 @@ interface LookupMatch {
  * loading === true - trying to load contact, will make many attempts in case of connection issues
  * loading === false && notFound === false - success
  * loading === false && notFound === true  - fail
- * @param {string} username - this can also be an email which will be replaced with username if user found
- * @param {Object} [prefetchedData] - if, for some reason you have the contact data from server, feed it here
- * @param {bool} [noAutoLoad] - don't automatically call this.load() in constructor (needed for tests only)
+ * @param username - this can also be an email which will be replaced with username if user found
+ * @param prefetchedData - if, for some reason you have the contact data from server, feed it here
+ * @param noAutoLoad - don't automatically call this.load() in constructor (needed for tests only)
  */
 class Contact {
-    constructor(username, prefetchedData, noAutoLoad) {
+    constructor(username: string, prefetchedData?, noAutoLoad = false) {
         this.username = username.toLowerCase();
         if (getUser().username === this.username) this.isMe = true;
         this.usernameTag = `@${this.username}`;
@@ -347,7 +347,6 @@ class Contact {
     /**
      * Helper function to execute callback when contact is loaded.
      * Executes immediately if already loaded.
-     * @param {function} callback
      */
     whenLoaded(callback) {
         // it is important for this to be async
@@ -358,7 +357,6 @@ class Contact {
     }
     /**
      * Helper function to get a promise that resolves when contact is loaded.
-     * @returns {Promise}
      */
     ensureLoaded() {
         return new Promise(resolve => {
@@ -367,10 +365,8 @@ class Contact {
     }
     /**
      * Helper function to get a promise that resolves when all contacts in passed collection are loaded.
-     * @param {Array<Contact>} contacts
-     * @returns {Promise}
      */
-    static ensureAllLoaded(contacts) {
+    static ensureAllLoaded(contacts: Contact[]) {
         return Promise.map(contacts, contact => contact.ensureLoaded());
     }
 }

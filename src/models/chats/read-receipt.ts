@@ -1,14 +1,12 @@
 import { observable } from 'mobx';
 import Keg from '../kegs/keg';
+import ChatKegDb from '~/models/kegs/chat-keg-db';
 
 /**
  * Holds read position (kegId) for a user in a chat. Named keg, names contain usernames.
- * @param {string} username
- * @param {ChatKegDb} db
- * @extends {Keg}
  */
 class ReadReceipt extends Keg {
-    constructor(username, db) {
+    constructor(username: string, db: ChatKegDb) {
         super(username ? `read_receipt-${username}` : null, 'read_receipt', db, false, false, true);
     }
     /**

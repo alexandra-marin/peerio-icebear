@@ -46,10 +46,10 @@ class UploadConfig {
 
     /**
      * Finds which chunk size to use for given file size based on {@link chunkSizes} reference table.
-     * @param {number} fileSize - in bytes.
-     * @returns {number} chunk size to use, in bytes.
+     * @param fileSize - in bytes.
+     * @returns chunk size to use, in bytes.
      */
-    getChunkSize(fileSize) {
+    getChunkSize(fileSize: number): number {
         const data = this.chunkSizes;
         for (let i = 0; i < data.length; i++) {
             const row = data[i];
@@ -104,7 +104,7 @@ const config = new class {
      *
      * **Client app is required to set this property before using Icebear SDK.**
      */
-    ghostFrontendUrl = 'https://';
+    // ghostFrontendUrl = 'https://';
 
     /**
      * Application name

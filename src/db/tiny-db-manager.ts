@@ -3,10 +3,10 @@ import TinyDbCollection from './tiny-db-collection';
 /**
  * TinyDbManager manages system and user collections, and allows opening
  * other collections.
- * @param {Function} [createStorageEngine] - function returning a new storage engine for the name
+ * @param createStorageEngine - function returning a new storage engine for the name
  */
 class TinyDbManager {
-    constructor(createStorageEngine) {
+    constructor(createStorageEngine: () => StorageEngine) {
         this.createStorageEngine = createStorageEngine;
         this.systemCollection = null;
         this.userCollection = null;
@@ -30,31 +30,30 @@ class TinyDbManager {
 
     /**
      * Creates a collection instance.
-     * @param {string} name - database name
-     * @param {Uint8Array} [encryptionKey] - optional encryption key
-     * @returns {TinyDbCollection}
+     * @param name - database name
+     * @param encryptionKey - optional encryption key
      */
-    open(name, encryptionKey) {
+    open(name: string, encryptionKey?: Uint8Array): TinyDbCollection {
         const engine = this.createStorageEngine(name);
         return new TinyDbCollection(engine, name, encryptionKey);
     }
 
     /**
      * Creates system collection instance and assigns it to {@link system} property
-     * @returns {TinyDbCollection} system collection
+     * @returns system collection
      */
-    openSystem() {
+    openSystem(): TinyDbCollection {
         this.systemCollection = this.open('$system$');
         return this.systemCollection;
     }
 
     /**
      * Creates user collection instance and assigns it to {@link user} property
-     * @param {string} username
-     * @param {Uint8Array} encryptionKey - database key
-     * @returns {TinyDbCollection} user collection
+     * @param  username
+     * @param  encryptionKey - database key
+     * @returns user collection
      */
-    openUser(username, encryptionKey) {
+    openUser(username: string, encryptionKey: Uint8Array): TinyDbCollection {
         this.userCollection = this.open(username, encryptionKey);
         return this.userCollection;
     }

@@ -3,19 +3,21 @@ import secret from '../../crypto/secret';
 import config from '../../config';
 import FileProcessor from './file-processor';
 import { DisconnectedError } from '../../errors';
+import FileStreamAbstract from '~/models/files/file-stream-abstract';
+import FileNonceGenerator from '~/models/files/file-nonce-generator';
 
 const { CHUNK_OVERHEAD } = config;
 
 /**
  * Manages file download process.
- * @param {File} file
- * @param {FileStreamAbstract} stream
- * @param {FileNonceGenerator} nonceGenerator
- * @param {{partialChunkSize:number, wholeChunks:number}} resumeParams
- * @extends {FileProcessor}
  */
 class FileDownloader extends FileProcessor {
-    constructor(file, stream, nonceGenerator, resumeParams) {
+    constructor(
+        file: File,
+        stream: FileStreamAbstract,
+        nonceGenerator: FileNonceGenerator,
+        resumeParams?: { partialChunkSize: number; wholeChunks: number }
+    ) {
         super(file, stream, nonceGenerator, 'download');
 
         // total amount to download and save to disk

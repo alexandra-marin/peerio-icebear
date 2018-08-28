@@ -15,7 +15,6 @@ import { asPromise } from '../helpers/prombservable';
  * 2. Every time connection is authenticated, Update Tracker performs update of relevant data
  *    (because we might have missed it while disconnected).
  *
- * @namespace UpdateTracker
  */
 class UpdateTracker {
     constructor() {
@@ -42,14 +41,12 @@ class UpdateTracker {
     DESCRIPTOR_PATH = 'global:fileDescriptor:updated';
     /**
      * listeners to new keg db added event
-     * @type {Array<function>}
      */
     dbAddedHandlers = [];
     /**
      * Listeners to changes in existing keg databases.
-     * @type {{kegDbId: {kegType: function}}}
      */
-    updateHandlers = {};
+    updateHandlers: { kegDbId: { kegType: function } } = {};
 
     // sets to true when digest is initialized with server data at least once
     @observable loadedOnce = false;
@@ -59,14 +56,12 @@ class UpdateTracker {
 
     /**
      * Keg digest
-     * @type {kegDbId:{ kegType: { maxUpdateId: string, knownUpdateId(session): string, newKegsCount: number }}
      */
-    digest = {};
+    digest:{kegDbId:{ kegType: { maxUpdateId: string, knownUpdateId(session): string, newKegsCount: number }} = {};
     /**
      * Global digest
-     * @type {path:{ maxUpdateId: string, knownUpdateId(session): string }}
      */
-    globalDigest = {
+    globalDigest:{path:{ maxUpdateId: string, knownUpdateId(session): string }} = {
         [this.DESCRIPTOR_PATH]: { maxUpdateId: '', knownUpdateId: '' }
     };
 
@@ -103,10 +98,10 @@ class UpdateTracker {
     /**
      * Wrapper around this.digest to safely retrieve data that might be not retrieved yet,
      * so we want to avoid null reference. This function will return zeroes in case of null.
-     * @param {string} id - keg db id
-     * @param {string} type - keg type
+     * @param id - keg db id
+     * @param type - keg type
      */
-    getDigest(id, type) {
+    getDigest(id: string, type: string) {
         if (!this.digest[id]) return this.zeroDigest;
         const d = this.digest[id][type];
         if (!d) return this.zeroDigest;
@@ -115,7 +110,6 @@ class UpdateTracker {
 
     /**
      * Subscribes handler to an event of new keg db created for this user
-     * @param {function} handler
      */
     subscribeToKegDbAdded(handler) {
         if (this.dbAddedHandlers.includes(handler)) {
@@ -127,11 +121,10 @@ class UpdateTracker {
 
     /**
      * Subscribes handler to an event of keg of specific type change in keg db
-     * @param {string} kegDbId - id of the db to watch
-     * @param {string} kegType - keg type to watch
-     * @param {function} handler
+     * @param kegDbId - id of the db to watch
+     * @param kegType - keg type to watch
      */
-    subscribeToKegUpdates(kegDbId, kegType, handler) {
+    subscribeToKegUpdates(kegDbId: string, kegType: string, handler) {
         if (!this.updateHandlers[kegDbId]) {
             this.updateHandlers[kegDbId] = {};
         }
@@ -152,7 +145,6 @@ class UpdateTracker {
 
     /**
      * Unsubscribes handler from all events (subscribeToKegUpdates, subscribeToKegDbAdded)
-     * @param {function} handler
      */
     unsubscribe(handler) {
         let ind = this.dbAddedHandlers.indexOf(handler);
@@ -228,10 +220,8 @@ class UpdateTracker {
 
     /**
      * Emits one update event for a keg type in specific database.
-     * @param {string} id
-     * @param {string} type
      */
-    emitKegTypeUpdatedEvent(id, type) {
+    emitKegTypeUpdatedEvent(id: string, type: string) {
         if (!this.loadedOnce) {
             when(() => this.loadedOnce, () => this.emitKegDbAddedEvent(id, type));
             return;
@@ -338,11 +328,11 @@ class UpdateTracker {
     seenThisQueue = {};
     /**
      * Stores max update id that user has seen to server.
-     * @param {string} id - keg db id
-     * @param {string} type - keg type
-     * @param {string} updateId - max known update id
+     * @param id - keg db id
+     * @param type - keg type
+     * @param updateId - max known update id
      */
-    seenThis(id, type, updateId, throttle = true) {
+    seenThis(id: string, type: string, updateId: string, throttle = true) {
         if (!updateId) return;
 
         if (throttle) {

@@ -3,11 +3,9 @@ import { observable } from 'mobx';
 
 /**
  * Chat head keg is open for any chat participant to update.
- * @param {ChatKegDb} db
- * @extends SyncedKeg
  */
 export default class ChatHead extends SyncedKeg {
-    constructor(db, noSync = false) {
+    constructor(db: ChatKegDb, noSync = false) {
         super('chat_head', db, undefined, undefined, undefined, undefined, noSync);
     }
 

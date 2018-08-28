@@ -137,7 +137,6 @@ export default class Volume extends FileFolder {
 
     /**
      * Deletes the volume.
-     * @returns {Promise}
      */
     async remove() {
         if (this.owner !== getUser().username) {

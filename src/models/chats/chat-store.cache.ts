@@ -1,8 +1,8 @@
 import config from '../../config';
+import { ChatStore } from '~/models/chats/chat-store';
 
-/** @param {ChatStore} store */
 class ChatStoreCache {
-    constructor(store) {
+    constructor(store: ChatStore) {
         this.store = store;
     }
 

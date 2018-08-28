@@ -7,12 +7,10 @@ import config from '../config';
 import { getUser } from '../helpers/di-current-user';
 import TinyDb from '../db/tiny-db';
 
-/**
- * @callback CacheEngineBase~cacheUpdateCallback
- * @param {object} oldValue
- * @param {object} newValue
- * @returns {object | false} object - write this object, false - don't write anything
- */
+/* when it returns object - write this object, false - don't write anything */
+interface ICacheUpdateCallback {
+    (oldValue: {}, newValue: {}): {} | false;
+}
 
 const META_DB_NAME = 'peerio_cache_meta';
 
@@ -23,11 +21,11 @@ const CACHE_RESET_KEY = 'cacheResetCounter';
 
 /**
  * CacheEngineBase
- * @param {string} shortName - unique(per user) database short name (will be converted to longer and safer name)
- * @param {string} keyPath - how to find the key in saved objects
+ * @param shortName - unique(per user) database short name (will be converted to longer and safer name)
+ * @param keyPath - how to find the key in saved objects
  */
 class CacheEngineBase implements StorageEngineInterface {
-    constructor(shortName, keyPath) {
+    constructor(shortName: string, keyPath: string) {
         if (!shortName || !keyPath) throw new Error('Invalid arguments');
         this.name =
             shortName === META_DB_NAME
@@ -132,7 +130,6 @@ class CacheEngineBase implements StorageEngineInterface {
 
     /**
      * Ensures database is open and ready (in case of async).
-     * @returns {Promise}
      */
     openInternal() {
         throw new Error('Method not implemented');
@@ -140,56 +137,46 @@ class CacheEngineBase implements StorageEngineInterface {
 
     /**
      * Asynchronously gets a value from storage.
-     * @param {string} key
-     * @returns {Promise<Object>}
      */
-    // eslint-disable-next-line no-unused-vars
-    getValue(key) {
+    getValue(key: string): Promise<{}> {
         throw new Error('Method not implemented');
     }
 
     /**
      * Asynchronously saves a value to storage.
-     * @param {string} key - if key already exists - overwrite value
-     * @param {object} value
-     * @callback {[cacheUpdateCallback]} confirm - a callback to confirm update if value already exists
+     * @param key - if key already exists - overwrite value
+     * @param confirm - a callback to confirm update if value already exists
      *                                             read and write should be done in atomic/transactional way.
-     * @returns {Promise}
      */
-    // eslint-disable-next-line no-unused-vars
-    setValue(key, value, confirmUpdate) {
+    setValue(key: string, value: object, confirmUpdate: ICacheUpdateCallback): Promise {
         throw new Error('Method not implemented');
     }
 
     /**
      * Asynchronously removes key/value from store.
-     * @param {string} key - if key doesn't exist, just resolve promise.
-     * @returns {Promise}
+     * @param key - if key doesn't exist, just resolve promise.
      */
     // eslint-disable-next-line no-unused-vars
-    removeValue(key) {
+    removeValue(key: string): Promise {
         throw new Error('Method not implemented');
     }
 
     /**
      * Asynchronously retrieves a list of all keys in current namespace
-     * @returns {Promise<string[]>}
      */
-    getAllKeys() {
+    getAllKeys(): Promise<string[]> {
         throw new Error('Method not implemented');
     }
 
     /**
      * Asynchronously retrieves a list of all values in current namespace
-     * @returns {Promise<string[]>}
      */
-    getAllValues() {
+    getAllValues(): Promise<string[]> {
         throw new Error('Method not implemented');
     }
 
     /**
      * Removes all data from current database.
-     * @returns {Promise}
      */
     clear() {
         throw new Error('Method not implemented');
@@ -197,10 +184,8 @@ class CacheEngineBase implements StorageEngineInterface {
 
     /**
      * Deletes any database by name
-     * @param {string} fullName
      */
-    // eslint-disable-next-line no-unused-vars
-    deleteDatabase(fullName) {
+    deleteDatabase(fullName: string) {
         throw new Error('Method not implemented');
     }
 }

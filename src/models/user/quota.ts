@@ -1,12 +1,11 @@
 import Keg from '../kegs/keg';
+import User from '~/models/user/user';
 
 /**
  * Plaintext readonly system named keg.
- * @param {User} user
- * @extends {Keg}
  */
 class Quota extends Keg {
-    constructor(user) {
+    constructor(user: User) {
         super('quotas', 'quotas', user.kegDb, true);
         this.user = user;
     }

@@ -42,12 +42,10 @@ function _getUlResumeParams(path) {
 
 /**
  * Starts file upload.
- * @param {string} filePath
- * @param {string} [fileName] - if you'd like to override this.name or filePath
- * @param {bool} [resume] - system sets this param to true when it detects unfinished upload
- * @returns {Promise}
+ * @param fileName - if you'd like to override this.name or filePath
+ * @param resume - system sets this param to true when it detects unfinished upload
  */
-function upload(filePath, fileName, resume) {
+function upload(filePath: string, fileName?: string, resume = false) {
     if (this.downloading || this.uploading) {
         return Promise.reject(
             new Error(`File is already ${this.downloading ? 'downloading' : 'uploading'}`)
@@ -142,7 +140,6 @@ function upload(filePath, fileName, resume) {
 
 /**
  * Cancels ongoing upload. This will also remove file keg.
- * @returns {Promise}
  */
 function cancelUpload() {
     if (this.readyForDownload) {

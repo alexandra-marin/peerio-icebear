@@ -42,10 +42,10 @@ class FileNonceGenerator {
     }
 
     /**
-     * @returns {Uint8Array|null} - nonce for the next chunk
+     * @returns nonce for the next chunk
      * @throws if called after nonce for maxChunkId was generated
      */
-    getNextNonce() {
+    getNextNonce(): Uint8Array | null {
         if (this.eof) throw new Error('Attempt to generate nonce past maxChunkId.');
         this._writeChunkNum();
         if (this.chunkId === this.maxChunkId) {

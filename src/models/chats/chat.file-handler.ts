@@ -98,15 +98,12 @@ class ChatFileHandler {
      * Initiates file upload and shares it to the chat afterwards.
      * Note that if app session ends before this is done - files will be only uploaded by resume logic.
      * But chat message will not be sent.
-     * @param {string} path - full file path
-     * @param {string} [name] - override file name, specify to store the file keg with this name
-     * @param {boolean} [deleteAfterUpload=false] - delete local file after successful upload
-     * @param {function} [beforeShareCallback=null] - function returning Promise which will be waited for
-     *                                                before file is shared. We need this to finish keg preparations.
-     * @param {string} [message=null] - message to attach to file
-     * @returns {File}
+     * @param path - full file path
+     * @param name - override file name, specify to store the file keg with this name
+     * @param deleteAfterUpload - delete local file after successful upload
+     * @param message - message to attach to file
      */
-    uploadAndShare(path, name, deleteAfterUpload = false, message) {
+    uploadAndShare(path: string, name?: string, deleteAfterUpload = false, message?: string): File {
         const file = fileStore.upload(path, name);
         file.uploadQueue = this.chat.uploadQueue; // todo: change, this is dirty
         this.chat.uploadQueue.push(file);
@@ -132,11 +129,9 @@ class ChatFileHandler {
 
     /**
      * Shares previously uploaded files to chat.
-     * @param {Array<File>} files
-     * @param {string} [message = ''] message to attach to file
-     * @returns {Promise}
+     * @param [message = ''] message to attach to file
      */
-    async share(files, message = '') {
+    async share(files: File[], message = '') {
         if (!files || !files.length) return Promise.reject();
         await Promise.map(files, f => f.share(this.chat));
         const ids = files.map(f => f.fileId);
@@ -145,9 +140,9 @@ class ChatFileHandler {
 
     /**
      *
-     * @param {string|File} file - file id or instance
+     * @param file - file id or instance
      */
-    async unshare(file) {
+    async unshare(file: string | File) {
         if (typeof file === 'string') {
             file = fileStore.getByIdInChat(file, this.chat.id); // eslint-disable-line no-param-reassign
             await file.ensureLoaded();

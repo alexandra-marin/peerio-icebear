@@ -5,14 +5,10 @@ import socket from '../../network/socket';
 import ReadReceipt from './read-receipt';
 import { retryUntilSuccess } from '../../helpers/retry';
 import TaskQueue from '../../helpers/task-queue';
-
-/**
- *
- * @param {Chat} chat - chat creates instance and passes itself to the constructor.
- */
+import Chat from '~/models/chats/chat';
 
 class ChatReceiptHandler {
-    constructor(chat) {
+    constructor(chat: Chat) {
         this.chat = chat;
         // receipts cache {username: ReadReceipt}
         this.chat.receipts = observable.shallowMap();
@@ -57,9 +53,8 @@ class ChatReceiptHandler {
     };
     /**
      * Sends receipt for message id seen
-     * @param {string} pos
      */
-    sendReceipt(pos) {
+    sendReceipt(pos: string) {
         // console.debug(`sendReceipt(${pos})`);
         pos = +pos; // eslint-disable-line no-param-reassign
         // console.debug('asked to send receipt: ', pos);

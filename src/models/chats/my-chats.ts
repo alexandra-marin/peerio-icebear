@@ -46,10 +46,9 @@ class MyChats extends SyncedKeg {
     }
     /**
      * Adds favorite chat and removes it from hidden list if it was there.
-     * @param {string} chatId
-     * @returns {boolean} - true if added, false if already had been in the list
+     * @returns true - if added, false - if already had been in the list
      */
-    addFavorite(chatId) {
+    addFavorite(chatId: string) {
         const ret = this._add(this.favorites, chatId);
         if (ret) {
             this.removeHidden(chatId);
@@ -59,19 +58,17 @@ class MyChats extends SyncedKeg {
 
     /**
      * Removes favorite chat,
-     * @param {string} chatId
-     * @returns {boolean} - true if removed, false if couldn't find it in the favorites list
+     * @returns true - if removed, false - if couldn't find it in the favorites list
      */
-    removeFavorite(chatId) {
+    removeFavorite(chatId: string) {
         return this._remove(this.favorites, chatId);
     }
 
     /**
      * Adds hidden chat and removes it from favorites list if it was there.
-     * @param {string} chatId
-     * @returns {boolean} - true if added, false if already had been in the list
+     * @returns true - if added, false - if already had been in the list
      */
-    addHidden(chatId) {
+    addHidden(chatId: string) {
         const ret = this._add(this.hidden, chatId);
         if (ret) {
             this.removeFavorite(chatId);
@@ -81,10 +78,9 @@ class MyChats extends SyncedKeg {
 
     /**
      * Removes hidden chat.
-     * @param {string} chatId
-     * @returns {boolean} - true if removed, false if couldn't find it in the hidden list
+     * @returns true - if removed, false - if couldn't find it in the hidden list
      */
-    removeHidden(chatId) {
+    removeHidden(chatId: string) {
         return this._remove(this.hidden, chatId);
     }
 }

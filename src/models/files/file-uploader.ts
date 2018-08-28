@@ -3,17 +3,20 @@ import errors from '../../errors';
 import secret from '../../crypto/secret';
 import config from '../../config';
 import FileProcessor from './file-processor';
+import FileStreamAbstract from '~/models/files/file-stream-abstract';
+import FileNonceGenerator from '~/models/files/file-nonce-generator';
 
 /**
  * Handles file upload process
- * @param {File} file
- * @param {FileStreamAbstract} stream
- * @param {FileNonceGenerator} nonceGenerator
- * @param {number} startFromChunk - in case of resume, start uploading from the chunk after this one
- * @extends {FileProcessor}
+ * @param startFromChunk - in case of resume, start uploading from the chunk after this one
  */
 class FileUploader extends FileProcessor {
-    constructor(file, stream, nonceGenerator, startFromChunk) {
+    constructor(
+        file: File,
+        stream: FileStreamAbstract,
+        nonceGenerator: FileNonceGenerator,
+        startFromChunk?: number
+    ) {
         super(file, stream, nonceGenerator, 'upload');
         // amount of bytes to read and to send
         this.file.progressMax = file.size;

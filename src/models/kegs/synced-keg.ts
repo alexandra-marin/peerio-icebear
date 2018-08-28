@@ -62,7 +62,6 @@ class SyncedKeg<TPayload, TProps> extends Keg<TPayload, TProps> {
 
     /**
      * Forces updating keg data from server
-     * @returns {Promise}
      */
     reload = () => {
         return this.load().then(() => {
@@ -77,16 +76,15 @@ class SyncedKeg<TPayload, TProps> extends Keg<TPayload, TProps> {
     /**
      * Enqueues Save task.
      *
-     * @param {function<bool>} dataChangeFn - function that will be called right before keg save,
+     * @param dataChangeFn - function that will be called right before keg save,
      * it has to mutate keg's state. Return false to cancel save.
-     * @param {function} [dataRestoreFn] - function that will be called to restore keg state to the point before
+     * @param dataRestoreFn - function that will be called to restore keg state to the point before
      * dataChangeFn mutated it. Default implementation will rely on keg serialization functions. dataRestoreFn will only
      * get called if version of the keg didn't change after save failed. This will make sure we won't overwrite
      * freshly received data from server.
-     * @param {string} [errorLocaleKey] - optional error to show in snackbar
-     * @returns {Promise}
+     * @param errorLocaleKey - optional error to show in snackbar
      */
-    save(dataChangeFn, dataRestoreFn, errorLocaleKey) {
+    save(dataChangeFn: () => boolean, dataRestoreFn?: () => void, errorLocaleKey?: string) {
         return new Promise((resolve, reject) => {
             this._syncQueue.addTask(
                 () => {
@@ -135,7 +133,6 @@ class SyncedKeg<TPayload, TProps> extends Keg<TPayload, TProps> {
 
     /**
      * Override to perform actions after keg data has been updated from server.
-     * @abstract
      */
     onUpdated() {
         // abstract function
@@ -143,7 +140,6 @@ class SyncedKeg<TPayload, TProps> extends Keg<TPayload, TProps> {
 
     /**
      * Override to perform actions after keg data has been saved.
-     * @abstract
      */
     onSaved() {
         // abstract function
@@ -151,10 +147,8 @@ class SyncedKeg<TPayload, TProps> extends Keg<TPayload, TProps> {
 
     /**
      * Override if required. Default implementation generates medium warning if locale key is provided.
-     * @param {string} [localeKey]
-     * @abstract
      */
-    onSaveError(localeKey) {
+    onSaveError(localeKey?: string) {
         if (!localeKey) return;
         warnings.add(localeKey);
     }

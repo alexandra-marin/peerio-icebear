@@ -18,6 +18,7 @@ import FileStoreBulk from './file-store.bulk';
 import util from '../../util';
 import { asPromise } from '../../helpers/prombservable';
 import _ from 'lodash';
+import FileFolder from '~/models/files/file-folder';
 
 export class FileStore extends FileStoreBase {
     constructor() {
@@ -332,10 +333,8 @@ export class FileStore extends FileStoreBase {
 
     /**
      * Returns file shared in specific chat. Loads it if needed.
-     * @param {string} fileId
-     * @param {string} kegDbId
      */
-    getByIdInChat(fileId, kegDbId) {
+    getByIdInChat(fileId: string, kegDbId: string) {
         const fileMap = this.chatFileMap.get(kegDbId);
         if (!fileMap) {
             return this.loadChatFile(fileId, kegDbId);
@@ -347,7 +346,7 @@ export class FileStore extends FileStoreBase {
         return file;
     }
 
-    async loadKegByFileId(fileId) {
+    async loadKegByFileId(fileId: string) {
         try {
             const file = new File(this.kegDb, this);
             file.fileId = fileId;
@@ -379,7 +378,7 @@ export class FileStore extends FileStoreBase {
         }
     }
 
-    setChatFile(kegDbId, file) {
+    setChatFile(kegDbId: string, file: File) {
         let fileMap = this.chatFileMap.get(kegDbId);
         if (!fileMap) {
             fileMap = observable.map();
@@ -393,7 +392,7 @@ export class FileStore extends FileStoreBase {
     }
 
     // TODO: i think this will do parallel loading with chat.file-handler of newly shared files
-    loadChatFile(fileId, kegDbId) {
+    loadChatFile(fileId: string, kegDbId: string) {
         const chat = getChatStore().chatMap[kegDbId];
         if (!chat) {
             const file = new File();
@@ -469,9 +468,9 @@ export class FileStore extends FileStoreBase {
      *           files: ['path', ...],
      *           folders: [same object recursively]
      *        }} tree - folder tree info
-     * @param {FileFolder} folder - existing folder to attach uploading folder to
+     * @param folder - existing folder to attach uploading folder to
      */
-    async uploadFolder(tree, folder) {
+    async uploadFolder(tree, folder: FileFolder) {
         const uploadOneLevel = (folders, parent) => {
             // we received a list of folder and we iterate them
             Promise.map(folders, f => {
@@ -490,11 +489,11 @@ export class FileStore extends FileStoreBase {
 
     /**
      * Start new file upload and get the file keg for it.
-     * @param {string} filePath - full path with name
-     * @param {string} [fileName] - if u want to override name in filePath
-     * @param {FileFolder} [folder] - where to put the file
+     * @param filePath - full path with name
+     * @param fileName - if u want to override name in filePath
+     * @param folder - where to put the file
      */
-    upload = (filePath, fileName, folder) => {
+    upload = (filePath: string, fileName?: string, folder?: FileFolder) => {
         const keg = new File(User.current.kegDb, this);
         keg.generateFileId();
         // if user uploads to main store folder - we place the file there

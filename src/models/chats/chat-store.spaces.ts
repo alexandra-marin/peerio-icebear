@@ -84,9 +84,6 @@ class ChatStoreSpaces {
         return space;
     };
 
-    /**
-     * @returns {Chat}
-     */
     createRoomInSpace = async (space, roomName, roomType, participants) => {
         space.nameInSpace = roomName;
         space.spaceRoomType = roomType;

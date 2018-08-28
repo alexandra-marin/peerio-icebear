@@ -2,11 +2,11 @@ import util from '../crypto/util';
 
 /**
  * Passphrase dictionary module.
- * @param {string} locale - locale code for dict
- * @param {string} dictString - '\n' separated word list
+ * @param locale - locale code for dict
+ * @param dictString - '\n' separated word list
  */
 class PhraseDictionary {
-    constructor(locale, dictString) {
+    constructor(locale: string, dictString: string) {
         this.locale = locale;
         this._buildDict(dictString);
     }
@@ -16,16 +16,16 @@ class PhraseDictionary {
 
     /**
      * Returns a random passphrase of chosen word length
-     * @param {number} length - passphrase word count
+     * @param length - passphrase word count
      */
-    getPassphrase(length) {
+    getPassphrase(length: number) {
         if (!this.dict) throw new Error('no dictionary available');
         let ret = '';
         for (let i = 0; i < length; i++) {
             ret += this.dict[util.getRandomNumber(0, this.dict.length)];
             ret += ' ';
         }
-        return ret.trim(' ');
+        return ret.trim();
     }
 
     /**

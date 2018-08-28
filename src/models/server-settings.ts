@@ -2,7 +2,6 @@
  * Some client configuration details can't be hardcoded to clients or stored in every user database.
  * This module takes care of these settings by loading them from server every time client connects.
  * There's no need for 'updated' events from server because when these settings change server always resets connection.
- * @namespace ServerSettings
  */
 import socket from '../network/socket';
 import { observable, reaction } from 'mobx';

@@ -1,5 +1,6 @@
 import SyncedKeg from '../kegs/synced-keg';
 import { getUser } from '../../helpers/di-current-user';
+import Contact from '~/models/contacts/contact';
 
 /**
  * User's favorite contacts. Named plaintext synced keg.
@@ -21,20 +22,18 @@ class MyContacts extends SyncedKeg {
     }
 
     /**
-     * @param {Contact} contact
-     * @returns {boolean} - true if contact was added, false if contact was already in the list.
+     * @returns true - if contact was added, false - if contact was already in the list.
      */
-    addContact(contact) {
+    addContact(contact: Contact) {
         if (this.contacts[contact.username]) return false;
         this.contacts[contact.username] = { addedAt: Date.now() };
         return true;
     }
 
     /**
-     * @param {Contact} contact
-     * @returns {boolean} - true if contact was removed, false if contact was not in the list.
+     * @returns true - if contact was removed, false - if contact was not in the list.
      */
-    removeContact(contact) {
+    removeContact(contact: Contact) {
         if (!this.contacts[contact.username]) return false;
         delete this.contacts[contact.username];
         return true;

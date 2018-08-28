@@ -13,9 +13,9 @@ import config from '../../config';
 import MRUList from '../../helpers/mru-list';
 import warnings from '../warnings';
 import clientApp from '../client-app';
+import { Address, KeyPair } from '~/defs/interfaces';
 
-/** @type {User} */
-let currentUser;
+let currentUser: User;
 
 /**
  * Class represents application user, you have to create and instance and assign it to `User.current`
@@ -39,10 +39,7 @@ export default class User {
     }
 
     kegDb: KegDb;
-    _username = '';
-    /**
-     * @type {string}
-     */
+    _username: string = '';
     get username() {
         return this._username;
     }
@@ -51,72 +48,39 @@ export default class User {
         this._username = typeof v === 'string' ? v.trim().toLowerCase() : '';
     }
     // -- profile data
-    /**
-     * @type {string}
-     */
     @observable firstName = '';
-    /**
-     * @type {string}
-     */
     @observable lastName = '';
-    /**
-     * @type {string}
-     */
     @observable email = '';
-    /**
-     * @type {string}
-     */
     @observable locale = 'en';
     /**
      * Currently unused, maybe we will bring passcodes back eventually
-     * @type {boolean}
      */
     @observable passcodeIsSet = false;
     /**
      * Quota object as received from server, it has complex and weird format.
      * You don't need to use this directly, use computed properties that are based on this.
-     * @type {Object}
      */
     @observable quota = null;
     /**
      * Sets to `true` when profile is loaded for the first time and is not empty anymore.
-     * @type {boolean}
      */
     @observable profileLoaded = false;
-    /**
-     * @type {Array<Address>}
-     */
-    @observable.ref addresses = [];
-    /**
-     * @type {boolean}
-     */
+    @observable.ref addresses: Address[] = [];
     @observable primaryAddressConfirmed = false;
-    /**
-     * @type {boolean}
-     */
     @observable deleted = false;
-    /**
-     * @type {boolean}
-     */
     @observable blacklisted = false;
     /**
      * Don't try to upload another avatar while this is `true`
-     * @type {boolean}
      */
     @observable savingAvatar = false;
     /**
      * UI-controlled flag, Icebear doesn't use it
-     * @type {boolean}
      */
     @observable autologinEnabled = false;
     /**
      * UI-controlled flag, Icebear doesn't use it
-     * @type {boolean}
      */
     @observable secureWithTouchID = false;
-    /**
-     * @type {string}
-     */
     props = {};
 
     @computed
@@ -127,20 +91,17 @@ export default class User {
 
     /**
      * Indicates 2fa state on current user.
-     * @type {boolean}
      */
     @observable twoFAEnabled = false;
 
     /**
      * Indicates device trust if 2fa is enabled.
      *
-     * @type {boolean|undefined}
      */
-    @observable trustedDevice = undefined;
+    @observable trustedDevice: boolean;
 
     /**
      * Computed `firstName+' '+lastName`
-     * @type {string}
      */
     @computed
     get fullName() {
@@ -154,58 +115,37 @@ export default class User {
     }
     /**
      * Account creation timestamp. Is null until `profileLoaded != true`.
-     * @type {number}
      */
-    createdAt = null;
+    createdAt: number = null;
     // -- key data
-    /**
-     * @type {string}
-     */
-    passphrase;
-    /**
-     * @type {Uint8Array}
-     */
-    authSalt;
+    passphrase: string;
+    authSalt: Uint8Array;
     /**
      * Key for SELF database boot keg.
-     * @type {Uint8Array}
      */
-    bootKey;
-    /**
-     * @type {KeyPair}
-     */
-    authKeys;
-    /**
-     * @type {KeyPair}
-     */
-    signKeys;
-    /**
-     * @type {KeyPair}
-     */
-    encryptionKeys;
+    bootKey: Uint8Array;
+    authKeys: KeyPair;
+    signKeys: KeyPair;
+    encryptionKeys: KeyPair;
     /**
      * Key for SELF keg database.
-     * @type {Uint8Array}
      */
-    kegKey;
+    kegKey: Uint8Array;
     /**
      * Automatically managed by authentication code.
      * Session id is generated and expired by server.
-     * @type {string}
      * */
-    sessionId;
+    sessionId: string;
     // -- flags
     _firstLoginInSession = true;
 
     /**
      * Most recently used emoji.
-     * @type {MRUList}
      */
     emojiMRU = new MRUList('emojiPicker', 30);
 
     /**
      * All current active plan names
-     * @type {Array<string>}
      */
     @computed
     get activePlans() {
@@ -218,7 +158,6 @@ export default class User {
 
     /**
      * Total amounts of bytes user can upload.
-     * @type {number}
      */
     @computed
     get fileQuotaTotal() {
@@ -241,7 +180,6 @@ export default class User {
 
     /**
      * Formatted total amounts of bytes user can upload.
-     * @type {string}
      */
     @computed
     get fileQuotaTotalFmt() {
@@ -250,7 +188,6 @@ export default class User {
 
     /**
      * Free bytes left for uploads.
-     * @type {number}
      */
     @computed
     get fileQuotaLeft() {
@@ -272,7 +209,6 @@ export default class User {
 
     /**
      * Formatted bytes left for uploads.
-     * @type {string}
      */
     @computed
     get fileQuotaLeftFmt() {
@@ -281,7 +217,6 @@ export default class User {
 
     /**
      * Maximum file size user can upload.
-     * @type {number}
      */
     @computed
     get fileSizeLimit() {
@@ -303,7 +238,6 @@ export default class User {
 
     /**
      * Formatted maximum file size user can upload.
-     * @type {number}
      */
     @computed
     get fileSizeLimitFmt() {
@@ -312,7 +246,6 @@ export default class User {
 
     /**
      * Used bytes in storage.
-     * @type {number}
      */
     @computed
     get fileQuotaUsed() {
@@ -321,7 +254,6 @@ export default class User {
 
     /**
      * Formatted used bytes in storage.
-     * @type {number}
      */
     @computed
     get fileQuotaUsedFmt() {
@@ -330,7 +262,6 @@ export default class User {
 
     /**
      * Amount of % used bytes in storage.
-     * @type {number}
      */
     @computed
     get fileQuotaUsedPercent() {
@@ -341,7 +272,6 @@ export default class User {
 
     /**
      * Maximum number of channels user can have
-     * @type {number}
      */
     @computed
     get channelLimit() {
@@ -364,7 +294,6 @@ export default class User {
 
     /**
      * Available channel slots left.
-     * @type {number}
      */
     @computed
     get channelsLeft() {
@@ -387,10 +316,10 @@ export default class User {
 
     /**
      * Adjust file size for overhead
-     * @param {number} size - amount of bytes user wants to upload
-     * @returns {number} file size including overhead
+     * @param size - amount of bytes user wants to upload
+     * @returns file size including overhead
      */
-    _adjustedOverheadFileSize(size) {
+    _adjustedOverheadFileSize(size: number) {
         const chunkSize = config.upload.getChunkSize(size);
         const chunkCount = Math.ceil(size / chunkSize);
         return size + chunkCount * config.CHUNK_OVERHEAD;
@@ -398,7 +327,6 @@ export default class User {
 
     /**
      * Maximum amount of people invited which give you bonus
-     * @type {number}
      */
     @computed
     get maxInvitedPeopleBonus() {
@@ -408,7 +336,6 @@ export default class User {
 
     /**
      * Maximum amount of people invited which give you bonus
-     * @type {number}
      */
     @computed
     get currentInvitedPeopleBonus() {
@@ -423,7 +350,6 @@ export default class User {
 
     /**
      * Maximum bonus user can achieve if they complete all tasks
-     * @type {number}
      */
     @computed
     get maximumOnboardingBonus() {
@@ -448,7 +374,6 @@ export default class User {
 
     /**
      * Maximum bonus user can achieve if they complete all tasks
-     * @type {number}
      */
     @computed
     get currentOnboardingBonus() {
@@ -479,20 +404,20 @@ export default class User {
 
     /**
      * Checks if there's enough storage to upload a file.
-     * @param {number} size - amount of bytes user wants to upload.
-     * @returns {boolean} is there enough storage left to upload.
+     * @param size - amount of bytes user wants to upload.
+     * @returns is there enough storage left to upload.
      */
-    canUploadFileSize = size => {
+    canUploadFileSize = (size: number) => {
         return this.fileQuotaLeft >= this._adjustedOverheadFileSize(size);
     };
 
     /**
      * Checks if the file size is not too big for the current plan
      * e.g. Basic - 500 Mb limit, Premium - 2 Gb. Pro - unlimited.
-     * @param {number} size - amount of bytes user wants to upload.
-     * @returns {boolean} is file size acceptable for current plan
+     * @param size - amount of bytes user wants to upload.
+     * @returns is file size acceptable for current plan
      */
-    canUploadMaxFileSize = size => {
+    canUploadMaxFileSize = (size: number) => {
         const realSize = this._adjustedOverheadFileSize(size);
         return realSize <= this.fileSizeLimit;
     };
@@ -556,7 +481,6 @@ export default class User {
     /**
      * Full registration process.
      * Initial login after registration differs a little.
-     * @returns {Promise}
      */
     createAccountAndLogin = () => {
         console.log('Starting account registration sequence.');
@@ -586,7 +510,6 @@ export default class User {
 
     /**
      * Authenticates connection and makes necessary initial requests.
-     * @returns {Promise}
      */
     login = () => {
         console.log('Starting login sequence');
@@ -648,7 +571,6 @@ export default class User {
 
     /**
      * Currently authenticated user.
-     * @type {User}
      */
     static get current() {
         return currentUser;
@@ -661,15 +583,17 @@ export default class User {
 
     /**
      * Gets the last authenticated user.
-     * @returns {Promise<?{username:string,firstName:string,lastName:string}>}
      */
-    static getLastAuthenticated() {
+    static getLastAuthenticated(): Promise<{
+        username: string;
+        firstName: string;
+        lastName: string;
+    } | null> {
         return TinyDb.system.getValue(`last_user_authenticated`);
     }
 
     /**
      * Saves the data of the last authenticated user.
-     * @returns {Promise}
      */
     setAsLastAuthenticated() {
         return TinyDb.system.setValue(`last_user_authenticated`, {
@@ -681,7 +605,6 @@ export default class User {
 
     /**
      * Removes last authenticated user information.
-     * @returns {Promise}
      */
     static removeLastAuthenticated() {
         return TinyDb.system.removeValue(`last_user_authenticated`);
@@ -694,10 +617,8 @@ export default class User {
 
     /**
      * Computes or gets from cache shared encryption key for a public key.
-     * @param {Uint8Array} theirPublicKey
-     * @return {Uint8Array}
      */
-    getSharedKey(theirPublicKey) {
+    getSharedKey(theirPublicKey: Uint8Array) {
         if (!(theirPublicKey instanceof Uint8Array)) throw new Error('Invalid argument type');
         const cacheKey = theirPublicKey.join(',');
         let cachedValue = this._sharedKeyCache[cacheKey];

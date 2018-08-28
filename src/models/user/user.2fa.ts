@@ -8,9 +8,9 @@ import { cryptoUtil } from '../../crypto/index';
 export default function mixUser2faModule() {
     /**
      * Starts 2fa setup challenge.
-     * @returns {Promise<string>} - TOTP secret
+     * @returns TOTP secret
      */
-    this.setup2fa = () => {
+    this.setup2fa = (): Promise<string> => {
         console.log('Starting 2fa setup.');
         if (this.twoFAEnabled)
             return Promise.reject(new Error('2fa already enabled on this account.'));
@@ -21,11 +21,9 @@ export default function mixUser2faModule() {
 
     /**
      * Finishes 2fa setup challenge
-     * @param {string} code
-     * @param {boolean} trust - wether or not to trust this device and minimize 2fa requests on login
-     * @returns {Promise<Array<string>>} backup codes
+     * @param trust - wether or not to trust this device and minimize 2fa requests on login
      */
-    this.confirm2faSetup = (code, trust = false) => {
+    this.confirm2faSetup = (code: string, trust = false): Promise<string[]> => {
         // eslint-disable-next-line no-param-reassign
         code = sanitizeCode(code);
         console.log('Confirming 2fa setup.');
@@ -46,7 +44,6 @@ export default function mixUser2faModule() {
 
     /**
      * Disables 2fa on current account.
-     * @returns {Promise}
      */
     this.disable2fa = () => {
         return verifyProtectedAction('disable')
@@ -62,7 +59,6 @@ export default function mixUser2faModule() {
 
     /**
      * Requests new set of 2fa backup codes invalidating previous ones..
-     * @returns {Promise}
      */
     this.reissueBackupCodes = () => {
         return verifyProtectedAction('backupCodes')
@@ -76,25 +72,21 @@ export default function mixUser2faModule() {
 
     /**
      * Stores 2fa cookie and device trust in system database.
-     * @param {{cookie, trusted}} data
-     * @returns {Promise<void>}
      */
-    this._set2faCookieData = data => {
+    this._set2faCookieData = (data: { cookie: string; trusted: boolean }) => {
         return TinyDb.system.setValue(`${this.username}:twoFACookie`, data);
     };
 
     /**
      * Retrieves 2fa cookie and device trust from system database.
      * If there's no cookie, returns a promise resolving to undefined.
-     * @returns {Promise<{cookie, trusted}|undefined>}
      */
-    this._get2faCookieData = () => {
+    this._get2faCookieData = (): Promise<{ cookie: string; trusted: boolean } | undefined> => {
         return TinyDb.system.getValue(`${this.username}:twoFACookie`);
     };
 
     /**
      * Deletes 2fa cookie from the system database.
-     * @returns {Promise<void>}
      */
     this._delete2faCookieData = () => {
         return TinyDb.system.removeValue(`${this.username}:twoFACookie`);
@@ -103,9 +95,8 @@ export default function mixUser2faModule() {
     /**
      * Returns deviceId from system database.
      * If there's no deviceId stored, it generates a new one, stores it, and returns.
-     * @returns {Promise<string>}
      */
-    this._getDeviceId = () => {
+    this._getDeviceId = (): Promise<string> => {
         const key = `${this.username}:deviceId`;
         return TinyDb.system.getValue(key).then(deviceId => {
             // Found it.

@@ -44,13 +44,17 @@ import IKegDb from '../../defs/IKegDb';
  * - 3.3 load failed: retry is triggered
  * , 'Unique retry id')
  * ```
- * At least one of 2 parameters should be passed
- * @param {string} [id] - or specific id for shared databases
- * @param {Array<Contact>} [participants] - participants list, EXCLUDING own username
- * @param {bool} [isChannel=false] - does this db belong to a DM or Channel
+ * @param id - specific id for shared databases
+ * @param participants - participants list, EXCLUDING own username
+ * @param isChannel - does this db belong to a DM or Channel
  */
 abstract class SharedKegDb implements IKegDb {
-    constructor(id, participants = [], isChannel = false, onBootKegLoadedFromKeg) {
+    constructor(
+        id?: string,
+        participants: Contact[] = [],
+        isChannel = false,
+        onBootKegLoadedFromKeg?: () => {}
+    ) {
         this.id = id;
         this.onBootKegLoadedFromKeg = onBootKegLoadedFromKeg;
         const usernames = uniq(participants.map(p => p.username));
@@ -139,7 +143,6 @@ abstract class SharedKegDb implements IKegDb {
     /**
      * Performs initial load of the keg database data based on id or participants list.
      * Will create kegDb and boot keg if needed.
-     * @returns {Promise}
      */
     loadMeta(cachedMeta, cachedBootKeg) {
         return retryUntilSuccess(() => {

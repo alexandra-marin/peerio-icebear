@@ -33,7 +33,6 @@ import Contact from '../contacts/contact';
 
 /**
  * Chat store.
- * @namespace
  */
 export class ChatStore {
     constructor() {
@@ -281,10 +280,10 @@ export class ChatStore {
 
     /**
      * Adds chat to the list.
-     * @param {string | Chat} chat - chat id or Chat instance
+     * @param chat - chat id or Chat instance
      */
     @action.bound
-    addChat(chat, noActivate) {
+    addChat(chat: string | Chat, noActivate = false) {
         if (!chat) throw new Error(`Invalid chat id. ${chat}`);
         let c;
         if (typeof chat === 'string') {
@@ -356,7 +355,6 @@ export class ChatStore {
      * - see if digest contains some new chats that are not hidden
      *
      * ORDER OF THE STEPS IS IMPORTANT ON MANY LEVELS
-     * @returns {Promise}
      */
     @action
     async loadAllChats() {
@@ -425,10 +423,8 @@ export class ChatStore {
     /**
      * When starting new chat for a list of participants we need a way to check if it already is loaded without knowing
      * the chatId.
-     * @param {Array<Contact>} participants
-     * @returns {?Chat} if found
      */
-    findCachedChatWithParticipants(participants) {
+    findCachedChatWithParticipants(participants: Contact[]): Chat | null {
         // validating participants
         if (!participants || !participants.length) {
             throw new Error('Can not start chat with no participants');
@@ -478,15 +474,19 @@ export class ChatStore {
 
     /**
      * Starts new chat or loads existing one and
-     * @param {Array<Contact>=} participants
-     * @param {boolean=} isChannel
-     * @param {string=} name
-     * @param {string=} purpose - only for channels, not relevant for DMs
-     * @param {object=} space - only to create a space
-     * @returns {?Chat} - can return null in case of paywall
+     * @param purpose - only for channels, not relevant for DMs
+     * @param space - only to create a space
+     * @returns  - can return null in case of paywall
      */
     @action
-    async startChat(participants = [], isChannel = false, name, purpose, noActivate, space = null) {
+    async startChat(
+        participants: Contact[] = [],
+        isChannel = false,
+        name: string,
+        purpose: string,
+        noActivate = false,
+        space = null
+    ): Promise<Chat | null> {
         const cached = isChannel ? null : this.findCachedChatWithParticipants(participants);
         if (cached) {
             if (!noActivate) this.activate(cached.id);
@@ -530,10 +530,10 @@ export class ChatStore {
 
     /**
      * Activates the chat.
-     * @param {string} id - chat id
+     * @param id - chat id
      */
     @action
-    activate(id) {
+    activate(id: string) {
         const chat = this.chatMap[id];
         if (!chat) return;
         TinyDb.user.setValue('lastUsedChat', id);
@@ -556,12 +556,9 @@ export class ChatStore {
 
     /**
      * Can be used from file view.
-     * @param {Array<Contact>} participants
-     * @param {File|Array<File>} fileOrFiles
-     * @returns {Promise}
      */
     @action
-    async startChatAndShareFiles(participants, fileOrFiles) {
+    async startChatAndShareFiles(participants: Contact[], fileOrFiles: File | File[]) {
         const files =
             Array.isArray(fileOrFiles) || isObservableArray(fileOrFiles)
                 ? fileOrFiles
@@ -584,10 +581,9 @@ export class ChatStore {
 
     /**
      * Removes chat from working set.
-     * @param {Chat} chat
      */
     @action.bound
-    unloadChat(chat) {
+    unloadChat(chat: Chat) {
         if (typeof chat === 'string') {
             chat = this.chatMap[chat]; // eslint-disable-line no-param-reassign
             if (!chat) return;
@@ -604,10 +600,9 @@ export class ChatStore {
 
     /**
      * Returns a promise that resolves with chat instance once that chat is added to chat store and loaded.
-     * @param {string} id - chat id
-     * @returns {Promise<Chat>}
+     * @param id - chat id
      */
-    getChatWhenReady(id) {
+    getChatWhenReady(id: string): Promise<Chat> {
         return new Promise(resolve => {
             when(
                 () => {

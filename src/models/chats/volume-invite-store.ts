@@ -47,10 +47,9 @@ class VolumeInviteStore {
 
     /**
      * Activate invite by id
-     * @param {string} kegDbId
      */
     @action.bound
-    activateInvite(kegDbId) {
+    activateInvite(kegDbId: string) {
         const invite = this.received.find(obj => {
             return obj.kegDbId === kegDbId;
         });

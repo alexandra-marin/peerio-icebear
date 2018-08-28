@@ -18,7 +18,6 @@ class ReceivedInvite {
 
 /**
  * Chat invites store. Contains lists of incoming and outgoing invites and operations on them.
- * @namespace
  */
 class ChatInviteStore {
     constructor() {
@@ -204,10 +203,9 @@ class ChatInviteStore {
     }
 
     /**
-     * @param {Object} data - invite objects
-     * @returns {Promise<ChatHead>}
+     * @param data - invite objects
      */
-    async getChatHead(data) {
+    async getChatHead(data):Promise<ChatHead> {
         try {
             const { bootKeg, chatHeadKeg } = data;
             bootKeg.payload = JSON.parse(bootKeg.payload);
@@ -256,8 +254,6 @@ class ChatInviteStore {
             });
     };
 
-    /**
-     */
     afterUpdate() {
         this.initialInvitesProcessed = true;
         this.updating = false;
@@ -265,10 +261,7 @@ class ChatInviteStore {
         setTimeout(this.update);
     }
 
-    /**
-     * @param {string} kegDbId
-     */
-    acceptInvite(kegDbId) {
+    acceptInvite(kegDbId:string) {
         if (getUser().channelsLeft === 0) {
             warnings.add('error_acceptChannelInvite');
             return Promise.reject(new Error('Channel limit reached'));
@@ -298,10 +291,7 @@ class ChatInviteStore {
             });
     }
 
-    /**
-     * @param {string} kegDbId
-     */
-    rejectInvite(kegDbId) {
+    rejectInvite(kegDbId:string) {
         const invite = this.received.find(i => i.kegDbId === kegDbId);
         if (!invite) {
             return Promise.reject(
@@ -318,11 +308,7 @@ class ChatInviteStore {
         );
     }
 
-    /**
-     * @param {string} kegDbId
-     * @param {string} username
-     */
-    revokeInvite(kegDbId, username, noWarning = false) {
+    revokeInvite(kegDbId:string, username:string, noWarning = false) {
         return getChatStore()
             .getChatWhenReady(kegDbId)
             .then(chat => {

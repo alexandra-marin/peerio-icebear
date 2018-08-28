@@ -14,6 +14,9 @@ import { retryUntilSuccess } from '../../helpers/retry';
 import clientApp from '../client-app';
 import { asPromise } from '../../helpers/prombservable';
 import TaskQueue from '../../helpers/task-queue';
+import FileStoreBase from '~/models/files/file-store-base';
+import KegDb from '~/models/kegs/keg-db';
+import Chat from '~/models/chats/chat';
 
 const signDetached = sign.signDetached;
 // every unique file (fileId) has a set of properties we want to be shared between all the file kegs
@@ -124,11 +127,9 @@ const fileDataMap = new Map();
 
 /**
  * File keg and model.
- * @param {KegDb} db
- * @extends {Keg}
  */
 class File extends Keg {
-    constructor(db, store) {
+    constructor(db: KegDb, store: FileStoreBase) {
         super(null, 'file', db);
         this.store = store;
         this.format = 1;
@@ -151,9 +152,8 @@ class File extends Keg {
 
     /**
      * System-wide unique client-generated id
-     * @type {string}
      */
-    @observable fileId;
+    @observable fileId: string;
 
     generateFileId() {
         if (this.fileId) return;
@@ -161,12 +161,10 @@ class File extends Keg {
     }
     /**
      * Folder id
-     * @type {string}
      */
-    @observable folderId = null;
+    @observable folderId: string = null;
     /**
      * Bytes
-     * @type {number}
      */
     get size() {
         return this.data.size;
@@ -175,7 +173,6 @@ class File extends Keg {
         this.data.size = val;
     }
     /**
-     * @type {number}
      */
     get uploadedAt() {
         return this.data.uploadedAt;
@@ -184,7 +181,6 @@ class File extends Keg {
         this.data.uploadedAt = val;
     }
     /**
-     * @type {number}
      */
     get updatedAt() {
         return this.data.updatedAt;
@@ -194,7 +190,6 @@ class File extends Keg {
     }
     /**
      * Username uploaded this file.
-     * @type {string}
      */
     get fileOwner() {
         return this.data.fileOwner;
@@ -217,7 +212,6 @@ class File extends Keg {
     /**
      * When this is 'true' file is ready to be downloaded. Upload finishes before that,
      * then server needs some time to process file.
-     * @type {boolean}
      */
     get readyForDownload() {
         return this.data.readyForDownload;
@@ -227,14 +221,8 @@ class File extends Keg {
         this.data.readyForDownload = val;
     }
 
-    /**
-     * @type {boolean}
-     */
     @observable uploading = false;
 
-    /**
-     * @type {boolean}
-     */
     get downloading() {
         return this.data.downloading;
     }
@@ -244,7 +232,6 @@ class File extends Keg {
     }
     /**
      * Upload or download progress value in bytes. Note that when uploading it doesn't count overhead.
-     * @type {number}
      */
     get progress() {
         return this.data.progress;
@@ -255,7 +242,6 @@ class File extends Keg {
     }
     /**
      * File size with overhead for downloads and without overhead for uploads.
-     * @type {number}
      */
     get progressMax() {
         return this.data.progressMax;
@@ -266,7 +252,6 @@ class File extends Keg {
 
     /**
      * currently mobile only: flag means file was downloaded and is available locally
-     * @type {boolean}
      */
     get cached() {
         return this.data.cached;
@@ -277,7 +262,6 @@ class File extends Keg {
 
     /**
      * file was downloaded for inline image display
-     * @type {boolean}
      */
     get tmpCached() {
         return this.data.tmpCached;
@@ -290,7 +274,6 @@ class File extends Keg {
      * File was uploaded in this session from this device
      * and we saved it's original upload path. Useful for preview
      * launch
-     * @type {String}
      */
     get originalUploadPath() {
         return this.data.originalUploadPath;
@@ -303,7 +286,6 @@ class File extends Keg {
      * We have some type of path available for our file
      * It was cached for inline image view, uploaded during this session
      * or downloaded manually by user
-     * @type {bool}
      */
     get hasFileAvailableForPreview() {
         return this.originalUploadPath || this.cached || this.tmpCached;
@@ -313,13 +295,11 @@ class File extends Keg {
      * Is this file selected in file pickers for group operations.
      * It's a bit weird mix of UI state and logic, but it works fine at the moment,
      * we'll rethink it when we implement folders.
-     * @type {boolean}
      */
     @observable selected = false;
 
     /**
      * Is this file currently shared with anyone.
-     * @type {boolean}
      */
     get shared() {
         return this.data.shared;
@@ -339,7 +319,6 @@ class File extends Keg {
 
     /**
      * Amount of visual components which display this file currently
-     * @type {number}
      */
     get visibleCounter() {
         return this.data.visibleCounter;
@@ -352,7 +331,6 @@ class File extends Keg {
     // -- computed properties ------------------------------------------------------------------------------------
     /**
      * file name
-     * @member {string} name
      */
     get name() {
         return this.data.name;
@@ -368,7 +346,6 @@ class File extends Keg {
 
     /**
      * file extension
-     * @type {string}
      */
     get ext() {
         return this.data.ext;
@@ -376,7 +353,6 @@ class File extends Keg {
 
     /**
      * file icon type
-     * @type {string}
      */
     get iconType() {
         return this.data.iconType;
@@ -386,7 +362,6 @@ class File extends Keg {
      * which folder is this file located in
      * default: undefined (folders have not been loaded)
      * null: file is in the root folder
-     * @type {FileFolder}
      */
     @computed
     get folder() {
@@ -425,36 +400,27 @@ class File extends Keg {
 
     /**
      * currently mobile only: Full path to locally stored file
-     * @type {string}
      */
     get cachePath() {
         return this.data.cachePath;
     }
     /**
      * Human readable file size
-     * @type {string}
      */
     get sizeFormatted() {
         return this.data.sizeFormatted;
     }
 
-    /**
-     * @type {number}
-     */
     get chunksCount() {
         return this.data.chunksCount;
     }
 
-    /**
-     * @type {boolean}
-     */
     @computed
     get canShare() {
         return this.format === 1;
     }
     /**
      * Bytes
-     * @type {number}
      */
     get sizeWithOverhead() {
         return this.size + this.chunksCount * config.CHUNK_OVERHEAD;
@@ -630,18 +596,17 @@ class File extends Keg {
 
     /**
      * Shares file with a chat (creates a copy of the keg)
-     * @param {Chat} any chat instance
-     * @returns {Promise}
+     * @param chat -  chat instance
      */
-    share(chat) {
+    share(chat: Chat) {
         return this.copyTo(chat.db, getFileStore());
     }
 
     /**
      * Open file with system's default file type handler app.
-     * @param {string} [path] - tries cachePath, tmpCachePath and originalUploadPath if path is not passed
+     * @param path - tries cachePath, tmpCachePath and originalUploadPath if path is not passed
      */
-    launchViewer(path) {
+    launchViewer(path?: string) {
         let filePath = null;
         // if inline image was saved for preview
         if (this.tmpCached) filePath = this.tmpCachePath;
@@ -661,7 +626,6 @@ class File extends Keg {
     }
     /**
      * Remove file from cloud and unshare with everyone.
-     * @returns {Promise}
      */
     remove() {
         this._resetUploadState();
@@ -679,10 +643,8 @@ class File extends Keg {
     /**
      * Safe to call any time after upload has been started (keg created).
      * Retries a few times in case of error.
-     * @param {string} newName
-     * @returns {Promise}
      */
-    rename(newName) {
+    rename(newName: string) {
         return retryUntilSuccess(
             () => {
                 this.name = newName;
@@ -741,9 +703,8 @@ class File extends Keg {
 
     /**
      * Copies this file keg to another db
-     * @param {KegDb} db
      */
-    copyTo(db, store, folderId) {
+    copyTo(db: KegDb, store: FileStoreBase, folderId?: string) {
         // TODO: ugly, refactor when chats get their own file stores
         const dstIsChat = db.id.startsWith('channel:') || db.id.startsWith('chat:');
         const dstIsSELF = db.id === 'SELF';

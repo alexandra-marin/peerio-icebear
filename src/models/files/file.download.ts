@@ -48,11 +48,15 @@ function downloadToTmpCache() {
 const tempExt = '.peeriodownload';
 /**
  * Starts download.
- * @param {string} filePath - where to store file (including name)
- * @param {boolean} [resume] - for system use
- * @returns {Promise}
+ * @param filePath - where to store file (including name)
+ * @param resume - for system use
  */
-function download(filePath, resume, isTmpCacheDownload, suppressSnackbar) {
+function download(
+    filePath: string,
+    resume = false,
+    isTmpCacheDownload = false,
+    suppressSnackbar = false
+) {
     // we need this check because resume process will pass temp file name
     if (!filePath.endsWith(tempExt)) {
         filePath = `${filePath}${tempExt}`; // eslint-disable-line no-param-reassign
@@ -139,7 +143,6 @@ function download(filePath, resume, isTmpCacheDownload, suppressSnackbar) {
 
 /**
  * Cancels download and removes impartially downloaded file.
- * @returns {Promise}
  */
 function cancelDownload() {
     this._saveDownloadEndFact();
@@ -148,7 +151,6 @@ function cancelDownload() {
 
 /**
  * Removes download cache if it exists
- * @returns {Promise}
  */
 function removeCache() {
     return Promise.resolve(

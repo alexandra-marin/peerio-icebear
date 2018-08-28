@@ -6,11 +6,9 @@ import { getContactStore } from '../../helpers/di-contact-store';
 /**
  * Pending DM helper class
  * Mocks properties of Chat object to be displayed correctly by UI in chat lists
- * @param {string} username - user name of a registered user
- * @param {Date} timestamp - used to sort DMs with pending
  */
 class ChatPendingDM extends Chat {
-    constructor(username, email, isReceived, isAutoImport) {
+    constructor(username: string, email: string, isReceived: boolean, isAutoImport: boolean) {
         super(`pending-dm:${username}`, [{ username }], getChatStore());
         this.username = username;
         this.email = email;

@@ -78,11 +78,7 @@ export default function mixUserProfileModule() {
         });
     };
 
-    /**
-     * @param {string} email
-     * @returns {Promise}
-     */
-    this.resendEmailConfirmation = function(email) {
+    this.resendEmailConfirmation = function(email: string) {
         return socket
             .send('/auth/address/resend-confirmation', {
                 address: {
@@ -99,11 +95,7 @@ export default function mixUserProfileModule() {
             });
     };
 
-    /**
-     * @param {string} email
-     * @returns {Promise}
-     */
-    this.removeEmail = function(email) {
+    this.removeEmail = function(email: string) {
         return socket
             .send('/auth/address/remove', {
                 address: {
@@ -117,11 +109,7 @@ export default function mixUserProfileModule() {
             });
     };
 
-    /**
-     * @param {string} email
-     * @returns {Promise}
-     */
-    this.addEmail = function(email) {
+    this.addEmail = function(email: string) {
         return validators.emailAvailability.action(email).then(available => {
             if (!available) {
                 warnings.addSevere('error_emailTaken', 'title_error');
@@ -144,11 +132,7 @@ export default function mixUserProfileModule() {
         });
     };
 
-    /**
-     * @param {string} email
-     * @returns {Promise}
-     */
-    this.makeEmailPrimary = function(email) {
+    this.makeEmailPrimary = function(email: string) {
         return socket
             .send('/auth/address/make-primary', {
                 address: {
@@ -174,11 +158,10 @@ export default function mixUserProfileModule() {
     };
 
     /**
-     * @param {Array<ArrayBuffer>} [blobs] - 2 elements, 0-large, 1-medium avatar. Omit parameter
+     *  blobs - 2 elements, 0-large, 1-medium avatar. Omit parameter
      * or pass null to delete avatar
-     * @returns {Promise}
      */
-    this.saveAvatar = function(blobs) {
+    this.saveAvatar = function(blobs?: Array<ArrayBuffer>) {
         if (this.savingAvatar)
             return Promise.reject(new Error('Already saving avatar, wait for it to finish.'));
 
@@ -204,16 +187,12 @@ export default function mixUserProfileModule() {
         });
     };
 
-    /**
-     * @returns {Promise}
-     */
     this.deleteAvatar = function() {
         return this.saveAvatar(null);
     };
 
     /**
      * Notify server that the account key is backed up, so server would give a storage bonus
-     * @returns {Promise}
      */
     this.setAccountKeyBackedUp = function() {
         return retryUntilSuccess(() => socket.send('/auth/account-key/backed-up'));

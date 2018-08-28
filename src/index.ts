@@ -37,8 +37,8 @@ import tofuStore from './models/contacts/tofu-store';
 import chatStore from './models/chats/chat-store';
 import fileStore from './models/files/file-store';
 import volumeStore from './models/volumes/volume-store';
-import ghostStore from './models/mail/ghost-store';
-import mailStore from './models/mail/mail-store';
+//import ghostStore from './models/mail/ghost-store';
+//import mailStore from './models/mail/mail-store';
 import validation from './helpers/validation/field-validation';
 import FileStreamAbstract from './models/files/file-stream-abstract';
 import FileNonceGenerator from './models/files/file-nonce-generator';
@@ -74,8 +74,8 @@ export default {
     chatInviteStore,
     fileStore,
     volumeStore,
-    ghostStore,
-    mailStore,
+    //ghostStore,
+    //mailStore,
     validation,
     FileStreamAbstract,
     FileNonceGenerator,

@@ -1,4 +1,12 @@
-import { observable, when, action, computed, intercept, isObservableArray } from 'mobx';
+import {
+    observable,
+    when,
+    action,
+    computed,
+    intercept,
+    isObservableArray,
+    IObservableArray
+} from 'mobx';
 import socket from '../../network/socket';
 import Contact from './contact';
 import { setContactStore } from '../../helpers/di-contact-store';
@@ -14,11 +22,11 @@ import tofuStore from './tofu-store';
 import { asPromise } from '../../helpers/prombservable';
 import { retryUntilSuccess } from '../../helpers/retry';
 import ContactStoreWhitelabel from './contact-store.whitelabel';
+import { InvitedContact } from '~/defs/interfaces';
 
 /**
  * Contact store handles all Peerio users you(your app) are in some contact with,
  * not just the ones you add to favorites explicitly.
- * @namespace
  */
 export class ContactStore {
     constructor() {
@@ -38,25 +46,21 @@ export class ContactStore {
 
     /**
      * All peerio users your app encounters end up here (except invited by email, they're non-peerio users).
-     * @type {ObservableArray<Contact>}
      */
-    @observable.shallow contacts = [];
+    @observable.shallow contacts = [] as IObservableArray<Contact>;
     /**
      * My contacts keg.
-     * @type {MyContacts}
      */
-    @observable.ref myContacts;
+    @observable.ref myContacts: MyContacts;
     /**
      * Invites keg.
-     * @type {MyContacts}
      */
-    invites;
+    invites: Invites;
     _requestMap = {};
     _cachedContacts = {}; // the ones that are not in this.contacts, but still valid and requested during session
 
     /**
      * Favorite Contacts.
-     * @type {ObservableArray<Contact>}
      */
     @computed
     get addedContacts() {
@@ -65,13 +69,11 @@ export class ContactStore {
 
     /**
      * Contacts pending to be added (invited manually or synced)
-     * @type {ObservableArray<InvitedContact>}
      */
-    @observable.shallow pendingContacts = [];
+    @observable.shallow pendingContacts = [] as IObservableArray<InvitedContact>;
 
     /**
      * Contacts pending to be added (invited manually or synced)
-     * @type {ObservableArray<InvitedContact>}
      */
     @computed
     get invitedContacts() {
@@ -85,33 +87,28 @@ export class ContactStore {
 
     /**
      * options: firstName, lastName, username
-     * @type {string}
      */
     @observable uiViewSortBy = 'firstName';
     /**
      * options: added, all
-     * @type {string}
      */
     @observable uiViewFilter = 'added';
     /**
      * Any string to search in user's names.
      * Set to `''` to clear search.
-     * @type {string}
      */
     @observable uiViewSearchQuery = '';
 
     /**
      * Contact object instance for current user
-     * @type {Contact}
      */
-    currentUser;
+    currentUser: Contact;
 
     EVENT_TYPES = {
         inviteAccepted: 'inviteAccepted'
     };
     /**
      * Events emitter.
-     * @type {EventEmitter}
      */
     events = new EventEmitter();
 
@@ -140,10 +137,9 @@ export class ContactStore {
 
     /**
      * Helper data view to simplify sorting and filtering.
-     * @type {Array<{letter:string, items:Array<Contact>}>}
      */
     @computed
-    get uiView() {
+    get uiView(): Array<{ letter: string; items: Array<Contact> }> {
         let ret;
         switch (this.uiViewFilter) {
             case 'all':
@@ -234,10 +230,10 @@ export class ContactStore {
 
     /**
      * Tries to add contact to favorites.
-     * @param {string|Contact} val - username, email or Contact
-     * @returns {Promise<bool>} - true: added, false: not found
+     * @param val - username, email or Contact
+     * @returns true: added, false: not found
      */
-    addContact(val) {
+    addContact(val: string | Contact): Promise<boolean> {
         const c = typeof val === 'string' ? this.getContactAndSave(val) : val;
         return new Promise((resolve, reject) => {
             when(
@@ -273,10 +269,8 @@ export class ContactStore {
     /**
      * Accepts array of preloaded contacts, and adds them to favorites.
      * WARNING: doesn't not wait for passed contacts to load.
-     * @param {Array<Contact>} contacts
-     * @returns {Promise}
      */
-    addContactBatch(contacts) {
+    addContactBatch(contacts: Contact[]) {
         return this.myContacts.save(
             () => {
                 contacts.forEach(c => this.myContacts.addContact(c));
@@ -288,10 +282,10 @@ export class ContactStore {
 
     /**
      * Looks up by email and adds contacts to favorites list.
-     * @param {Array<string>} emails
-     * @returns {{imported:Array<string>, notFound: Array<string>}}
      */
-    importContacts(emails) {
+    importContacts(
+        emails: string[]
+    ): Promise<{ imported: Array<string>; notFound: Array<string> }> {
         if (!Array.isArray(emails) && !isObservableArray(emails)) {
             return Promise.reject(
                 new Error(`importContact(emails) argument should be an Array<string>`)
@@ -337,9 +331,8 @@ export class ContactStore {
 
     /**
      * Removes contact from favorites.
-     * @param {string|Contact} usernameOrContact
      */
-    removeContact(usernameOrContact) {
+    removeContact(usernameOrContact: string | Contact) {
         const c =
             typeof usernameOrContact === 'string'
                 ? this.getContact(usernameOrContact)
@@ -365,10 +358,8 @@ export class ContactStore {
 
     /**
      * Removes invitation.
-     * @param {string} email
-     * @returns {Promise}
      */
-    removeInvite(email) {
+    removeInvite(email: string) {
         return retryUntilSuccess(
             () => socket.send('/auth/contacts/issued-invites/remove', { email }),
             Math.random(),
@@ -379,10 +370,8 @@ export class ContactStore {
     /**
      * Removes incoming invitation. This is useful for new users, logic automatically adds authors of received invites
      * to favorites and then removes received invites.
-     * @param {string} username
-     * @returns {Promise}
      */
-    removeReceivedInvite(username) {
+    removeReceivedInvite(username: string) {
         return retryUntilSuccess(
             () =>
                 socket.send('/auth/contacts/received-invites/remove', {
@@ -397,11 +386,8 @@ export class ContactStore {
      * Returns Contact object ether from cache or server.
      * It is important to be aware about `loading` state of contact, it is not guaranteed it will be loaded
      * after this function returns contact.
-     * @param {string} usernameOrEmail
-     * @param {Object} [prefetchedData]
-     * @returns {Contact}
      */
-    getContact(usernameOrEmail, prefetchedData?) {
+    getContact(usernameOrEmail: string, prefetchedData?): Contact {
         const existing =
             this._contactMap[usernameOrEmail] ||
             this._requestMap[usernameOrEmail] ||
@@ -427,9 +413,8 @@ export class ContactStore {
     /**
      * Searches for contact and saves its tofu,
      * effectively adding it to the contact list
-     * @param {string} username
      */
-    getContactAndSave(usernameOrEmail): Contact {
+    getContactAndSave(usernameOrEmail: string): Contact {
         let c = this.getContact(usernameOrEmail);
         when(
             () => !c.loading,
@@ -455,10 +440,8 @@ export class ContactStore {
 
     /**
      * Sends an invite
-     * @param {string} email
-     * @returns {Promise}
      */
-    invite(email, context, isAutoImport) {
+    invite(email: string, context: string, isAutoImport = false) {
         return this.inviteNoWarning(email, context, isAutoImport)
             .then(() => {
                 warnings.add('snackbar_contactInvited');
@@ -470,10 +453,8 @@ export class ContactStore {
 
     /**
      * Sends an invite
-     * @param {string} email
-     * @returns {Promise}
      */
-    inviteNoWarning(email, context, isAutoImport) {
+    inviteNoWarning(email: string, context: string, isAutoImport = false) {
         return socket.send('/auth/contacts/invite', {
             email,
             context,
@@ -501,11 +482,10 @@ export class ContactStore {
     }
     /**
      * Filters contacts by username and First Last name based on passed token
-     * @param {string} token - search query string
-     * @param {Array<Contact>} list - optional list to search in, by default it will search in contact store
-     * @returns {Array<Contact>}
+     * @param token - search query string
+     * @param list - optional list to search in, by default it will search in contact store
      */
-    filter(token, list, nosort = false) {
+    filter(token: string, list: Contact[], nosort = false) {
         // eslint-disable-next-line no-param-reassign
         token = token.toLocaleLowerCase();
         let removeUnavailable = false;

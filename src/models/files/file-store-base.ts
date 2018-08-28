@@ -146,23 +146,19 @@ class FileStoreBase {
     // #region functions and actions
     /**
      * Finds file in user's drive by fileId. Creates a mobx subscription.
-     * @param {string} fileId
-     * @returns {?File}
      */
-    getById(fileId) {
+    getById(fileId: string): File | null {
         return this.fileMapObservable.get(fileId);
     }
     /**
      * Finds file in user's drive by kegId. This is not used often, only to detect deleted descriptor and remove file
      * from memory, since deleted keg has no props to link it to the file.
-     * @param {string} kegId
-     * @returns {?File}
      */
-    getByKegId(kegId) {
+    getByKegId(kegId: string): File {
         return this.files.find(f => f.id === kegId);
     }
 
-    getFilesSharedBy(username) {
+    getFilesSharedBy(username: string) {
         return this.files.filter(f => f.owner === username);
     }
 

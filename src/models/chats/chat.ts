@@ -15,12 +15,14 @@ import warnings from '../warnings';
 import Contact from '../contacts/contact';
 import chatInviteStore from '../chats/chat-invite-store';
 import { asPromise } from '../../helpers/prombservable';
-import { cryptoUtil } from '../../crypto';
+import * as cryptoUtil from '../../crypto/util';
 import tracker from '../update-tracker';
 import { getFileStore } from '../../helpers/di-file-store';
 import { retryUntilSuccess } from '../../helpers/retry';
 import { getVolumeStore } from '../../helpers/di-volume-store';
 import FileFolder from '../files/file-folder';
+import { ChatStore } from '~/models/chats/chat-store';
+import Volume from '~/models/volumes/volume';
 
 // to assign when sending a message and don't have an id yet
 let temporaryChatId = 0;
@@ -34,13 +36,10 @@ const ACK_MSG = '👍';
 
 /**
  * at least one of two arguments should be set
- * @param {string} id - chat id
- * @param {Array<Contact>} participants - chat participants, will be used to create chat or find it by participant list
- * @param {?bool} isChannel
- * @param {ChatStore} store
+ * @param participants - chat participants, will be used to create chat or find it by participant list
  */
 class Chat {
-    constructor(id, participants = [], store, isChannel = false) {
+    constructor(id: string, participants: Contact[] = [], store: ChatStore, isChannel = false) {
         this.id = id;
         this.store = store;
         this.isChannel = isChannel;
@@ -70,6 +69,8 @@ class Chat {
             )
         );
     }
+
+    store: ChatStore;
 
     /**
      * Chat id
@@ -355,7 +356,6 @@ class Chat {
 
     /**
      * Don't render message marker if this is false.
-     * @type {boolean}
      */
     @computed
     get showNewMessagesMarker() {
@@ -372,7 +372,6 @@ class Chat {
 
     /**
      * True if current user is an admin of this chat.
-     * @type {boolean}
      */
     @computed
     get canIAdmin() {
@@ -385,7 +384,6 @@ class Chat {
 
     /**
      * True if current user can leave the channel. (Last admin usually can't)
-     * @type {boolean}
      */
     @computed
     get canILeave() {
@@ -394,28 +392,20 @@ class Chat {
         return this.db.boot.admins.length > 1;
     }
 
-    /**
-     * @type {?Message}
-     */
-    @observable mostRecentMessage;
+    @observable mostRecentMessage: Message;
 
     /**
      * UI flag for chats created from chat-pending-dms
      * Will be set to true if it was for user who just signed up
-     * @type {boolean}
      */
-    @observable isChatCreatedFromPendingDM;
+    @observable isChatCreatedFromPendingDM: boolean;
 
     /**
      * UI flag for chats where user is a new user who accepted an invite to join
      * Will be set to true in a DM with the user who invited this user
-     * @type {boolean}
      */
-    @observable isNewUserFromInvite;
+    @observable isNewUserFromInvite: boolean;
 
-    /**
-     * @returns {Promise}
-     */
     async loadMetadata() {
         if (this.metaLoaded) return null;
         if (this.loadingMeta) return asPromise(this, 'metaLoaded', true);
@@ -459,11 +449,11 @@ class Chat {
 
     /**
      * Adds messages to current message list.
-     * @param {Array<Object|Message>} kegs - list of messages to add
-     * @param {boolean} [prepend=false] - add message to top of bottom
+     * @param kegs - list of messages to add
+     * @param prepend - add message to top of bottom
      */
     @action
-    addMessages(kegs, prepend = false) {
+    addMessages(kegs: Array<{}>, prepend = false) {
         if (!kegs || !kegs.length) return Promise.resolve();
         return new Promise(resolve => {
             // we need this because we don't want to add messages one by one causing too many renders
@@ -494,11 +484,15 @@ class Chat {
 
     /**
      * Alert UI hooks of new messages/mentions.
-     * @param {number} freshBatchMentionCount -- # of new/freshly loaded messages
-     * @param {number} freshBatchMessageCount -- # of new/freshly loaded mentions
-     * @param {number} lastMentionId -- id of last mention message, if exists
+     * @param freshBatchMentionCount -- # of new/freshly loaded messages
+     * @param freshBatchMessageCount -- # of new/freshly loaded mentions
+     * @param lastMentionId -- id of last mention message, if exists
      */
-    onNewMessageLoad(freshBatchMentionCount, freshBatchMessageCount, lastMentionId) {
+    onNewMessageLoad(
+        freshBatchMentionCount: number,
+        freshBatchMessageCount: number,
+        lastMentionId: number
+    ) {
         // fresh batch could mean app/page load rather than unreads,
         // but we don't care about unread count if there aren't *new* unreads
         if (this.unreadCount && freshBatchMessageCount) {
@@ -625,11 +619,7 @@ class Chat {
         return -1;
     }
 
-    /**
-     * @param {Message} m
-     * @returns {Promise}
-     */
-    _sendMessage(m) {
+    _sendMessage(m: Message): Promise {
         if (this.canGoDown) this.reset();
         // send() will fill message with data required for rendering
         const promise = m.send();
@@ -654,12 +644,11 @@ class Chat {
     /**
      * Create a new Message keg attached to this chat with the given
      * plaintext (and optional files) and send it to the server.
-     * @param {string} text
-     * @param {Array<string>} [files] an array of file ids.
-     * @returns {Promise}
+     * @param files - an array of file ids to attach.
+     * @param folders - an array of folder ids to attach.
      */
     @action
-    sendMessage(text, files, folders) {
+    sendMessage(text: string, files?: string[], folders?: string[]) {
         const m = new Message(this.db);
         m.text = text;
         m.files = files;
@@ -670,13 +659,12 @@ class Chat {
     /**
      * Create a new Message keg attached to this chat with the given
      * plaintext (and optional files) and send it to the server.
-     * @param {Object} richText A ProseMirror document tree, as JSON
-     * @param {string} legacyText The rendered HTML of the rich text, for back-compat with older clients
-     * @param {Array<string>} [files] An array of file ids
-     * @returns {Promise}
+     * @param richText - A ProseMirror document tree, as JSON
+     * @param legacyText - The rendered HTML of the rich text, for back-compat with older clients
+     * @param files - An array of file ids
      */
     @action
-    sendRichTextMessage(richText, legacyText, files) {
+    sendRichTextMessage(richText: {}, legacyText: string, files?: string[]) {
         const m = new Message(this.db);
         m.files = files;
         m.richText = richText;
@@ -687,27 +675,22 @@ class Chat {
     /**
      * todo: this is temporary, for messages that failed to send.
      * When we have message delete - it should be unified process.
-     * @param {Message} message
      */
     @action
-    removeMessage(message) {
+    removeMessage(message: Message) {
         this.limboMessages.remove(message);
         this.messages.remove(message);
         delete this._messageMap[message.id];
     }
-    /**
-     * @returns {Promise}
-     */
+
     sendAck() {
         return this.sendMessage(ACK_MSG);
     }
 
     /**
      * Checks if this chat's participants are the same with ones that are passed
-     * @param participants
-     * @returns boolean
      */
-    hasSameParticipants(participants) {
+    hasSameParticipants(participants: Contact[]) {
         if (this.otherParticipants.length !== participants.length) return false;
 
         for (const p of participants) {
@@ -718,32 +701,23 @@ class Chat {
 
     /**
      * Note that file will not be shared if session ends, but it will be uploaded because of upload resume logic.
-     * @param {string} path
-     * @param {string} [name]
-     * @param {boolean} [deleteAfterUpload=false]
-     * @param {string} [message=null]
-     * @returns {Promise}
      */
-    uploadAndShareFile(path, name, deleteAfterUpload = false, message = null) {
+    uploadAndShareFile(path: string, name?: string, deleteAfterUpload = false, message?: string) {
         return this._fileHandler.uploadAndShare(path, name, deleteAfterUpload, message);
     }
 
-    /**
-     * @param {Array<File>} files
-     * @returns {Promise}
-     */
-    shareFiles(files) {
+    shareFiles(files: File[]) {
         return this._fileHandler.share(files);
     }
-    unshareFile(file) {
+    unshareFile(file: File) {
         return this._fileHandler.unshare(file);
     }
 
-    shareVolume(volume) {
+    shareVolume(volume: Volume) {
         this.sendMessage('', null, [volume.id]);
     }
 
-    async shareFilesAndFolders(filesAndFolders) {
+    async shareFilesAndFolders(filesAndFolders: Array<File | FileFolder>) {
         const files = filesAndFolders.filter(f => !f.isFolder);
         const folders = filesAndFolders.filter(f => f.isFolder && !f.isShared);
         const volumes = filesAndFolders.filter(f => f.isFolder && f.isShared);
@@ -765,16 +739,10 @@ class Chat {
         });
     }
 
-    /**
-     * @returns {Promise}
-     */
     loadMostRecentMessage() {
         return this._messageHandler.loadMostRecentMessage();
     }
 
-    /**
-     * @returns {Promise}
-     */
     async loadMessages() {
         if (!this.metaLoaded) await this.loadMetadata();
         this._messageHandler
@@ -782,24 +750,20 @@ class Chat {
             .then(() => this._messageHandler.onMessageDigestUpdate());
     }
 
-    /**
-     */
     loadPreviousPage() {
         if (!this.canGoUp) return;
         this._messageHandler.getPage(true);
     }
 
-    /**
-     */
     loadNextPage() {
         if (!this.canGoDown) return;
         this._messageHandler.getPage(false);
     }
 
     /**
-     * @param {string} name - pass empty string to remove chat name
+     * @param name - pass empty string to remove chat name
      */
-    rename(name) {
+    rename(name: string) {
         let validated = name || '';
         validated = validated.trim().substr(0, config.chat.maxChatNameLength);
         if (this.chatHead.chatName === validated || (!this.chatHead.chatName && !validated)) {
@@ -821,7 +785,7 @@ class Chat {
     }
 
     /**
-     * @param {string} name - name to appear for MC admin users
+     * @param name - name to appear for MC admin users
      */
     renameInSpace(name = '') {
         const validated = name.trim().substr(0, config.chat.maxChatNameLength);
@@ -839,9 +803,9 @@ class Chat {
     }
 
     /**
-     * @param {string} purpose - pass empty string to remove chat purpose
+     * @param purpose - pass empty string to remove chat purpose
      */
-    changePurpose(purpose) {
+    changePurpose(purpose: string) {
         let validated = purpose || '';
         validated = validated.trim().substr(0, config.chat.maxChatPurposeLength);
         if (this.chatHead.purpose === validated || (!this.chatHead.purpose && !validated)) {
@@ -863,7 +827,7 @@ class Chat {
     }
 
     /**
-     * @param {object} space - contains id, name, description, type
+     * @param space - contains id, name, description, type
      */
     setSpace(space) {
         const validated = space;
@@ -1003,7 +967,6 @@ class Chat {
 
     /**
      * Deletes the channel.
-     * @returns {Promise}
      */
     delete() {
         if (!this.isChannel) return Promise.reject(new Error('Can not delete DM chat.'));
@@ -1026,13 +989,12 @@ class Chat {
 
     /**
      * Adds participants to a channel.
-     * @param {Array<string|Contact>} participants - mix of usernames and Contact objects.
+     * @param participants - mix of usernames and Contact objects.
      *                                               Note that this function will ensure contacts are loaded
      *                                               before proceeding. So if there are some invalid
      *                                               contacts - entire batch will fail.
-     * @returns {Promise}
      */
-    addParticipants(participants) {
+    addParticipants(participants: Array<string | Contact>) {
         if (!participants || !participants.length) return Promise.resolve();
         if (!this.isChannel)
             return Promise.reject(new Error('Can not add participants to a DM chat'));
@@ -1064,10 +1026,8 @@ class Chat {
 
     /**
      * Assigns admin role to a contact.
-     * @param {Contact} contact
-     * @returns {Promise}
      */
-    promoteToAdmin(contact) {
+    promoteToAdmin(contact: Contact) {
         if (!this.otherParticipants.includes(contact)) {
             return Promise.reject(new Error('Attempt to promote user who is not a participant'));
         }
@@ -1095,10 +1055,8 @@ class Chat {
 
     /**
      * Unassigns admin role from a contact.
-     * @param {Contact} contact
-     * @returns {Promise}
      */
-    demoteAdmin(contact) {
+    demoteAdmin(contact: Contact) {
         if (!this.otherParticipants.includes(contact)) {
             return Promise.reject(new Error('Attempt to demote user who is not a participant'));
         }
@@ -1127,21 +1085,18 @@ class Chat {
 
     /**
      * Checks if a contact has admin rights to this chat.
-     * @param {Contact} contact
-     * @returns {boolean}
      */
-    isAdmin(contact) {
+    isAdmin(contact: Contact) {
         return this.db.admins.includes(contact);
     }
 
     /**
      * Removes participant from the channel.
-     * @param {string | Contact} participant
-     * @param {boolean} isUserKick - this function is called in case admin kicks the user and in case user left and
+     * @param participant
+     * @param isUserKick - this function is called in case admin kicks the user and in case user left and
      *                                admin needs to remove their keys. Method wants to know which case is it.
-     * @returns {Promise}
      */
-    removeParticipant(participant, isUserKick = true) {
+    removeParticipant(participant: string | Contact, isUserKick = true) {
         let contact = participant;
         if (typeof contact === 'string') {
             // we don't really care if it's loaded or not, we just need Contact instance

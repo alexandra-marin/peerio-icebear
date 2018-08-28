@@ -183,7 +183,6 @@ export default function mixUserAuthModule() {
      * Creates an object with key authentication data that can be used for login
      * with minimal time waste on key derivation.
      * You can use this to store auth data locally in keychain or protected with shorter password.
-     * @returns {string}
      */
     this.serializeAuthData = () => {
         const paddedPassphrase = cryptoUtil.padPassphrase(this.passphrase);
@@ -203,9 +202,8 @@ export default function mixUserAuthModule() {
     /**
      * Applies serialized auth data to user object. Just call `login()` after this and user will get authenticated
      * faster then when you just provide username and passphrase.
-     * @param {string} data
      */
-    this.deserializeAuthData = data => {
+    this.deserializeAuthData = (data: string) => {
         // console.log(data);
         const { username, authSalt, bootKey, authKeys } = data;
         this.username = username;
@@ -229,7 +227,6 @@ export default function mixUserAuthModule() {
 
     /**
      * Removes passcode for a user if it exists, and disables using passcodes.
-     * @returns {Promise}
      */
     this.disablePasscode = () => {
         return TinyDb.system.setValue(`${this.username}:passcode:disabled`, true).then(() => {
@@ -244,9 +241,8 @@ export default function mixUserAuthModule() {
 
     /**
      * Checks if user disabled passcode.
-     * @returns {Promise<boolean>}
      */
-    this.passcodeIsDisabled = () => {
+    this.passcodeIsDisabled = (): Promise<boolean> => {
         return TinyDb.system.getValue(`${this.username}:passcode:disabled`).catch(() => false);
     };
 
@@ -254,10 +250,8 @@ export default function mixUserAuthModule() {
      * Given a passcode and a populated User model, gets a passcode-encrypted
      * secret containing the username and passphrase as a JSON string and stores
      * it to the local db.
-     * @param {string} passcode
-     * @returns {Promise}
      */
-    this.setPasscode = passcode => {
+    this.setPasscode = (passcode: string) => {
         if (!this.username) return Promise.reject(new Error('Username is required to derive keys'));
         if (!this.passphrase)
             return Promise.reject(new Error('Passphrase is required to derive keys'));
@@ -289,10 +283,8 @@ export default function mixUserAuthModule() {
 
     /**
      * Validates passcode.
-     * @param {string} passcode
-     * @returns {Promise<boolean>}
      */
-    this.validatePasscode = passcode => {
+    this.validatePasscode = (passcode: string) => {
         // creating temporary user obj to do that without affecting current instance's state
         const u = new this.constructor();
         u.passphrase = passcode;
@@ -306,9 +298,8 @@ export default function mixUserAuthModule() {
 
     /**
      * Checks if user has a passcode saved.
-     * @returns {Promise<boolean>}
      */
-    this.hasPasscode = () => {
+    this.hasPasscode = (): Promise<boolean> => {
         return TinyDb.system.getValue(`${this.username}:passcode`).then(result => !!result);
     };
 
@@ -316,7 +307,7 @@ export default function mixUserAuthModule() {
      * Call from client app when user specifically chooses to signout.
      * This will positively effect 2fa security.
      *
-     * @param {boolean} untrust if true, no longer trust the device
+     * @param untrust - if true, no longer trust the device
      */
     this.signout = (untrust = false) => {
         // On untrusted devices, during logout we remove

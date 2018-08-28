@@ -1,15 +1,18 @@
 import errors from '../../errors';
 import cryptoUtil from '../../crypto/util';
+import FileStreamAbstract from '~/models/files/file-stream-abstract';
+import FileNonceGenerator from '~/models/files/file-nonce-generator';
 
 /**
  * Abstract parent class for FileDownloader and FileUploader
- * @param {File} file
- * @param {FileStreamAbstract} stream
- * @param {FileNonceGenerator} nonceGenerator
- * @param {string} processType - 'upload' or 'download'
  */
 class FileProcessor {
-    constructor(file, stream, nonceGenerator, processType) {
+    constructor(
+        file: File,
+        stream: FileStreamAbstract,
+        nonceGenerator: FileNonceGenerator,
+        processType: 'upload' | 'download'
+    ) {
         this.file = file;
         this.fileKey = cryptoUtil.b64ToBytes(file.blobKey);
         this.stream = stream;
@@ -19,19 +22,16 @@ class FileProcessor {
 
     /**
      * Next queue processing calls will stop if stopped == true
-     * @type {boolean}
      */
     stopped = false;
 
     /**
      * process stopped and promise resolved/rejected
-     * @type {boolean}
      */
     processFinished = false;
 
     /**
      * Starts the up/download process
-     * @returns {Promise}
      */
     start() {
         console.log(`starting ${this.processType} for file id: ${this.file.id}`);
@@ -83,7 +83,6 @@ class FileProcessor {
 
     /**
      * Override in child classes if cleanup is needed on finish.
-     * @abstract
      */
     cleanup() {}
 }

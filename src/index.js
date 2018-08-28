@@ -63,7 +63,7 @@ const prombservable = require('./helpers/prombservable');
 const tracker = require('./models/update-tracker');
 const CacheEngineBase = require('./db/cache-engine-base');
 const saveAccountKeyBackup = require('./helpers/pdf').default;
-import telemetry from './telemetry'; // eslint-disable-line
+const telemetry = require('./telemetry').default;
 
 // MEMO: Do NOT export NodeJsonStorage and NodeFileStream here for compatibility reasons
 module.exports = {

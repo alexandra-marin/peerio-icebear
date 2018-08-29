@@ -561,7 +561,7 @@ class Chat {
             this.store.onNewMessages({
                 freshBatchMentionCount,
                 lastMessageText,
-                unreadCount: this.unreadCount,
+                unreadCount: 1, // this.unreadCount,
                 chat: this
             });
         }
@@ -580,7 +580,7 @@ class Chat {
     _finishAddMessages(accumulator, prepend, kegs) {
         let newMessageCount = 0;
         let newMentionCount = 0;
-        let lastMentionId;
+        // let lastMentionId;
         if (!accumulator.length) {
             // this was en entire page of empty/deleted messages
             this._reTriggerPaging(prepend, kegs);
@@ -604,7 +604,7 @@ class Chat {
                 newMessageCount += 1;
                 if (msg.isMention) {
                     newMentionCount += 1;
-                    lastMentionId = msg.id;
+                    // lastMentionId = msg.id;
                 }
             }
             // new message case
@@ -618,7 +618,7 @@ class Chat {
         }
         // sort
         this.sortMessages();
-        this.onNewMessageLoad(newMentionCount, newMessageCount, lastMentionId);
+        this.onNewMessageLoad(newMentionCount, newMessageCount /* , lastMentionId */);
         if (!prepend) {
             // updating most recent message
             for (let i = this.messages.length - 1; i >= 0; i--) {

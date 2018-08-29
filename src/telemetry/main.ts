@@ -68,7 +68,7 @@ export function send(eventObj) {
 
         console.log(object);
         g.fetch(url, {
-            method: 'POST'
+            method: 'GET'
         });
     } catch (e) {
         console.error('Could not send telemetry event.', e);

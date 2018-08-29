@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.20.0"></a>
+# [5.20.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.19.2...v5.20.0) (2018-08-29)
+
+
+### Features
+
+* medcryptor pdf ([b34ddcf](https://github.com/PeerioTechnologies/peerio-icebear/commit/b34ddcf))
+
+
+
 <a name="5.19.2"></a>
 ## [5.19.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.19.1...v5.19.2) (2018-08-29)
 

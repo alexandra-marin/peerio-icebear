@@ -312,60 +312,82 @@ class FileStoreBase {
             }`
         );
         // process kegs
-        runInAction(async () => {
-            for (const keg of resp.kegs) {
-                if (keg.collectionVersion > this.knownUpdateId) {
-                    this.knownUpdateId = keg.collectionVersion;
-                }
-                if (keg.collectionVersion > this.maxUpdateId) {
-                    this.maxUpdateId = keg.collectionVersion;
-                }
-                if (!keg.props.fileId && !keg.deleted) {
-                    if (keg.version > 1) {
-                        // this is not normal, kegs with version > 1 should have fileId or should be deleted
-                        console.error('File keg missing fileId', keg.kegId);
-                    }
-                    // this is normal, keg version 1
-                    continue;
-                }
-                //  no point wasting time looking up existing kegs when we load from cache
-                const existing = fromCache
-                    ? null
-                    : this.fileMap[keg.props.fileId] || this.getByKegId(keg.kegId);
-                if (keg.deleted || keg.hidden) {
-                    // deleted keg that exists gets wiped from store and cache
-                    if (existing) {
-                        this.files.remove(existing);
-                    }
-                    this.cache.removeValue(keg.kegId);
-                    continue;
-                }
-                const file = existing || new File(this.kegDb, this);
-                // this will deserialize new keg in to new file object or existing file object
-                if (!(await file.loadFromKeg(keg, fromCache))) {
-                    console.error('Failed to load file keg.', keg.kegId);
-                    // broken keg, removing from store and cache
-                    if (existing) {
-                        this.files.remove(existing);
-                    }
-                    this.cache.removeValue(keg.kegId);
-                    continue;
-                }
+        let newKnownUpdateId = this.knownUpdateId;
+        let newMaxUpdateId = this.maxUpdateId;
 
+        const filesToAdd = []; // array of [ File, Keg ] tuples
+        const filesToRemove = []; // array of File
+
+        for (const keg of resp.kegs) {
+            if (keg.collectionVersion > newKnownUpdateId) {
+                newKnownUpdateId = keg.collectionVersion;
+            }
+            if (keg.collectionVersion > newMaxUpdateId) {
+                newMaxUpdateId = keg.collectionVersion;
+            }
+            if (!keg.props.fileId && !keg.deleted) {
+                if (keg.version > 1) {
+                    // this is not normal, kegs with version > 1 should have fileId or should be deleted
+                    console.error('File keg missing fileId', keg.kegId);
+                }
+                // this is normal, keg version 1
+                continue;
+            }
+            //  no point wasting time looking up existing kegs when we load from cache
+            const existing = fromCache
+                ? null
+                : this.fileMap[keg.props.fileId] || this.getByKegId(keg.kegId);
+            if (keg.deleted || keg.hidden) {
+                // deleted keg that exists gets wiped from store and cache
+                if (existing) {
+                    filesToRemove.push(existing);
+                }
+                this.cache.removeValue(keg.kegId);
+                continue;
+            }
+            const file = existing || new File(this.kegDb, this);
+            // this will deserialize new keg in to new file object or existing file object
+            if (!(await file.loadFromKeg(keg, fromCache))) {
+                console.error('Failed to load file keg.', keg.kegId);
+                // broken keg, removing from store and cache
+                if (existing) {
+                    filesToRemove.push(existing);
+                }
+                this.cache.removeValue(keg.kegId);
+                continue;
+            }
+
+            // existing keg data got updated earlier
+            // otherwise we insert it into the store
+            if (!existing) {
+                dirty = true;
+                filesToAdd.push([file, keg]);
+            }
+        }
+
+        runInAction(() => {
+            if (this.knownUpdateId < newKnownUpdateId) {
+                this.knownUpdateId = newKnownUpdateId;
+            }
+            if (this.maxUpdateId < newMaxUpdateId) {
+                this.maxUpdateId = newMaxUpdateId;
+            }
+
+            for (const [file, keg] of filesToAdd) {
                 if (!fromCache) {
                     // scheduling caching when signature is verified, unless we process cached keg
                     this.cacheOnceVerified(file, keg);
                 }
-                // existing keg data got updated earlier
-                // otherwise we insert it into the store
-                if (!existing) {
-                    dirty = true;
-                    this.files.push(file);
-                    if (this.onFileAdded) {
-                        this.onFileAdded(keg, file);
-                    }
+                this.files.push(file);
+                if (this.onFileAdded) {
+                    this.onFileAdded(keg, file);
                 }
             }
+
+            for (const file of filesToRemove) {
+                this.files.remove(file);
+            }
+
             if (fromCache) {
                 performance.mark(`stop loading files cache ${this.id}`);
                 performance.measure(

@@ -470,17 +470,21 @@ export class FileStore extends FileStoreBase {
      *        }} tree - folder tree info
      * @param folder - existing folder to attach uploading folder to
      */
-    async uploadFolder(tree, folder: FileFolder) {
-        const uploadOneLevel = (folders, parent) => {
+    async uploadFolder(tree, folder) {
+        const uploadOneLevel = async (folders, parent) => {
             // we received a list of folder and we iterate them
-            Promise.map(folders, f => {
+            for (const f of folders) {
                 // we create the next folder in list
                 const newParent = parent.createFolder(f.name, null, true);
                 // we upload files in the folder
                 f.files.forEach(file => this.upload(file, null, newParent));
                 // we recursively upload folders in this folder
-                return uploadOneLevel(f.folders, newParent);
+                await new Promise(resolve => {
+                    setTimeout(() => {
+                        uploadOneLevel(f.folders, newParent).then(resolve);
+                    });
             });
+            }
         };
 
         await uploadOneLevel([tree], folder || this.folderStore.root);

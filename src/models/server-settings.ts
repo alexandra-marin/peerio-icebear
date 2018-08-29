@@ -8,15 +8,6 @@ import { observable, reaction } from 'mobx';
 import { retryUntilSuccess } from '../helpers/retry';
 
 class ServerSettings {
-    constructor() {
-        reaction(
-            () => socket.authenticated,
-            authenticated => {
-                if (authenticated) this.loadSettings();
-            },
-            true
-        );
-    }
     /**
      * Observable base url for avatars https service
      */
@@ -34,23 +25,35 @@ class ServerSettings {
      * Observable array of timestamps for maintenance begin and end, if applicable.
      */
     @observable maintenanceWindow: number[];
+    @observable mixPanelClientToken;
 
+    constructor() {
+        reaction(
+            () => socket.connected,
+            connected => {
+                if (connected) this.loadSettings();
+            },
+            true
+        );
+    }
     /**
      * (Re)loads server settings from server.
      */
     loadSettings() {
         retryUntilSuccess(() => {
-            return socket.send('/auth/server/settings').then(res => {
+            return socket.send('/noauth/server/settings').then(res => {
                 this.avatarServer = res.fileBaseUrl;
                 this.acceptableClientVersions = res.acceptsClientVersions;
                 this.tag = res.tag;
                 this.maintenanceWindow = res.maintenance;
+                this.mixPanelClientToken = res.mixPanelClientToken;
                 console.log(
                     'Server settings retrieved.',
                     this.tag,
                     this.avatarServer,
                     this.acceptableClientVersions,
-                    this.maintenanceWindow
+                    this.maintenanceWindow,
+                    this.mixPanelClientToken
                 );
             });
         }, 'Server Settings Load');

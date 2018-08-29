@@ -2,6 +2,49 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.20.0"></a>
+# [5.20.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.19.2...v5.20.0) (2018-08-29)
+
+
+### Features
+
+* medcryptor pdf ([b34ddcf](https://github.com/PeerioTechnologies/peerio-icebear/commit/b34ddcf))
+
+
+
+<a name="5.19.2"></a>
+## [5.19.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.19.1...v5.19.2) (2018-08-29)
+
+
+
+<a name="5.19.1"></a>
+## [5.19.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.19.0...v5.19.1) (2018-08-29)
+
+
+
+<a name="5.19.0"></a>
+# [5.19.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.18.0...v5.19.0) (2018-08-29)
+
+
+### Bug Fixes
+
+* add files in a single action ([3277f61](https://github.com/PeerioTechnologies/peerio-icebear/commit/3277f61))
+* copy ([493282e](https://github.com/PeerioTechnologies/peerio-icebear/commit/493282e))
+* do not rely on lastMentionID to show mentions [ch12327] ([442201b](https://github.com/PeerioTechnologies/peerio-icebear/commit/442201b))
+* lint ([620ac58](https://github.com/PeerioTechnologies/peerio-icebear/commit/620ac58))
+* prettier ([17b7f58](https://github.com/PeerioTechnologies/peerio-icebear/commit/17b7f58))
+* prevent UI freeze when uploading large trees ([4c270ba](https://github.com/PeerioTechnologies/peerio-icebear/commit/4c270ba))
+* rename ([c221d7f](https://github.com/PeerioTechnologies/peerio-icebear/commit/c221d7f))
+* save settings in a concurrent-safe way [ch12811] ([e1ae617](https://github.com/PeerioTechnologies/peerio-icebear/commit/e1ae617))
+* username length ([59a2585](https://github.com/PeerioTechnologies/peerio-icebear/commit/59a2585))
+
+
+### Features
+
+* [ch12151] support for mixpanel token in settings ([c3cd2c4](https://github.com/PeerioTechnologies/peerio-icebear/commit/c3cd2c4))
+
+
+
 <a name="5.18.0"></a>
 # [5.18.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.17.1...v5.18.0) (2018-08-28)
 

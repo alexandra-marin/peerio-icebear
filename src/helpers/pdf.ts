@@ -1,5 +1,5 @@
 import pdfform from 'pdfform.js';
-import config from '../config';
+import { FileStream, assetPathResolver, whiteLabel } from '../config';
 /**
  * Generates and saves a pdf file with account recovery information
  * @param destination file path
@@ -10,9 +10,14 @@ export default async function saveAccountKeyBackup(
     username: string,
     accountKey: string
 ) {
+    let file = 'account_key_backup';
+    if (whiteLabel.name && whiteLabel.name !== 'peerio') {
+        file += `_${whiteLabel.name}`;
+    }
+    file += '.pdf';
     // getting template file as a buffer to later process it and perform substitutions
-    const templatePath = config.assetPathResolver('account_key_backup.pdf');
-    const templateStream = new config.FileStream(templatePath, 'read');
+    const templatePath = assetPathResolver(file);
+    const templateStream = new FileStream(templatePath, 'read');
     await templateStream.open();
     const { size } = await config.FileStream.getStat(templatePath);
     const template = await templateStream.read(size);

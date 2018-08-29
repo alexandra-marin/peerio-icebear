@@ -212,7 +212,7 @@ abstract class SharedKegDb implements IKegDb {
                         //         })
                         //         .return([boot, false]);
                     }
-                    return [boot, false];
+                    return Promise.resolve([boot, false]);
                 }
                 return this.createBootKeg();
             })

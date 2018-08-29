@@ -15,10 +15,6 @@ import globalContext from './helpers/global-context';
 
 globalContext.Promise = Bluebird;
 
-declare global {
-    type Promise = typeof Bluebird;
-}
-
 //@ts-ignore
 Bluebird.coroutine.addYieldHandler(function(value) {
     return Bluebird.resolve(value);

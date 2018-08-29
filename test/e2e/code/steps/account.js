@@ -38,6 +38,7 @@ When('I change my account settings', async function() {
     await ice.User.current.saveSettings(settings => {
         settings.contactNotifications = true;
         settings.contactRequestNotifications = true;
+        settings.messageNotifications = false;
         settings.dataCollection = true;
         settings.subscribeToPromoEmails = true;
     });

@@ -1,10 +1,10 @@
-/**
+/*
  * Icebear client lib entry point.
- * @desc In addition to exporting public API, entry point, when first required,
+ * In addition to exporting public API, entry point, when first required,
  * performs some global configuration such as:
  * - replaces global Promise object with bluebird implementation. Note that native(not transpiled) async functions
  *  will still return native Promise.
- * - extends Uint8Array prototype. See {@link extensions/uint8array}.
+ * - extends Uint8Array prototype.
  */
 
 import './helpers/performance-polyfill';
@@ -14,6 +14,10 @@ import * as Bluebird from 'bluebird';
 import globalContext from './helpers/global-context';
 
 globalContext.Promise = Bluebird;
+
+declare global {
+    type Promise = typeof Bluebird;
+}
 
 //@ts-ignore
 Bluebird.coroutine.addYieldHandler(function(value) {
@@ -37,17 +41,20 @@ import tofuStore from './models/contacts/tofu-store';
 import chatStore from './models/chats/chat-store';
 import fileStore from './models/files/file-store';
 import volumeStore from './models/volumes/volume-store';
-//import ghostStore from './models/mail/ghost-store';
-//import mailStore from './models/mail/mail-store';
 import validation from './helpers/validation/field-validation';
 import FileStreamBase from '~/models/files/file-stream-base';
 import FileNonceGenerator from './models/files/file-nonce-generator';
 import * as util from './util';
 import warnings from './models/warnings';
-import crypto from './crypto';
+import * as cryptoUtil from './crypto/util';
+import * as keys from './crypto/keys';
+import * as publicCrypto from './crypto/public';
+import * as secret from './crypto/secret';
+import * as sign from './crypto/sign';
+import { setScrypt } from './crypto/scrypt-proxy';
 import TinyDb from './db/tiny-db';
 import Clock from './helpers/observable-clock';
-import fileHelpers from './helpers/file';
+import * as fileHelpers from './helpers/file';
 import MRUList from './helpers/mru-list';
 import { WarningStates as warningStates } from './models/warnings/system-warning';
 import clientApp from './models/client-app';
@@ -58,6 +65,8 @@ import Contact from './models/contacts/contact';
 import * as prombservable from './helpers/prombservable';
 import tracker from './models/update-tracker';
 import CacheEngineBase from './db/cache-engine-base';
+
+const crypto = { cryptoUtil, keys, publicCrypto, secret, sign, setScrypt };
 
 // MEMO: Do NOT export NodeJsonStorage and NodeFileStream here for compatibility reasons
 export default {
@@ -74,8 +83,6 @@ export default {
     chatInviteStore,
     fileStore,
     volumeStore,
-    //ghostStore,
-    //mailStore,
     validation,
     FileStreamBase,
     FileNonceGenerator,

@@ -363,8 +363,12 @@ class FileStoreBase {
         }
 
         runInAction(() => {
-            this.knownUpdateId = newKnownUpdateId;
-            this.maxUpdateId = newMaxUpdateId;
+            if (this.knownUpdateId < newKnownUpdateId) {
+                this.knownUpdateId = newKnownUpdateId;
+            }
+            if (this.maxUpdateId < newMaxUpdateId) {
+                this.maxUpdateId = newMaxUpdateId;
+            }
 
             for (const [file, keg] of filesToAdd) {
                 if (!fromCache) {

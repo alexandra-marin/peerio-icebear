@@ -3,6 +3,7 @@ const config = require('../config');
 const TinyDb = require('../db/tiny-db');
 const { cryptoUtil } = require('../crypto');
 const g = require('../helpers/global-context');
+const serverSettings = require('../models/server-settings');
 
 interface propertyTypes {
     'Version Number'?: number;
@@ -32,7 +33,6 @@ async function getUserId(): Promise<string> {
 export async function init() {
     try {
         baseObj.properties.distinct_id = await getUserId(); // eslint-disable-line
-        baseObj.properties.token = config.telemetry.token;
         baseObj.properties.Device = config.isMobile ? 'Mobile' : 'Desktop';
         baseObj.properties['App Version'] = config.appVersion;
     } catch (e) {
@@ -46,6 +46,9 @@ function camelToTitleCase(text: string): string {
 
 export function send(eventObj) {
     try {
+        // Check server for Mixpanel token on every send, in case token changes.
+        baseObj.properties.token = serverSettings.mixPanelClientToken;
+
         // Marketing wants all items (property names and values) to be in Title Case, but this breaks code style.
         // So we still write props in camelCase when sending events from client, and convert them here.
         let properties = {};

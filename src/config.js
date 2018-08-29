@@ -164,15 +164,7 @@ const config = new class {
          * Mixpanel base URL. base64 encoded tracking events get added to this.
          * @type {string}
          */
-        baseUrl: 'https://api.mixpanel.com/track/?data=',
-
-        /**
-         * Token for our Mixpanel account.
-         * TODO: this is staging token, change to prod.
-         * TODO: or, get from server?
-         * @type {string}
-         */
-        token: '05ee93d5cdb68e0de0709b6c85200c44'
+        baseUrl: 'https://api.mixpanel.com/track/?data='
     };
 
     /**

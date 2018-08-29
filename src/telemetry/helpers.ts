@@ -17,7 +17,7 @@ function errorMessage(msg: string): string {
 }
 
 // Factory for text input events
-interface textInputProps {
+interface TextInputProps {
     item: string;
     location?: string;
     sublocation?: string;
@@ -31,7 +31,7 @@ export function textInput(
     state?: string,
     errorMsg?: string
 ) {
-    const properties: textInputProps = { item, state };
+    const properties: TextInputProps = { item, state };
 
     if (location) properties.location = location;
     if (sublocation) properties.sublocation = sublocation;
@@ -41,7 +41,7 @@ export function textInput(
 }
 
 // Factory for duration events
-interface durationProps {
+interface DurationProps {
     item?: string;
     location?: string;
     sublocation?: string;
@@ -50,7 +50,7 @@ interface durationProps {
 export function duration(item: string, location: string, sublocation: string, startTime: number) {
     const totalTime = Math.round((Date.now() - startTime) / 1000);
 
-    const properties: durationProps = { totalTime };
+    const properties: DurationProps = { totalTime };
 
     if (item) properties.item = item;
     if (location) properties.location = location;

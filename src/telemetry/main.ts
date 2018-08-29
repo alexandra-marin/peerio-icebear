@@ -5,7 +5,7 @@ const { cryptoUtil } = require('../crypto');
 const g = require('../helpers/global-context');
 const serverSettings = require('../models/server-settings');
 
-interface propertyTypes {
+interface Properties {
     'Version Number'?: number;
     distinct_id?: string; // eslint-disable-line
     token?: string;
@@ -13,7 +13,7 @@ interface propertyTypes {
     'App Version'?: string;
 }
 
-const baseObj: { properties: propertyTypes } = {
+const baseObj: { properties: Properties } = {
     properties: {
         'Version Number': 1 // refers to our own tracker library versioning
     }

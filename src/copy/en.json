@@ -169,6 +169,7 @@
   "title_email": "Email",
   "title_enterEmail": "Enter an email address",
   "title_hintUsername": "a-Z, 0-9, and _ only.",
+  "title_emailPlaceholderSignup": "eg. alice@peerio.com",
   "title_hintUsernameValid": "You picked a good one!<br/>Share this with your contacts so they can add you on Peerio.",
   "title_hintEmail": "Your email lets your contacts find you in Peerio.",
   "title_language": "Language",

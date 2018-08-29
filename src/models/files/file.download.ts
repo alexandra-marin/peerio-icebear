@@ -6,7 +6,7 @@ import config from '../../config';
 import warnings from './../warnings';
 import FileDownloader from './file-downloader';
 import FileCacheHandler from './file-cache-handler';
-import cryptoUtil from '../../crypto/util';
+import * as cryptoUtil from '../../crypto/util';
 import FileNonceGenerator from './file-nonce-generator';
 import TinyDb from '../../db/tiny-db';
 import { action } from 'mobx';

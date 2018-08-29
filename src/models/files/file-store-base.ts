@@ -1,14 +1,15 @@
-import { observable, action, runInAction, computed } from 'mobx';
+import { observable, action, runInAction, computed, IObservableArray, ObservableMap } from 'mobx';
 import socket from '../../network/socket';
 import File from './file';
 import tracker from '../update-tracker';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { retryUntilSuccess } from '../../helpers/retry';
 import createMap from '../../helpers/dynamic-array-map';
 import FileStoreFolders from './file-store.folders';
 import { getUser } from '../../helpers/di-current-user';
 import { getFileStore } from '../../helpers/di-file-store';
 import config from '../../config';
+import IKegDb from '~/defs/keg-db';
 
 const PAGE_SIZE = 100;
 function isFileSelected(file) {
@@ -34,6 +35,12 @@ class FileStoreBase {
         }
     }
 
+    id: string;
+    _kegDb: IKegDb;
+    fileMap: { [key: string]: File };
+    fileMapObservable: ObservableMap<File>;
+    folderStore: FileStoreFolders;
+
     // #region File store instances
     static instances = observable.map();
     getFileStoreById(id) {
@@ -50,7 +57,7 @@ class FileStoreBase {
     // #endregion
 
     // #region Properties
-    @observable.shallow files = [];
+    @observable.shallow files = [] as IObservableArray<File>;
     // Filter to apply when computing search for files and folders
     @observable searchQuery = '';
     // Store is loading full file list for the first time.

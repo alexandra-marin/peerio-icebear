@@ -1,6 +1,5 @@
 /* eslint-disable no-unused-vars */
 import { AbstractCallError } from '~/errors';
-
 /**
  * Abstract File Stream class. Icebear wants to read/write files,
  * but doesn't know how exactly that would work on your platform.
@@ -63,16 +62,15 @@ class FileStreamBase {
                 new Error(`file-stream.js: Attempt to write to read stream. ${this.mode}`)
             );
         }
-        this._increasePosition(buffer);
         if (!buffer || !buffer.length) return Promise.resolve();
-        return this.writeInternal(buffer).then(this._increasePosition);
+        return this.writeInternal(buffer).then(() => this._increasePosition(buffer));
     };
 
     /**
      * Override this in your implementation.
      * @returns buffer, same one as was passed
      */
-    writeInternal(_buffer: Uint8Array): Promise<Uint8Array> {
+    writeInternal(_buffer: Uint8Array): Promise<void> {
         throw new AbstractCallError();
     }
 
@@ -80,23 +78,23 @@ class FileStreamBase {
      * Move file position pointer.
      * @returns new position
      */
-    seek = (pos: number): number => {
+    seek = (pos: number): void => {
         if (this.mode !== 'read') throw new Error('Seek only on read streams');
-        return this.seekInternal(pos);
+        this.seekInternal(pos);
     };
 
     /**
      * Override this in your implementation. Move file position pointer.
      * @returns new position
      */
-    seekInternal(_pos: number): number {
+    seekInternal(_pos: number): void {
         throw new AbstractCallError();
     }
 
     /**
      * Override. This function has to set 'size' property.
      */
-    open(): Promise<FileStreamBase> {
+    open(): Promise<void> {
         throw new AbstractCallError();
     }
 
@@ -122,7 +120,7 @@ class FileStreamBase {
      * Override.
      * @returns true if path exists on device
      */
-    static exists(_path: string): boolean {
+    static exists(_path: string): Promise<boolean> {
         throw new AbstractCallError();
     }
 
@@ -137,7 +135,7 @@ class FileStreamBase {
     /**
      * Override. Get file stat object.
      */
-    static getStat(path: string): Promise<{ size: number }> {
+    static getStat(_path: string): Promise<{ size: number }> {
         throw new AbstractCallError();
     }
 

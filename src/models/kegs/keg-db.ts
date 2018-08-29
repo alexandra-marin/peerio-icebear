@@ -1,6 +1,7 @@
 import BootKeg from './boot-keg';
 import tracker from '../../models/update-tracker';
 import IKegDb from '~/defs/keg-db';
+import { KeyPair } from '~/defs/interfaces';
 
 /**
  * Keg database.

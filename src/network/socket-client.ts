@@ -381,7 +381,7 @@ export default class SocketClient {
             .timeout(60000)
             .finally(() => {
                 delete this.awaitingRequests[id];
-            });
+            }) as Promise<any>;
     }
 
     /**

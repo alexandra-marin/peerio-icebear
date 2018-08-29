@@ -24,11 +24,11 @@ export default async function saveAccountKeyBackup(
         accountKey: [accountKey],
         date: [new Date().toLocaleDateString()]
     };
-    const outBuffer = pdfform().transform(template.buffer, fields);
+    const outBuffer = pdfform().transform(template.buffer as ArrayBuffer, fields);
 
     // writing out destination file
-    const outStream = new FileStream(destination, 'write');
+    const outStream = new config.FileStream(destination, 'write');
     await outStream.open();
-    await outStream.write(outBuffer);
+    await outStream.write(new Uint8Array(outBuffer));
     await outStream.close();
 }

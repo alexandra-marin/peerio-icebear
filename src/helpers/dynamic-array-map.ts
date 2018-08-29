@@ -4,15 +4,15 @@ import { observable, IObservableArray, ObservableMap } from 'mobx';
  * Creates a map object that will be dynamically updated when items are added or removed to the passed array.
  * Doesn't watch for map key property change.
  * @param array - array to create map for
- * @param  keyProp - property of the items in the array that will be used as key for the map
+ * @param keyProp - property of the items in the array that will be used as key for the map
  * @returns map object
  */
-export default function createMap(
-    array: IObservableArray<Object>,
+export default function createMap<T>(
+    array: IObservableArray<T>,
     keyProp: string
-): { map: Object; observableMap: ObservableMap<{}> } {
+): { map: { [key: string]: T }; observableMap: ObservableMap<T> } {
     const map = {};
-    const observableMap = observable.map();
+    const observableMap = observable.map<T>();
 
     array.intercept(delta => {
         if (delta.type === 'splice') {

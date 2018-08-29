@@ -1,6 +1,6 @@
 import socket from '../../network/socket';
-import errors from '../../errors';
-import secret from '../../crypto/secret';
+import * as errors from '../../errors';
+import * as secret from '../../crypto/secret';
 import config from '../../config';
 import FileProcessor from './file-processor';
 import FileStreamBase from '~/models/files/file-stream-base';

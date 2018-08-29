@@ -182,7 +182,7 @@ export default new class {
      *
      * **Client app is required to set this property before using Icebear SDK.**
      */
-    FileStream: FileStreamBase = null;
+    FileStream: typeof FileStreamBase = null;
     /**
      * Storage engine implementation class.
      *

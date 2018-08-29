@@ -1,10 +1,11 @@
 import warnings from '../warnings';
 import { retryUntilSuccess } from '../../helpers/retry';
 import { observable, computed, action } from 'mobx';
-import util from '../../util';
+import * as util from '../../util';
 import { getFileStore } from '../../helpers/di-file-store';
 import { getUser } from '../../helpers/di-current-user';
-import cryptoUtil from '../../crypto/util';
+import * as cryptoUtil from '../../crypto/util';
+import FileStoreBase from '~/models/files/file-store-base';
 
 function isLegacyFilePredicate(f) {
     return !!(f && f.isLegacy);
@@ -23,6 +24,9 @@ class FileFolder {
             this.id = 'root';
         }
     }
+
+    isShared: boolean;
+    store: FileStoreBase;
 
     // unique global id (local folder id, or volume id)
     @observable id = null;

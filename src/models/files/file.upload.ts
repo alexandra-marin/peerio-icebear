@@ -6,9 +6,9 @@ import config from '../../config';
 import warnings from './../warnings';
 import FileUploader from './file-uploader';
 import socket from '../../network/socket';
-import cryptoUtil from '../../crypto/util';
-import keys from '../../crypto/keys';
-import fileHelper from '../../helpers/file';
+import * as cryptoUtil from '../../crypto/util';
+import * as keys from '../../crypto/keys';
+import * as fileHelper from '../../helpers/file';
 import FileNonceGenerator from './file-nonce-generator';
 import TinyDb from '../../db/tiny-db';
 

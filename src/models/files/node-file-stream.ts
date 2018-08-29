@@ -2,14 +2,18 @@ import FileStreamBase from '~/models/files/file-stream-base';
 import * as errors from '../../errors';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as mkdirp from 'mkdirp';
-import * as rimraf from 'rimraf';
-
+import mkdirp from 'mkdirp';
+import rimraf from 'rimraf';
 /**
  * FileStreamBase implementation for nodejs, see {@link FileStreamBase} for docs.
  * @extends {FileStreamBase}
  */
 class NodeFileStream extends FileStreamBase {
+    static storageFolder: string;
+    nextReadPos: number;
+    fileDescriptor: number;
+    size: number;
+    closed: boolean;
     checkForError(err, rejectFn) {
         if (err) {
             rejectFn(errors.normalize(err));
@@ -18,7 +22,7 @@ class NodeFileStream extends FileStreamBase {
         return false;
     }
 
-    open() {
+    open(): Promise<void> {
         this.nextReadPos = null;
         return new Promise((resolve, reject) => {
             fs.open(this.filePath, this.mode[0], (err, fd) => {
@@ -27,13 +31,13 @@ class NodeFileStream extends FileStreamBase {
                 fs.fstat(fd, (sErr, stat) => {
                     if (this.checkForError(sErr, reject)) return;
                     this.size = stat.size;
-                    resolve(this);
+                    resolve();
                 });
             });
         });
     }
 
-    close() {
+    close(): Promise<void> {
         if (this.fileDescriptor == null || this.closed) return Promise.resolve();
         this.closed = true;
         return new Promise((resolve, reject) => {
@@ -44,12 +48,12 @@ class NodeFileStream extends FileStreamBase {
         });
     }
 
-    readInternal(size) {
+    readInternal(size: number): Promise<Uint8Array> {
         return new Promise((resolve, reject) => {
             const buffer = new Uint8Array(size);
             fs.read(
                 this.fileDescriptor,
-                Buffer.from(buffer.buffer),
+                Buffer.from(buffer),
                 0,
                 size,
                 this.nextReadPos,
@@ -66,16 +70,16 @@ class NodeFileStream extends FileStreamBase {
         });
     }
 
-    writeInternal(buffer) {
+    writeInternal(buffer: Uint8Array): Promise<void> {
         return new Promise((resolve, reject) => {
             fs.write(this.fileDescriptor, Buffer.from(buffer), 0, buffer.length, null, err => {
                 if (this.checkForError(err, reject)) return;
-                resolve(buffer);
+                resolve();
             });
         });
     }
 
-    seekInternal(pos) {
+    seekInternal(pos: number) {
         this.nextReadPos = pos;
         this.pos = pos;
     }
@@ -89,7 +93,7 @@ class NodeFileStream extends FileStreamBase {
         }
     }
 
-    static delete(filePath) {
+    static delete(filePath): Promise<void> {
         return new Promise((resolve, reject) => {
             fs.unlink(filePath, err => {
                 if (err) reject(err);
@@ -98,7 +102,7 @@ class NodeFileStream extends FileStreamBase {
         });
     }
 
-    static rename(oldPath, newPath) {
+    static rename(oldPath, newPath): Promise<void> {
         return new Promise((resolve, reject) => {
             fs.rename(oldPath, newPath, err => {
                 if (err) reject(err);
@@ -114,11 +118,11 @@ class NodeFileStream extends FileStreamBase {
         return path.join(this.storageFolder, name);
     }
 
-    static exists(filePath) {
+    static exists(filePath: string) {
         return Promise.resolve(fs.existsSync(filePath));
     }
 
-    static createDir(folderPath) {
+    static createDir(folderPath): Promise<void> {
         return new Promise((resolve, reject) => {
             mkdirp(folderPath, err => {
                 if (err) reject(err);
@@ -127,7 +131,7 @@ class NodeFileStream extends FileStreamBase {
         });
     }
 
-    static removeDir(folderPath) {
+    static removeDir(folderPath): Promise<void> {
         return new Promise((resolve, reject) => {
             rimraf(folderPath, { disableGlob: true }, err => {
                 if (err) reject(err);
@@ -136,7 +140,7 @@ class NodeFileStream extends FileStreamBase {
         });
     }
 
-    static async createTempCache() {
+    static async createTempCache(): Promise<void> {
         console.log(`Initializing temporary path ${this.storageFolder}`);
         try {
             await this.createDir(this.storageFolder);
@@ -146,7 +150,7 @@ class NodeFileStream extends FileStreamBase {
         }
     }
 
-    static deleteTempCache() {
+    static deleteTempCache(): Promise<void> {
         console.log(`Deleting temporary path ${this.storageFolder}`);
         return this.removeDir(this.storageFolder).catch(e => void console.error(e));
     }

@@ -13,7 +13,7 @@ import IKegDb from '~/defs/keg-db';
  * Multiple people might try to create boot keg for the same chat at the same time.
  * We have a special logic to resolve this kind of situations.
  *
- * SharedKegDb is similar to {@link KegDb} in a sense that it has same `id`, `boot` and `key`
+ * SharedKegDb is similar to KegDb in a sense that it has same `id`, `boot` and `key`
  * properties, but the logic is too different to extract a base class. Although when saving and loading Kegs,
  * you can use both databases, the properties mentioned is all Kegs can care about.
  *
@@ -77,7 +77,8 @@ abstract class SharedKegDb implements IKegDb {
 
     onBootKegLoadedFromKeg: () => {};
     _retryId: number;
-
+    rawMeta: {}; // this a raw server-returned meta object to cache as-is, maybe type it later
+    _metaParticipants: Contact[];
     /**
      * Returns the name of keg type for URLs.
      * APIs will get called as `/auth/kegs/db/create-${this.urlName}`.
@@ -116,7 +117,7 @@ abstract class SharedKegDb implements IKegDb {
      * Just a mirror of this.boot.admins
      */
     @computed
-    get admins(): IObservableArray<Contact> {
+    get admins(): Contact[] {
         return (this.boot && this.boot.admins) || [];
     }
 
@@ -201,7 +202,7 @@ abstract class SharedKegDb implements IKegDb {
                     // (rooms are all in new format from the start)
                     // Migrating boot keg
                     if (!boot.format) {
-                        boot.participants = this._metaParticipants;
+                        boot.participants = this._metaParticipants as IObservableArray<Contact>;
                         //     // prevent spamming server on bootkeg migration
                         //     return Promise.delay(Math.round(Math.random() * 3000 + 2000))
                         //         .then(() => Contact.ensureAllLoaded(boot.participants))
@@ -246,13 +247,13 @@ abstract class SharedKegDb implements IKegDb {
 
             // saving bootkeg
             return boot.saveToServer().return([boot, true]);
-        });
+        }) as Promise<[SharedDbBootKeg, boolean]>;
     }
 
     /**
      * Retrieves boot keg for the db and initializes this KegDb instance with required data.
      */
-    async loadBootKeg(cachedBootKeg) {
+    async loadBootKeg(cachedBootKeg): Promise<SharedDbBootKeg> {
         // console.log(`Loading chat boot keg for ${this.id}`);
         const boot = new SharedDbBootKeg(this, User.current);
         if (cachedBootKeg && (await boot.loadFromKeg(cachedBootKeg))) {

@@ -147,7 +147,7 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
     /**
      * Keg format version, client tracks kegs structure changes with this property
      */
-    @observable protected format = 0;
+    @observable format = 0;
 
     /**
      * null when signature has not been verified yet (it's async) or it will never be because this keg is not supposed
@@ -166,7 +166,7 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
     /**
      * Keg version, when first created and empty, keg has version === 1
      */
-    @observable protected version = 0;
+    @observable version = 0;
 
     @observable protected deleted = false;
 

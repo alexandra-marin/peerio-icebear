@@ -1,5 +1,5 @@
-import errors from '../../errors';
-import cryptoUtil from '../../crypto/util';
+import * as errors from '../../errors';
+import * as cryptoUtil from '../../crypto/util';
 import FileStreamBase from '~/models/files/file-stream-base';
 import FileNonceGenerator from '~/models/files/file-nonce-generator';
 

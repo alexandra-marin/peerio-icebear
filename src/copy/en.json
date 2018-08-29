@@ -94,7 +94,7 @@
   "title_akBackupDescription": "<b>Important:</> Download this recovery document, and store it somewhere safe to ensure you don't lose access to your account.",
   "title_demoPdfUsernameLabel": "Your Peerio <b>USERNAME</>:",
   "title_demoPdfAkLabel": "Your Peerio <b>ACCOUNT KEY</>:",
-  "button_downloadPdf": "Download PDF",
+  "button_downloadPdf": "Save PDF",
   "title_backupAk": "Back up your Account Key",
   "title_backupAkReminder": "Save your Account Key. Peerio can’t reset your Account Key or unlock your account for you.",
   "title_backupAkReminderMobile": "Peerio can’t reset your Account Key or unlock your account for you.",

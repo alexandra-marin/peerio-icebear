@@ -1,12 +1,13 @@
 import S from './strings';
 import { init, send } from './main';
-import { duration } from './helpers';
+import { duration, errorMessage } from './helpers';
 
 const telemetry = {
     S,
     init,
     send,
-    duration
+    duration,
+    errorMessage
 };
 
 export default telemetry;

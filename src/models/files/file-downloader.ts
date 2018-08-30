@@ -212,6 +212,10 @@ class FileDownloader extends FileProcessor {
                 return true;
             };
 
+            // HACK: if there was no progress event fired
+            // calculate the file progress from completion handler
+            let progressEventFired = false;
+
             xhr.onreadystatechange = function() {
                 if (this.readyState === LOADING) {
                     // Download started, maybe start
@@ -232,6 +236,9 @@ class FileDownloader extends FileProcessor {
                     (this.status === 200 || this.status === 206) &&
                     this.response.byteLength === expectedSize
                 ) {
+                    if (!progressEventFired) {
+                        self.file.progress += expectedSize;
+                    }
                     resolve(this.response); // success
                     return;
                 }
@@ -258,6 +265,7 @@ class FileDownloader extends FileProcessor {
             };
 
             xhr.onprogress = function(event) {
+                progressEventFired = true;
                 if (p.isRejected()) return;
                 if (event.loaded > lastLoaded) {
                     self.file.progress += event.loaded - lastLoaded;

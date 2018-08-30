@@ -1,6 +1,6 @@
 {
   "name": "peerio-icebear",
-  "version": "5.20.0",
+  "version": "5.20.2",
   "description": "Peerio Icebear client library",
   "main": "dist/index.js",
   "scripts": {

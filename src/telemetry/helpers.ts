@@ -15,6 +15,5 @@ export function errorMessage(msg: string): string {
 }
 
 export function duration(startTime: number): number {
-    const totalTime = Math.round((Date.now() - startTime) / 1000);
-    return totalTime;
+    return Math.round((Date.now() - startTime) / 1000);
 }

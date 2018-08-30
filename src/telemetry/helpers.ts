@@ -13,3 +13,8 @@ const ERROR_MESSAGES = {
 export function errorMessage(msg: string): string {
     return ERROR_MESSAGES[msg] || msg;
 }
+
+export function duration(startTime: number): number {
+    const totalTime = Math.round((Date.now() - startTime) / 1000);
+    return totalTime;
+}

@@ -11,5 +11,5 @@ const ERROR_MESSAGES = {
 };
 
 export function errorMessage(msg: string): string {
-    return ERROR_MESSAGES[msg] || msg || 'Unknown Error Type';
+    return ERROR_MESSAGES[msg] || msg;
 }

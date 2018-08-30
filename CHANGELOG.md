@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.20.1"></a>
+## [5.20.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.20.0...v5.20.1) (2018-08-30)
+
+
+### Bug Fixes
+
+* hack for progress downloads in case onprogress does not work [ch12982] ([618878a](https://github.com/PeerioTechnologies/peerio-icebear/commit/618878a))
+
+
+
 <a name="5.20.0"></a>
 # [5.20.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.19.2...v5.20.0) (2018-08-29)
 

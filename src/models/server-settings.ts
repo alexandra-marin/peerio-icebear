@@ -8,6 +8,15 @@ import { observable, reaction } from 'mobx';
 import { retryUntilSuccess } from '../helpers/retry';
 
 class ServerSettings {
+    constructor() {
+        reaction(
+            () => socket.connected,
+            connected => {
+                if (connected) this.loadSettings();
+            },
+            true
+        );
+    }
     /**
      * Observable base url for avatars https service
      */
@@ -27,15 +36,6 @@ class ServerSettings {
     @observable maintenanceWindow: number[];
     @observable mixPanelClientToken;
 
-    constructor() {
-        reaction(
-            () => socket.connected,
-            connected => {
-                if (connected) this.loadSettings();
-            },
-            true
-        );
-    }
     /**
      * (Re)loads server settings from server.
      */

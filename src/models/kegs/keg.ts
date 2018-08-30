@@ -11,14 +11,11 @@ import { asPromise } from '../../helpers/prombservable';
 
 import { AntiTamperError, DecryptionError, serverErrorCodes } from '../../errors';
 import IKegDb from '~/defs/keg-db';
+import { IFileDescriptor } from '~/models/files/file';
 
 let temporaryKegId = 0;
 function getTemporaryKegId() {
     return `tempKegId_${temporaryKegId++}`;
-}
-
-interface FileProps {
-    descriptor?: unknown;
 }
 
 interface SignedKegProps {
@@ -26,7 +23,11 @@ interface SignedKegProps {
     signature?: string;
 }
 
-type BaseProps = FileProps & SignedKegProps;
+interface FileProps {
+    descriptor?: IFileDescriptor;
+}
+
+type BaseProps = SignedKegProps & FileProps;
 
 interface RawKegData<TProps> {
     kegId: string;
@@ -39,7 +40,6 @@ interface RawKegData<TProps> {
     /** guard against potential server bugs sending null */
     collectionVersion: string | null;
     deleted: boolean;
-    // hidden?: boolean
     createdAt: number;
     updatedAt: number;
     props: BaseProps & TProps;
@@ -140,7 +140,7 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
     owner?: string;
     kegCreatedAt?: number;
     kegUpdatedAt?: number;
-    deserializeDescriptor?: (descriptor: unknown) => void;
+    abstract deserializeDescriptor(_data: IFileDescriptor): void;
     afterLoad?: () => void;
     onLoadedFromKeg?: (keg: unknown) => void;
 
@@ -183,7 +183,7 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
     /**
      * Sets to true when keg is loaded for the first time.
      */
-    @observable protected loaded = false;
+    @observable loaded = false;
 
     protected lastLoadHadError = false;
 

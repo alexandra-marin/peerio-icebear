@@ -1,4 +1,4 @@
-import { observable, computed } from 'mobx';
+import { observable, computed, IObservableArray } from 'mobx';
 // import createMap from '../../helpers/dynamic-array-map';
 // import warnings from '../warnings';
 import FileFolder from '../files/file-folder';
@@ -21,6 +21,12 @@ export default class Volume extends FileFolder {
         this.db = new VolumeKegDb(id);
     }
 
+    db: VolumeKegDb;
+    chatHead: ChatHead;
+    _metaPromise: Promise<void>;
+    deletedByMyself: boolean;
+    leaving: boolean;
+
     @observable loadingMeta = false;
     @observable metaLoaded = false;
 
@@ -32,7 +38,7 @@ export default class Volume extends FileFolder {
 
     @computed
     get allParticipants() {
-        if (!this.db.boot || !this.db.boot.participants) return [];
+        if (!this.db.boot || !this.db.boot.participants) return [] as IObservableArray<Contact>;
         return this.db.boot.participants.sort(this.compareContacts);
     }
 
@@ -61,6 +67,7 @@ export default class Volume extends FileFolder {
         return this.chatHead.save(
             () => {
                 this.chatHead.chatName = validated;
+                return true;
             },
             null,
             'error_chatRename'

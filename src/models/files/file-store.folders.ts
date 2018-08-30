@@ -1,12 +1,13 @@
-import { observable, action, reaction, computed } from 'mobx';
+import { observable, action, reaction, computed, IObservableArray } from 'mobx';
 import tracker from '../update-tracker';
 import FileFolder from './file-folder';
 import FileFoldersKeg from './file-folders-keg';
 import createMap from '../../helpers/dynamic-array-map';
 import { retryUntilSuccess } from '../../helpers/retry';
+import FileStoreBase from '~/models/files/file-store-base';
 
 class FileStoreFolders {
-    constructor(fileStore, root) {
+    constructor(fileStore: FileStoreBase, root: FileFolder) {
         this.fileStore = fileStore;
         this.root = root || new FileFolder(fileStore, '/');
         this.currentFolder = this.root;
@@ -27,8 +28,11 @@ class FileStoreFolders {
         this.foldersMap = map.observableMap;
     }
 
+    fileStore: FileStoreBase;
+    root: FileFolder;
+
     // flat folders array, every other folder array is computed from this one
-    @observable.shallow folders = [];
+    @observable.shallow folders = [] as IObservableArray<FileFolder>;
     // will update automatically when folders array changes
     @observable foldersMap;
 

@@ -2,7 +2,6 @@
 // Upload module for File model, extracted for readability sake.
 //
 
-import config from '../../config';
 import warnings from './../warnings';
 import FileUploader from './file-uploader';
 import socket from '../../network/socket';
@@ -11,8 +10,11 @@ import * as keys from '../../crypto/keys';
 import * as fileHelper from '../../helpers/file';
 import FileNonceGenerator from './file-nonce-generator';
 import TinyDb from '../../db/tiny-db';
+import File from './file';
+import config from '../../config';
+import FileStreamBase from '~/models/files/file-stream-base';
 
-function _getUlResumeParams(path) {
+export function _getUlResumeParams(this: File, path: string) {
     return config.FileStream.getStat(path)
         .then(stat => {
             if (stat.size !== this.size) {
@@ -45,7 +47,7 @@ function _getUlResumeParams(path) {
  * @param fileName - if you'd like to override this.name or filePath
  * @param resume - system sets this param to true when it detects unfinished upload
  */
-function upload(filePath: string, fileName?: string, resume = false) {
+export function upload(this: File, filePath: string, fileName?: string, resume = false) {
     if (this.downloading || this.uploading) {
         return Promise.reject(
             new Error(`File is already ${this.downloading ? 'downloading' : 'uploading'}`)
@@ -141,7 +143,7 @@ function upload(filePath: string, fileName?: string, resume = false) {
 /**
  * Cancels ongoing upload. This will also remove file keg.
  */
-function cancelUpload() {
+export function cancelUpload(this: File) {
     if (this.readyForDownload) {
         return Promise.reject(new Error('Can not cancel upload because file is already uploaded'));
     }
@@ -151,18 +153,18 @@ function cancelUpload() {
     return this.remove();
 }
 
-function _saveUploadStartFact(path) {
+export function _saveUploadStartFact(this: File, path: string) {
     TinyDb.user.setValue(`UPLOAD:${this.fileId}`, {
         fileId: this.fileId,
         path
     });
 }
 
-function _saveUploadEndFact() {
+export function _saveUploadEndFact(this: File) {
     TinyDb.user.removeValue(`UPLOAD:${this.fileId}`);
 }
 
-function _resetUploadState(stream) {
+export function _resetUploadState(this: File, stream?: FileStreamBase) {
     this.uploading = false;
     this.uploader && this.uploader.cancel();
     this.uploader = null;
@@ -172,13 +174,4 @@ function _resetUploadState(stream) {
     } catch (ex) {
         console.error(ex);
     }
-}
-
-export default function(File) {
-    File.prototype._getUlResumeParams = _getUlResumeParams;
-    File.prototype.upload = upload;
-    File.prototype.cancelUpload = cancelUpload;
-    File.prototype._saveUploadStartFact = _saveUploadStartFact;
-    File.prototype._saveUploadEndFact = _saveUploadEndFact;
-    File.prototype._resetUploadState = _resetUploadState;
 }

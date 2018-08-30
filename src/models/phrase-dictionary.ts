@@ -1,4 +1,4 @@
-import util from '../crypto/util';
+import * as util from '../crypto/util';
 
 /**
  * Passphrase dictionary module.

@@ -2,6 +2,7 @@ import * as errors from '../../errors';
 import * as cryptoUtil from '../../crypto/util';
 import FileStreamBase from '~/models/files/file-stream-base';
 import FileNonceGenerator from '~/models/files/file-nonce-generator';
+import File from './file';
 
 /**
  * Abstract parent class for FileDownloader and FileUploader
@@ -19,6 +20,14 @@ class FileProcessor {
         this.nonceGenerator = nonceGenerator;
         this.processType = processType;
     }
+
+    file: File;
+    fileKey: Uint8Array;
+    stream: FileStreamBase;
+    nonceGenerator: FileNonceGenerator;
+    processType: string;
+    resolve: (thenableOrResult?: {} | PromiseLike<{}>) => void;
+    reject: (error?: any) => void;
 
     /**
      * Next queue processing calls will stop if stopped == true
@@ -40,6 +49,9 @@ class FileProcessor {
             this.resolve = resolve;
             this.reject = reject;
         });
+    }
+    _tick(): any {
+        throw new Error('Method not implemented.');
     }
 
     /**

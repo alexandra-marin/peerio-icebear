@@ -35,7 +35,7 @@ const callsInProgress: { [id: number]: CallInfo } = {};
  */
 export function retryUntilSuccess<T = any>(
     fn: () => Promise<T>,
-    id = Math.random(), // TODO: audit
+    id = Math.random().toString(),
     maxRetries = maxRetryCount,
     errorHandler?: () => void | Promise<any>,
     thisIsRetry?: boolean
@@ -86,7 +86,7 @@ export function retryUntilSuccess<T = any>(
     return callInfo.promise;
 }
 // todo: don't retry if throttled
-function scheduleRetry(fn: () => Promise<any>, id: number): void {
+function scheduleRetry(fn: () => Promise<any>, id: string): void {
     const callInfo = callsInProgress[id];
     if (++callInfo.retryCount > callInfo.maxRetries || callInfo.fatalErrorCount > 2) {
         console.error(

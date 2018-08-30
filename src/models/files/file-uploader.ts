@@ -5,7 +5,7 @@ import config from '../../config';
 import FileProcessor from './file-processor';
 import FileStreamBase from '~/models/files/file-stream-base';
 import FileNonceGenerator from '~/models/files/file-nonce-generator';
-
+import File from './file';
 /**
  * Handles file upload process
  * @param startFromChunk - in case of resume, start uploading from the chunk after this one
@@ -27,7 +27,7 @@ class FileUploader extends FileProcessor {
             this.file.progress = startFromChunk * file.chunkSize;
             console.log(`progress ${this.file.progress}`);
             stream.seek(startFromChunk * file.chunkSize);
-            console.log(`Upload continues from ${stream.nextReadPos}`);
+            console.log(`Upload continues from ${stream.pos}`);
         }
         // socket.onDisconnect(this._error);
     }

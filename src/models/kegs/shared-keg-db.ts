@@ -7,6 +7,7 @@ import { retryUntilSuccess } from '../../helpers/retry';
 import Contact from '../contacts/contact';
 import { observable, computed, IObservableArray } from 'mobx';
 import IKegDb from '~/defs/keg-db';
+import IBootKeg from '~/defs/boot-keg';
 /**
  * Class for shared keg databases.
  * Model is not really created until boot keg is updated for the first time.
@@ -71,12 +72,9 @@ abstract class SharedKegDb implements IKegDb {
         this.participantsToCreateWith = usernames.map(p => contactStore.getContactAndSave(p));
 
         this.isChannel = isChannel;
-        // Just to prevent parallel load routines. We can't use chat id because we don't always have it.
-        this._retryId = Math.random();
     }
 
     onBootKegLoadedFromKeg: () => {};
-    _retryId: number;
     rawMeta: {}; // this a raw server-returned meta object to cache as-is, maybe type it later
     _metaParticipants: Contact[];
     /**
@@ -103,7 +101,7 @@ abstract class SharedKegDb implements IKegDb {
         return this.boot ? this.boot.kegKeyId : null;
     }
 
-    @observable boot: SharedDbBootKeg;
+    @observable boot: IBootKeg;
 
     /**
      * Just a mirror of this.boot.participants
@@ -145,16 +143,16 @@ abstract class SharedKegDb implements IKegDb {
      * Performs initial load of the keg database data based on id or participants list.
      * Will create kegDb and boot keg if needed.
      */
-    loadMeta(cachedMeta, cachedBootKeg) {
+    loadMeta(cachedMeta?, cachedBootKeg?): Promise<{ justCreated: boolean; rawMeta: {} }> {
         return retryUntilSuccess(() => {
             if (this.id) {
                 return this._loadExistingMeta(cachedMeta, cachedBootKeg);
             }
             return this._createMeta();
-        }, this._retryId);
+        });
     }
 
-    async _loadExistingMeta(cachedMeta, cachedBootKeg) {
+    async _loadExistingMeta(cachedMeta?, cachedBootKeg?) {
         let meta = cachedMeta;
         if (!meta) {
             meta = await socket.send('/auth/kegs/db/meta', { kegDbId: this.id }, false);
@@ -217,9 +215,12 @@ abstract class SharedKegDb implements IKegDb {
                 return this.createBootKeg();
             })
             .spread((boot, justCreated) => {
-                this.boot = boot;
+                this.boot = boot as SharedDbBootKeg;
                 if (!this.key && !justCreated) this.dbIsBroken = true;
-                return { justCreated, rawMeta: this.rawMeta };
+                return { justCreated, rawMeta: this.rawMeta } as {
+                    justCreated: boolean;
+                    rawMeta: {};
+                };
             })
             .tapCatch(err => console.error(err));
     };

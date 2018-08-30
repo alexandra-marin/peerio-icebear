@@ -1,11 +1,22 @@
 import SyncedKeg from '../kegs/synced-keg';
 import { observable } from 'mobx';
+import IKegDb from '~/defs/keg-db';
 
+interface IChatHeadPayload {
+    chatName: string;
+    purpose: string;
+    spaceId: string;
+    spaceName: string;
+    spaceDescription: string;
+    spaceRoomType: 'internal' | 'patient';
+}
+
+interface IChatHeadProps {}
 /**
  * Chat head keg is open for any chat participant to update.
  */
-export default class ChatHead extends SyncedKeg {
-    constructor(db: ChatKegDb, noSync = false) {
+export default class ChatHead extends SyncedKeg<IChatHeadPayload, IChatHeadProps> {
+    constructor(db: IKegDb, noSync = false) {
         super('chat_head', db, undefined, undefined, undefined, undefined, noSync);
     }
 

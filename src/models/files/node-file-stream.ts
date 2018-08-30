@@ -10,7 +10,6 @@ import rimraf from 'rimraf';
  */
 class NodeFileStream extends FileStreamBase {
     static storageFolder: string;
-    nextReadPos: number;
     fileDescriptor: number;
     size: number;
     closed: boolean;
@@ -23,7 +22,6 @@ class NodeFileStream extends FileStreamBase {
     }
 
     open(): Promise<void> {
-        this.nextReadPos = null;
         return new Promise((resolve, reject) => {
             fs.open(this.filePath, this.mode[0], (err, fd) => {
                 if (this.checkForError(err, reject)) return;
@@ -56,7 +54,7 @@ class NodeFileStream extends FileStreamBase {
                 Buffer.from(buffer),
                 0,
                 size,
-                this.nextReadPos,
+                this.pos,
                 (err, bytesRead) => {
                     if (this.checkForError(err, reject)) return;
                     if (this.nextReadPos != null) this.nextReadPos += bytesRead;

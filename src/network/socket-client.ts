@@ -298,7 +298,7 @@ export default class SocketClient {
      * @param listener - event handler
      * @returns function you can call to unsubscribe
      */
-    subscribe(event: SOCKET_EVENTS, listener: () => void): () => void {
+    subscribe(event: SOCKET_EVENTS | APP_EVENTS, listener: (data?) => void): () => void {
         this.validateSubscription(event, listener);
         if (event === SOCKET_EVENTS.authenticated) {
             // maybe this listener was subscribed already
@@ -316,7 +316,7 @@ export default class SocketClient {
      * @param event - event name, one of SOCKET_EVENTS or APP_EVENTS
      * @param listener - event handler
      */
-    unsubscribe(event: string, listener: () => void) {
+    unsubscribe(event: SOCKET_EVENTS | APP_EVENTS, listener: () => void) {
         this.validateSubscription(event, listener);
         if (event === SOCKET_EVENTS.authenticated) {
             const ind = this.authenticatedEventListeners.indexOf(listener);

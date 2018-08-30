@@ -9,6 +9,13 @@ When('I upload a {int} byte file', async function(int) {
     await this.waitFor(() => !keg.uploading && keg.readyForDownload);
     this.uploadedFile = { name, fileId: keg.fileId };
 });
+When('I upload a {int} byte file with interruptions', async function(int) {
+    const name = await createRandomTempFile(int);
+    this.filesToCleanup.push(name);
+    const keg = ice.fileStore.upload(name);
+    await this.waitFor(() => !keg.uploading && keg.readyForDownload);
+    this.uploadedFile = { name, fileId: keg.fileId };
+});
 
 When('I rename uploaded file to {string}', async function(string) {
     await ice.fileStore.getById(this.uploadedFile.fileId).rename(string);

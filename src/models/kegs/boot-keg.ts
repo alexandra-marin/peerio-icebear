@@ -7,7 +7,7 @@ import * as util from '../../crypto/util';
 import IBootKeg from '~/defs/boot-keg';
 import { KeyPair } from '../../defs/interfaces';
 
-interface BootKegPayload {
+export interface BootKegPayload {
     kegKey: string;
     signKeys: {
         publicKey: string;

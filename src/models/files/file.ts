@@ -1,13 +1,11 @@
 import { serverErrorCodes } from '../../errors';
 import Keg from './../kegs/keg';
 import { observable, computed, action } from 'mobx';
-import { cryptoUtil, secret, sign } from '../../crypto';
-import fileHelper from '../../helpers/file';
-import util from '../../util';
+import * as cryptoUtil from '../../crypto/util';
+import * as secret from '../../crypto/secret';
+import * as sign from '../../crypto/sign';
 import config from '../../config';
 import socket from '../../network/socket';
-import uploadModule from './file.upload';
-import downloadModule from './file.download';
 import { getUser } from '../../helpers/di-current-user';
 import { getFileStore } from '../../helpers/di-file-store';
 import { retryUntilSuccess } from '../../helpers/retry';
@@ -17,118 +15,37 @@ import TaskQueue from '../../helpers/task-queue';
 import FileStoreBase from '~/models/files/file-store-base';
 import KegDb from '~/models/kegs/keg-db';
 import Chat from '~/models/chats/chat';
+import IKegDb from '~/defs/keg-db';
+import * as uploadModule from './file.upload';
+import * as downloadModule from './file.download';
+import FileData from './file-data';
+import FileStreamBase from '~/models/files/file-stream-base';
 
 const signDetached = sign.signDetached;
-// every unique file (fileId) has a set of properties we want to be shared between all the file kegs
-// representing this file
-class FileData {
-    constructor(fileId) {
-        this.fileId = fileId;
-    }
-    @observable size = 0;
-    @observable uploadedAt = null;
-    @observable updatedAt = null;
-    @observable fileOwner;
-    @observable unsanitizedName = '';
-    @observable cachingFailed = false;
-    @observable readyForDownload = false;
-    // 'uploading' is not here because while uploading == true it's not possible to have 2+ kegs for the file
-    @observable downloading = false;
-    @observable progress = 0;
-    @observable progressMax = 0;
-    @observable cached = false;
-    @observable tmpCached = false;
-    @observable originalUploadPath;
-    @observable shared = false;
-    @observable sharedBy = '';
-    @observable visibleCounter = 0;
-    @observable role = '';
-    fileId = null;
-    descriptorVersion = 0;
-    descriptorFormat = 1;
-    chunkSize = 0;
-    blobKey = null;
-    blobNonce = null;
-
-    @computed
-    get name() {
-        return fileHelper.sanitizeBidirectionalFilename(this.unsanitizedName);
-    }
-
-    @computed
-    get normalizedName() {
-        return this.unsanitizedName ? this.unsanitizedName.toUpperCase() : '';
-    }
-
-    @computed
-    get ext() {
-        return fileHelper.getFileExtension(this.name);
-    }
-
-    @computed
-    get iconType() {
-        return fileHelper.getFileIconType(this.ext);
-    }
-
-    @computed
-    get nameWithoutExtension() {
-        return fileHelper.getFileNameWithoutExtension(this.name);
-    }
-
-    @computed
-    get isImage() {
-        return fileHelper.isImage(this.ext);
-    }
-
-    @computed
-    get fsSafeUid() {
-        return cryptoUtil.getHexHash(16, cryptoUtil.b64ToBytes(this.fileId));
-    }
-
-    @computed
-    get tmpCachePath() {
-        return config.FileStream.getTempCachePath(`${this.fsSafeUid}.${this.ext}`);
-    }
-
-    @computed
-    get cachePath() {
-        if (!config.isMobile) return null;
-
-        const name = `${this.name || this.fsSafeUid}.${this.ext}`;
-        return config.FileStream.getFullPath(this.fsSafeUid, name);
-    }
-    @computed
-    get sizeFormatted() {
-        return util.formatBytes(this.size);
-    }
-
-    @computed
-    get chunksCount() {
-        return Math.ceil(this.size / this.chunkSize);
-    }
-
-    @computed
-    get isOverInlineSizeLimit() {
-        return (
-            clientApp.uiUserPrefs.limitInlineImageSize &&
-            this.size > config.chat.inlineImageSizeLimit
-        );
-    }
-
-    @computed
-    get isOversizeCutoff() {
-        return this.size > config.chat.inlineImageSizeLimitCutoff;
-    }
-}
 
 // TODO: deleted/unshared files will leak FileData object memory
 // need ideas how to fix it without hooking into file stores
 const fileDataMap = new Map();
 
+interface IFilePayload {}
+
+interface IFileProps {}
+
+export interface IFileDescriptor {}
+
+interface File {
+    _getUlResumeParams: typeof uploadModule._getUlResumeParams;
+    _saveUploadEndFact: typeof uploadModule._saveUploadEndFact;
+    _saveUploadStartFact: typeof uploadModule._saveUploadStartFact;
+    cancelUpload: typeof uploadModule.cancelUpload;
+    upload: typeof uploadModule.upload;
+}
+
 /**
  * File keg and model.
  */
-class File extends Keg {
+class File extends Keg<IFilePayload, IFileProps> implements File {
+    uploader: import('/Users/anri/src/peerio/peerio-icebear/src/models/files/file-uploader').default;
     constructor(db: KegDb, store: FileStoreBase) {
         super(null, 'file', db);
         this.store = store;
@@ -137,6 +54,11 @@ class File extends Keg {
     }
 
     static copyQueue = new TaskQueue(1, 200);
+
+    hidden: boolean;
+    store: FileStoreBase;
+    latestFormat: number;
+    descriptorKey: string;
 
     get data() {
         if (!this.fileId) return null;
@@ -520,16 +442,19 @@ class File extends Keg {
     }
 
     async serializeDescriptor() {
-        let payload = {
+        const objPayload = {
             name: this.name,
             blobKey: this.blobKey,
             blobNonce: this.blobNonce
         };
-        payload = JSON.stringify(payload);
-        payload = secret.encryptString(payload, cryptoUtil.b64ToBytes(this.descriptorKey));
+        const stringPayload = JSON.stringify(objPayload);
+        const payload = secret.encryptString(
+            stringPayload,
+            cryptoUtil.b64ToBytes(this.descriptorKey)
+        );
 
-        let signature = await signDetached(payload, getUser().signKeys.secretKey);
-        signature = cryptoUtil.bytesToB64(signature);
+        const binSignature = await signDetached(payload, getUser().signKeys.secretKey);
+        const signature = cryptoUtil.bytesToB64(binSignature);
 
         const descriptor = {
             fileId: this.fileId,
@@ -537,7 +462,11 @@ class File extends Keg {
             ext: this.ext,
             format: this.descriptorFormat,
             signature,
-            signedBy: getUser().username
+            signedBy: getUser().username,
+            // to be filled by caller
+            size: 0,
+            chunkSize: 0,
+            version: 0
         };
         return descriptor;
     }
@@ -567,9 +496,12 @@ class File extends Keg {
         // preventing access to data, which is already possible by just removing keys
         // BUT once we have some feature that allows uploading new blob version with
         // existing blob key - we need to verify
-        let payload = new Uint8Array(d.payload);
-        payload = secret.decryptString(payload, cryptoUtil.b64ToBytes(this.descriptorKey));
-        payload = JSON.parse(payload);
+        const binPayload = new Uint8Array(d.payload);
+        const stringPayload = secret.decryptString(
+            binPayload,
+            cryptoUtil.b64ToBytes(this.descriptorKey)
+        );
+        const payload = JSON.parse(stringPayload);
         this.name = payload.name;
         this.blobKey = payload.blobKey;
         this.blobNonce = payload.blobNonce;
@@ -621,7 +553,7 @@ class File extends Keg {
      * Remove locally stored file copy. Currently only mobile uses this.
      */
     deleteCache() {
-        config.FileSystem.delete(this.cachePath);
+        config.FileStream.delete(this.cachePath);
         this.cached = false;
     }
     /**
@@ -638,6 +570,12 @@ class File extends Keg {
         ).then(() => {
             this.deleted = true;
         });
+    }
+    _resetDownloadState(): void {
+        throw new Error('Method not implemented.');
+    }
+    _resetUploadState(_stream?: FileStreamBase): void {
+        throw new Error('Method not implemented.');
     }
 
     /**
@@ -696,6 +634,9 @@ class File extends Keg {
 
         this.downloadToTmpCache();
     }
+    downloadToTmpCache(): any {
+        throw new Error('Method not implemented.');
+    }
 
     ensureLoaded() {
         return asPromise(this, 'loaded', true);
@@ -704,7 +645,7 @@ class File extends Keg {
     /**
      * Copies this file keg to another db
      */
-    copyTo(db: KegDb, store: FileStoreBase, folderId?: string) {
+    copyTo(db: IKegDb, store: FileStoreBase, folderId?: string) {
         // TODO: ugly, refactor when chats get their own file stores
         const dstIsChat = db.id.startsWith('channel:') || db.id.startsWith('chat:');
         const dstIsSELF = db.id === 'SELF';
@@ -767,7 +708,7 @@ class File extends Keg {
     }
 }
 
-uploadModule(File);
-downloadModule(File);
+Object.assign(File.prototype, uploadModule);
+Object.assign(File.prototype, downloadModule);
 
 export default File;

@@ -85,6 +85,8 @@ class UploadConfig {
 export default new class {
     sdkVersion = _sdkVersion;
 
+    isMobile = false;
+
     debug = {
         /**
          * All socket messages will be logged if set to `true` before socket is started.

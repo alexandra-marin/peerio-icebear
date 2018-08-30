@@ -21,6 +21,9 @@ function isSelectedFileShareable(file) {
 }
 
 class FileStoreBase {
+    getByIdInChat(id: string, fileId: string): any {
+        throw new Error('Method not implemented.');
+    }
     constructor(kegDb, root = null, id) {
         this.id = id; // something to identify this instance in runtime
         this._kegDb = kegDb;
@@ -40,9 +43,9 @@ class FileStoreBase {
     fileMap: { [key: string]: File };
     fileMapObservable: ObservableMap<File>;
     folderStore: FileStoreFolders;
-
+    isMainStore = false;
     // #region File store instances
-    static instances = observable.map();
+    static instances = observable.map<FileStoreBase>();
     getFileStoreById(id) {
         if (id === 'main') return getFileStore();
         return FileStoreBase.instances.get(id);
@@ -86,7 +89,7 @@ class FileStoreBase {
         let ret = this.files;
         if (this.isMainStore) {
             FileStoreBase.instances.forEach(store => {
-                ret = ret.concat(store.files.slice());
+                ret = ret.concat(store.files.slice()) as IObservableArray<File>;
             });
         }
         return ret;

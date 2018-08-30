@@ -46,7 +46,11 @@ class UpdateTracker {
     /**
      * Listeners to changes in existing keg databases.
      */
-    updateHandlers: { kegDbId: { kegType: function } } = {};
+    updateHandlers: {
+        [kegDbId: string]: {
+            [kegType: string]: Array<(kegDbId: string) => void>;
+        };
+    } = {};
 
     // sets to true when digest is initialized with server data at least once
     @observable loadedOnce = false;
@@ -57,11 +61,24 @@ class UpdateTracker {
     /**
      * Keg digest
      */
-    digest:{kegDbId:{ kegType: { maxUpdateId: string, knownUpdateId(session): string, newKegsCount: number }} = {};
+    digest: {
+        [kegDbId: string]: {
+            [kegType: string]: {
+                maxUpdateId: string;
+                knownUpdateId: string;
+                newKegsCount: number;
+            };
+        };
+    } = {};
     /**
      * Global digest
      */
-    globalDigest:{path:{ maxUpdateId: string, knownUpdateId(session): string }} = {
+    globalDigest: {
+        [path: string]: {
+            maxUpdateId: string;
+            knownUpdateId: string;
+        };
+    } = {
         [this.DESCRIPTOR_PATH]: { maxUpdateId: '', knownUpdateId: '' }
     };
 
@@ -158,7 +175,11 @@ class UpdateTracker {
         }
     }
 
-    processDigestEvent(kegDbId, ev, isFromEvent) {
+    processDigestEvent(
+        kegDbId: string,
+        ev: [string, string, string | 0, number],
+        isFromEvent = false
+    ) {
         // eslint-disable-next-line prefer-const
         let [kegType, maxUpdateId, sessionUpdateId, newKegsCount] = ev;
         // GOTCHA: when this is a digest event and not the result of getDigest
@@ -221,16 +242,16 @@ class UpdateTracker {
     /**
      * Emits one update event for a keg type in specific database.
      */
-    emitKegTypeUpdatedEvent(id: string, type: string) {
+    emitKegTypeUpdatedEvent(kegDbId: string, kegType: string) {
         if (!this.loadedOnce) {
-            when(() => this.loadedOnce, () => this.emitKegDbAddedEvent(id, type));
+            when(() => this.loadedOnce, () => this.emitKegTypeUpdatedEvent(kegDbId, kegType));
             return;
         }
-        if (!this.updateHandlers[id] || !this.updateHandlers[id][type]) return;
-        this.updateHandlers[id][type].forEach(handler => {
+        if (!this.updateHandlers[kegDbId] || !this.updateHandlers[kegDbId][kegType]) return;
+        this.updateHandlers[kegDbId][kegType].forEach(handler => {
             setTimeout(() => {
                 try {
-                    handler(id);
+                    handler(kegDbId);
                 } catch (err) {
                     console.error(err);
                 }

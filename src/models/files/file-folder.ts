@@ -15,7 +15,7 @@ function hasLegacyFilesPredicate(f) {
 }
 
 class FileFolder {
-    constructor(store, name, isShared) {
+    constructor(store, name?, isShared = false) {
         this.store = store;
         this.isRoot = name === '/';
         this.name = this.isRoot ? '' : name;
@@ -130,7 +130,14 @@ class FileFolder {
 
     @computed
     get foldersSortedByName() {
-        return this.folders.sort((f1, f2) => f1.normalizedName > f2.normalizedName);
+        return this.folders.sort(
+            (f1, f2) =>
+                f1.normalizedName > f2.normalizedName
+                    ? -1
+                    : f1.normalizedName < f2.normalizedName
+                        ? 1
+                        : 0
+        );
     }
 
     @computed
@@ -140,7 +147,9 @@ class FileFolder {
 
     @computed
     get filesAndFoldersDefaultSorting() {
-        return this.foldersSortedByName.concat(this.filesSortedByDate);
+        return (this.foldersSortedByName as Array<File | FileFolder>).concat(
+            this.filesSortedByDate
+        );
     }
 
     // number of bytes, total size of all files in this folder tree

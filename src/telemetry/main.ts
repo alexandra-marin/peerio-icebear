@@ -6,18 +6,14 @@ const g = require('../helpers/global-context');
 const serverSettings = require('../models/server-settings');
 
 interface Properties {
-    'Version Number'?: number;
-    distinct_id?: string; // eslint-disable-line
-    token?: string;
-    Device?: 'Mobile' | 'Desktop';
-    'App Version'?: string;
+    // eslint-disable-next-line camelcase, Mixpanel requires distinct_id in this format
+    distinct_id: string;
+    token: string;
+    Device: 'Mobile' | 'Desktop';
+    'Version Number': number;
+    'App Version': string;
 }
-
-const baseObj: { properties: Properties } = {
-    properties: {
-        'Version Number': 1 // refers to our own tracker library versioning
-    }
-};
+let baseObj: { properties: Properties };
 
 async function getUserId(): Promise<string> {
     const userId: Promise<string> = await TinyDb.system.getValue('telemetryUserId');
@@ -32,8 +28,10 @@ async function getUserId(): Promise<string> {
 
 export async function init() {
     try {
-        baseObj.properties.distinct_id = await getUserId(); // eslint-disable-line
+        // eslint-disable-next-line camelcase, Mixpanel requires distinct_id in this format
+        baseObj.properties.distinct_id = await getUserId();
         baseObj.properties.Device = config.isMobile ? 'Mobile' : 'Desktop';
+        baseObj.properties['Version Number'] = 1; // refers to our own tracker library versioning
         baseObj.properties['App Version'] = config.appVersion;
     } catch (e) {
         console.error('Could not initialize telemetry.', e);

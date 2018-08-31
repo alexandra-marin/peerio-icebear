@@ -66,7 +66,7 @@ export function send(eventObj) {
         const data = g.btoa(JSON.stringify(object));
         const url = `${config.telemetry.baseUrl}${data}`;
 
-        console.log(object);
+        console.debug(object);
         g.fetch(url, {
             method: 'GET'
         });

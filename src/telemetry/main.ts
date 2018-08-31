@@ -9,11 +9,17 @@ interface Properties {
     // eslint-disable-next-line camelcase, Mixpanel requires distinct_id in this format
     distinct_id: string;
     token: string;
-    Device: 'Mobile' | 'Desktop';
+    Device: '' | 'Mobile' | 'Desktop';
     'Version Number': number;
     'App Version': string;
 }
-let baseObj: { properties: Properties };
+let baseProperties: Properties = {
+    distinct_id: '',
+    token: '',
+    Device: '',
+    'Version Number': 1,
+    'App Version': ''
+};
 
 async function getUserId(): Promise<string> {
     const userId: string = await TinyDb.system.getValue('telemetryUserId');
@@ -29,10 +35,10 @@ async function getUserId(): Promise<string> {
 export async function init(): Promise<void> {
     try {
         // eslint-disable-next-line camelcase, Mixpanel requires distinct_id in this format
-        baseObj.properties.distinct_id = await getUserId();
-        baseObj.properties.Device = config.isMobile ? 'Mobile' : 'Desktop';
-        baseObj.properties['Version Number'] = 1; // refers to our own tracker library versioning
-        baseObj.properties['App Version'] = config.appVersion;
+        baseProperties.distinct_id = await getUserId();
+        baseProperties.Device = config.isMobile ? 'Mobile' : 'Desktop';
+        baseProperties['Version Number'] = 1; // refers to our own tracker library versioning
+        baseProperties['App Version'] = config.appVersion;
     } catch (e) {
         console.error('Could not initialize telemetry.', e);
     }
@@ -50,7 +56,7 @@ interface EventObject {
 export function send(eventObj: EventObject): void {
     try {
         // Check server for Mixpanel token on every send, in case token changes.
-        baseObj.properties.token = serverSettings.mixPanelClientToken;
+        baseProperties.token = serverSettings.mixPanelClientToken;
 
         // Marketing wants all items (property names and values) to be in Title Case, but this breaks code style.
         // So we still write props in camelCase when sending events from client, and convert them here.
@@ -60,19 +66,17 @@ export function send(eventObj: EventObject): void {
             properties[item] = eventObj.properties[itemInCamel];
         });
 
-        // `properties` will be overwritten if you directly assign eventObj to baseObj or vice versa.
-        // This song-and-dance merges the properties first, assigns the object, then assigns the object's properties
-        properties = { ...baseObj.properties, ...properties };
-        const object: EventObject = { ...eventObj, ...baseObj };
-        object.properties = properties;
+        const sendObject = eventObj;
+        properties = { ...baseProperties, ...properties };
+        sendObject.properties = properties;
 
-        const data = g.btoa(JSON.stringify(object));
+        const data = g.btoa(JSON.stringify(sendObject));
         const url = `${config.telemetry.baseUrl}${data}`;
 
-        console.debug(object);
-        g.fetch(url, {
-            method: 'GET'
-        });
+        console.log(sendObject);
+        // g.fetch(url, {
+        //     method: 'GET'
+        // });
     } catch (e) {
         console.error('Could not send telemetry event.', e);
     }

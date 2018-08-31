@@ -318,6 +318,20 @@ const config = new class {
         }
     };
 
+    user = {
+        /**
+         * Max number of characters in username
+         * @type {number}
+         */
+        maxUsernameLength: 16,
+
+        /**
+         * Max number of characters in first name or last name
+         * @type {number}
+         */
+        maxNameLength: 40
+    };
+
     /**
      * How long to wait for external server to respond when unfurling urls posted in messages.
      */

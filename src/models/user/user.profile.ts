@@ -6,14 +6,15 @@ import tracker from '../update-tracker';
 import { retryUntilSuccess } from '../../helpers/retry';
 import warnings from '../warnings';
 import socket from '../../network/socket';
-import { validators } from '../../helpers/validation/field-validation';
+import validators from '../../helpers/validation/user-validators';
 import contactStore from '../contacts/contact-store';
 import AccountVersion from './account-version';
 import { getFileStore } from '../../helpers/di-file-store';
+import User from '~/models/user/user';
 //
 // These are still members of User class, they're just split across several mixins to make User file size sensible.
 //
-export default function mixUserProfileModule() {
+export default function mixUserProfileModule(this: User) {
     const _profileKeg = new Profile(this);
     const _quotaKeg = new Quota(this);
     this.accountVersionKeg = new AccountVersion(this);
@@ -105,7 +106,7 @@ export default function mixUserProfileModule() {
             .tapCatch(err => {
                 console.error(err);
                 warnings.add('error_resendConfirmation');
-            });
+            }) as Promise<void>;
     };
 
     this.removeEmail = function(email: string) {
@@ -119,7 +120,7 @@ export default function mixUserProfileModule() {
             .tapCatch(err => {
                 console.error(err);
                 warnings.add('error_saveSettings');
-            });
+            }) as Promise<void>;
     };
 
     this.addEmail = function(email: string) {
@@ -156,7 +157,7 @@ export default function mixUserProfileModule() {
             .tapCatch(err => {
                 console.error(err);
                 warnings.add('error_saveSettings');
-            });
+            }) as Promise<void>;
     };
 
     // todo: move to quota keg, make computed

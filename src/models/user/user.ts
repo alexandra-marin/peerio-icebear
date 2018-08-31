@@ -6,14 +6,14 @@ import mixUser2faModule from './user.2fa.js';
 import KegDb from './../kegs/keg-db';
 import TinyDb from '../../db/tiny-db';
 import { observable, when, computed } from 'mobx';
-import currentUserHelper from './../../helpers/di-current-user';
-import { publicCrypto } from '../../crypto/index';
+import * as currentUserHelper from './../../helpers/di-current-user';
+import * as publicCrypto from '../../crypto/public';
 import { formatBytes, tryToGet } from '../../util';
 import config from '../../config';
 import MRUList from '../../helpers/mru-list';
 import warnings from '../warnings';
 import clientApp from '../client-app';
-import { Address, KeyPair } from '~/defs/interfaces';
+import { Address, KeyPair, AuthToken, AccountCreationChallenge } from '~/defs/interfaces';
 
 let currentUser: User;
 
@@ -28,6 +28,50 @@ let currentUser: User;
  * Many private and protected members are not documented with jsdoc tags to avoid clutter.
  */
 export default class User {
+    stopReauthenticator: () => void;
+    _handleAccountCreationChallenge: (challenge: AccountCreationChallenge) => void;
+    _loadAuthSalt: () => Promise<void>;
+    _deriveKeys: () => Promise<void>;
+    _getAuthToken: () => Promise<AuthToken>;
+    _authenticateAuthToken: (data: AuthToken) => any;
+    _derivePassphraseFromPasscode: (passcodeSecret: any) => any;
+    _getAuthDataFromPasscode: (passphrase: string, passcodeSecret: any) => any;
+    deserializeAuthData: (deserializeAuthData: any) => any;
+    setup2fa: () => Promise<string>;
+    confirm2faSetup: (code: string, trust?: boolean) => Promise<string[]>;
+    disable2fa: () => Promise<void>;
+    reissueBackupCodes: () => Promise<any>;
+    _set2faCookieData: (data: { cookie: string; trusted: boolean }) => Promise<void>;
+    _get2faCookieData: () => Promise<{ cookie: string; trusted: boolean }>;
+    _delete2faCookieData: () => Promise<void>;
+    _getDeviceId: () => Promise<string>;
+    _handle2faOnLogin: () => Promise<{}>;
+    _authenticateConnection: () => any;
+    _checkForPasscode: (skipCache?: boolean) => Promise<any>;
+    serializeAuthData: () => string;
+    disablePasscode: () => Promise<void>;
+    passcodeIsDisabled: () => Promise<boolean>;
+    setPasscode: (passcode: string) => Promise<void>;
+    validatePasscode: (passcode: string) => any;
+    hasPasscode: () => Promise<boolean>;
+    signout: (untrust?: boolean) => Promise<any>;
+    accountVersionKeg: import('/Users/anri/src/peerio/peerio-icebear/src/models/user/account-version').default;
+    settings: import('/Users/anri/src/peerio/peerio-icebear/src/models/user/settings').default;
+    loadSettings: () => void;
+    saveSettings: (updateFunction: any) => Promise<{}>;
+    loadProfile: () => void;
+    loadQuota: () => void;
+    saveProfile: () => any;
+    resendEmailConfirmation: (email: string) => Promise<any>;
+    removeEmail: (email: string) => Promise<any>;
+    addEmail: (email: string) => any;
+    makeEmailPrimary: (email: string) => Promise<any>;
+    canSendGhost: () => boolean;
+    saveAvatar: (blobs?: ArrayBuffer[]) => Promise<any>;
+    deleteAvatar: () => any;
+    setAccountKeyBackedUp: () => Promise<any>;
+    _createAccount: () => Promise<any>;
+
     constructor() {
         this.kegDb = new KegDb();
         // this is not really extending prototype, but we don't care because User is almost a singleton
@@ -81,7 +125,7 @@ export default class User {
      * UI-controlled flag, Icebear doesn't use it
      */
     @observable secureWithTouchID = false;
-    props = {};
+    props: { mcrRoles?: string[] } = {};
 
     @computed
     get isMCAdmin() {

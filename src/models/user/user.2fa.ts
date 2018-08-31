@@ -3,9 +3,10 @@ import warnings from '../warnings';
 import clientApp from '../client-app';
 import TinyDb from '../../db/tiny-db';
 import config from '../../config';
-import { cryptoUtil } from '../../crypto/index';
+import * as cryptoUtil from '../../crypto/util';
+import User from '~/models/user/user';
 
-export default function mixUser2faModule() {
+export default function mixUser2faModule(this: User) {
     /**
      * Starts 2fa setup challenge.
      * @returns TOTP secret
@@ -39,7 +40,7 @@ export default function mixUser2faModule() {
             .tapCatch(err => {
                 console.error(err);
                 warnings.add('error_setup2fa');
-            });
+            }) as Promise<string[]>;
     };
 
     /**
@@ -54,7 +55,7 @@ export default function mixUser2faModule() {
             .tapCatch(err => {
                 console.error(err);
                 warnings.add('error_disable2fa');
-            });
+            }) as Promise<void>;
     };
 
     /**
@@ -63,11 +64,11 @@ export default function mixUser2faModule() {
     this.reissueBackupCodes = () => {
         return verifyProtectedAction('backupCodes')
             .then(() => socket.send('/2fa/backup-codes/reissue'))
-            .then(res => res.backupCodes)
+            .then(res => (res as { backupCodes: string[] }).backupCodes)
             .tapCatch(err => {
                 console.error(err);
                 warnings.add('error_reissue2faBackupCodes');
-            });
+            }) as Promise<string[]>;
     };
 
     /**

@@ -4,7 +4,6 @@ import Contact from '~/models/contacts/contact';
 
 /**
  * User's favorite contacts. Named plaintext synced keg.
- * @extends {SyncedKeg}
  */
 class MyContacts extends SyncedKeg {
     constructor() {

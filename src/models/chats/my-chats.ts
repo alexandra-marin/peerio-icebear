@@ -3,7 +3,6 @@ import { getUser } from '../../helpers/di-current-user';
 
 /**
  * MyChats keg holds chat groups for user.
- * @extends {SyncedKeg}
  */
 class MyChats extends SyncedKeg {
     constructor() {

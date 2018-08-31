@@ -21,6 +21,7 @@ import _ from 'lodash';
 import FileFolder from '~/models/files/file-folder';
 
 export class FileStore extends FileStoreBase {
+    migration: any;
     constructor() {
         super(null, null, 'main');
         this.bulk = new FileStoreBulk(this);
@@ -483,7 +484,7 @@ export class FileStore extends FileStoreBase {
                     setTimeout(() => {
                         uploadOneLevel(f.folders, newParent).then(resolve);
                     });
-            });
+                });
             }
         };
 

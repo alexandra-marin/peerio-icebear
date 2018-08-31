@@ -15,7 +15,6 @@ import IKegDb from '~/defs/keg-db';
  * @param forceSign - force signature of plaintext kegs or not
  * @param noSync - in rare cases we want to use some keg that extends synced keg out of normal flow,
  *                 like one-time decryption, for that we need to disable synced keg sync automation.
- * @extends {Keg}
  */
 class SyncedKeg<TPayload, TProps> extends Keg<TPayload, TProps> {
     constructor(

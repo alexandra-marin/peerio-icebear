@@ -45,7 +45,12 @@ const serverValidationStore = { request: {} };
  * @param context - context for field, e.g "signup"
  * @param name - field name
  */
-function _callServer(context: string, name: string, value: string | number, subkey: string): Promise<boolean> {
+function _callServer(
+    context: string,
+    name: string,
+    value: string | number,
+    subkey: string
+): Promise<boolean> {
     const key = `${context}::${name}::${subkey}`;
     const pending = serverValidationStore.request[key];
     if (pending) {
@@ -90,8 +95,8 @@ function isValidMedicalId(val) {
     return Promise.resolve(medicalIdRegex.test(val));
 }
 
-function isValid(context, name, subKey) {
-    return (value, n) =>
+function isValid(context, name, subKey?) {
+    return (value, n?) =>
         value ? _callServer(context, name || n, value, subKey) : Promise.resolve(false);
 }
 

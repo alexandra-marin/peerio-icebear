@@ -6,7 +6,6 @@ import { InvitedContact } from '../../defs/interfaces';
 /**
  * Named readonly server-controlled keg. Contains data about contacts invited by email.
  * Invite data can be modified via separate api.
- * @extends {SyncedKeg}
  */
 class Invites extends SyncedKeg {
     constructor() {

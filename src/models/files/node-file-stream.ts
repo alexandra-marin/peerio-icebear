@@ -6,7 +6,6 @@ import mkdirp from 'mkdirp';
 import rimraf from 'rimraf';
 /**
  * FileStreamBase implementation for nodejs, see {@link FileStreamBase} for docs.
- * @extends {FileStreamBase}
  */
 class NodeFileStream extends FileStreamBase {
     static storageFolder: string;

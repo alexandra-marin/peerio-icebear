@@ -146,6 +146,7 @@ export default new class {
      *
      */
     deviceUID: string = null;
+    arch: any;
 
     /**
      * For reference. Amount of bytes added to every file chunk in encrypted state.

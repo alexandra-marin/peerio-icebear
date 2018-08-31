@@ -85,7 +85,7 @@ export class ClientApp {
     create2FARequest(
         type: 'login' | 'backupCodes' | 'disable',
         submitCallback: (code: string, trust?: boolean) => void,
-        cancelCallback: () => void
+        cancelCallback?: () => void
     ) {
         // deliberately overwriting existing request
         // this should never happen anyway, if it does - it's safer to overwrite
@@ -97,7 +97,7 @@ export class ClientApp {
             },
             cancel: () => {
                 this.active2FARequest = null;
-                cancelCallback();
+                if (cancelCallback) cancelCallback();
             }
         };
     }

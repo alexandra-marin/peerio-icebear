@@ -1,16 +1,21 @@
 import { serverErrorCodes, normalize, NoPasscodeFoundError } from '../../errors';
 import socket from '../../network/socket';
-import { keys, publicCrypto, secret, cryptoUtil } from '../../crypto/index';
-import util from '../../util';
+import * as keys from '../../crypto/keys';
+import * as publicCrypto from '../../crypto/public';
+import * as secret from '../../crypto/secret';
+import * as cryptoUtil from '../../crypto/util';
+import * as util from '../../util';
 import TinyDb from '../../db/tiny-db';
 import config from '../../config';
 import warnings from '../warnings';
 import clientApp from '../client-app';
+import User from '~/models/user/user';
+import { AuthToken } from '~/defs/interfaces';
 //
 // Authentication mixin for User model.
 // TODO: authentication code is a bit hard to read and follow, needs refactoring
 //
-export default function mixUserAuthModule() {
+export default function mixUserAuthModule(this: User) {
     this._authenticateConnection = () => {
         console.log('Starting connection auth sequence.');
         return this._loadAuthSalt()
@@ -54,7 +59,7 @@ export default function mixUserAuthModule() {
             .then(keySet => {
                 this.bootKey = keySet.bootKey;
                 this.authKeys = keySet.authKeyPair;
-            });
+            }) as Promise<void>;
     };
 
     this._loadAuthSalt = () => {
@@ -64,7 +69,7 @@ export default function mixUserAuthModule() {
             .send('/noauth/auth-salt/get', { username: this.username }, false)
             .then(response => {
                 this.authSalt = new Uint8Array(response.authSalt);
-            });
+            }) as Promise<void>;
     };
     this._getAuthToken = () => {
         console.log('Requesting auth token.');
@@ -80,7 +85,10 @@ export default function mixUserAuthModule() {
                     sdkVersion: config.sdkVersion,
                     // sending whatever string in the beginning to let server know we are
                     // a new, cool client which is gonna use sessions
-                    sessionId: this.sessionId || 'initialize'
+                    sessionId: this.sessionId || 'initialize',
+                    appLabel: '',
+                    deviceId: '',
+                    twoFACookie: ''
                 };
                 if (config.whiteLabel && config.whiteLabel.name) {
                     req.appLabel = config.whiteLabel.name;
@@ -94,7 +102,7 @@ export default function mixUserAuthModule() {
                 }
                 return socket.send('/noauth/auth-token/get', req, true);
             })
-            .then(resp => util.convertBuffers(resp));
+            .then(resp => util.convertBuffers(resp)) as Promise<AuthToken>;
     };
 
     this._authenticateAuthToken = data => {
@@ -107,7 +115,7 @@ export default function mixUserAuthModule() {
         );
         // 65 84 = 'AT' (access token)
         if (decrypted[0] !== 65 || decrypted[1] !== 84 || decrypted.length !== 32) {
-            return Promise.reject(new Error('Auth token plaintext is of invalid format.'));
+            throw new Error('Auth token plaintext is of invalid format.');
         }
         return socket
             .send('/noauth/authenticate', { decryptedAuthToken: decrypted.buffer }, true)
@@ -115,16 +123,14 @@ export default function mixUserAuthModule() {
                 if (this.sessionId && resp.sessionId !== this.sessionId) {
                     console.log('Digest session has expired.');
                     clientApp.clientSessionExpired = true;
-                    return Promise.reject(
-                        new Error('Digest session was expired, application restart is needed.')
-                    );
+                    throw new Error('Digest session was expired, application restart is needed.');
                 }
                 this.sessionId = resp.sessionId;
                 return null;
             });
     };
 
-    this._checkForPasscode = skipCache => {
+    this._checkForPasscode = (skipCache = false) => {
         if (!skipCache && this.authKeys) {
             console.log('user.auth.js: auth keys already loaded');
             return Promise.resolve(true);
@@ -203,7 +209,14 @@ export default function mixUserAuthModule() {
      * Applies serialized auth data to user object. Just call `login()` after this and user will get authenticated
      * faster then when you just provide username and passphrase.
      */
-    this.deserializeAuthData = (data: string) => {
+    this.deserializeAuthData = (data: {
+        username: string;
+        authSalt: string;
+        bootKey: string;
+        paddedPassphrase?: string;
+        passphrase?: string;
+        authKeys: { publicKey: string; secretKey: string };
+    }) => {
         // console.log(data);
         const { username, authSalt, bootKey, authKeys } = data;
         this.username = username;
@@ -217,10 +230,10 @@ export default function mixUserAuthModule() {
         this.bootKey = bootKey && cryptoUtil.b64ToBytes(bootKey);
         if (authKeys) {
             let { secretKey, publicKey } = authKeys;
-            secretKey = secretKey && cryptoUtil.b64ToBytes(secretKey);
-            publicKey = publicKey && cryptoUtil.b64ToBytes(publicKey);
+            const binSecretKey = secretKey ? cryptoUtil.b64ToBytes(secretKey) : null;
+            const binPublicKey = publicKey ? cryptoUtil.b64ToBytes(publicKey) : null;
             if (secretKey && publicKey) {
-                this.authKeys = { secretKey, publicKey };
+                this.authKeys = { secretKey: binSecretKey, publicKey: binPublicKey };
             }
         }
     };
@@ -230,11 +243,10 @@ export default function mixUserAuthModule() {
      */
     this.disablePasscode = () => {
         return TinyDb.system.setValue(`${this.username}:passcode:disabled`, true).then(() => {
-            return TinyDb.system.removeValue(`${this.username}:passcode`).catch(err => {
-                if (err.message === 'Invalid tinydb key') {
-                    return true;
+            return TinyDb.system.removeValue(`${this.username}:passcode`).catch((err: Error) => {
+                if (err.message !== 'Invalid tinydb key') {
+                    throw err;
                 }
-                return Promise.reject(err);
             });
         });
     };
@@ -251,10 +263,9 @@ export default function mixUserAuthModule() {
      * secret containing the username and passphrase as a JSON string and stores
      * it to the local db.
      */
-    this.setPasscode = (passcode: string) => {
-        if (!this.username) return Promise.reject(new Error('Username is required to derive keys'));
-        if (!this.passphrase)
-            return Promise.reject(new Error('Passphrase is required to derive keys'));
+    this.setPasscode = async (passcode: string) => {
+        if (!this.username) throw new Error('Username is required to derive keys');
+        if (!this.passphrase) throw new Error('Passphrase is required to derive keys');
         console.log('Setting passcode');
         return keys
             .deriveKeyFromPasscode(this.username, passcode)
@@ -273,10 +284,9 @@ export default function mixUserAuthModule() {
                 return TinyDb.system
                     .removeValue(`${this.username}:passcode:disabled`)
                     .catch(err => {
-                        if (err.message === 'Invalid tinydb key') {
-                            return true;
+                        if (err.message !== 'Invalid tinydb key') {
+                            throw err;
                         }
-                        return Promise.reject(err);
                     });
             });
     };
@@ -286,7 +296,7 @@ export default function mixUserAuthModule() {
      */
     this.validatePasscode = (passcode: string) => {
         // creating temporary user obj to do that without affecting current instance's state
-        const u = new this.constructor();
+        const u = new (this.constructor as typeof User)();
         u.passphrase = passcode;
         u.username = this.username;
         return u._checkForPasscode().then(() => {

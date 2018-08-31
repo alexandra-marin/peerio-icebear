@@ -77,7 +77,7 @@ export interface RawKegDataEncrypted<TProps> extends RawKegData<TProps> {
  *
  * todo: convert this monstrous constructor params to object
  */
-export default abstract class Keg<TPayload, TProps extends {} = {}> {
+export default class Keg<TPayload, TProps extends {} = {}> {
     constructor(
         id: string | null,
         type: string,
@@ -140,7 +140,7 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
     owner?: string;
     kegCreatedAt?: number;
     kegUpdatedAt?: number;
-    abstract deserializeDescriptor(_data: IFileDescriptor): void;
+    deserializeDescriptor: (_data: IFileDescriptor) => void;
     afterLoad?: () => void;
     onLoadedFromKeg?: (keg: unknown) => void;
 
@@ -155,24 +155,24 @@ export default abstract class Keg<TPayload, TProps extends {} = {}> {
      */
     @observable protected signatureError: boolean | null = null;
 
-    @observable protected id: string | null;
+    @observable id: string | null;
 
     /**
      * If this keg wasn't created yet, but you need to use it in a list somewhere like chat, you can call
      * `assignTempId()` and use this field as identification.
      */
-    @observable protected tempId: string | null;
+    @observable tempId: string | null;
 
     /**
      * Keg version, when first created and empty, keg has version === 1
      */
     @observable version = 0;
 
-    @observable protected deleted = false;
+    @observable deleted = false;
 
-    @observable protected loading = false;
+    @observable loading = false;
 
-    @observable protected saving = false;
+    @observable saving = false;
 
     /**
      * Subclasses can set this to 'true' on data modification and subscribe to the flag resetting to 'false'

@@ -1,16 +1,30 @@
 import Keg from '../kegs/keg';
+import User from '~/models/user/user';
 
+interface ProfilePayload {
+    firstName: string;
+    lastName: string;
+    created?: number;
+    locale: string;
+    deleted?: boolean;
+    primaryAddressValue?: string;
+    props: {}; // todo define medcryptor props
+    addresses?: Array<{ type: string; address: string }>;
+    primaryAddressConfirmed?: boolean;
+    isBlackListed?: boolean;
+    use2fa?: boolean;
+}
 /**
  * Plaintext system named keg. Server verifies contract on update.
  * Some properties (addresses) can be changed only via separate api.
- * @extends {Keg}
  */
-class Profile extends Keg {
-    constructor(user) {
+class Profile extends Keg<ProfilePayload> {
+    constructor(user: User) {
         super('profile', 'profile', user.kegDb, true);
         this.user = user;
     }
 
+    user: User;
     serializeKegPayload() {
         return {
             firstName: this.user.firstName.trim(),
@@ -25,7 +39,7 @@ class Profile extends Keg {
         this.user.lastName = data.lastName;
         this.user.createdAt = data.created;
         this.user.locale = data.locale;
-        this.user.isDeleted = data.deleted;
+        this.user.deleted = data.deleted;
         this.user.email = data.primaryAddressValue;
         this.user.props = data.props;
         // don't needs this currently
@@ -42,7 +56,7 @@ class Profile extends Keg {
             this.user.primaryAddressConfirmed = a.confirmed;
             break;
         }
-        this.user.isBlacklisted = data.isBlackListed;
+        this.user.blacklisted = data.isBlackListed;
         this.user.twoFAEnabled = data.use2fa;
         this.user.profileLoaded = true;
     }

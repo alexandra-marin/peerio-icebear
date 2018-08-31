@@ -11,6 +11,38 @@ export interface KeyPair {
     secretKey: Uint8Array;
 }
 
+export interface AuthToken {
+    token: Uint8Array;
+    nonce: Uint8Array;
+    ephemeralServerPK: Uint8Array;
+}
+
+export interface AccountCreationChallenge {
+    username: string;
+    ephemeralServerPK: ArrayBuffer;
+    signingKey: { token: ArrayBuffer };
+    authKey: {
+        token: ArrayBuffer;
+        nonce: ArrayBuffer;
+    };
+    encryptionKey: {
+        token: ArrayBuffer;
+        nonce: ArrayBuffer;
+    };
+}
+export interface AccountCreationChallengeConverted {
+    username: string;
+    ephemeralServerPK: Uint8Array;
+    signingKey: { token: Uint8Array };
+    authKey: {
+        token: Uint8Array;
+        nonce: Uint8Array;
+    };
+    encryptionKey: {
+        token: Uint8Array;
+        nonce: Uint8Array;
+    };
+}
 /**
  * Object representing an address as server sends it.
  */

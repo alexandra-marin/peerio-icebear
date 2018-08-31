@@ -1,14 +1,16 @@
-import keys from '../../crypto/keys';
-import publicCrypto from '../../crypto/public';
-import signCrypto from '../../crypto/sign';
+import * as keys from '../../crypto/keys';
+import * as publicCrypto from '../../crypto/public';
+import * as signCrypto from '../../crypto/sign';
 import socket from '../../network/socket';
-import util from '../../util';
+import * as util from '../../util';
 import config from '../../config';
+import User from '~/models/user/user';
+import { AccountCreationChallenge, AccountCreationChallengeConverted } from '~/defs/interfaces';
 
 //
 // Registration mixin for User model.
 //
-export default function mixUserRegisterModule() {
+export default function mixUserRegisterModule(this: User) {
     this._createAccount = () => {
         console.log('Generating keys.');
         this.authSalt = keys.generateAuthSalt();
@@ -31,7 +33,8 @@ export default function mixUserRegisterModule() {
                     platform: config.platform,
                     clientVersion: config.appVersion,
                     sdkVersion: config.sdkVersion,
-                    props: this.props || {}
+                    props: this.props || {},
+                    appLabel: ''
                 };
                 if (config.whiteLabel && config.whiteLabel.name) {
                     request.appLabel = config.whiteLabel.name;
@@ -41,24 +44,26 @@ export default function mixUserRegisterModule() {
             .then(this._handleAccountCreationChallenge);
     };
 
-    this._handleAccountCreationChallenge = cng => {
+    this._handleAccountCreationChallenge = (receivedChallenge: AccountCreationChallenge) => {
         console.log('Processing account creation challenge.');
         // validating challenge, paranoid mode on
         if (
-            typeof cng.username !== 'string' ||
-            !(cng.ephemeralServerPK instanceof ArrayBuffer) ||
-            !(cng.signingKey.token instanceof ArrayBuffer) ||
-            !(cng.authKey.token instanceof ArrayBuffer) ||
-            !(cng.authKey.nonce instanceof ArrayBuffer) ||
-            !(cng.encryptionKey.token instanceof ArrayBuffer) ||
-            !(cng.encryptionKey.nonce instanceof ArrayBuffer)
+            typeof receivedChallenge.username !== 'string' ||
+            !(receivedChallenge.ephemeralServerPK instanceof ArrayBuffer) ||
+            !(receivedChallenge.signingKey.token instanceof ArrayBuffer) ||
+            !(receivedChallenge.authKey.token instanceof ArrayBuffer) ||
+            !(receivedChallenge.authKey.nonce instanceof ArrayBuffer) ||
+            !(receivedChallenge.encryptionKey.token instanceof ArrayBuffer) ||
+            !(receivedChallenge.encryptionKey.nonce instanceof ArrayBuffer)
         ) {
-            throw new Error('Invalid account creation challenge received from server', cng);
+            throw new Error('Invalid account creation challenge received from server');
         }
 
-        util.convertBuffers(cng);
+        const convertedChallenge = util.convertBuffers(
+            receivedChallenge
+        ) as AccountCreationChallengeConverted;
 
-        if (cng.username !== this.username) {
+        if (convertedChallenge.username !== this.username) {
             return Promise.reject(
                 new Error('User.username and account creation challenge username do not match.')
             );
@@ -68,28 +73,28 @@ export default function mixUserRegisterModule() {
             username: this.username,
             auth: {
                 token: publicCrypto.decryptCompat(
-                    cng.authKey.token,
-                    cng.authKey.nonce,
-                    cng.ephemeralServerPK,
+                    convertedChallenge.authKey.token,
+                    convertedChallenge.authKey.nonce,
+                    convertedChallenge.ephemeralServerPK,
                     this.authKeys.secretKey
                 ).buffer
             },
             encryption: {
                 token: publicCrypto.decryptCompat(
-                    cng.encryptionKey.token,
-                    cng.encryptionKey.nonce,
-                    cng.ephemeralServerPK,
+                    convertedChallenge.encryptionKey.token,
+                    convertedChallenge.encryptionKey.nonce,
+                    convertedChallenge.ephemeralServerPK,
                     this.encryptionKeys.secretKey
                 ).buffer
             },
             signing: {
-                token: cng.signingKey.token.buffer,
+                token: convertedChallenge.signingKey.token.buffer,
                 signature: null // to be filled in promise below
             }
         };
 
         return signCrypto
-            .signDetached(cng.signingKey.token, this.signKeys.secretKey)
+            .signDetached(convertedChallenge.signingKey.token, this.signKeys.secretKey)
             .then(signature => {
                 activationRequest.signing.signature = signature.buffer;
             })

@@ -222,6 +222,7 @@
   "error_addressNotAvailable": "Email address is not available.",
   "error_signupServerError": "Server error. Please try again later.",
   "error_usernameNotFound": "Username not found.",
+  "error_usingEmailInUsernameField": "Using @",
   "error_userNotFound": "User not found",
   "error_userNotFoundSendInvite": "User not found. Send an invitation?",
   "error_userNotFoundTryEmail": "<b>{user}</> could not be found. Try searching by email address.",

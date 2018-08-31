@@ -31,12 +31,13 @@
  */
 const socket = require('../../network/socket');
 const { getFirstLetter } = require('../string');
+const config = require('../../config');
 
 const VALIDATION_THROTTLING_PERIOD_MS = 400;
 const usernameRegex = /^\w{1,16}$/;
 const emailRegex = /^[^ ]+@[^ ]+/i;
 const medicalIdRegex = /MED\d{10}/i;
-const usernameLength = 16;
+const usernameLength = config.user.maxUsernameLength;
 // const phoneRegex =
 //     /^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$/i;
 

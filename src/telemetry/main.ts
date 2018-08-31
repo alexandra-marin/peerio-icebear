@@ -59,8 +59,8 @@ export function send(eventObj) {
 
         // `properties` will be overwritten if you directly assign eventObj to baseObj or vice versa.
         // This song-and-dance merges the properties first, assigns the object, then assigns the object's properties
-        properties = Object.assign(properties, baseObj.properties);
-        const object = Object.assign({}, eventObj, baseObj);
+        properties = { ...baseObj.properties, ...properties };
+        const object = { ...eventObj, ...baseObj };
         object.properties = properties;
 
         const data = g.btoa(JSON.stringify(object));

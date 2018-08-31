@@ -200,7 +200,7 @@ const validators = {
     lastNameReserved,
     email: [emailFormat, emailAvailability],
     username: [usernameLengthCheck, usernameFormat, usernameAvailability],
-    usernameLogin: [usernameFormat, usernameExistence],
+    usernameLogin: [stringExists, usernameFormat, usernameExistence],
     firstName: [stringExists, firstNameReserved],
     lastName: [stringExists, lastNameReserved],
     mcrDoctorAhpraAvailability,

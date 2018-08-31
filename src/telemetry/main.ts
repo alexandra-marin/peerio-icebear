@@ -16,17 +16,17 @@ interface Properties {
 let baseObj: { properties: Properties };
 
 async function getUserId(): Promise<string> {
-    const userId: Promise<string> = await TinyDb.system.getValue('telemetryUserId');
+    const userId: string = await TinyDb.system.getValue('telemetryUserId');
 
     if (!userId) {
-        const newId: any = cryptoUtil.getRandomGlobalShortIdHex();
+        const newId: string = cryptoUtil.getRandomGlobalShortIdHex();
         await TinyDb.system.setValue('telemetryUserId', newId);
         return newId;
     }
     return userId;
 }
 
-export async function init() {
+export async function init(): Promise<void> {
     try {
         // eslint-disable-next-line camelcase, Mixpanel requires distinct_id in this format
         baseObj.properties.distinct_id = await getUserId();
@@ -42,7 +42,12 @@ function camelToTitleCase(text: string): string {
     return (text[0].toUpperCase() + text.slice(1)).split(/(?=[A-Z])/).join(' ');
 }
 
-export function send(eventObj) {
+interface EventObject {
+    event: string;
+    properties: {};
+}
+
+export function send(eventObj: EventObject): void {
     try {
         // Check server for Mixpanel token on every send, in case token changes.
         baseObj.properties.token = serverSettings.mixPanelClientToken;
@@ -58,7 +63,7 @@ export function send(eventObj) {
         // `properties` will be overwritten if you directly assign eventObj to baseObj or vice versa.
         // This song-and-dance merges the properties first, assigns the object, then assigns the object's properties
         properties = { ...baseObj.properties, ...properties };
-        const object = { ...eventObj, ...baseObj };
+        const object: EventObject = { ...eventObj, ...baseObj };
         object.properties = properties;
 
         const data = g.btoa(JSON.stringify(object));

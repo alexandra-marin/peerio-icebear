@@ -129,9 +129,9 @@ class User {
 
     /**
      * UI beacons
-     * @type {Array}
+     * @type {Object}
      */
-    @observable beacons = [];
+    @observable beacons = {};
     /**
 
     /**

@@ -47,3 +47,9 @@ Feature: User profile
 
     #@wip
     #Scenario: Remove email
+@wip
+    Scenario: Save beacons
+        When  I am shown a beacon
+        Then  the beacon appears as seen
+        When  I restart
+        Then  the beacon appears as seen

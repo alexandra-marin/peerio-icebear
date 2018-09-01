@@ -7,7 +7,7 @@ class Beacons extends SyncedKeg {
     }
 
     serializeKegPayload() {
-        return this.user.beacons || [];
+        return this.user.beacons;
     }
 
     deserializeKegPayload(data) {

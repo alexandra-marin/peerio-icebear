@@ -13,7 +13,9 @@ import config from '../../config';
 import MRUList from '../../helpers/mru-list';
 import warnings from '../warnings';
 import clientApp from '../client-app';
-import { Address, KeyPair, AuthToken, AccountCreationChallenge } from '~/defs/interfaces';
+import { Address, KeyPair, AuthToken, AccountCreationChallenge, AuthData } from '~/defs/interfaces';
+import AccountVersion from '~/models/user/account-version';
+import Settings from '~/models/user/settings';
 
 let currentUser: User;
 
@@ -33,32 +35,32 @@ export default class User {
     _loadAuthSalt: () => Promise<void>;
     _deriveKeys: () => Promise<void>;
     _getAuthToken: () => Promise<AuthToken>;
-    _authenticateAuthToken: (data: AuthToken) => any;
-    _derivePassphraseFromPasscode: (passcodeSecret: any) => any;
-    _getAuthDataFromPasscode: (passphrase: string, passcodeSecret: any) => any;
-    deserializeAuthData: (deserializeAuthData: any) => any;
+    _authenticateAuthToken: (data: AuthToken) => void;
+    _derivePassphraseFromPasscode: (passcodeSecret: Uint8Array) => void;
+    _getAuthDataFromPasscode: (passphrase: string, passcodeSecret: Uint8Array) => Promise<AuthData>;
+    deserializeAuthData: (authData: AuthData) => void;
     setup2fa: () => Promise<string>;
     confirm2faSetup: (code: string, trust?: boolean) => Promise<string[]>;
     disable2fa: () => Promise<void>;
-    reissueBackupCodes: () => Promise<any>;
+    reissueBackupCodes: () => Promise<string[]>;
     _set2faCookieData: (data: { cookie: string; trusted: boolean }) => Promise<void>;
     _get2faCookieData: () => Promise<{ cookie: string; trusted: boolean }>;
     _delete2faCookieData: () => Promise<void>;
     _getDeviceId: () => Promise<string>;
-    _handle2faOnLogin: () => Promise<{}>;
-    _authenticateConnection: () => any;
-    _checkForPasscode: (skipCache?: boolean) => Promise<any>;
+    _handle2faOnLogin: () => Promise<void>;
+    _authenticateConnection: () => Promise<void>;
+    _checkForPasscode: (skipCache?: boolean) => Promise<boolean>;
     serializeAuthData: () => string;
     disablePasscode: () => Promise<void>;
     passcodeIsDisabled: () => Promise<boolean>;
     setPasscode: (passcode: string) => Promise<void>;
-    validatePasscode: (passcode: string) => any;
+    validatePasscode: (passcode: string) => Promise<string>;
     hasPasscode: () => Promise<boolean>;
-    signout: (untrust?: boolean) => Promise<any>;
-    accountVersionKeg: import('/Users/anri/src/peerio/peerio-icebear/src/models/user/account-version').default;
-    settings: import('/Users/anri/src/peerio/peerio-icebear/src/models/user/settings').default;
+    signout: (untrust?: boolean) => Promise<void>;
+    accountVersionKeg: AccountVersion;
+    settings: Settings;
     loadSettings: () => void;
-    saveSettings: (updateFunction: any) => Promise<{}>;
+    saveSettings: (updateFunction: (settingsKeg: Settings) => void) => Promise<void>;
     loadProfile: () => void;
     loadQuota: () => void;
     saveProfile: () => any;
@@ -544,12 +546,11 @@ export default class User {
             .tapCatch(socket.reset);
     };
 
-    _preAuth() {
+    async _preAuth() {
         this.trustedDevice = undefined;
         if (this._firstLoginInSession) {
             return this._checkForPasscode();
         }
-        return Promise.resolve();
     }
 
     /**

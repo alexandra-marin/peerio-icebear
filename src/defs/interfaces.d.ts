@@ -17,6 +17,15 @@ export interface AuthToken {
     ephemeralServerPK: Uint8Array;
 }
 
+interface AuthData {
+    username: string;
+    paddedPassphrase: string;
+    passphrase?: string;
+    authSalt: string;
+    bootKey: string;
+    authKeys: { secretKey: string; publicKey: string };
+}
+
 export interface AccountCreationChallenge {
     username: string;
     ephemeralServerPK: ArrayBuffer;

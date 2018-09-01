@@ -1,7 +1,7 @@
 import Contact from '~/models/contacts/contact';
 import { IObservableArray } from 'mobx';
 
-export default interface IBootKeg {
+export interface IBootKeg {
     keys: {
         [keyId: string]: { key: Uint8Array; createdAt: number };
     };

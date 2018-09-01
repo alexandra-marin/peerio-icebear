@@ -10,13 +10,13 @@ import config from '../../config';
 import warnings from '../warnings';
 import clientApp from '../client-app';
 import User from '~/models/user/user';
-import { AuthToken } from '~/defs/interfaces';
+import { AuthToken, AuthData } from '~/defs/interfaces';
 //
 // Authentication mixin for User model.
 // TODO: authentication code is a bit hard to read and follow, needs refactoring
 //
 export default function mixUserAuthModule(this: User) {
-    this._authenticateConnection = () => {
+    this._authenticateConnection = (): Promise<void> => {
         console.log('Starting connection auth sequence.');
         return this._loadAuthSalt()
             .then(this._deriveKeys)
@@ -126,14 +126,13 @@ export default function mixUserAuthModule(this: User) {
                     throw new Error('Digest session was expired, application restart is needed.');
                 }
                 this.sessionId = resp.sessionId;
-                return null;
             });
     };
 
-    this._checkForPasscode = (skipCache = false) => {
+    this._checkForPasscode = async (skipCache = false): Promise<boolean> => {
         if (!skipCache && this.authKeys) {
             console.log('user.auth.js: auth keys already loaded');
-            return Promise.resolve(true);
+            return true;
         }
         return TinyDb.system
             .getValue(`${this.username}:passcode`)
@@ -141,7 +140,7 @@ export default function mixUserAuthModule(this: User) {
                 if (passcodeSecretArray) {
                     return cryptoUtil.b64ToBytes(passcodeSecretArray);
                 }
-                return Promise.reject(new NoPasscodeFoundError());
+                throw new NoPasscodeFoundError();
             })
             .then(passcodeSecret => {
                 this.passcodeIsSet = true;
@@ -166,7 +165,7 @@ export default function mixUserAuthModule(this: User) {
     // as a passphrase instead of a passcode, allowing users who have a passcode set to still
     // use their passphrases.
     //
-    this._derivePassphraseFromPasscode = passcodeSecret => {
+    this._derivePassphraseFromPasscode = (passcodeSecret: Uint8Array): Promise<void> => {
         console.log('Deriving passphrase from passcode.');
         return this._getAuthDataFromPasscode(this.passphrase, passcodeSecret)
             .then(this.deserializeAuthData)
@@ -178,11 +177,11 @@ export default function mixUserAuthModule(this: User) {
             });
     };
 
-    this._getAuthDataFromPasscode = (passcode, passcodeSecret) => {
+    this._getAuthDataFromPasscode = (passcode: string, passcodeSecret: Uint8Array) => {
         return keys
             .deriveKeyFromPasscode(this.username, passcode)
             .then(passcodeKey => secret.decryptString(passcodeSecret, passcodeKey))
-            .then(authDataJSON => JSON.parse(authDataJSON));
+            .then(authDataJSON => JSON.parse(authDataJSON)) as Promise<AuthData>;
     };
 
     /**
@@ -209,14 +208,7 @@ export default function mixUserAuthModule(this: User) {
      * Applies serialized auth data to user object. Just call `login()` after this and user will get authenticated
      * faster then when you just provide username and passphrase.
      */
-    this.deserializeAuthData = (data: {
-        username: string;
-        authSalt: string;
-        bootKey: string;
-        paddedPassphrase?: string;
-        passphrase?: string;
-        authKeys: { publicKey: string; secretKey: string };
-    }) => {
+    this.deserializeAuthData = (data: AuthData): void => {
         // console.log(data);
         const { username, authSalt, bootKey, authKeys } = data;
         this.username = username;
@@ -294,15 +286,14 @@ export default function mixUserAuthModule(this: User) {
     /**
      * Validates passcode.
      */
-    this.validatePasscode = (passcode: string) => {
+    this.validatePasscode = (passcode: string): Promise<string> => {
         // creating temporary user obj to do that without affecting current instance's state
         const u = new (this.constructor as typeof User)();
         u.passphrase = passcode;
         u.username = this.username;
         return u._checkForPasscode().then(() => {
-            return u.passphrase && u.passphrase !== passcode
-                ? u.passphrase
-                : Promise.reject(new Error('user.auth.js: passcode is not valid'));
+            if (u.passphrase && u.passphrase !== passcode) return u.passphrase;
+            throw new Error('user.auth.js: passcode is not valid');
         });
     };
 

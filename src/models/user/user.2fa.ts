@@ -137,7 +137,7 @@ export default function mixUser2faModule(this: User) {
                     .then(resolve)
                     .catch(reject);
             });
-        });
+        }) as Promise<void>;
     };
 
     function verifyProtectedAction(type) {

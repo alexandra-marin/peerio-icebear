@@ -62,7 +62,6 @@ module.exports = function mixUserProfileModule() {
         loadSimpleKeg(_quotaKeg);
     };
 
-
     this.loadBeacons = () => {
         loadSimpleKeg(_beaconsKeg);
     };

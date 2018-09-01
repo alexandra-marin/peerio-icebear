@@ -119,8 +119,8 @@ Then('my avatar should be empty', function() {
 Then('I am shown a beacon', async function() {
     ice.User.current.beacons.mobile_files_zero = true;
     ice.User.current.beacons.desktop_files_zero = false;
-    
-    await ice.User.current.saveBeacons();  
+
+    await ice.User.current.saveBeacons();
 });
 
 Then('the beacon appears as seen', function() {

@@ -129,9 +129,9 @@ class User {
 
     /**
      * UI beacons
-     * @type {Object}
+     * @type {Map<beaconName: string, seen: bool>}
      */
-    @observable beacons = {};
+    @observable beacons = observable.shallowMap();
     /**
 
     /**

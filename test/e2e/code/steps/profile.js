@@ -117,13 +117,13 @@ Then('my avatar should be empty', function() {
 });
 
 Then('I am shown a beacon', async function() {
-    ice.User.current.beacons.mobile_files_zero = true;
-    ice.User.current.beacons.desktop_files_zero = false;
+    ice.User.current.beacons.set('mobile_files_zero', true);
+    ice.User.current.beacons.set('desktop_files_zero', false);
 
     await ice.User.current.saveBeacons();
 });
 
 Then('the beacon appears as seen', function() {
-    ice.User.current.beacons.mobile_files_zero.should.be.true;
-    ice.User.current.beacons.desktop_files_zero.should.be.false;
+    ice.User.current.beacons.get('mobile_files_zero').should.be.true;
+    ice.User.current.beacons.get('desktop_files_zero').should.be.false;
 });

@@ -13,7 +13,7 @@ class Beacons extends SyncedKeg {
     }
 
     deserializeKegPayload(data) {
-        this.user.beacons = data.beacons;
+        this.user.beacons = data.beacons || {};
     }
 }
 

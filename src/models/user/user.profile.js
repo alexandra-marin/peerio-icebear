@@ -1,5 +1,6 @@
 const { when } = require('mobx');
 const Profile = require('./profile');
+const Beacons = require('./beacons');
 const Quota = require('./quota');
 const Settings = require('./settings');
 const tracker = require('../update-tracker');
@@ -15,6 +16,7 @@ const { getFileStore } = require('../../helpers/di-file-store');
 //
 module.exports = function mixUserProfileModule() {
     const _profileKeg = new Profile(this);
+    const _beaconsKeg = new Beacons(this);
     const _quotaKeg = new Quota(this);
     this.accountVersionKeg = new AccountVersion(this);
     this.settings = new Settings(this);
@@ -60,6 +62,11 @@ module.exports = function mixUserProfileModule() {
         loadSimpleKeg(_quotaKeg);
     };
 
+
+    this.loadBeacons = () => {
+        loadSimpleKeg(_beaconsKeg);
+    };
+
     function loadSimpleKeg(keg) {
         if (keg.loading) return;
         if (keg.loaded) {
@@ -77,17 +84,25 @@ module.exports = function mixUserProfileModule() {
     tracker.subscribeToKegUpdates('SELF', 'profile', this.loadProfile);
     tracker.subscribeToKegUpdates('SELF', 'quotas', this.loadQuota);
     tracker.subscribeToKegUpdates('SELF', 'settings', this.loadSettings);
+    tracker.subscribeToKegUpdates('SELF', 'beacons', this.loadBeacons);
 
     tracker.onUpdated(() => {
         this.loadProfile();
         this.loadQuota();
         this.loadSettings();
+        this.loadBeacons();
     });
 
     this.saveProfile = function() {
         return _profileKeg.saveToServer().tapCatch(err => {
             console.error(err);
             warnings.add('error_saveSettings');
+        });
+    };
+
+    this.saveBeacons = function() {
+        return _beaconsKeg.saveToServer().tapCatch(err => {
+            console.error(err);
         });
     };
 

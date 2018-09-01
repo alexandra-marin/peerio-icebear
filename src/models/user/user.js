@@ -128,6 +128,13 @@ class User {
     @observable trustedDevice = undefined;
 
     /**
+     * UI beacons
+     * @type {Array}
+     */
+    @observable beacons = [];
+    /**
+
+    /**
      * Computed `firstName+' '+lastName`
      * @type {string}
      */

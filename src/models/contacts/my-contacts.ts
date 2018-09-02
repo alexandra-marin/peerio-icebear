@@ -2,10 +2,12 @@ import SyncedKeg from '../kegs/synced-keg';
 import { getUser } from '../../helpers/di-current-user';
 import Contact from '~/models/contacts/contact';
 
+interface MyContactsPayload {}
+interface MyContactsProps {}
 /**
  * User's favorite contacts. Named plaintext synced keg.
  */
-class MyContacts extends SyncedKeg {
+class MyContacts extends SyncedKeg<MyContactsPayload, MyContactsProps> {
     constructor() {
         super('my_contacts', getUser().kegDb, true, true);
     }

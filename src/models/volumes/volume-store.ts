@@ -1,4 +1,4 @@
-import { observable, computed, action, when } from 'mobx';
+import { observable, computed, action, when, IObservableArray } from 'mobx';
 import { setVolumeStore } from '../../helpers/di-volume-store';
 import Volume from './volume';
 import socket from '../../network/socket';
@@ -16,7 +16,7 @@ export class VolumeStore {
     }
 
     shareQueue = new TaskQueue(1);
-    @observable.shallow volumes = [];
+    @observable.shallow volumes = [] as IObservableArray<Volume>;
     volumeMap = {};
     @observable loading = false;
     @observable loaded = false;
@@ -85,7 +85,7 @@ export class VolumeStore {
             // 1. we can't add participants before setting volume name because
             // server will trigger invites and send empty volume name to user
             // 2. this is really a temporary instance, 'create volume and boot keg' needs to be extracted (TODO)
-            let volume = new Volume(null, []);
+            let volume = new Volume(null);
             // this call will create metadata only
             await volume.db.loadMeta();
             // due to concurrency with db added event from update tracker,
@@ -126,7 +126,14 @@ export class VolumeStore {
 
     @computed
     get sortedVolumes() {
-        return this.volumes.sort((f1, f2) => f1.normalizedName > f2.normalizedName);
+        return this.volumes.sort(
+            (f1, f2) =>
+                f1.normalizedName > f2.normalizedName
+                    ? -1
+                    : f1.normalizedName < f2.normalizedName
+                        ? 1
+                        : 0
+        );
     }
 
     @action.bound

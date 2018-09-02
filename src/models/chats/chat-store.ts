@@ -15,7 +15,7 @@ import ChatStoreCache from './chat-store.cache.js';
 import socket from '../../network/socket';
 import tracker from '../update-tracker';
 import { EventEmitter } from 'eventemitter3';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import MyChats from '../chats/my-chats';
 import TinyDb from '../../db/tiny-db';
 import config from '../../config';
@@ -23,7 +23,7 @@ import { asPromise } from '../../helpers/prombservable';
 import { getUser } from '../../helpers/di-current-user';
 import warnings from '../warnings';
 import { setChatStore } from '../../helpers/di-chat-store';
-import { cryptoUtil } from '../../crypto';
+import * as cryptoUtil from '../../crypto/util';
 import chatInviteStore from './chat-invite-store';
 import dbListProvider from '../../helpers/keg-db-list-provider';
 
@@ -36,10 +36,6 @@ import Contact from '../contacts/contact';
  */
 export class ChatStore {
     constructor() {
-        this.pending = new ChatStorePending(this);
-        this.spaces = new ChatStoreSpaces(this);
-        this.cache = new ChatStoreCache(this);
-
         reaction(
             () => this.activeChat,
             chat => {
@@ -64,6 +60,10 @@ export class ChatStore {
             socket.subscribe(socket.APP_EVENTS.channelDeleted, this.processChannelDeletedEvent);
         });
     }
+
+    pending = new ChatStorePending(this);
+    spaces = new ChatStoreSpaces(this);
+    cache = new ChatStoreCache(this);
 
     // todo: not sure this little event emitter experiment should live
     EVENT_TYPES = {
@@ -482,8 +482,8 @@ export class ChatStore {
     async startChat(
         participants: Contact[] = [],
         isChannel = false,
-        name: string,
-        purpose: string,
+        name?: string,
+        purpose?: string,
         noActivate = false,
         space = null
     ): Promise<Chat | null> {

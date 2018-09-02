@@ -197,7 +197,7 @@ export default new class {
      *
      * **Client app is required to set this property before using Icebear SDK.**
      */
-    CacheEngine: CacheEngineBase;
+    CacheEngine: typeof CacheEngineBase;
     /**
      * Frequency (seconds) at which default observable clock will be changing its value.
      * Default clock can be used for refreshing timestamps and other time counters.

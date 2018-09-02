@@ -4,7 +4,6 @@ import * as cryptoKeys from '../../crypto/keys';
 import { action, observable, when } from 'mobx';
 import { getContactStore } from '../../helpers/di-contact-store';
 import SyncedKeg from '../kegs/synced-keg';
-import IBootKeg from '~/defs/boot-keg';
 import User from '../user/user';
 import SharedKegDb from './shared-keg-db';
 import Contact from '../contacts/contact';
@@ -100,8 +99,7 @@ interface IEncryptedKeys {
  * @param db - owner instance
  * @param user - currently authenticated user
  */
-class SharedDbBootKeg extends SyncedKeg<ISharedDbBootKegPayload, ISharedDbBootKegProps>
-    implements IBootKeg {
+class SharedDbBootKeg extends SyncedKeg<ISharedDbBootKegPayload, ISharedDbBootKegProps> {
     constructor(db: SharedKegDb, user: User) {
         // named kegs are pre-created, so we know the id already and only going to update boot keg
         super('boot', db, true, true, true, true);

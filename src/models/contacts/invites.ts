@@ -1,13 +1,17 @@
 import SyncedKeg from '../kegs/synced-keg';
 import { getUser } from '../../helpers/di-current-user';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { InvitedContact } from '../../defs/interfaces';
+
+interface InvitesPayload {}
+
+interface InvitesProps {}
 
 /**
  * Named readonly server-controlled keg. Contains data about contacts invited by email.
  * Invite data can be modified via separate api.
  */
-class Invites extends SyncedKeg {
+class Invites extends SyncedKeg<InvitesPayload, InvitesProps> {
     constructor() {
         super('invites', getUser().kegDb, true);
     }
@@ -16,10 +20,6 @@ class Invites extends SyncedKeg {
      * Usernames of users invited us before we created an account.
      */
     received: string[] = [];
-
-    serializeKegPayload() {
-        throw new Error('Read only keg is not supposed to be saved.');
-    }
 
     deserializeKegPayload(payload) {
         this.issued = _.uniqWith(payload.issued, this._compareInvites);

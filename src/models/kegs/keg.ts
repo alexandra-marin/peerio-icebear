@@ -114,7 +114,7 @@ export default class Keg<TPayload, TProps extends {} = {}> {
     /**
      * Sometimes this specific key has to be en/decrypted with other then default for this KegDb key.
      */
-    protected overrideKey: Uint8Array | null = null;
+    overrideKey: Uint8Array | null = null;
 
     /**
      * Keg collection (all kegs with this.type) version, snowflake string id.

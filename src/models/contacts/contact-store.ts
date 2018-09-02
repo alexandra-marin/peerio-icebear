@@ -32,8 +32,6 @@ export class ContactStore {
     constructor() {
         intercept(this, 'uiViewSortBy', this._checkSortValue);
         intercept(this, 'uiViewFilter', this._checkFilterValue);
-        this._contactMap = createMap(this.contacts, 'username').map;
-        this.whitelabel = new ContactStoreWhitelabel(this);
         socket.onceAuthenticated(() => {
             this.myContacts = new MyContacts();
             this.myContacts.onUpdated = this.applyMyContactsData;
@@ -43,11 +41,13 @@ export class ContactStore {
             this.currentUser = this.getContact(getUser().username);
         });
     }
+    whitelabel = new ContactStoreWhitelabel(this);
 
     /**
      * All peerio users your app encounters end up here (except invited by email, they're non-peerio users).
      */
     @observable.shallow contacts = [] as IObservableArray<Contact>;
+    _contactMap = createMap(this.contacts, 'username').map;
     /**
      * My contacts keg.
      */
@@ -194,7 +194,7 @@ export class ContactStore {
     });
 
     applyInvitesData = action(() => {
-        this.pendingContacts = this.invites.issued;
+        this.pendingContacts = this.invites.issued as IObservableArray<InvitedContact>;
         when(
             () => this.invites.loaded && tofuStore.loaded && getChatStore().loaded,
             () => {
@@ -362,7 +362,7 @@ export class ContactStore {
     removeInvite(email: string) {
         return retryUntilSuccess(
             () => socket.send('/auth/contacts/issued-invites/remove', { email }),
-            Math.random(),
+            null,
             10
         );
     }
@@ -377,7 +377,7 @@ export class ContactStore {
                 socket.send('/auth/contacts/received-invites/remove', {
                     username
                 }),
-            Math.random(),
+            null,
             10
         );
     }

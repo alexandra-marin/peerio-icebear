@@ -138,7 +138,7 @@ class CacheEngineBase {
     /**
      * Asynchronously gets a value from storage.
      */
-    getValue(key: string): Promise<{}> {
+    getValue<T>(_key: string): Promise<T> {
         throw new Error('Method not implemented');
     }
 
@@ -148,7 +148,7 @@ class CacheEngineBase {
      * @param confirm - a callback to confirm update if value already exists
      *                                             read and write should be done in atomic/transactional way.
      */
-    setValue(key: string, value: object, confirmUpdate: ICacheUpdateCallback): Promise {
+    setValue<T>(_key: string, _value: T, _confirmUpdate?: ICacheUpdateCallback): Promise<void> {
         throw new Error('Method not implemented');
     }
 
@@ -157,7 +157,7 @@ class CacheEngineBase {
      * @param key - if key doesn't exist, just resolve promise.
      */
     // eslint-disable-next-line no-unused-vars
-    removeValue(key: string): Promise {
+    removeValue(_key: string): Promise<void> {
         throw new Error('Method not implemented');
     }
 
@@ -185,7 +185,7 @@ class CacheEngineBase {
     /**
      * Deletes any database by name
      */
-    deleteDatabase(fullName: string) {
+    deleteDatabase(_fullName: string) {
         throw new Error('Method not implemented');
     }
 }

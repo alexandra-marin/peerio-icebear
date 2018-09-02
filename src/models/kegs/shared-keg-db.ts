@@ -7,7 +7,6 @@ import { retryUntilSuccess } from '../../helpers/retry';
 import Contact from '../contacts/contact';
 import { observable, computed, IObservableArray } from 'mobx';
 import IKegDb from '~/defs/keg-db';
-import IBootKeg from '~/defs/boot-keg';
 /**
  * Class for shared keg databases.
  * Model is not really created until boot keg is updated for the first time.
@@ -101,7 +100,7 @@ abstract class SharedKegDb implements IKegDb {
         return this.boot ? this.boot.kegKeyId : null;
     }
 
-    @observable boot: IBootKeg;
+    @observable boot: SharedDbBootKeg;
 
     /**
      * Just a mirror of this.boot.participants

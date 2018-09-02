@@ -1,10 +1,13 @@
 import SyncedKeg from '../kegs/synced-keg';
 import { getUser } from '../../helpers/di-current-user';
 
+interface MyChatsPayload {}
+interface MyChatsProps {}
+
 /**
  * MyChats keg holds chat groups for user.
  */
-class MyChats extends SyncedKeg {
+class MyChats extends SyncedKeg<MyChatsPayload, MyChatsProps> {
     constructor() {
         super('my_chats', getUser().kegDb);
     }

@@ -1,11 +1,14 @@
 import ChatPendingDM from './chat-pending-dm';
+import { ChatStore } from '~/models/chats/chat-store';
 
 class ChatStorePending {
-    constructor(store) {
+    constructor(store: ChatStore) {
         this.store = store;
     }
 
-    add(username, email, received, isAutoImport) {
+    store: ChatStore;
+
+    add(username, email, received, isAutoImport = false) {
         // edge case: if the chat list loaded before invites
         // and there was already a DM created
         if (this.store.directMessages.find(s => s.dmPartnerUsername === username)) {
@@ -24,8 +27,11 @@ class ChatStorePending {
             return;
         }
         const username = chat.dmPartnerUsername;
-        const existing = this.store.directMessages.find(s => s.isInvite && s.username === username);
+        const existing = this.store.directMessages.find(
+            s => s.isInvite && s.dmPartnerUsername === username
+        );
         if (existing && existing.isInvite) {
+            //@ts-ignore fix this mess with Pending DMs being placed with regular chats
             existing.dismiss();
         }
     }

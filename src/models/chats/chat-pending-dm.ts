@@ -8,8 +8,8 @@ import { getContactStore } from '../../helpers/di-contact-store';
  * Mocks properties of Chat object to be displayed correctly by UI in chat lists
  */
 class ChatPendingDM extends Chat {
-    constructor(username: string, email: string, isReceived: boolean, isAutoImport: boolean) {
-        super(`pending-dm:${username}`, [{ username }], getChatStore());
+    constructor(username: string, email: string, isReceived: boolean, isAutoImport = false) {
+        super(`pending-dm:${username}`, [getContactStore().getContact(username)], getChatStore());
         this.username = username;
         this.email = email;
         this.isAutoImport = isAutoImport;
@@ -17,6 +17,11 @@ class ChatPendingDM extends Chat {
         this.metaLoaded = true;
         this.isReceived = isReceived;
     }
+
+    email: string;
+    isAutoImport: boolean;
+    loaded: boolean;
+    isReceived: boolean;
 
     get contact() {
         return getContactStore().getContact(this.username);
@@ -77,12 +82,12 @@ class ChatPendingDM extends Chat {
     @action.bound
     start() {
         const { contact } = this;
-        contact.whenLoaded(() => {
+        contact.whenLoaded(async () => {
             if (contact.notFound || contact.isDeleted) {
                 console.error(`contact is not found or deleted`);
                 return;
             }
-            const chat = getChatStore().startChat([contact]);
+            const chat = await getChatStore().startChat([contact]);
             chat.isChatCreatedFromPendingDM = true;
             if (this.isReceived) chat.isNewUserFromInvite = true;
             when(() => chat.active, this.dismiss);

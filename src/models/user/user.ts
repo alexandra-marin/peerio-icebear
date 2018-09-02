@@ -63,16 +63,16 @@ export default class User {
     saveSettings: (updateFunction: (settingsKeg: Settings) => void) => Promise<void>;
     loadProfile: () => void;
     loadQuota: () => void;
-    saveProfile: () => any;
-    resendEmailConfirmation: (email: string) => Promise<any>;
-    removeEmail: (email: string) => Promise<any>;
-    addEmail: (email: string) => any;
-    makeEmailPrimary: (email: string) => Promise<any>;
+    saveProfile: () => void;
+    resendEmailConfirmation: (email: string) => Promise<void>;
+    removeEmail: (email: string) => Promise<void>;
+    addEmail: (email: string) => void;
+    makeEmailPrimary: (email: string) => Promise<void>;
     canSendGhost: () => boolean;
-    saveAvatar: (blobs?: ArrayBuffer[]) => Promise<any>;
-    deleteAvatar: () => any;
-    setAccountKeyBackedUp: () => Promise<any>;
-    _createAccount: () => Promise<any>;
+    saveAvatar: (blobs?: ArrayBuffer[]) => Promise<void>;
+    deleteAvatar: () => void;
+    setAccountKeyBackedUp: () => Promise<void>;
+    _createAccount: () => Promise<void>;
 
     constructor() {
         this.kegDb = new KegDb();

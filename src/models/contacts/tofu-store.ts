@@ -5,10 +5,13 @@ import Tofu from './tofu';
 import config from '../../config';
 import { asPromise } from '../../helpers/prombservable';
 import { retryUntilSuccess } from '../../helpers/retry';
+import CacheEngineBase from '~/db/cache-engine-base';
 
 export class TofuStore {
     @observable loaded = false;
     loading = false;
+    cache: CacheEngineBase;
+    cacheMeta: CacheEngineBase;
 
     @action.bound
     async load() {
@@ -26,7 +29,7 @@ export class TofuStore {
     }
 
     async getKnownUpdateId() {
-        const data = await this.cacheMeta.getValue('knownUpdateId');
+        const data = (await this.cacheMeta.getValue('knownUpdateId')) as { value: string };
         if (!data) return '';
         return data.value;
     }
@@ -146,7 +149,7 @@ export class TofuStore {
     }
 
     getUsernames() {
-        return this.cache.getAllKeys() || [];
+        return this.cache.getAllKeys() || ([] as string[]);
     }
 }
 

@@ -73,6 +73,7 @@ class Chat {
     db: ChatKegDb;
     isChannel: boolean;
     tempId: string;
+    isInvite: boolean;
 
     store: ChatStore;
 

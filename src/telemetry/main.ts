@@ -13,7 +13,7 @@ interface Properties {
     'Version Number': number;
     'App Version': string;
 }
-let baseProperties = {} as Properties;
+const baseProperties = {} as Properties;
 
 async function getUserId(): Promise<string> {
     const userId: string = await TinyDb.system.getValue('telemetryUserId');

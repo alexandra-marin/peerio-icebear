@@ -1,4 +1,4 @@
-const S = {
+export const S = {
     ACCEPT_TERMS: 'Accept Terms Of Use',
     ACCOUNT_EMAIL: 'Account Email',
     ACCOUNT_KEY: 'Account Key',
@@ -82,5 +82,3 @@ const S = {
     WELCOME_BACK_SCREEN: 'Welcome Back Screen',
     WHERE_ACCOUNT_KEY: 'Where to find Account Key'
 };
-
-export default S;

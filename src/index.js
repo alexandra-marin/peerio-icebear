@@ -63,7 +63,9 @@ const prombservable = require('./helpers/prombservable');
 const tracker = require('./models/update-tracker');
 const CacheEngineBase = require('./db/cache-engine-base');
 const saveAccountKeyBackup = require('./helpers/pdf').default;
-const telemetry = require('./telemetry').default;
+
+// eslint-disable-next-line import/first, reorders will come naturally when we convert this file to TS
+import * as telemetry from './telemetry';
 
 // MEMO: Do NOT export NodeJsonStorage and NodeFileStream here for compatibility reasons
 module.exports = {

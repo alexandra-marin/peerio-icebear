@@ -68,7 +68,7 @@
   "title_enableAutomatic2": "<i>Account Key</> is always required to sign in.",
   "title_newUser": "New user?",
   "title_welcomeBack": "Welcome back",
-  "title_welcomeBackFirstname": "Welcome back,<br/>{firstname}",
+  "title_welcomeBackFirstname": "Welcome back,<br/>{firstName}",
   "title_switchUser": "Not {username}? <switchUser>Switch user.</>",
   "title_signupStep1": "Signup (1 of 2)",
   "title_signupStep2": "Signup (2 of 2)",

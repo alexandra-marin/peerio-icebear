@@ -70,6 +70,7 @@ const S = {
     SYNC_CONTACTS: 'Sync Contacts',
     TERMS_OF_SERVICE: 'Terms Of Service',
     TERMS_OF_USE: 'Terms Of Use',
+    TERMS_TOP_DRAWER: 'Terms of Use Top Drawer',
     TEXT_INPUT: 'Text Input',
     TOGGLE_VISIBILITY: 'Toggle Visibility',
     TRUE: 'true',
@@ -77,6 +78,7 @@ const S = {
     VIA_SYNC: 'Via Sync',
     VIEW_LINK: 'View Link',
     WELCOME_SCREEN: 'Welcome Screen',
+    WELCOME_BACK_SCREEN: 'Welcome Back Screen',
     WHERE_ACCOUNT_KEY: 'Where to find Account Key'
 };
 

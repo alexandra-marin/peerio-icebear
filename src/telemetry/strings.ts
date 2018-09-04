@@ -17,6 +17,7 @@ const S = {
     CAROUSEL_CARD_1: 'Carousel Card 1',
     CAROUSEL_CARD_2: 'Carousel Card 2',
     CAROUSEL_CARD_3: 'Carousel Card 3',
+    CHANGE_USER: 'Change User',
     CLEAR_TEXT: 'Clear Text',
     CLOSE_DIALOG: 'Close Dialog',
     CONFIRMED: 'Confirmed',

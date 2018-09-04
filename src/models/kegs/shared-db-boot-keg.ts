@@ -8,6 +8,7 @@ import User from '../user/user';
 import SharedKegDb from './shared-keg-db';
 import Contact from '../contacts/contact';
 import { IObservableArray } from 'mobx/lib/types/observablearray';
+import { IBootKeg } from '~/defs/interfaces';
 
 interface ISharedDbBootKegPayload {
     publicKey: string;
@@ -99,7 +100,8 @@ interface IEncryptedKeys {
  * @param db - owner instance
  * @param user - currently authenticated user
  */
-class SharedDbBootKeg extends SyncedKeg<ISharedDbBootKegPayload, ISharedDbBootKegProps> {
+class SharedDbBootKeg extends SyncedKeg<ISharedDbBootKegPayload, ISharedDbBootKegProps>
+    implements IBootKeg {
     constructor(db: SharedKegDb, user: User) {
         // named kegs are pre-created, so we know the id already and only going to update boot keg
         super('boot', db, true, true, true, true);

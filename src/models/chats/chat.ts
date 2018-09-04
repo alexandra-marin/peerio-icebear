@@ -23,7 +23,7 @@ import { getVolumeStore } from '../../helpers/di-volume-store';
 import FileFolder from '../files/file-folder';
 import { ChatStore } from '~/models/chats/chat-store';
 import Volume from '~/models/volumes/volume';
-
+import File from '../files/file';
 // to assign when sending a message and don't have an id yet
 let temporaryChatId = 0;
 function getTemporaryChatId() {
@@ -74,8 +74,14 @@ class Chat {
     isChannel: boolean;
     tempId: string;
     isInvite: boolean;
-
+    deletedByMyself: boolean;
     store: ChatStore;
+    spaceId: string;
+
+    _cancelTopPageLoad: boolean;
+    _cancelBottomPageLoad: boolean;
+    resetScheduled: boolean;
+    digestLoaded: boolean;
 
     /**
      * Chat id
@@ -106,7 +112,7 @@ class Chat {
      */
     @computed
     get allParticipants() {
-        if (!this.db.boot || !this.db.boot.participants) return [];
+        if (!this.db.boot || !this.db.boot.participants) return [] as IObservableArray<Contact>;
         return this.db.boot.participants.sort(this.compareContacts);
     }
 
@@ -462,7 +468,7 @@ class Chat {
         if (!kegs || !kegs.length) return Promise.resolve();
         return new Promise(resolve => {
             // we need this because we don't want to add messages one by one causing too many renders
-            const accumulator = [];
+            const accumulator: Message[] = [];
             for (let i = 0; i < kegs.length; i++) {
                 this._addMessageQueue.addTask(this._parseMessageKeg, this, [kegs[i], accumulator]);
             }
@@ -476,7 +482,8 @@ class Chat {
     }
 
     // decrypting a bunch of kegs in one call is tough on mobile, so we do it asynchronously one by one
-    async _parseMessageKeg(keg, accumulator) {
+    // TODO: raw keg types
+    async _parseMessageKeg(keg: any, accumulator: Message[]) {
         const msg = new Message(this.db);
         // no payload for some reason. probably because of connection break after keg creation
         if (!(await msg.loadFromKeg(keg)) || msg.isEmpty) {
@@ -493,17 +500,11 @@ class Chat {
      * @param freshBatchMessageCount -- # of new/freshly loaded mentions
      * @param lastMentionId -- id of last mention message, if exists
      */
-    onNewMessageLoad(
-        freshBatchMentionCount: number,
-        freshBatchMessageCount: number,
-        lastMentionId: number
-    ) {
+    onNewMessageLoad(freshBatchMentionCount: number, freshBatchMessageCount: number) {
         // fresh batch could mean app/page load rather than unreads,
         // but we don't care about unread count if there aren't *new* unreads
         if (this.unreadCount && freshBatchMessageCount) {
-            const lastMessageText = lastMentionId
-                ? this._messageMap[lastMentionId].text
-                : this.messages[this.messages.length - 1].text;
+            const lastMessageText = this.messages[this.messages.length - 1].text;
             this.store.onNewMessages({
                 freshBatchMentionCount,
                 lastMessageText,
@@ -564,7 +565,7 @@ class Chat {
         }
         // sort
         this.sortMessages();
-        this.onNewMessageLoad(newMentionCount, newMessageCount /* , lastMentionId */);
+        this.onNewMessageLoad(newMentionCount, newMessageCount);
         if (!prepend) {
             // updating most recent message
             for (let i = this.messages.length - 1; i >= 0; i--) {
@@ -624,7 +625,7 @@ class Chat {
         return -1;
     }
 
-    _sendMessage(m: Message): Promise {
+    _sendMessage(m: Message): Promise<void> {
         if (this.canGoDown) this.reset();
         // send() will fill message with data required for rendering
         const promise = m.send();
@@ -637,7 +638,7 @@ class Chat {
                 m.tempId = null;
                 // unless user already scrolled too high up, we add the message
                 if (!this.canGoDown) {
-                    this._finishAddMessages([m], false);
+                    this._finishAddMessages([m], false, []);
                 } else {
                     this._detectLimboGrouping();
                 }
@@ -723,9 +724,9 @@ class Chat {
     }
 
     async shareFilesAndFolders(filesAndFolders: Array<File | FileFolder>) {
-        const files = filesAndFolders.filter(f => !f.isFolder);
-        const folders = filesAndFolders.filter(f => f.isFolder && !f.isShared);
-        const volumes = filesAndFolders.filter(f => f.isFolder && f.isShared);
+        const files = filesAndFolders.filter(f => !f.isFolder) as File[];
+        const folders = filesAndFolders.filter(f => f.isFolder && !f.isShared) as FileFolder[];
+        const volumes = filesAndFolders.filter(f => f.isFolder && f.isShared) as Volume[];
         const participants = [this.dmPartnerUsername];
         if (files.length) {
             await this.shareFiles(files);
@@ -778,6 +779,7 @@ class Chat {
             .save(
                 () => {
                     this.chatHead.chatName = validated;
+                    return true;
                 },
                 null,
                 'error_chatRename'
@@ -801,6 +803,7 @@ class Chat {
         return this.chatHead.save(
             () => {
                 this.chatHead.nameInSpace = validated;
+                return true;
             },
             null,
             'error_chatRename'
@@ -820,6 +823,7 @@ class Chat {
             .save(
                 () => {
                     this.chatHead.purpose = validated;
+                    return true;
                 },
                 null,
                 'error_chatPurposeChange'
@@ -852,6 +856,7 @@ class Chat {
                 this.chatHead.nameInSpace = validated.nameInSpace;
                 this.chatHead.spaceDescription = validated.spaceDescription;
                 this.chatHead.spaceRoomType = validated.spaceRoomType;
+                return true;
             },
             null,
             'title_error'
@@ -866,6 +871,7 @@ class Chat {
             .save(
                 () => {
                     newVal ? myChats.addFavorite(this.id) : myChats.removeFavorite(this.id);
+                    return true;
                 },
                 () => {
                     newVal ? myChats.removeFavorite(this.id) : myChats.addFavorite(this.id);
@@ -885,6 +891,7 @@ class Chat {
         return this.store.myChats
             .save(() => {
                 this.store.myChats.addHidden(this.id);
+                return true;
             })
             .finally(() => {
                 this.store.hidingChat = false;
@@ -894,6 +901,7 @@ class Chat {
     unhide = () => {
         return this.store.myChats.save(() => {
             this.store.myChats.removeHidden(this.id);
+            return true;
         });
     };
 
@@ -942,7 +950,7 @@ class Chat {
             if (
                 prev.sender.username === current.sender.username &&
                 prev.dayFingerprint === current.dayFingerprint &&
-                current.timestamp - prev.timestamp < 600000
+                current.timestamp.valueOf() - prev.timestamp.valueOf() < 600000
             ) {
                 // 10 minutes
                 current.groupWithPrevious = true;
@@ -1101,11 +1109,12 @@ class Chat {
      *                                admin needs to remove their keys. Method wants to know which case is it.
      */
     removeParticipant(participant: string | Contact, isUserKick = true) {
-        let contact = participant;
-        if (typeof contact === 'string') {
+        let contact: Contact;
+        if (typeof participant === 'string') {
             // we don't really care if it's loaded or not, we just need Contact instance
-            contact = contactStore.getContact(contact);
-        }
+            contact = contactStore.getContact(participant);
+        } else contact = participant;
+
         const { boot } = this.db;
         const wasAdmin = boot.admins.includes(contact);
 

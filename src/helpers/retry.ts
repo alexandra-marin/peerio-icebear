@@ -21,7 +21,7 @@ interface CallInfo {
     lastError?: any;
 }
 
-const callsInProgress: { [id: number]: CallInfo } = {};
+const callsInProgress: { [id: string]: CallInfo } = {};
 
 /**
  * 1. Executes the passed function
@@ -109,6 +109,6 @@ function scheduleRetry(fn: () => Promise<any>, id: string): void {
     );
 }
 
-export function isRunning(id: number) {
+export function isRunning(id: string) {
     return !!callsInProgress[id];
 }

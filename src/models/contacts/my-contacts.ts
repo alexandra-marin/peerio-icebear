@@ -1,6 +1,7 @@
 import SyncedKeg from '../kegs/synced-keg';
 import { getUser } from '../../helpers/di-current-user';
 import Contact from '~/models/contacts/contact';
+import { IKegDb } from '~/defs/interfaces';
 
 interface MyContactsPayload {}
 interface MyContactsProps {}
@@ -9,7 +10,7 @@ interface MyContactsProps {}
  */
 class MyContacts extends SyncedKeg<MyContactsPayload, MyContactsProps> {
     constructor() {
-        super('my_contacts', getUser().kegDb, true, true);
+        super('my_contacts', getUser().kegDb as IKegDb, true, true);
     }
 
     contacts = {};

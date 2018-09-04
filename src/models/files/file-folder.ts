@@ -6,6 +6,7 @@ import { getFileStore } from '../../helpers/di-file-store';
 import { getUser } from '../../helpers/di-current-user';
 import * as cryptoUtil from '../../crypto/util';
 import FileStoreBase from '~/models/files/file-store-base';
+import File from './file';
 
 function isLegacyFilePredicate(f) {
     return !!(f && f.isLegacy);
@@ -248,7 +249,7 @@ class FileFolder {
         if (fileOrFolder.isFolder) {
             return this.attachFolder(fileOrFolder, ...rest);
         }
-        return this.attachFile(fileOrFolder, ...rest);
+        return this.attachFile(fileOrFolder);
     }
 
     // move file to this folder
@@ -287,7 +288,7 @@ class FileFolder {
 
     // adds exiting folder instance to this folder
     @action.bound
-    async attachFolder(folder, skipSave, skipRootFolder) {
+    async attachFolder(folder, skipSave = false, skipRootFolder?) {
         if (folder === this) return Promise.resolve();
         if (folder.store !== this.store) {
             // 1. we copy folder structure to another kegdb
@@ -327,7 +328,7 @@ class FileFolder {
 
     // private api
     @action
-    async copyFolderStructureTo(dst, skipRootFolder) {
+    async copyFolderStructureTo(dst, skipRootFolder = false) {
         const src = this;
         const folderIdMap = {}; // mapping between source folder ids and destination
         const copyFolders = (parentSrc, parentDst) => {

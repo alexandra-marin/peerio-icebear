@@ -1,5 +1,5 @@
 import { serverErrorCodes } from '../../errors';
-import { observable, action, when, computed } from 'mobx';
+import { observable, action, when, computed, ObservableMap } from 'mobx';
 import socket from '../../network/socket';
 import User from '../user/user';
 import File from './file';
@@ -15,25 +15,32 @@ import { getVolumeStore } from '../../helpers/di-volume-store';
 import FileStoreMigration from './file-store.migration';
 import FileStoreBase from './file-store-base';
 import FileStoreBulk from './file-store.bulk';
-import util from '../../util';
+import * as util from '../../util';
 import { asPromise } from '../../helpers/prombservable';
 import _ from 'lodash';
 import FileFolder from '~/models/files/file-folder';
+import CacheEngineBase from '~/db/cache-engine-base';
 
 export class FileStore extends FileStoreBase {
-    migration: any;
     constructor() {
         super(null, null, 'main');
         this.bulk = new FileStoreBulk(this);
         this.migration = new FileStoreMigration(this);
-        // currently gets updated by each chat.file-handler inside 'copyKegs()'
-        // not very intuitive, but until we make a special file store for chats it works
-        this.chatFileMap = observable.map();
 
         when(() => this.allStoresLoaded, this.onFinishLoading);
     }
     isMainStore = true;
+    knownDescriptorVersion: string;
+    descriptorsCache: CacheEngineBase<{
+        key: string;
+        value: string;
+    }>;
+    // currently gets updated by each chat.file-handler inside 'copyKegs()'
+    // not very intuitive, but until we make a special file store for chats it works
+    chatFileMap = observable.map<ObservableMap<File>>();
 
+    bulk: FileStoreBulk;
+    migration: FileStoreMigration;
     // Human readable maximum auto-expandable inline image size limit
     inlineImageSizeLimitFormatted = util.formatBytes(config.chat.inlineImageSizeLimit);
     // Human readable maximum cutoff inline image size limit
@@ -93,7 +100,7 @@ export class FileStore extends FileStoreBase {
                                 if (this.isMainStore) {
                                     await this.cacheDescriptor(d);
                                 }
-                                for (const store of this.getFileStoreInstances()) {
+                                for (const store of this.getFileStoreInstances().values()) {
                                     await store.cacheDescriptor(d);
                                 }
                             });
@@ -277,7 +284,7 @@ export class FileStore extends FileStoreBase {
                         options: {
                             type: 'file',
                             reverse: true,
-                            count: config.recentFilesDisplayLimit
+                            count: config.chat.recentFilesDisplayLimit
                         },
                         filter: {
                             deleted: false
@@ -396,7 +403,7 @@ export class FileStore extends FileStoreBase {
     loadChatFile(fileId: string, kegDbId: string) {
         const chat = getChatStore().chatMap[kegDbId];
         if (!chat) {
-            const file = new File();
+            const file = new File(null, null);
             file.fileId = fileId;
             file.deleted = true; // maybe not really, but it's the best option for now
             return file;
@@ -480,9 +487,9 @@ export class FileStore extends FileStoreBase {
                 // we upload files in the folder
                 f.files.forEach(file => this.upload(file, null, newParent));
                 // we recursively upload folders in this folder
-                await new Promise(resolve => {
+                await new Promise((resolve: () => void, reject) => {
                     setTimeout(() => {
-                        uploadOneLevel(f.folders, newParent).then(resolve);
+                        uploadOneLevel(f.folders, newParent).then(resolve, reject);
                     });
                 });
             }

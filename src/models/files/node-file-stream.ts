@@ -56,7 +56,6 @@ class NodeFileStream extends FileStreamBase {
                 this.pos,
                 (err, bytesRead) => {
                     if (this.checkForError(err, reject)) return;
-                    if (this.nextReadPos != null) this.nextReadPos += bytesRead;
                     if (bytesRead < buffer.length) {
                         resolve(buffer.subarray(0, bytesRead));
                     } else {
@@ -77,7 +76,6 @@ class NodeFileStream extends FileStreamBase {
     }
 
     seekInternal(pos: number) {
-        this.nextReadPos = pos;
         this.pos = pos;
     }
 

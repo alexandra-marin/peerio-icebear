@@ -11,24 +11,27 @@ import FileNonceGenerator from './file-nonce-generator';
 import TinyDb from '../../db/tiny-db';
 import { action } from 'mobx';
 import socket from '../../network/socket';
+import File from './file';
 
-function _getDlResumeParams(path) {
+export function _getDlResumeParams(this: File, path) {
     return config.FileStream.getStat(path)
-        .then(stat => {
-            if (stat.size >= this.size) {
-                return Promise.resolve(false); // do not download
+        .then(
+            (stat): { wholeChunks: number; partialChunkSize: number } | boolean => {
+                if (stat.size >= this.size) {
+                    return false; // do not download
+                }
+                const wholeChunks = Math.floor(stat.size / this.chunkSize);
+                const partialChunkSize = stat.size % this.chunkSize;
+                return { wholeChunks, partialChunkSize };
             }
-            const wholeChunks = Math.floor(stat.size / this.chunkSize);
-            const partialChunkSize = stat.size % this.chunkSize;
-            return { wholeChunks, partialChunkSize };
-        })
+        )
         .catch(err => {
             console.log(err);
-            return Promise.resolve(true); // download from start
+            return true; // download from start
         });
 }
 
-function downloadToTmpCache() {
+export function downloadToTmpCache(this: File) {
     return this.download(this.tmpCachePath, true, true)
         .then(() => FileCacheHandler.cacheMonitor(this))
         .tapCatch(() => {
@@ -51,7 +54,8 @@ const tempExt = '.peeriodownload';
  * @param filePath - where to store file (including name)
  * @param resume - for system use
  */
-function download(
+export function download(
+    this: File,
     filePath: string,
     resume = false,
     isTmpCacheDownload = false,
@@ -80,7 +84,9 @@ function download(
         );
         let stream,
             mode = 'write';
-        let p = Promise.resolve(true);
+        let p = Promise.resolve(true) as Promise<
+            boolean | { wholeChunks: number; partialChunkSize: number }
+        >;
         if (resume) {
             p = this._getDlResumeParams(filePath);
         }
@@ -144,7 +150,7 @@ function download(
 /**
  * Cancels download and removes impartially downloaded file.
  */
-function cancelDownload() {
+export function cancelDownload(this: File) {
     this._saveDownloadEndFact();
     this._resetDownloadState();
 }
@@ -152,7 +158,7 @@ function cancelDownload() {
 /**
  * Removes download cache if it exists
  */
-function removeCache() {
+export function removeCache(this: File) {
     return Promise.resolve(
         (async () => {
             if (!this.tmpCached) return;
@@ -166,18 +172,18 @@ function removeCache() {
     );
 }
 
-function _saveDownloadStartFact(path) {
+export function _saveDownloadStartFact(this: File, path) {
     TinyDb.user.setValue(`DOWNLOAD:${this.fileId}`, {
         fileId: this.fileId,
         path
     });
 }
 
-function _saveDownloadEndFact() {
+export function _saveDownloadEndFact(this: File) {
     TinyDb.user.removeValue(`DOWNLOAD:${this.fileId}`);
 }
 
-function _resetDownloadState(stream) {
+export function _resetDownloadState(this: File, stream) {
     this.uploading = false;
     this.downloading = false;
     this.uploader && this.uploader.cancel();
@@ -191,15 +197,4 @@ function _resetDownloadState(stream) {
     } catch (ex) {
         console.error(ex);
     }
-}
-
-export default function(File) {
-    File.prototype._getDlResumeParams = _getDlResumeParams;
-    File.prototype.download = download;
-    File.prototype.downloadToTmpCache = downloadToTmpCache;
-    File.prototype.cancelDownload = cancelDownload;
-    File.prototype.removeCache = removeCache;
-    File.prototype._saveDownloadStartFact = _saveDownloadStartFact;
-    File.prototype._saveDownloadEndFact = _saveDownloadEndFact;
-    File.prototype._resetDownloadState = _resetDownloadState;
 }

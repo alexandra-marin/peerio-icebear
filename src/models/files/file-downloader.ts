@@ -1,22 +1,23 @@
 import socket from '../../network/socket';
-import secret from '../../crypto/secret';
+import * as secret from '../../crypto/secret';
 import config from '../../config';
 import FileProcessor from './file-processor';
 import { DisconnectedError } from '../../errors';
 import FileStreamBase from '~/models/files/file-stream-base';
 import FileNonceGenerator from '~/models/files/file-nonce-generator';
+import File from './file';
 
 const { CHUNK_OVERHEAD } = config;
 
 /**
  * Manages file download process.
  */
-class FileDownloader extends FileProcessor {
+export default class FileDownloader extends FileProcessor {
     constructor(
         file: File,
         stream: FileStreamBase,
         nonceGenerator: FileNonceGenerator,
-        resumeParams?: { partialChunkSize: number; wholeChunks: number }
+        resumeParams?: { partialChunkSize: number; wholeChunks: number } | boolean
     ) {
         super(file, stream, nonceGenerator, 'download');
 
@@ -28,13 +29,18 @@ class FileDownloader extends FileProcessor {
             Math.floor(config.download.maxDownloadChunkSize / this.chunkSizeWithOverhead) *
             this.chunkSizeWithOverhead;
 
-        if (resumeParams) {
+        if (resumeParams && typeof resumeParams === 'object') {
             this.partialChunkSize = resumeParams.partialChunkSize;
             nonceGenerator.chunkId = resumeParams.wholeChunks;
             this.file.progress = this.chunkSizeWithOverhead * resumeParams.wholeChunks;
             this.downloadPos = this.chunkSizeWithOverhead * resumeParams.wholeChunks;
         }
     }
+
+    getUrlParams: { fileId: string };
+    chunkSizeWithOverhead: number;
+    downloadChunkSize: number;
+    partialChunkSize: number;
 
     /**
      * Chunks as they were uploaded
@@ -105,12 +111,9 @@ class FileDownloader extends FileProcessor {
 
         // Start download.
         this.activeDownloads++;
-        const promise = new Promise((resolve, reject) => {
-            this._getChunkUrl(pos, pos + size - 1)
-                .then(url => this._download(url, size))
-                .then(resolve)
-                .catch(reject);
-        });
+        const promise = this._getChunkUrl(pos, pos + size - 1).then(url =>
+            this._download(url, size)
+        );
 
         // Add download result processing to the chain.
         this.downloadChain = this.downloadChain
@@ -143,16 +146,15 @@ class FileDownloader extends FileProcessor {
         this.writing = true;
         if (this.partialChunkSize) {
             chunk = new Uint8Array(
-                chunk,
+                chunk.buffer,
                 this.partialChunkSize,
                 chunk.length - this.partialChunkSize
             );
             this.partialChunkSize = 0;
         }
-        this.stream
-            .write(chunk)
-            .then(this._onWriteEnd)
-            .catch(this._error);
+        this.stream.write(chunk);
+        //.then(this._onWriteEnd)
+        // .catch(this._error);
     }
 
     _onWriteEnd = () => {
@@ -182,10 +184,10 @@ class FileDownloader extends FileProcessor {
     _getChunkUrl(from, to) {
         return socket
             .send('/auth/file/url', this.getUrlParams, false)
-            .then(f => `${f.url}?rangeStart=${from}&rangeEnd=${to}`);
+            .then(f => `${f.url}?rangeStart=${from}&rangeEnd=${to}`) as Promise<string>;
     }
 
-    _download = (url, expectedSize) => {
+    _download = (url, expectedSize): Promise<ArrayBuffer> => {
         const LOADING = 3,
             DONE = 4; // XMLHttpRequest readyState constants.
         const self = this;
@@ -216,7 +218,7 @@ class FileDownloader extends FileProcessor {
             // calculate the file progress from completion handler
             let progressEventFired = false;
 
-            xhr.onreadystatechange = function() {
+            xhr.onreadystatechange = function(this: XMLHttpRequest) {
                 if (this.readyState === LOADING) {
                     // Download started, maybe start
                     // other parallel downloads now.
@@ -239,7 +241,7 @@ class FileDownloader extends FileProcessor {
                     if (!progressEventFired) {
                         self.file.progress += expectedSize;
                     }
-                    resolve(this.response); // success
+                    resolve(this.response as ArrayBuffer); // success
                     return;
                 }
                 if (
@@ -285,8 +287,6 @@ class FileDownloader extends FileProcessor {
             }
         });
 
-        return p;
+        return p as Promise<ArrayBuffer>;
     };
 }
-
-export default FileDownloader;

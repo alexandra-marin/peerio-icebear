@@ -14,7 +14,6 @@ interface ISettingsProps {}
 /**
  * Plaintext named system keg, server controlled.
  * User can update this keg, but server verifies contract.
- * @param  user
  */
 class Settings extends Keg<ISettingsPayload, ISettingsProps> {
     constructor(user: User) {

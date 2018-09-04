@@ -26,6 +26,7 @@ import { setChatStore } from '../../helpers/di-chat-store';
 import * as cryptoUtil from '../../crypto/util';
 import chatInviteStore from './chat-invite-store';
 import dbListProvider from '../../helpers/keg-db-list-provider';
+import File from '../files/file';
 
 // Used for typechecking
 // eslint-disable-next-line no-unused-vars
@@ -159,6 +160,8 @@ export class ChatStore {
      */
     @computed
     get allRooms() {
+        // @ts-ignore continuation of the mess with concatenating very different things
+        // probably better let UI do this, extracting interface or making union types seems like too much work for this
         const allRooms = chatInviteStore.received.concat(this.channels);
         allRooms.sort((a, b) => {
             const first = a.name || a.channelName;
@@ -201,7 +204,7 @@ export class ChatStore {
     /**
      * Chat comparison function. Takes into account favorite status of the chat, timestamp and user preferences.
      */
-    static compareChats(a: Chat, b: Chat, unreadOnTop: boolean): -1 | 0 | 1 {
+    static compareChats(a: Chat, b: Chat, unreadOnTop: boolean): number {
         if (a.isChannel && !b.isChannel) {
             return -1;
         }
@@ -376,7 +379,7 @@ export class ChatStore {
 
         // loading all the channels
         const channels = await dbListProvider.getChannels();
-        channels.forEach(this.addChat);
+        channels.forEach(id => this.addChat(id));
 
         // checking how many more chats we can load
         let chatsLeft = config.chat.maxInitialChats - this.myChats.favorites.length;
@@ -412,8 +415,8 @@ export class ChatStore {
         this.loaded = true;
 
         // TODO: remove when kegdb add/remove will make it's way to digest
-        dbListProvider.onDbAdded(this.addChat);
-        dbListProvider.onDbRemoved(this.unloadChat);
+        dbListProvider.onDbAdded(id => this.addChat(id));
+        dbListProvider.onDbRemoved(id => this.unloadChat(id));
     }
 
     getSelflessParticipants(participants) {
@@ -561,7 +564,7 @@ export class ChatStore {
     async startChatAndShareFiles(participants: Contact[], fileOrFiles: File | File[]) {
         const files =
             Array.isArray(fileOrFiles) || isObservableArray(fileOrFiles)
-                ? fileOrFiles
+                ? (fileOrFiles as File[])
                 : [fileOrFiles];
         const chat = await this.startChat(participants);
         if (!chat) return Promise.reject(new Error('Failed to create chat'));
@@ -583,7 +586,7 @@ export class ChatStore {
      * Removes chat from working set.
      */
     @action.bound
-    unloadChat(chat: Chat) {
+    unloadChat(chat: Chat | string) {
         if (typeof chat === 'string') {
             chat = this.chatMap[chat]; // eslint-disable-line no-param-reassign
             if (!chat) return;

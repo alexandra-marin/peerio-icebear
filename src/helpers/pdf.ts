@@ -1,5 +1,6 @@
 import pdfform from 'pdfform.js';
-import { FileStream, assetPathResolver, whiteLabel } from '../config';
+import config from '../config';
+const { FileStream, assetPathResolver, whiteLabel } = config;
 /**
  * Generates and saves a pdf file with account recovery information
  * @param destination file path

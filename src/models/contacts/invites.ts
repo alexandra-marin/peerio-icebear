@@ -1,7 +1,7 @@
 import SyncedKeg from '../kegs/synced-keg';
 import { getUser } from '../../helpers/di-current-user';
-import * as _ from 'lodash';
-import { InvitedContact } from '../../defs/interfaces';
+import _ from 'lodash';
+import { InvitedContact, IKegDb } from '../../defs/interfaces';
 
 interface InvitesPayload {}
 
@@ -13,7 +13,7 @@ interface InvitesProps {}
  */
 class Invites extends SyncedKeg<InvitesPayload, InvitesProps> {
     constructor() {
-        super('invites', getUser().kegDb, true);
+        super('invites', getUser().kegDb as IKegDb, true);
     }
     issued: InvitedContact[] = [];
     /**

@@ -9,7 +9,9 @@ import FileStoreFolders from './file-store.folders';
 import { getUser } from '../../helpers/di-current-user';
 import { getFileStore } from '../../helpers/di-file-store';
 import config from '../../config';
-import IKegDb from '~/defs/keg-db';
+import FileFolder from '~/models/files/file-folder';
+import CacheEngineBase from '~/db/cache-engine-base';
+import { IKegDb } from '~/defs/interfaces';
 
 const PAGE_SIZE = 100;
 function isFileSelected(file) {
@@ -21,18 +23,15 @@ function isSelectedFileShareable(file) {
 }
 
 class FileStoreBase {
-    getByIdInChat(id: string, fileId: string): any {
-        throw new Error('Method not implemented.');
-    }
-    constructor(kegDb, root = null, id) {
+    constructor(kegDb: IKegDb, root = null, id) {
         this.id = id; // something to identify this instance in runtime
         this._kegDb = kegDb;
-        const m = createMap(this.files, 'fileId');
+        const m = createMap<File>(this.files, 'fileId');
         this.fileMap = m.map;
         this.fileMapObservable = m.observableMap;
         this.folderStore = new FileStoreFolders(this, root);
         if (id !== 'main') {
-            FileStoreBase.instances.set(this.id, this);
+            //FileStoreBase.instances.set(this.id, this as FileStoreBase<SharedKegDb>);
         } else {
             tracker.onceUpdated(this.onFileDigestUpdate);
         }
@@ -44,6 +43,12 @@ class FileStoreBase {
     fileMapObservable: ObservableMap<File>;
     folderStore: FileStoreFolders;
     isMainStore = false;
+    // TODO: raw keg types
+    cache: CacheEngineBase<any>;
+
+    onFileAdded?(keg: any, file: File): void;
+    onAfterUpdate?(dirty: boolean): void;
+
     // #region File store instances
     static instances = observable.map<FileStoreBase>();
     getFileStoreById(id) {
@@ -89,7 +94,8 @@ class FileStoreBase {
         let ret = this.files;
         if (this.isMainStore) {
             FileStoreBase.instances.forEach(store => {
-                ret = ret.concat(store.files.slice()) as IObservableArray<File>;
+                //@ts-ignore can't make this work without refactor
+                ret = ret.concat(store.files.slice());
             });
         }
         return ret;
@@ -118,7 +124,9 @@ class FileStoreBase {
     // Subset of files and folders not currently hidden by any applied filters
     @computed
     get filesAndFoldersSearchResult() {
-        return this.foldersSearchResult.concat(this.filesSearchResult);
+        return (this.foldersSearchResult as Array<File | FileFolder>).concat(
+            this.filesSearchResult
+        );
     }
 
     @computed
@@ -148,7 +156,7 @@ class FileStoreBase {
 
     @computed
     get selectedFilesOrFolders() {
-        return this.selectedFolders.concat(this.selectedFiles);
+        return (this.selectedFolders as Array<File | FileFolder>).concat(this.selectedFiles);
     }
 
     // #endregion
@@ -208,7 +216,7 @@ class FileStoreBase {
     });
 
     async getFileKegsFromServer() {
-        const filter = { collectionVersion: { $gt: this.knownUpdateId } };
+        const filter = { collectionVersion: { $gt: this.knownUpdateId }, deleted: undefined };
         if (!this.loaded) {
             filter.deleted = false;
         }
@@ -260,6 +268,7 @@ class FileStoreBase {
     async cacheDescriptor(d) {
         const file = this.getById(d.fileId);
         if (!file) return null;
+        //TODO: raw keg types
         const cached = await this.cache.getValue(file.id);
         if (!cached) {
             console.error('cacheDescriptor was called, but cached keg not found');

@@ -1,7 +1,11 @@
 import SyncedKeg from '../kegs/synced-keg';
+import { IKegDb } from '~/defs/interfaces';
 
-class FileFoldersKeg extends SyncedKeg {
-    constructor(db) {
+interface FileFoldersPayload {}
+
+interface FileFoldersProps {}
+class FileFoldersKeg extends SyncedKeg<FileFoldersPayload, FileFoldersProps> {
+    constructor(db: IKegDb) {
         super('file_folders', db);
     }
 

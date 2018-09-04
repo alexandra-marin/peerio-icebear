@@ -90,7 +90,8 @@ export class TofuStore {
     }
 
     async getFromCache(username) {
-        const cached = await this.cache.getValue(username);
+        //TODO: raw keg types
+        const cached = await this.cache.getValue<any>(username);
         if (cached && (!cached.encryptionPublicKey || !cached.signingPublicKey)) {
             // Broken cached tofu.
             return null;

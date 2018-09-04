@@ -1,7 +1,6 @@
 import BootKeg from './boot-keg';
 import tracker from '../../models/update-tracker';
-import IKegDb from '~/defs/keg-db';
-import { KeyPair } from '~/defs/interfaces';
+import { KeyPair, IKegDb } from '~/defs/interfaces';
 
 /**
  * Keg database.
@@ -30,12 +29,13 @@ export default class KegDb implements IKegDb {
     /**
      * Creates boot keg for this database.
      * todo: when we will have key change, we'll need update operation load()->update() because of keg version
+     * TODO: args are not really optional, but it breaks type compatibility otherwise
      */
     createBootKeg(
-        bootKey: Uint8Array,
-        signKeys: KeyPair,
-        encryptionKeys: KeyPair,
-        kegKey: Uint8Array
+        bootKey?: Uint8Array,
+        signKeys?: KeyPair,
+        encryptionKeys?: KeyPair,
+        kegKey?: Uint8Array
     ) {
         console.log('Creating boot keg of "SELF".');
         const boot = new BootKeg(this, bootKey);

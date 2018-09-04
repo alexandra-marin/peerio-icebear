@@ -50,8 +50,8 @@ class TaskQueue {
 
      */
     @action
-    addTask<T>(
-        task: () => any,
+    addTask<T = void>(
+        task: (...params: any[]) => any,
         context?: {},
         args?: any[],
         onSuccess?: (result: T) => void,

@@ -1,6 +1,6 @@
 import { serverErrorCodes } from '../../errors';
 import Keg from './../kegs/keg';
-import { observable, computed, action } from 'mobx';
+import { observable, computed, action, IObservableArray } from 'mobx';
 import * as cryptoUtil from '../../crypto/util';
 import * as secret from '../../crypto/secret';
 import * as sign from '../../crypto/sign';
@@ -13,13 +13,15 @@ import clientApp from '../client-app';
 import { asPromise } from '../../helpers/prombservable';
 import TaskQueue from '../../helpers/task-queue';
 import FileStoreBase from '~/models/files/file-store-base';
-import KegDb from '~/models/kegs/keg-db';
 import Chat from '~/models/chats/chat';
-import IKegDb from '~/defs/keg-db';
 import * as uploadModule from './file.upload';
 import * as downloadModule from './file.download';
 import FileData from './file-data';
 import FileStreamBase from '~/models/files/file-stream-base';
+import { FileStore } from '~/models/files/file-store';
+import { IKegDb } from '~/defs/interfaces';
+import FileDownloader from '~/models/files/file-downloader';
+import FileUploader from '~/models/files/file-uploader';
 
 const signDetached = sign.signDetached;
 
@@ -33,32 +35,44 @@ interface IFileProps {}
 
 export interface IFileDescriptor {}
 
-interface File {
-    _getUlResumeParams: typeof uploadModule._getUlResumeParams;
-    _saveUploadEndFact: typeof uploadModule._saveUploadEndFact;
-    _saveUploadStartFact: typeof uploadModule._saveUploadStartFact;
-    cancelUpload: typeof uploadModule.cancelUpload;
-    upload: typeof uploadModule.upload;
-}
-
 /**
  * File keg and model.
  */
-class File extends Keg<IFilePayload, IFileProps> implements File {
-    uploader: import('/Users/anri/src/peerio/peerio-icebear/src/models/files/file-uploader').default;
-    constructor(db: KegDb, store: FileStoreBase) {
+export default class File extends Keg<IFilePayload, IFileProps> {
+    constructor(db: IKegDb, store: FileStoreBase) {
         super(null, 'file', db);
         this.store = store;
         this.format = 1;
         this.latestFormat = 1;
     }
-
     static copyQueue = new TaskQueue(1, 200);
+
+    _getUlResumeParams: typeof uploadModule._getUlResumeParams;
+    _saveUploadEndFact: typeof uploadModule._saveUploadEndFact;
+    _saveUploadStartFact: typeof uploadModule._saveUploadStartFact;
+    cancelUpload: typeof uploadModule.cancelUpload;
+    upload: typeof uploadModule.upload;
+
+    _getDlResumeParams: typeof downloadModule._getDlResumeParams;
+    _saveDownloadStartFact: typeof downloadModule._saveDownloadStartFact;
+    _saveDownloadEndFact: typeof downloadModule._saveDownloadEndFact;
+    cancelDownload: typeof downloadModule.cancelDownload;
+    download: typeof downloadModule.download;
 
     hidden: boolean;
     store: FileStoreBase;
     latestFormat: number;
     descriptorKey: string;
+    unmigrated: boolean;
+
+    downloader: FileDownloader;
+    uploader: FileUploader;
+    // files and folders get in mixed lists, so this helps
+    isFolder = false;
+    isShared = false; //TODO: rename this to 'isVolume'
+
+    //TODO: this is a pretty dirty hack to support UI, needs refactor
+    uploadQueue?: IObservableArray<File>;
 
     get data() {
         if (!this.fileId) return null;
@@ -571,12 +585,9 @@ class File extends Keg<IFilePayload, IFileProps> implements File {
             this.deleted = true;
         });
     }
-    _resetDownloadState(): void {
-        throw new Error('Method not implemented.');
-    }
-    _resetUploadState(_stream?: FileStreamBase): void {
-        throw new Error('Method not implemented.');
-    }
+    //TODO: better way to do this. Optional, so tsc won't complain, but it will always be defined.
+    _resetDownloadState?(stream?: FileStreamBase): void;
+    _resetUploadState?(stream?: FileStreamBase): void;
 
     /**
      * Safe to call any time after upload has been started (keg created).
@@ -621,7 +632,7 @@ class File extends Keg<IFilePayload, IFileProps> implements File {
         );
     }
 
-    tryToCacheTemporarily(force) {
+    tryToCacheTemporarily(force = false) {
         if (
             this.tmpCached ||
             this.downloading ||
@@ -644,14 +655,15 @@ class File extends Keg<IFilePayload, IFileProps> implements File {
 
     /**
      * Copies this file keg to another db
+     * TODO: this is too dynamic type wise, probably better to refactor
      */
-    copyTo(db: IKegDb, store: FileStoreBase, folderId?: string) {
+    copyTo(db: any, store: any, folderId?: string) {
         // TODO: ugly, refactor when chats get their own file stores
         const dstIsChat = db.id.startsWith('channel:') || db.id.startsWith('chat:');
         const dstIsSELF = db.id === 'SELF';
         const dstIsVolume = db.id.startsWith('volume:');
         if (dstIsChat) {
-            const chatFile = store.getByIdInChat(db.id, this.fileId);
+            const chatFile = (store as FileStore).getByIdInChat(db.id, this.fileId);
             if (chatFile && chatFile.loaded && !chatFile.deleted) return Promise.resolve();
         } else if (store.getById(this.fileId)) {
             return Promise.resolve();
@@ -710,5 +722,3 @@ class File extends Keg<IFilePayload, IFileProps> implements File {
 
 Object.assign(File.prototype, uploadModule);
 Object.assign(File.prototype, downloadModule);
-
-export default File;

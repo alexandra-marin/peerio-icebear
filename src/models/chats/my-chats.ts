@@ -1,5 +1,6 @@
 import SyncedKeg from '../kegs/synced-keg';
 import { getUser } from '../../helpers/di-current-user';
+import { IKegDb } from '~/defs/interfaces';
 
 interface MyChatsPayload {}
 interface MyChatsProps {}
@@ -9,7 +10,7 @@ interface MyChatsProps {}
  */
 class MyChats extends SyncedKeg<MyChatsPayload, MyChatsProps> {
     constructor() {
-        super('my_chats', getUser().kegDb);
+        super('my_chats', getUser().kegDb as IKegDb);
     }
     /**
      * Favorite chat ids

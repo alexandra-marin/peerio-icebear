@@ -1,3 +1,5 @@
+import Contact from '~/models/contacts/contact';
+
 // TODO: some of these could probably be split out and moved closer to their
 // usage sites
 
@@ -17,7 +19,7 @@ export interface AuthToken {
     ephemeralServerPK: Uint8Array;
 }
 
-interface AuthData {
+export interface AuthData {
     username: string;
     paddedPassphrase: string;
     passphrase?: string;
@@ -81,4 +83,23 @@ export interface TwoFARequest {
     type: 'login' | 'backupCodes' | 'disable';
     submit: (totpCode: string, trustThisDevice?: boolean) => void;
     cancel: () => void;
+}
+
+export interface IBootKeg {
+    getKey(keyId: string, timeout?: number): Promise<Uint8Array>;
+    keys: { [keyId: string]: { key: Uint8Array } };
+    loaded: boolean;
+    owner?: string;
+}
+
+// TODO: this is a mix of KegDb and SharedKegDb,
+// not very accurate in terms of members that exist in one but not in another
+// but anything else I tried was a nightmare at this point
+export interface IKegDb {
+    id: string;
+    key: Uint8Array;
+    keyId: string;
+    boot: IBootKeg;
+    createBootKeg?(): Promise<any>;
+    participants?: Array<Contact>;
 }

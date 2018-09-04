@@ -1,15 +1,16 @@
 import { computed, observable } from 'mobx';
 import config from '../../config';
-import Chat from './chat';
+import { ChatStore } from '~/models/chats/chat-store';
 
 class Space {
-    constructor(store) {
+    constructor(store: ChatStore) {
         this.store = store;
     }
 
     spaceId = '';
     spaceName = '';
     spaceDescription = '';
+    store: ChatStore;
 
     @computed
     get allRooms() {
@@ -41,9 +42,10 @@ class Space {
 }
 
 class ChatStoreSpaces {
-    constructor(store) {
+    constructor(store: ChatStore) {
         this.store = store;
     }
+    store: ChatStore;
 
     @computed
     get roomsWithinSpaces() {
@@ -54,13 +56,13 @@ class ChatStoreSpaces {
      * Subset of ChatStore#chats, contains all spaces
      */
     @computed
-    get spacesList(): Chat[] {
+    get spacesList(): Space[] {
         if (config.whiteLabel.name !== 'medcryptor') {
             return [];
         }
 
         // aggregate all spaces by id
-        const spacesMap = new Map(
+        const spacesMap = new Map<string, Space>(
             this.roomsWithinSpaces.map(chat => [
                 chat.chatHead.spaceId, // key: the space's id
                 this.getSpaceFrom(chat) // value: the space object

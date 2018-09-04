@@ -4,8 +4,7 @@ import KegDb from './keg-db';
 import { observable, when } from 'mobx';
 
 import * as util from '../../crypto/util';
-import { IBootKeg } from '~/defs/boot-keg';
-import { KeyPair } from '../../defs/interfaces';
+import { KeyPair, IBootKeg, IKegDb } from '../../defs/interfaces';
 
 export interface BootKegPayload {
     kegKey: string;
@@ -25,7 +24,7 @@ export interface BootKegPayload {
 export default class BootKeg extends Keg<BootKegPayload> implements IBootKeg {
     constructor(db: KegDb, bootKey: Uint8Array) {
         // named kegs are pre-created, so we know the id already and only going to update boot keg
-        super('boot', 'boot', db);
+        super('boot', 'boot', db as IKegDb);
         this.overrideKey = bootKey;
         this.version = 1; // pre-created named keg
     }

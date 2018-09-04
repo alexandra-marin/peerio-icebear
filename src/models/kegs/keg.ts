@@ -4,14 +4,12 @@ import * as secret from '../../crypto/secret';
 import * as sign from '../../crypto/sign';
 import * as cryptoUtil from '../../crypto/util';
 import socket from '../../network/socket';
-
 import { getContactStore } from '../../helpers/di-contact-store';
 import { getUser } from '../../helpers/di-current-user';
 import { asPromise } from '../../helpers/prombservable';
-
 import { AntiTamperError, DecryptionError, serverErrorCodes } from '../../errors';
-import IKegDb from '~/defs/keg-db';
 import { IFileDescriptor } from '~/models/files/file';
+import { IKegDb } from '~/defs/interfaces';
 
 let temporaryKegId = 0;
 function getTemporaryKegId() {
@@ -99,12 +97,12 @@ export default class Keg<TPayload, TProps extends {} = {}> {
     /**
      * Keg type
      */
-    protected type: string;
+    type: string;
 
     /**
      * Owner KegDb instance
      */
-    protected readonly db: IKegDb;
+    readonly db: IKegDb;
 
     /**
      * Is the payload of this keg encrypted or not
@@ -140,7 +138,7 @@ export default class Keg<TPayload, TProps extends {} = {}> {
     owner?: string;
     kegCreatedAt?: number;
     kegUpdatedAt?: number;
-    deserializeDescriptor: (_data: IFileDescriptor) => void;
+    deserializeDescriptor?(_data: IFileDescriptor): void;
     afterLoad?: () => void;
     onLoadedFromKeg?: (keg: unknown) => void;
 

@@ -1,13 +1,24 @@
 import { observable } from 'mobx';
 import Keg from '../kegs/keg';
 import ChatKegDb from '~/models/kegs/chat-keg-db';
+import { IKegDb } from '~/defs/interfaces';
+
+interface ReadReceiptPayload {}
+interface ReadReceiptProps {}
 
 /**
  * Holds read position (kegId) for a user in a chat. Named keg, names contain usernames.
  */
-class ReadReceipt extends Keg {
+class ReadReceipt extends Keg<ReadReceiptPayload, ReadReceiptProps> {
     constructor(username: string, db: ChatKegDb) {
-        super(username ? `read_receipt-${username}` : null, 'read_receipt', db, false, false, true);
+        super(
+            username ? `read_receipt-${username}` : null,
+            'read_receipt',
+            db as IKegDb,
+            false,
+            false,
+            true
+        );
     }
     /**
      * Id of the last read message
@@ -26,9 +37,9 @@ class ReadReceipt extends Keg {
         this.chatPosition = +(payload.chatPosition || 0);
     }
 
-    afterLoad() {
+    afterLoad = () => {
         this.receiptError = !this.id.endsWith(`-${this.owner}`);
-    }
+    };
 }
 
 export default ReadReceipt;

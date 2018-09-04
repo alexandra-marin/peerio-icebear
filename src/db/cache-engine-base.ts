@@ -6,8 +6,8 @@ import { getUser } from '../helpers/di-current-user';
 import TinyDb from '../db/tiny-db';
 
 /* when it returns object - write this object, false - don't write anything */
-interface ICacheUpdateCallback {
-    (oldValue: {}, newValue: {}): {} | false;
+interface ICacheUpdateCallback<T> {
+    (oldValue: T, newValue: T): T | false;
 }
 
 const META_DB_NAME = 'peerio_cache_meta';
@@ -22,7 +22,7 @@ const CACHE_RESET_KEY = 'cacheResetCounter';
  * @param shortName - unique(per user) database short name (will be converted to longer and safer name)
  * @param keyPath - how to find the key in saved objects
  */
-class CacheEngineBase {
+export default class CacheEngineBase<TValue> {
     constructor(shortName: string, keyPath: string) {
         if (!shortName || !keyPath) throw new Error('Invalid arguments');
         this.name =
@@ -138,7 +138,7 @@ class CacheEngineBase {
     /**
      * Asynchronously gets a value from storage.
      */
-    getValue<T>(_key: string): Promise<T> {
+    getValue(_key: string): Promise<TValue> {
         throw new Error('Method not implemented');
     }
 
@@ -148,7 +148,11 @@ class CacheEngineBase {
      * @param confirm - a callback to confirm update if value already exists
      *                                             read and write should be done in atomic/transactional way.
      */
-    setValue<T>(_key: string, _value: T, _confirmUpdate?: ICacheUpdateCallback): Promise<void> {
+    setValue(
+        _key: string,
+        _value: TValue,
+        _confirmUpdate?: ICacheUpdateCallback<TValue>
+    ): Promise<void> {
         throw new Error('Method not implemented');
     }
 
@@ -171,7 +175,7 @@ class CacheEngineBase {
     /**
      * Asynchronously retrieves a list of all values in current namespace
      */
-    getAllValues(): Promise<string[]> {
+    getAllValues(): Promise<TValue[]> {
         throw new Error('Method not implemented');
     }
 
@@ -189,5 +193,3 @@ class CacheEngineBase {
         throw new Error('Method not implemented');
     }
 }
-
-export default CacheEngineBase;

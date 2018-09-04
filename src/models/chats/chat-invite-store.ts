@@ -7,7 +7,7 @@ import * as publicCrypto from '../../crypto/public';
 import User from '../user/user';
 import { getUser } from '../../helpers/di-current-user';
 import ChatHead from './chat-head';
-import IKegDb from '~/defs/keg-db';
+import SharedKegDb from '~/models/kegs/shared-keg-db';
 
 interface RawReceivedInvite {
     chatHeadKeg: any; // TODO: raw keg types
@@ -47,7 +47,7 @@ class ChatInviteStore {
      * List of channel invites admins of current channel have sent.
      * key - kegDbId
      */
-    @observable sent = observable.shallowMap<Array<{ username: string; timestamp: number }>>();
+    @observable sent = observable.shallowMap<Array<{ username: string; timestamp?: number }>>();
 
     /**
      * List of users requested to leave channels. This is normally for internal icebear use.
@@ -61,7 +61,7 @@ class ChatInviteStore {
      * List of users who rejected invites and are pending to be removed from boot keg.
      * key - kegDbId
      */
-    @observable rejected = observable.shallowMap<string[]>();
+    @observable rejected = observable.shallowMap<Array<{ username: string }>>();
 
     updating = false;
     updateAgain = false;
@@ -126,7 +126,12 @@ class ChatInviteStore {
                         arr.sort((i1, i2) => i1.username.localeCompare(i2.username));
 
                         const rejectedUsernames = Object.keys(item.rejected);
-                        this.rejected.set(item.kegDbId, rejectedUsernames);
+                        this.rejected.set(
+                            item.kegDbId,
+                            rejectedUsernames.map(username => {
+                                return { username };
+                            })
+                        );
 
                         Promise.map(
                             rejectedUsernames,
@@ -246,8 +251,8 @@ class ChatInviteStore {
                 publicKey,
                 User.current.encryptionKeys.secretKey
             );
-            const fakeDb: IKegDb = { id: data.channel, key: null, keyId: null, boot: null };
-            const chatHead = new ChatHead(fakeDb);
+            const fakeDb = { id: data.channel, key: null, keyId: null, boot: null };
+            const chatHead = new ChatHead(fakeDb as SharedKegDb); // TODO: this is nasty,
             chatHead.overrideKey = kegKey;
             await chatHead.loadFromKeg(chatHeadKeg);
 

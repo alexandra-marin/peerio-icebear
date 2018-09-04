@@ -11,7 +11,7 @@ import { AbstractCallError } from '~/errors';
  * @param mode - 'read' or 'write' or 'append'
  */
 class FileStreamBase {
-    constructor(filePath: string, mode: 'read' | 'write' | 'append') {
+    constructor(filePath: string, mode: string) {
         this.filePath = filePath;
         if (mode !== 'read' && mode !== 'write' && mode !== 'append') {
             throw new Error('Invalid stream mode.');
@@ -54,16 +54,14 @@ class FileStreamBase {
 
     /**
      * Writes a chunk of data to file stream
-     * @returns Promise resolves when chunk is written out
      */
-    write = (buffer: Uint8Array) => {
+    write = async (buffer: Uint8Array): Promise<void> => {
         if (this.mode !== 'write' && this.mode !== 'append') {
-            return Promise.reject(
-                new Error(`file-stream.js: Attempt to write to read stream. ${this.mode}`)
-            );
+            throw new Error(`file-stream.js: Attempt to write to read stream. ${this.mode}`);
         }
-        if (!buffer || !buffer.length) return Promise.resolve();
-        return this.writeInternal(buffer).then(() => this._increasePosition(buffer));
+        if (!buffer || !buffer.length) return;
+        await this.writeInternal(buffer);
+        await this._increasePosition(buffer);
     };
 
     /**

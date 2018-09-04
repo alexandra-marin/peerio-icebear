@@ -1,15 +1,17 @@
-import { observable, computed, when } from 'mobx';
+import { observable, computed, when, IObservableArray } from 'mobx';
 import contactStore from './../contacts/contact-store';
 import User from './../user/user';
 import Keg from './../kegs/keg';
 import moment from 'moment';
 import _ from 'lodash';
 import { retryUntilSuccess } from '../../helpers/retry';
-import unfurl from '../../helpers/unfurl';
+import * as unfurl from '../../helpers/unfurl';
 import config from '../../config';
 import clientApp from '../client-app';
 import TaskQueue from '../../helpers/task-queue';
 import socket from '../../network/socket';
+import SharedKegDb from '~/models/kegs/shared-keg-db';
+import Contact from '~/models/contacts/contact';
 
 interface ExternalImage {
     url: string;
@@ -18,11 +20,24 @@ interface ExternalImage {
     isOversizeCutoff: boolean;
 }
 
+interface MessagePayload {
+    text: string;
+    richText?: {};
+    timestamp: number;
+    userMentions: string[];
+    files?: string; // stringified array if file ids
+    folders?: string; // stringified array if folder ids
+    systemData?: { action: string } & { [key: string]: any };
+}
+
+interface MessageProps {
+    systemAction?: string;
+}
 /**
  * Message keg and model
  */
-class Message extends Keg {
-    constructor(db: ChatStore) {
+class Message extends Keg<MessagePayload, MessageProps> {
+    constructor(db: SharedKegDb) {
         super(null, 'message', db);
         // format 1 adds richText property to payload.
         // this property will be be overwritten when keg is dehydrated from older format data,
@@ -30,17 +45,27 @@ class Message extends Keg {
         this.latestFormat = this.format;
     }
 
+    latestFormat: number;
+    timestamp: Date;
+    sender: Contact;
+    systemData: { action: string } & { [key: string]: any };
+    files: string[];
+    folders: string[];
+    text: string;
+    richText: {};
+    isMention: boolean;
+
     static unfurlQueue = new TaskQueue(5);
     @observable sending = false;
     @observable sendError = false;
     /**
      * array of usernames to render receipts for
      */
-    @observable receipts: string[];
+    @observable receipts: IObservableArray<string>;
     /**
      * Which usernames are mentioned in this message.
      */
-    @observable.shallow userMentions: string[] = [];
+    @observable.shallow userMentions = [] as IObservableArray<string>;
     // ----- calculated in chat store, used in ui
     /**
      * Is this message first in the day it was sent (and loaded message page)
@@ -54,7 +79,7 @@ class Message extends Keg {
     /**
      * External image urls mentioned in this chat and safe to render in agreement with all settings.
      */
-    @observable externalImages: ExternalImage[] = [];
+    @observable externalImages = [] as IObservableArray<ExternalImage>;
 
     /**
      * Indicates if current message contains at least one url.
@@ -297,14 +322,14 @@ class Message extends Keg {
 
     serializeKegPayload() {
         this.format = this.latestFormat;
-        this.userMentions = this.text
+        this.userMentions = (this.text
             ? _.uniq(
                   this.db.participants
                       .filter(u => this.text.match(u.mentionRegex))
                       .map(u => u.username)
               )
-            : [];
-        const ret = {
+            : []) as IObservableArray<string>;
+        const ret: MessagePayload = {
             text: this.text,
             timestamp: this.timestamp.valueOf(),
             userMentions: this.userMentions
@@ -338,7 +363,7 @@ class Message extends Keg {
     }
 
     serializeProps() {
-        const ret = {};
+        const ret: MessageProps = {};
         // for future server notifications
         if (this.systemData) ret.systemAction = this.systemData.action;
         return ret;

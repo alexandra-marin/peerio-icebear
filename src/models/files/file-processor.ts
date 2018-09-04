@@ -62,7 +62,7 @@ class FileProcessor {
     }
 
     // stops process and resolves or rejects promise
-    _finishProcess(err) {
+    _finishProcess(err?: Error) {
         if (this.processFinished) return;
         this.processFinished = true;
         this.stopped = true; // bcs in case of error some calls might be scheduled

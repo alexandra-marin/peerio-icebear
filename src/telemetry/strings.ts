@@ -1,4 +1,4 @@
-export const S = {
+export default {
     ACCEPT_TERMS: 'Accept Terms Of Use',
     ACCOUNT_EMAIL: 'Account Email',
     ACCOUNT_KEY: 'Account Key',

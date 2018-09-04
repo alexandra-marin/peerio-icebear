@@ -68,9 +68,9 @@ export function send(eventObj: EventObject): void {
         const url = `${config.telemetry.baseUrl}${data}`;
 
         console.log(sendObject);
-        // g.fetch(url, {
-        //     method: 'GET'
-        // });
+        g.fetch(url, {
+            method: 'GET'
+        });
     } catch (e) {
         console.error('Could not send telemetry event.', e);
     }

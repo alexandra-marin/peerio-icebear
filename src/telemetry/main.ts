@@ -45,8 +45,8 @@ export async function send(eventObj: EventObject): Promise<void> {
             // eslint-disable-next-line camelcase, Mixpanel requires distinct_id in this format
             distinct_id: await getUserId(),
             Device: config.isMobile ? 'Mobile' : 'Desktop',
-            ['Version Number']: 1, // refers to our own tracker library versioning,
-            ['App Version']: config.appVersion,
+            'Version Number': 1, // refers to our own tracker library versioning,
+            'App Version': config.appVersion,
             token: serverSettings.mixPanelClientToken
         };
 

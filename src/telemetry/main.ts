@@ -12,7 +12,6 @@ interface Properties {
     'Version Number': number;
     'App Version': string;
 }
-let baseProperties: Properties | null = 0 as any;
 
 async function getUserId(): Promise<string> {
     const userId: string = await TinyDb.system.getValue('telemetryUserId');
@@ -40,7 +39,7 @@ interface EventObject {
 
 export async function send(eventObj: EventObject): Promise<void> {
     try {
-        baseProperties = {
+        const baseProperties: Properties = {
             // eslint-disable-next-line camelcase, Mixpanel requires distinct_id in this format
             distinct_id: await getUserId(),
             Device: config.isMobile ? 'Mobile' : 'Desktop',

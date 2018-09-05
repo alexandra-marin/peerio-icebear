@@ -13,7 +13,7 @@ interface Properties {
     'Version Number': number;
     'App Version': string;
 }
-const baseProperties = {} as Properties;
+let baseProperties: Properties | null = 0 as any;
 
 async function getUserId(): Promise<string> {
     const userId: string = await TinyDb.system.getValue('telemetryUserId');
@@ -26,48 +26,44 @@ async function getUserId(): Promise<string> {
     return userId;
 }
 
-export async function init(): Promise<void> {
-    try {
-        // eslint-disable-next-line camelcase, Mixpanel requires distinct_id in this format
-        baseProperties.distinct_id = await getUserId();
-        baseProperties.Device = config.isMobile ? 'Mobile' : 'Desktop';
-        baseProperties['Version Number'] = 1; // refers to our own tracker library versioning
-        baseProperties['App Version'] = config.appVersion;
-    } catch (e) {
-        console.error('Could not initialize telemetry.', e);
-    }
-}
-
 function camelToTitleCase(text: string): string {
     return (text[0].toUpperCase() + text.slice(1)).split(/(?=[A-Z])/).join(' ');
 }
 
-interface EventObject {
-    event: string;
-    properties: {};
+interface EventProperties {
+    [key: string]: string | number | boolean;
 }
 
-export function send(eventObj: EventObject): void {
+interface EventObject {
+    event: string;
+    properties: EventProperties;
+}
+
+export async function send(eventObj: EventObject): Promise<void> {
     try {
-        // Check server for Mixpanel token on every send, in case token changes.
-        baseProperties.token = serverSettings.mixPanelClientToken;
+        baseProperties = {
+            // eslint-disable-next-line camelcase, Mixpanel requires distinct_id in this format
+            distinct_id: await getUserId(),
+            Device: config.isMobile ? 'Mobile' : 'Desktop',
+            ['Version Number']: 1, // refers to our own tracker library versioning,
+            ['App Version']: config.appVersion,
+            token: serverSettings.mixPanelClientToken
+        };
 
         // Marketing wants all items (property names and values) to be in Title Case, but this breaks code style.
         // So we still write props in camelCase when sending events from client, and convert them here.
-        let properties = {};
+        const eventProperties: EventProperties = {};
         Object.keys(eventObj.properties).forEach(itemInCamel => {
             const item = camelToTitleCase(itemInCamel);
-            properties[item] = eventObj.properties[itemInCamel];
+            eventProperties[item] = eventObj.properties[itemInCamel];
         });
 
-        const sendObject = eventObj;
-        properties = { ...baseProperties, ...properties };
-        sendObject.properties = properties;
+        eventObj.properties = { ...baseProperties, ...eventProperties };
 
-        const data = g.btoa(JSON.stringify(sendObject));
+        const data = g.btoa(JSON.stringify(eventObj));
         const url = `${config.telemetry.baseUrl}${data}`;
 
-        console.log(sendObject);
+        console.log(eventObj);
         g.fetch(url, {
             method: 'GET'
         });

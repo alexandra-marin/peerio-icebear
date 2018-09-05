@@ -1,4 +1,3 @@
-// Main telemetry functionality is here, most importantly the send() export
 const config = require('../config');
 const TinyDb = require('../db/tiny-db');
 const { cryptoUtil } = require('../crypto');

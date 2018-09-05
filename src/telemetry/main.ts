@@ -4,15 +4,6 @@ const { cryptoUtil } = require('../crypto');
 const g = require('../helpers/global-context');
 const serverSettings = require('../models/server-settings');
 
-interface Properties {
-    // eslint-disable-next-line camelcase, Mixpanel requires distinct_id in this format
-    distinct_id: string;
-    token: string;
-    Device: '' | 'Mobile' | 'Desktop';
-    'Version Number': number;
-    'App Version': string;
-}
-
 async function getUserId(): Promise<string> {
     const userId: string = await TinyDb.system.getValue('telemetryUserId');
 
@@ -28,6 +19,15 @@ function camelToTitleCase(text: string): string {
     return (text[0].toUpperCase() + text.slice(1)).split(/(?=[A-Z])/).join(' ');
 }
 
+interface BaseProperties {
+    // eslint-disable-next-line camelcase, Mixpanel requires distinct_id in this format
+    distinct_id: string;
+    token: string;
+    Device: '' | 'Mobile' | 'Desktop';
+    'Version Number': number;
+    'App Version': string;
+}
+
 interface EventProperties {
     [key: string]: string | number | boolean;
 }
@@ -39,7 +39,7 @@ interface EventObject {
 
 export async function send(eventObj: EventObject): Promise<void> {
     try {
-        const baseProperties: Properties = {
+        const baseProperties: BaseProperties = {
             // eslint-disable-next-line camelcase, Mixpanel requires distinct_id in this format
             distinct_id: await getUserId(),
             Device: config.isMobile ? 'Mobile' : 'Desktop',

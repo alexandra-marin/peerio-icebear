@@ -34,16 +34,17 @@ class FileStreamBase {
      * @param size - amount of bytes to read (if possible)
      * @return resolves with a number of bytes written to buffer
      */
-    read = (size: number) => {
+    read = async (size: number) => {
         if (this.mode !== 'read') {
-            return Promise.reject(new Error('Attempt to read from write stream.'));
+            throw new Error('Attempt to read from write stream.');
         }
-        return this.readInternal(size).then(this._increasePosition);
+        const buf = await this.readInternal(size);
+        this._increasePosition(buf);
+        return buf;
     };
 
     _increasePosition = (buf: Uint8Array) => {
         this.pos += buf.length;
-        return buf;
     };
 
     /**
@@ -63,7 +64,7 @@ class FileStreamBase {
         }
         if (!buffer || !buffer.length) return;
         await this.writeInternal(buffer);
-        await this._increasePosition(buffer);
+        this._increasePosition(buffer);
     };
 
     /**

@@ -1,7 +1,7 @@
 //
 //  Crypto utilities module testing
 //
-const util = require('~/crypto/util');
+import * as util from '~/crypto/util';
 
 describe('Crypto Utilities module', () => {
     [
@@ -98,7 +98,7 @@ describe('Crypto Utilities module', () => {
         const set2 = util.getRandomBytes(10);
         set1.should.be.an.instanceOf(Uint8Array);
         set2.should.be.an.instanceOf(Uint8Array);
-        set1.should.not.be.deep.eql(set2);
+        set1.should.not.be.deep.equal(set2);
     });
 
     it('should generate a non-personalized byte hash', () => {

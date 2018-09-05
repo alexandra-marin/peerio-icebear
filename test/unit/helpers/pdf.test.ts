@@ -1,7 +1,15 @@
 import saveAccountKeyBackup from '~/helpers/pdf';
 import { getTempFileName } from '../../e2e/code/helpers/files.js'; // TODO: create shared helpers folder
+import config from '~/config';
+import NodeFileStream from '~/models/files/node-file-stream';
 
 describe('PDF module', () => {
+    before(() => {
+        config.FileStream = NodeFileStream;
+        // config.assetPathResolver = fileName => {
+        //     return `../../../src/assets/${fileName}`;
+        // };
+    });
     it('generates account key backup file', () => {
         const dest = `${getTempFileName()}.pdf`;
         console.log('Saving pdf file', dest);

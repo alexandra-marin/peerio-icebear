@@ -1,6 +1,5 @@
 import { Promise } from 'bluebird';
-
-const TaskQueue = require('~/helpers/task-queue');
+import TaskQueue from '~/helpers/task-queue';
 
 describe('TaskQueue should', () => {
     it('do tasks in order', async () => {

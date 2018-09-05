@@ -1,5 +1,5 @@
-const Clock = require('~/helpers/observable-clock');
-const { autorun } = require('mobx');
+import Clock from '~/helpers/observable-clock';
+import { autorun } from 'mobx';
 
 describe('Observable clock should', () => {
     it('not tick if not observed', () => {
@@ -18,11 +18,11 @@ describe('Observable clock should', () => {
             const expected = clock.now;
             const actual = Date.now();
 
-            actual.should.closeTo(expected, 50);
+            actual.should.closeTo(expected, 30);
             clock._atom.reportObserved().should.be.true;
         });
 
-        await Promise.delay(5000).then(disposer);
+        await Promise.delay(3000).then(disposer);
         clock._atom.reportObserved().should.be.false;
     });
 });

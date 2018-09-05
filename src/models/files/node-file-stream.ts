@@ -48,21 +48,14 @@ class NodeFileStream extends FileStreamBase {
     readInternal(size: number): Promise<Uint8Array> {
         return new Promise((resolve, reject) => {
             const buffer = new Uint8Array(size);
-            fs.read(
-                this.fileDescriptor,
-                Buffer.from(buffer),
-                0,
-                size,
-                this.pos,
-                (err, bytesRead) => {
-                    if (this.checkForError(err, reject)) return;
-                    if (bytesRead < buffer.length) {
-                        resolve(buffer.subarray(0, bytesRead));
-                    } else {
-                        resolve(buffer);
-                    }
+            fs.read(this.fileDescriptor, buffer, 0, size, this.pos, (err, bytesRead) => {
+                if (this.checkForError(err, reject)) return;
+                if (bytesRead < buffer.length) {
+                    resolve(buffer.subarray(0, bytesRead));
+                } else {
+                    resolve(buffer);
                 }
-            );
+            });
         });
     }
 

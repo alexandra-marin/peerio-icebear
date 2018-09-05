@@ -1,6 +1,6 @@
-const Timer = require('~/helpers/observable-timer');
-const { when } = require('mobx');
-const { performance } = require('perf_hooks');
+import Timer from '~/helpers/observable-timer';
+import { when } from 'mobx';
+import { performance } from 'perf_hooks';
 
 describe('Timer should', () => {
     it('count down', done => {

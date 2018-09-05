@@ -1,4 +1,4 @@
-const { getFirstLetterUpperCase } = require('~/helpers/string');
+import { getFirstLetterUpperCase } from '~/helpers/string';
 
 describe('String helper should', () => {
     it('return empty string for no input', () => {

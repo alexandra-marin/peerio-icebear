@@ -1,9 +1,9 @@
 //
 //  Secret key encryption module testing
 //
-const crypto = require('~/crypto/secret');
-const nacl = require('tweetnacl');
-const util = require('~/crypto/util');
+import * as crypto from '~/crypto/secret';
+import nacl from 'tweetnacl';
+import * as util from '~/crypto/util';
 
 describe('Secret key encryption module', () => {
     const key = new Uint8Array([

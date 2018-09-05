@@ -1,5 +1,5 @@
 import { observable } from 'mobx';
-const { asPromise } = require('~/helpers/prombservable');
+import { asPromise } from '~/helpers/prombservable';
 
 describe('Promservable should', () => {
     it('execute when property changes', () => {

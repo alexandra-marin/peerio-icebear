@@ -1,4 +1,4 @@
-const { convertBuffers, formatBytes, tryToGet } = require('~/util');
+import { convertBuffers, formatBytes, tryToGet } from '~/util';
 
 describe('Utils', () => {
     it('convertBuffers', () => {

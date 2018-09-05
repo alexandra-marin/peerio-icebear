@@ -39,8 +39,9 @@ export function formatBytes(bytes: number) {
  * Do not use this in performance critical cases because of deliberate exception throwing
  * @param fn - Functor, which may throw exception in which case default value will be used.
  * @returns Result of fn execution, if it didn't throw exception, or defaultValue
+ * NOTE: explicit any is intentional, this function is supposed to try and return anything from anything
  */
-export function tryToGet(fn: () => any, defaultValue: any) {
+export function tryToGet(fn: any, defaultValue: any) {
     try {
         return fn();
     } catch (e) {

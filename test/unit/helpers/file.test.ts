@@ -1,7 +1,7 @@
-const helper = require('~/helpers/file');
+import * as helper from '~/helpers/file';
 
 describe('File helper should', () => {
-    const paths = [
+    let paths = [
         {
             data: 'noext',
             expectedFullName: 'noext',
@@ -77,21 +77,27 @@ describe('File helper should', () => {
     ];
 
     folders.forEach(f => {
-        paths.concat(paths.map(p => f + p));
+        paths = paths.concat(
+            paths.map(p => {
+                const newP = Object.assign({}, p);
+                newP.data = f + newP.data;
+                return newP;
+            })
+        );
     });
 
     paths.forEach(testCase => {
-        it(`return file name from path ${testCase.data}`, () => {
+        it(`return file name from path "${testCase.data}"`, () => {
             const actual = helper.getFileName(testCase.data);
             actual.should.equal(testCase.expectedFullName);
         });
 
-        it(`return file name without extension from path ${testCase.data}`, () => {
+        it(`return file name without extension from path "${testCase.data}"`, () => {
             const actual = helper.getFileNameWithoutExtension(testCase.data);
             actual.should.equal(testCase.expectedName);
         });
 
-        it(`return extension from path ${testCase.data}`, () => {
+        it(`return extension from path "${testCase.data}"`, () => {
             const actual = helper.getFileExtension(testCase.data);
             actual.should.equal(testCase.expectedExt);
         });

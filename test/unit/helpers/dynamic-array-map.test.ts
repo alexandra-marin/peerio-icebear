@@ -1,5 +1,5 @@
-const createMap = require('~/helpers/dynamic-array-map');
-const { when, observable } = require('mobx');
+import createMap from '~/helpers/dynamic-array-map';
+import { when, observable } from 'mobx';
 
 describe('createMap should', () => {
     it('notify when items are added', done => {

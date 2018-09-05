@@ -1,6 +1,6 @@
-const { retryUntilSuccess } = require('~/helpers/retry');
-const tracker = require('~/models/update-tracker');
-const { performance } = require('perf_hooks');
+import { retryUntilSuccess } from '~/helpers/retry';
+import tracker from '~/models/update-tracker';
+import { performance } from 'perf_hooks';
 
 describe('Retry helper should', function() {
     this.timeout(50000);
@@ -38,7 +38,7 @@ describe('Retry helper should', function() {
     it('fail to resolve after 3 tries', async () => {
         let attemptNumber = 0;
         const task = () =>
-            new Promise((resolve, reject) => {
+            new Promise((_resolve, reject) => {
                 attemptNumber++;
                 console.log('attemptNumber', attemptNumber);
                 reject();

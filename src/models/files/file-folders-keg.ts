@@ -1,5 +1,5 @@
 import SyncedKeg from '../kegs/synced-keg';
-import { IKegDb } from '~/defs/interfaces';
+import { IKegDb } from '../../defs/interfaces';
 
 interface FileFoldersPayload {}
 

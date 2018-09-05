@@ -22,7 +22,7 @@ import tofuStore from './tofu-store';
 import { asPromise } from '../../helpers/prombservable';
 import { retryUntilSuccess } from '../../helpers/retry';
 import ContactStoreWhitelabel from './contact-store.whitelabel';
-import { InvitedContact } from '~/defs/interfaces';
+import { InvitedContact } from '../../defs/interfaces';
 
 /**
  * Contact store handles all Peerio users you(your app) are in some contact with,

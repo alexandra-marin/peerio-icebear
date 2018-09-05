@@ -12,16 +12,16 @@ import { retryUntilSuccess } from '../../helpers/retry';
 import clientApp from '../client-app';
 import { asPromise } from '../../helpers/prombservable';
 import TaskQueue from '../../helpers/task-queue';
-import FileStoreBase from '~/models/files/file-store-base';
-import Chat from '~/models/chats/chat';
+import FileStoreBase from './file-store-base';
+import Chat from '../chats/chat';
 import * as uploadModule from './file.upload';
 import * as downloadModule from './file.download';
 import FileData from './file-data';
-import FileStreamBase from '~/models/files/file-stream-base';
-import { FileStore } from '~/models/files/file-store';
-import { IKegDb } from '~/defs/interfaces';
-import FileDownloader from '~/models/files/file-downloader';
-import FileUploader from '~/models/files/file-uploader';
+import FileStreamBase from './file-stream-base';
+import { FileStore } from './file-store';
+import { IKegDb } from '../../defs/interfaces';
+import FileDownloader from './file-downloader';
+import FileUploader from './file-uploader';
 
 const signDetached = sign.signDetached;
 

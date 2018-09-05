@@ -1,7 +1,7 @@
 import { observable } from 'mobx';
 import Keg from '../kegs/keg';
-import ChatKegDb from '~/models/kegs/chat-keg-db';
-import { IKegDb } from '~/defs/interfaces';
+import ChatKegDb from '../kegs/chat-keg-db';
+import { IKegDb } from '../../defs/interfaces';
 
 interface ReadReceiptPayload {}
 interface ReadReceiptProps {}

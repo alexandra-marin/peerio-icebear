@@ -1,4 +1,4 @@
-import FileStreamBase from '~/models/files/file-stream-base';
+import FileStreamBase from './file-stream-base';
 import * as errors from '../../errors';
 import * as fs from 'fs';
 import * as path from 'path';

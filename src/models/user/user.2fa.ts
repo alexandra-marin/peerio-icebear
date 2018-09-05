@@ -4,7 +4,7 @@ import clientApp from '../client-app';
 import TinyDb from '../../db/tiny-db';
 import config from '../../config';
 import * as cryptoUtil from '../../crypto/util';
-import User from '~/models/user/user';
+import User from './user';
 
 export default function mixUser2faModule(this: User) {
     /**

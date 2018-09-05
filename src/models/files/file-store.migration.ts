@@ -7,7 +7,7 @@ import { retryUntilSuccess } from '../../helpers/retry';
 import { getChatStore } from '../../helpers/di-chat-store';
 import { getContactStore } from '../../helpers/di-contact-store';
 import { asPromise } from '../../helpers/prombservable';
-import { FileStore } from '~/models/files/file-store';
+import { FileStore } from './file-store';
 
 /**
  * File store migration module

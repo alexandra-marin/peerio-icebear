@@ -4,7 +4,7 @@ import { retryUntilSuccess } from '../../helpers/retry';
 import TaskQueue from '../../helpers/task-queue';
 import Keg from './keg';
 import warnings from '../warnings';
-import { IKegDb } from '~/defs/interfaces';
+import { IKegDb } from '../../defs/interfaces';
 
 /**
  * This class allows named kegs to share sync/save logic.

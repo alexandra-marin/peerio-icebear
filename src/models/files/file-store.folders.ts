@@ -4,7 +4,7 @@ import FileFolder from './file-folder';
 import FileFoldersKeg from './file-folders-keg';
 import createMap from '../../helpers/dynamic-array-map';
 import { retryUntilSuccess } from '../../helpers/retry';
-import FileStoreBase from '~/models/files/file-store-base';
+import FileStoreBase from './file-store-base';
 
 class FileStoreFolders {
     constructor(fileStore: FileStoreBase, root: FileFolder) {

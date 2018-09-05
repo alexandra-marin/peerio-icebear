@@ -9,7 +9,7 @@ import { retryUntilSuccess } from '../../helpers/retry';
 import { reaction, action } from 'mobx';
 import clientApp from '../client-app';
 import { getChatStore } from '../../helpers/di-chat-store';
-import Chat from '~/models/chats/chat';
+import Chat from './chat';
 
 class ChatMessageHandler {
     /**

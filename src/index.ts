@@ -47,7 +47,7 @@ export { default as chatStore } from './models/chats/chat-store';
 export { default as fileStore } from './models/files/file-store';
 export { default as volumeStore } from './models/volumes/volume-store';
 export { default as validation } from './helpers/validation/field-validation';
-export { default as FileStreamBase } from '~/models/files/file-stream-base';
+export { default as FileStreamBase } from './models/files/file-stream-base';
 export { default as FileNonceGenerator } from './models/files/file-nonce-generator';
 export { default as warnings } from './models/warnings';
 export { default as TinyDb } from './db/tiny-db';

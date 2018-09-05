@@ -1,5 +1,5 @@
 import Keg from '../kegs/keg';
-import User from '~/models/user/user';
+import User from '../../models/user/user';
 
 interface ProfilePayload {
     firstName: string;

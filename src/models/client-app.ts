@@ -3,7 +3,7 @@ import socket from '../network/socket';
 import { getChatStore } from '../helpers/di-chat-store';
 import { getFileStore } from '../helpers/di-file-store';
 import tracker from './update-tracker';
-import { TwoFARequest } from '~/defs/interfaces';
+import { TwoFARequest } from '../defs/interfaces';
 
 // settings to control icebear behaviour towards internal and external media content in chats
 interface ChatContentPrefs {

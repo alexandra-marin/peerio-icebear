@@ -1,7 +1,7 @@
 import SyncedKeg from '../kegs/synced-keg';
 import { getUser } from '../../helpers/di-current-user';
-import Contact from '~/models/contacts/contact';
-import { IKegDb } from '~/defs/interfaces';
+import Contact from './contact';
+import { IKegDb } from '../../defs/interfaces';
 
 interface MyContactsPayload {}
 interface MyContactsProps {}

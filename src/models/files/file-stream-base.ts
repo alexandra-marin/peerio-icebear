@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { AbstractCallError } from '~/errors';
+import { AbstractCallError } from '../../errors';
 /**
  * Abstract File Stream class. Icebear wants to read/write files,
  * but doesn't know how exactly that would work on your platform.

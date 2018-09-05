@@ -29,10 +29,10 @@ import { getFileStore } from '../../helpers/di-file-store';
 import { retryUntilSuccess } from '../../helpers/retry';
 import { getVolumeStore } from '../../helpers/di-volume-store';
 import FileFolder from '../files/file-folder';
-import { ChatStore } from '~/models/chats/chat-store';
-import Volume from '~/models/volumes/volume';
+import { ChatStore } from './chat-store';
+import Volume from '../volumes/volume';
 import File from '../files/file';
-import ReadReceipt from '~/models/chats/read-receipt';
+import ReadReceipt from './read-receipt';
 // to assign when sending a message and don't have an id yet
 let temporaryChatId = 0;
 function getTemporaryChatId() {

@@ -10,7 +10,7 @@ import validators from '../../helpers/validation/user-validators';
 import contactStore from '../contacts/contact-store';
 import AccountVersion from './account-version';
 import { getFileStore } from '../../helpers/di-file-store';
-import User from '~/models/user/user';
+import User from './user';
 //
 // These are still members of User class, they're just split across several mixins to make User file size sensible.
 //

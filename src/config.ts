@@ -1,7 +1,7 @@
 import _sdkVersion from './__sdk';
-import FileStreamBase from '~/models/files/file-stream-base';
-import CacheEngineBase from '~/db/cache-engine-base';
-import { TinyDBStorageEngineConstructor } from '~/defs/tiny-db';
+import FileStreamBase from './models/files/file-stream-base';
+import CacheEngineBase from './db/cache-engine-base';
+import { TinyDBStorageEngineConstructor } from './defs/tiny-db';
 
 const SERVER_PLAN_PREMIUM_MONTHLY = 'icebear_premium_monthly';
 const SERVER_PLAN_PREMIUM_YEARLY = 'icebear_premium_yearly';

@@ -1,6 +1,6 @@
 import config from '../../config';
-import { ChatStore } from '~/models/chats/chat-store';
-import CacheEngineBase from '~/db/cache-engine-base';
+import { ChatStore } from './chat-store';
+import CacheEngineBase from '../../db/cache-engine-base';
 
 class ChatStoreCache {
     constructor(store: ChatStore) {

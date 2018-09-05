@@ -4,8 +4,8 @@ import { getFileStore } from '../../helpers/di-file-store';
 import { getVolumeStore } from '../../helpers/di-volume-store';
 import config from '../../config';
 import warnings from '../warnings';
-import FileStoreBase from '~/models/files/file-store-base';
-import FileFolder from '~/models/files/file-folder';
+import FileStoreBase from './file-store-base';
+import FileFolder from './file-folder';
 
 /**
  * Extension to operate with selected files and folders in bulk

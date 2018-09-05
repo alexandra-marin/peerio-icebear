@@ -1,6 +1,6 @@
 import SyncedKeg from '../kegs/synced-keg';
 import { observable } from 'mobx';
-import SharedKegDb from '~/models/kegs/shared-keg-db';
+import SharedKegDb from '../../models/kegs/shared-keg-db';
 
 interface IChatHeadPayload {
     chatName: string;

@@ -1,4 +1,4 @@
-import Contact from '~/models/contacts/contact';
+import Contact from '../models/contacts/contact';
 
 // TODO: some of these could probably be split out and moved closer to their
 // usage sites

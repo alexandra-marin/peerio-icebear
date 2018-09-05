@@ -12,7 +12,7 @@ import FileNonceGenerator from './file-nonce-generator';
 import TinyDb from '../../db/tiny-db';
 import File from './file';
 import config from '../../config';
-import FileStreamBase from '~/models/files/file-stream-base';
+import FileStreamBase from './file-stream-base';
 
 export function _getUlResumeParams(this: File, path: string) {
     return config.FileStream.getStat(path)

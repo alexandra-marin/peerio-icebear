@@ -9,8 +9,8 @@ import TinyDb from '../../db/tiny-db';
 import config from '../../config';
 import warnings from '../warnings';
 import clientApp from '../client-app';
-import User from '~/models/user/user';
-import { AuthToken, AuthData } from '~/defs/interfaces';
+import User from './user';
+import { AuthToken, AuthData } from '../../defs/interfaces';
 //
 // Authentication mixin for User model.
 // TODO: authentication code is a bit hard to read and follow, needs refactoring

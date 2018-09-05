@@ -5,7 +5,7 @@ import * as util from '../../util';
 import { getFileStore } from '../../helpers/di-file-store';
 import { getUser } from '../../helpers/di-current-user';
 import * as cryptoUtil from '../../crypto/util';
-import FileStoreBase from '~/models/files/file-store-base';
+import FileStoreBase from './file-store-base';
 import File from './file';
 
 function isLegacyFilePredicate(f) {

@@ -8,8 +8,8 @@ import { getContactStore } from '../../helpers/di-contact-store';
 import { getUser } from '../../helpers/di-current-user';
 import { asPromise } from '../../helpers/prombservable';
 import { AntiTamperError, DecryptionError, serverErrorCodes } from '../../errors';
-import { IFileDescriptor } from '~/models/files/file';
-import { IKegDb } from '~/defs/interfaces';
+import { IFileDescriptor } from '../files/file';
+import { IKegDb } from '../../defs/interfaces';
 
 let temporaryKegId = 0;
 function getTemporaryKegId() {

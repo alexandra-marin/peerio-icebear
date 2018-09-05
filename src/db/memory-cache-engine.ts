@@ -1,4 +1,4 @@
-import CacheEngineBase from '~/db/cache-engine-base';
+import CacheEngineBase from '../db/cache-engine-base';
 type Storage = { [name: string]: { [key: string]: any } };
 class MemoryCacheEngine implements CacheEngineBase<any> {
     // pass an empty(or existing) object as storage - MemoryCacheEngine will read and write objects to it

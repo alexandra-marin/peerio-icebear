@@ -6,7 +6,7 @@ import { uniq } from 'lodash';
 import { retryUntilSuccess } from '../../helpers/retry';
 import Contact from '../contacts/contact';
 import { observable, computed, IObservableArray } from 'mobx';
-import { IKegDb } from '~/defs/interfaces';
+import { IKegDb } from '../../defs/interfaces';
 
 /**
  * Class for shared keg databases.

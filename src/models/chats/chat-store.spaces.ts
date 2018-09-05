@@ -1,6 +1,6 @@
 import { computed, observable } from 'mobx';
 import config from '../../config';
-import { ChatStore } from '~/models/chats/chat-store';
+import { ChatStore } from './chat-store';
 
 class Space {
     constructor(store: ChatStore) {

@@ -1,6 +1,6 @@
 import { observable, action } from 'mobx';
 import socket from '../../network/socket';
-import { getVolumeStore } from '~/helpers/di-volume-store';
+import { getVolumeStore } from '../../helpers/di-volume-store';
 
 class VolumeInviteStore {
     constructor() {

@@ -1,5 +1,5 @@
-import TinyDbImplementation from '~/db/tiny-db-implementation';
-import { TinyDBStorageEngine } from '~/defs/tiny-db';
+import TinyDbImplementation from './tiny-db-implementation';
+import { TinyDBStorageEngine } from '../defs/tiny-db';
 
 /**
  * TinyDbManager manages system and user instances, and allows opening

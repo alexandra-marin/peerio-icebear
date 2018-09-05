@@ -1,6 +1,6 @@
 import SyncedKeg from '../kegs/synced-keg';
 import { getUser } from '../../helpers/di-current-user';
-import { IKegDb } from '~/defs/interfaces';
+import { IKegDb } from '../../defs/interfaces';
 
 interface MyChatsPayload {}
 interface MyChatsProps {}

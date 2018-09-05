@@ -9,9 +9,9 @@ import FileStoreFolders from './file-store.folders';
 import { getUser } from '../../helpers/di-current-user';
 import { getFileStore } from '../../helpers/di-file-store';
 import config from '../../config';
-import FileFolder from '~/models/files/file-folder';
-import CacheEngineBase from '~/db/cache-engine-base';
-import { IKegDb } from '~/defs/interfaces';
+import FileFolder from './file-folder';
+import CacheEngineBase from '../../db/cache-engine-base';
+import { IKegDb } from '../../defs/interfaces';
 
 const PAGE_SIZE = 100;
 function isFileSelected(file) {

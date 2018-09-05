@@ -4,8 +4,8 @@ import * as signCrypto from '../../crypto/sign';
 import socket from '../../network/socket';
 import * as util from '../../util';
 import config from '../../config';
-import User from '~/models/user/user';
-import { AccountCreationChallenge, AccountCreationChallengeConverted } from '~/defs/interfaces';
+import User from './user';
+import { AccountCreationChallenge, AccountCreationChallengeConverted } from '../../defs/interfaces';
 
 //
 // Registration mixin for User model.

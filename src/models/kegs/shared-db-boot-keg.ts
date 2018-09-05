@@ -8,7 +8,7 @@ import User from '../user/user';
 import SharedKegDb from './shared-keg-db';
 import Contact from '../contacts/contact';
 import { IObservableArray } from 'mobx/lib/types/observablearray';
-import { IBootKeg } from '~/defs/interfaces';
+import { IBootKeg } from '../../defs/interfaces';
 
 interface ISharedDbBootKegPayload {
     publicKey: string;

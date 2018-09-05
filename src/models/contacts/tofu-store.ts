@@ -5,7 +5,7 @@ import Tofu from './tofu';
 import config from '../../config';
 import { asPromise } from '../../helpers/prombservable';
 import { retryUntilSuccess } from '../../helpers/retry';
-import CacheEngineBase from '~/db/cache-engine-base';
+import CacheEngineBase from '../../db/cache-engine-base';
 
 export class TofuStore {
     @observable loaded = false;

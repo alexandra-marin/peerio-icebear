@@ -2,7 +2,7 @@ import { observable, computed, action, when, IObservableArray } from 'mobx';
 import Chat from '../chats/chat';
 import { getChatStore } from '../../helpers/di-chat-store';
 import { getContactStore } from '../../helpers/di-contact-store';
-import Contact from '~/models/contacts/contact';
+import Contact from '../../models/contacts/contact';
 
 /**
  * Pending DM helper class

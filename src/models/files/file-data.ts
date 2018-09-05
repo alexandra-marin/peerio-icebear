@@ -1,9 +1,9 @@
 import { observable, computed } from 'mobx';
-import * as fileHelper from '~/helpers/file';
-import clientApp from '~/models/client-app';
-import * as cryptoUtil from '~/crypto/util';
-import config from '~/config';
-import * as util from '~/util';
+import * as fileHelper from '../../helpers/file';
+import clientApp from '../client-app';
+import * as cryptoUtil from '../../crypto/util';
+import config from '../../config';
+import * as util from '../../util';
 
 // every unique file (fileId) has a set of properties we want to be shared between all the file kegs
 // representing this file

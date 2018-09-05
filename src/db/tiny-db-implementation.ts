@@ -1,6 +1,6 @@
-import * as secret from '~/crypto/secret';
-import * as util from '~/crypto/util';
-import { TinyDBStorageEngine } from '~/defs/tiny-db';
+import * as secret from '../crypto/secret';
+import * as util from '../crypto/util';
+import { TinyDBStorageEngine } from '../defs/tiny-db';
 
 /**
  * TinyDbImplementation is a named local storage for small amounts of data

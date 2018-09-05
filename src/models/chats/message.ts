@@ -10,9 +10,9 @@ import config from '../../config';
 import clientApp from '../client-app';
 import TaskQueue from '../../helpers/task-queue';
 import socket from '../../network/socket';
-import SharedKegDb from '~/models/kegs/shared-keg-db';
-import Contact from '~/models/contacts/contact';
-import ReadReceipt from '~/models/chats/read-receipt';
+import SharedKegDb from '../kegs/shared-keg-db';
+import Contact from '../contacts/contact';
+import ReadReceipt from './read-receipt';
 
 interface ExternalImage {
     url: string;

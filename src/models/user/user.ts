@@ -13,9 +13,15 @@ import config from '../../config';
 import MRUList from '../../helpers/mru-list';
 import warnings from '../warnings';
 import clientApp from '../client-app';
-import { Address, KeyPair, AuthToken, AccountCreationChallenge, AuthData } from '~/defs/interfaces';
-import AccountVersion from '~/models/user/account-version';
-import Settings from '~/models/user/settings';
+import {
+    Address,
+    KeyPair,
+    AuthToken,
+    AccountCreationChallenge,
+    AuthData
+} from '../../defs/interfaces';
+import AccountVersion from './account-version';
+import Settings from './settings';
 
 let currentUser: User;
 

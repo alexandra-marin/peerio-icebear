@@ -7,7 +7,7 @@ import * as publicCrypto from '../../crypto/public';
 import User from '../user/user';
 import { getUser } from '../../helpers/di-current-user';
 import ChatHead from './chat-head';
-import SharedKegDb from '~/models/kegs/shared-keg-db';
+import SharedKegDb from '../../models/kegs/shared-keg-db';
 
 interface RawReceivedInvite {
     chatHeadKeg: any; // TODO: raw keg types

@@ -1,5 +1,5 @@
 import ChatPendingDM from './chat-pending-dm';
-import { ChatStore } from '~/models/chats/chat-store';
+import { ChatStore } from './chat-store';
 
 class ChatStorePending {
     constructor(store: ChatStore) {

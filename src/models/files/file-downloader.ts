@@ -3,8 +3,8 @@ import * as secret from '../../crypto/secret';
 import config from '../../config';
 import FileProcessor from './file-processor';
 import { DisconnectedError } from '../../errors';
-import FileStreamBase from '~/models/files/file-stream-base';
-import FileNonceGenerator from '~/models/files/file-nonce-generator';
+import FileStreamBase from './file-stream-base';
+import FileNonceGenerator from './file-nonce-generator';
 import File from './file';
 
 const { CHUNK_OVERHEAD } = config;

@@ -5,7 +5,7 @@ import socket from '../../network/socket';
 import ReadReceipt from './read-receipt';
 import { retryUntilSuccess } from '../../helpers/retry';
 import TaskQueue from '../../helpers/task-queue';
-import Chat from '~/models/chats/chat';
+import Chat from './chat';
 
 class ChatReceiptHandler {
     constructor(chat: Chat) {

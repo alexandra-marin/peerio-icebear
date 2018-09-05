@@ -18,8 +18,8 @@ import FileStoreBulk from './file-store.bulk';
 import * as util from '../../util';
 import { asPromise } from '../../helpers/prombservable';
 import _ from 'lodash';
-import FileFolder from '~/models/files/file-folder';
-import CacheEngineBase from '~/db/cache-engine-base';
+import FileFolder from './file-folder';
+import CacheEngineBase from '../../db/cache-engine-base';
 
 export class FileStore extends FileStoreBase {
     constructor() {

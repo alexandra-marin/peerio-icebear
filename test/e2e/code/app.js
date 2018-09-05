@@ -1,6 +1,6 @@
 if (!console.debug) console.debug = console.log.bind(console);
 import XMLHttpRequest from 'w3c-xmlhttprequest';
-import w3cwebsocket from 'websocket';
+import { w3cwebsocket } from 'websocket';
 
 global.XMLHttpRequest = XMLHttpRequest;
 global.WebSocket = w3cwebsocket;

@@ -27,41 +27,45 @@ Bluebird.config({ warnings: { wForgottenReturn: false } });
 import './extensions/uint8array';
 
 // MEMO: Do NOT export NodeJsonStorage and NodeFileStream here for compatibility reasons
-
+/*
+export default {
+    errors,
+    crypto,
+    util,
+    fileHelpers,
+    prombservable,
+};
+*/
 // exporting Icebear Library Interface
-export * from './network/socket';
-export * from './models/user/user';
-export * from './models/phrase-dictionary';
-export * from './config';
-export * from './models/contacts/contact-store';
-export * from './models/contacts/tofu-store';
-export * from './models/chats/chat-store';
-export * from './models/files/file-store';
-export * from './models/volumes/volume-store';
-export * from './helpers/validation/field-validation';
-export * from '~/models/files/file-stream-base';
-export * from './models/files/file-nonce-generator';
-export * from './models/warnings';
-export * from './db/tiny-db';
-export * from './helpers/observable-clock';
-export * from './helpers/mru-list';
+export { default as socket } from './network/socket';
+export { default as User } from './models/user/user';
+export { default as PhraseDictionary } from './models/phrase-dictionary';
+export { default as config } from './config';
+export { default as contactStore } from './models/contacts/contact-store';
+export { default as tofuStore } from './models/contacts/tofu-store';
+export { default as chatStore } from './models/chats/chat-store';
+export { default as fileStore } from './models/files/file-store';
+export { default as volumeStore } from './models/volumes/volume-store';
+export { default as validation } from './helpers/validation/field-validation';
+export { default as FileStreamBase } from '~/models/files/file-stream-base';
+export { default as FileNonceGenerator } from './models/files/file-nonce-generator';
+export { default as warnings } from './models/warnings';
+export { default as TinyDb } from './db/tiny-db';
+export { default as Clock } from './helpers/observable-clock';
+export { default as MRUList } from './helpers/mru-list';
 export { WarningStates as warningStates } from './models/warnings/system-warning';
-export * from './models/client-app';
-export * from './helpers/system-messages';
-export * from './models/server-settings';
-export * from './models/chats/chat-invite-store';
-export * from './models/contacts/contact';
-export * from './models/update-tracker';
-export * from './db/cache-engine-base';
+export { default as clientApp } from './models/client-app';
+export { default as systemMessages } from './helpers/system-messages';
+export { default as serverSettings } from './models/server-settings';
+export { default as chatInviteStore } from './models/chats/chat-invite-store';
+export { default as Contact } from './models/contacts/contact';
+export { default as __tracker } from './models/update-tracker'; // Clients do not need it. Exported just for debugging.
+export { default as CacheEngineBase } from './db/cache-engine-base';
 
-import * as _util from './util';
-export const util = _util;
-
-import * as _errors from './errors';
-export const errors = _errors;
-
-import * as _fileHelpers from './helpers/file';
-export const fileHelpers = _fileHelpers;
+export { default as util } from './util';
+export { default as errors } from './errors';
+export { default as fileHelpers } from './helpers/file';
+export { default as prombservable } from './helpers/prombservable';
 
 import * as cryptoUtil from './crypto/util';
 import * as keys from './crypto/keys';
@@ -70,6 +74,3 @@ import * as secret from './crypto/secret';
 import * as sign from './crypto/sign';
 import { setScrypt } from './crypto/scrypt-proxy';
 export const crypto = { cryptoUtil, keys, publicCrypto, secret, sign, setScrypt };
-
-import * as _prombservable from './helpers/prombservable';
-export const prombservable = _prombservable;

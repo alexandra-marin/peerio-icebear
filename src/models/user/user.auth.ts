@@ -86,7 +86,7 @@ export default function mixUserAuthModule(this: User) {
                     // sending whatever string in the beginning to let server know we are
                     // a new, cool client which is gonna use sessions
                     sessionId: this.sessionId || 'initialize',
-                    appLabel: '',
+                    appLabel: 'peerio',
                     deviceId: '',
                     twoFACookie: ''
                 };

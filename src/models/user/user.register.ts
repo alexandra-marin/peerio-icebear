@@ -34,7 +34,7 @@ export default function mixUserRegisterModule(this: User) {
                     clientVersion: config.appVersion,
                     sdkVersion: config.sdkVersion,
                     props: this.props || {},
-                    appLabel: ''
+                    appLabel: 'peerio'
                 };
                 if (config.whiteLabel && config.whiteLabel.name) {
                     request.appLabel = config.whiteLabel.name;

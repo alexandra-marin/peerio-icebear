@@ -136,9 +136,7 @@ function addValidation(
     );
 }
 
-const validation = {
+export default {
     validators: userValidators,
     addValidation
 };
-
-export default validation;

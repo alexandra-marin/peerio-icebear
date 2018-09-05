@@ -3,24 +3,19 @@
 // This module exports SocketClient class that can be instantiated as many times as needed.
 //
 
-import { ServerError, serverErrorCodes, DisconnectedError, NotAuthenticatedError } from '../errors';
 import io from 'socket.io-client/dist/socket.io';
-import { observable } from 'mobx';
-import config from '../config';
+import { computed, observable } from 'mobx';
+import { ServerError, serverErrorCodes, DisconnectedError, NotAuthenticatedError } from '../errors';
 import Timer from '../helpers/observable-timer';
 import { getUser } from '../helpers/di-current-user';
 import TaskPacer from '../helpers/task-pacer';
+import config from '../config';
 
 interface ManagerExt extends SocketIOClient.Manager {
-    backoff: any; // usage of this should go away with reconnect logic fix
     engine: any; // this is used only for debugging
 }
 
 interface SocketExt extends SocketIOClient.Socket {
-    // We need access to these internals bcs socket.io thinks it can queue messages and send them right
-    // after reconnect. In our reality those messages are likely to need an authenticated connection.
-    sendBuffer: any[];
-    receiveBuffer: any[];
     io: ManagerExt;
     binary: (hasBinaryProps: boolean) => SocketExt;
 }
@@ -64,6 +59,9 @@ enum APP_EVENTS {
     volumeInvitesUpdate = 'volumeInvitesUpdate'
 }
 
+const MIN_RECONNECT_MS = 500;
+const MAX_RECONNECT_MS = 9000;
+
 /**
  * Use socket.js to get the default instance of SocketClient, unless you do need a separate connection for some reason.
  *
@@ -90,7 +88,7 @@ export default class SocketClient {
     /**
      * Connection url this socket uses. Readonly.
      */
-    url = null;
+    url?: string;
     /**
      * Observable connection state.
      */
@@ -110,21 +108,24 @@ export default class SocketClient {
      */
     @observable throttled = false;
     /**
-     * Observable. In case reconnection attempt failed, this property will reflect current attempt number.
+     * Flag indicating that the socket must reconnect if disconnected.
      */
-    @observable reconnectAttempt = 0;
+    mustReconnect = false;
     /**
      * Observable. Shows current server response time in milliseconds. This is not a network ping,
      * this is a time needed for a websocket message to do a round trip.
      */
     @observable latency = 0;
     /**
+     * Observable. In case reconnection attempt failed, this property will reflect current attempt number.
+     */
+    @observable reconnectAttempt = 0;
+    /**
      * Countdown to the next reconnect attempt.
      */
     reconnectTimer = new Timer();
-
     /**
-     * Just an incrementing with every request number to be able to identify server responses.
+     * Counter incremented with every request to be able to identify server responses.
      */
     requestId = 0;
     /**
@@ -154,14 +155,14 @@ export default class SocketClient {
      */
     APP_EVENTS = APP_EVENTS;
 
-    backoffAttempts: number;
     _originalWSSend: typeof WebSocket.prototype.send;
-    handleReconnectError: () => void;
+
     resetting: boolean;
+
     /**
      * Initializes the SocketClient instance, creates wrapped socket.io instance and so on.
      */
-    start(url: string) {
+    start(url: string): void {
         if (this.started) return;
         console.log(`Starting socket: ${url}`);
         if (!url) {
@@ -172,6 +173,8 @@ export default class SocketClient {
         this.started = true;
         this.preauthenticated = false;
         this.authenticated = false;
+        this.mustReconnect = true;
+
         // <DEBUG>
         if (config.debug && config.debug.socketLogEnabled) {
             const s = (this._originalWSSend = WebSocket.prototype.send);
@@ -185,30 +188,20 @@ export default class SocketClient {
         // </DEBUG>
 
         this.socket = io.connect(
-            url,
+            this.url,
             {
-                reconnection: true,
-                reconnectionAttempts: Infinity,
-                reconnectionDelay: 500,
-                reconnectionDelayMax: 9000,
-                randomizationFactor: 0,
+                reconnection: false,
                 timeout: 10000,
                 autoConnect: false,
                 transports: ['websocket'],
                 forceNew: true
             }
         );
-        // socket.io is weird, it caches data sometimes to send it to listeners after reconnect
-        // but this is not working with authenticate-first connections.
-        const clearBuffers = () => {
-            this.socket.sendBuffer = [];
-            this.socket.receiveBuffer = [];
-        };
 
         this.socket.on('connect', () => {
             console.log('\ud83d\udc9a Socket connected.');
-            clearBuffers();
             this.configureDebugLogger();
+            this.reconnectAttempt = 0;
             this.connected = true;
         });
 
@@ -217,23 +210,10 @@ export default class SocketClient {
             this.preauthenticated = false;
             this.authenticated = false;
             this.connected = false;
-            // timeout is needed because for some reason,
-            // if server sends a fatal error(user blacklisted for example) in response and immediately disconnects,
-            // socket io calls disconnect handler before passing error response to message handler.
-            // so request gets canceled with 'DisconnectedError' instead of error returned in the response.
-            setTimeout(() => {
-                clearBuffers();
-                this.cancelAwaitingRequests();
-            });
-        });
-
-        this.socket.on('reconnect_attempt', num => {
-            if (this.backoffAttempts) {
-                this.reconnectAttempt = this.backoffAttempts;
-                this.socket.io.backoff.attempts = this.backoffAttempts;
-                this.backoffAttempts = 0;
-            } else {
-                this.reconnectAttempt = num;
+            this.cancelAwaitingRequests();
+            // Reconnect?
+            if (this.mustReconnect) {
+                this.reconnect();
             }
         });
 
@@ -241,23 +221,38 @@ export default class SocketClient {
             this.latency = latency;
         });
 
-        this.handleReconnectError = () => {
-            if (this.resetting) return;
-            // HACK: backoff.duration() will increase attempt count, so we balance that
-            this.socket.io.backoff.attempts--;
-            this.reconnectTimer.countDown(this.socket.io.backoff.duration() / 1000);
-            this.socket.open();
-        };
-
-        this.socket.on('connect_error', this.handleReconnectError);
-        this.socket.on('reconnect_error', this.handleReconnectError);
-        this.socket.on('error', this.handleReconnectError);
+        this.socket.on('connect_error', this.handleConnectError);
+        this.socket.on('error', this.handleConnectError);
 
         this.socket.open();
 
         this.startedEventListeners.forEach(l => setTimeout(l));
         this.startedEventListeners = [];
     }
+
+    @computed
+    private get reconnectTimeout(): number {
+        return Math.min(MIN_RECONNECT_MS * 2 ** this.reconnectAttempt, MAX_RECONNECT_MS);
+    }
+
+    private reconnect() {
+        this.reconnectAttempt++;
+        console.warn(
+            `Scheduling reconnecting attempt ${this.reconnectAttempt} in ${this.reconnectTimeout}ms`
+        );
+        setTimeout(() => {
+            console.log('Trying to reconnected.');
+            this.open();
+        }, this.reconnectTimeout);
+        this.reconnectTimer.countDown(this.reconnectTimeout / 1000);
+    }
+
+    private handleConnectError = () => {
+        if (this.resetting) return;
+        if (this.mustReconnect) {
+            this.reconnect();
+        }
+    };
 
     configureDebugLogger() {
         if (config.debug && config.debug.socketLogEnabled) {
@@ -270,7 +265,7 @@ export default class SocketClient {
     }
 
     /**
-     * Returns connection state
+     * Returns connection state, one of {@link STATES}
      */
     get state(): string {
         // unknown states translated to 'closed' for safety
@@ -294,7 +289,7 @@ export default class SocketClient {
     /**
      * Internal function to do what it says
      */
-    validateSubscription(event, listener) {
+    validateSubscription(event: SOCKET_EVENTS | APP_EVENTS, listener: (data?) => void) {
         if (!SOCKET_EVENTS[event] && !APP_EVENTS[event]) {
             throw new Error('Attempt to un/subscribe from/to unknown socket event.');
         }
@@ -344,7 +339,7 @@ export default class SocketClient {
      * @param hasBinaryData - if you know for sure, set this to true/false to increase performance
      * @returns - server response, always returns `{}` if response is empty
      */
-    send(name: string, data?: {}, hasBinaryData: boolean = null): Promise<any> {
+    send(name: string, data?: {}, hasBinaryData: boolean | undefined = undefined): Promise<any> {
         const id = this.requestId++;
         return (new Promise((resolve, reject) => {
             this.awaitingRequests[id] = { name, data, reject };
@@ -382,7 +377,7 @@ export default class SocketClient {
                     resolve(resp);
                 };
                 // console.debug(id, name, data);
-                if (hasBinaryData === null) {
+                if (hasBinaryData == null) {
                     this.socket.emit(name, data, handler);
                 } else {
                     this.socket.binary(hasBinaryData).emit(name, data, handler);
@@ -439,6 +434,7 @@ export default class SocketClient {
         };
         this.subscribe(SOCKET_EVENTS.authenticated, handler);
     }
+
     onceDisconnected(callback: () => void) {
         if (!this.connected) {
             setTimeout(callback, 0);
@@ -485,6 +481,7 @@ export default class SocketClient {
      * Closes current connection and disables reconnects until open() is called.
      */
     close = () => {
+        this.mustReconnect = false;
         this.socket.close();
     };
 
@@ -493,6 +490,7 @@ export default class SocketClient {
      */
     open = () => {
         if (this.resetting) return;
+        this.mustReconnect = true;
         this.socket.open();
     };
 
@@ -501,7 +499,6 @@ export default class SocketClient {
      */
     resetReconnectTimer = () => {
         if (this.connected) return;
-        this.backoffAttempts = this.socket.io.backoff.attempts;
         this.reset();
     };
 

@@ -1,5 +1,3 @@
-import S from './strings';
-import { init, send } from './main';
-import { duration, errorMessage } from './helpers';
-
-export { S, init, send, duration, errorMessage };
+export { default as S } from './strings';
+export { init, send } from './main';
+export { duration, errorMessage } from './helpers';

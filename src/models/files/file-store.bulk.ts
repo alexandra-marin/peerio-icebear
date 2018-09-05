@@ -4,26 +4,28 @@ import { getFileStore } from '../../helpers/di-file-store';
 import { getVolumeStore } from '../../helpers/di-volume-store';
 import config from '../../config';
 import warnings from '../warnings';
+import FileStoreBase from '~/models/files/file-store-base';
+import FileFolder from '~/models/files/file-folder';
 
 /**
  * Extension to operate with selected files and folders in bulk
  */
 class FileStoreBulk {
-    constructor(fileStore) {
+    constructor(fileStore: FileStoreBase) {
         this.fileStore = fileStore;
     }
+    fileStore: FileStoreBase;
+
     // functor taking items selected as an argument to choose who to share with
     shareWithSelector = null;
 
     // functor taking folder as an argument to confirm folder deletion
     deleteFolderConfirmator = null;
-
-    // functor taking files and shared fields as an argument to confirm
-    // folder deletion
-    deleteFolderConfirmator = null;
-
+    deleteFilesConfirmator = null;
     // functor selecting folder for bulk download
     downloadFolderSelector = null;
+
+    pickPathSelector = null;
 
     @computed
     get canMove() {
@@ -87,12 +89,13 @@ class FileStoreBulk {
             promise = promise.then(() => {
                 i.selected = false;
             });
-            if (i.isFolder) {
+            // TODO: instanceof check is for typescript, how to avoid it?
+            if (i.isFolder || i instanceof FileFolder) {
                 promise = promise.then(() => getVolumeStore().shareFolder(i, usernamesAccessList));
             } else {
                 usernamesAccessList.forEach(contact => {
                     promise = promise.then(async () =>
-                        getChatStore().startChatAndShareFiles([contact], [i])
+                        getChatStore().startChatAndShareFiles([contact], i)
                     );
                 });
             }

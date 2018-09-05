@@ -76,7 +76,7 @@ class Contact {
      */
     @observable loading = true; // default state, because that's what we do from the moment contact is created
     username: string;
-    /** '@username'*/
+    /** '@username' */
     usernameTag: string;
     addresses: Array<string> = [];
     @observable firstName = '';
@@ -313,7 +313,8 @@ class Contact {
     loadTofu(): Promise<void> {
         // console.log('Loading tofu:', this.username);
         return tofuStore.getByUsername(this.username).then(
-            action(tofu => {
+            // TODO: tofu raw keg type
+            action((tofu: any) => {
                 this._waitingForResponse = false;
                 this.loading = false;
                 if (!tofu) {

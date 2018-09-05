@@ -14,7 +14,7 @@ import Message from '../models/chats/message';
  * Checks message object for system data and returns translated string to render for the system data.
  * @returns translated string to render for the system message
  */
-function getSystemMessageText(msg: Message): string {
+function getSystemMessageText(msg: Message): Result {
     switch (msg.systemData.action) {
         case 'rename':
             return msg.systemData.newName

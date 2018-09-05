@@ -26,6 +26,8 @@ export default class Volume extends FileFolder {
     _metaPromise: Promise<void>;
     deletedByMyself: boolean;
     leaving: boolean;
+    // currently everyone is an admin
+    canIAdmin = true;
 
     @observable loadingMeta = false;
     @observable metaLoaded = false;

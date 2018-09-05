@@ -1,10 +1,14 @@
 import config from '../../config';
 import { ChatStore } from '~/models/chats/chat-store';
+import CacheEngineBase from '~/db/cache-engine-base';
 
 class ChatStoreCache {
     constructor(store: ChatStore) {
         this.store = store;
     }
+
+    store: ChatStore;
+    cache: CacheEngineBase<any>; // TODO: raw meta type
 
     async open() {
         if (!this.cache) {

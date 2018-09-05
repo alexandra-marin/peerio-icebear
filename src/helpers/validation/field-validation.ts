@@ -110,12 +110,10 @@ function addValidation(
                 const executor = async () => {
                     const result = await action(value, fieldName);
                     if (result === true) return true;
-                    const errorMessage =
-                        result === false
-                            ? message
-                            : typeof result === 'object'
-                                ? result.message
-                                : result;
+                    let errorMessage;
+                    if (result === false) errorMessage = message;
+                    else if (typeof result === 'object') errorMessage = result.message;
+                    else errorMessage = result;
                     throw new Error(errorMessage);
                 };
                 validationPromises.push(executor());

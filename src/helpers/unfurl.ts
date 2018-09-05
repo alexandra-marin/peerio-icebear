@@ -31,13 +31,14 @@ export function getContentHeaders(url: string) {
                 case 1:
                     req.send();
                     break;
-                case 2:
+                case 2: {
                     resolved = true;
                     const res = parseResponseHeaders(req.getAllResponseHeaders());
                     req.abort();
                     urlCache[url] = res;
                     resolve(res);
                     break;
+                }
                 case 4:
                     // in case we got to DONE(4) without receiving headers
                     if (!resolved) reject(new Error(`${url} request failed`));

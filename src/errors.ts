@@ -123,7 +123,7 @@ Object.keys(serverErrorCodes).forEach(key => {
     serverErrorMap[serverErrorCodes[key]] = key;
 });
 
-type ServerError = Error & { code: number; error: number };
+type ServerErrorType = Error & { code: number; error: number };
 
 /**
  * Server error, socket throws it when server returns error.
@@ -131,7 +131,7 @@ type ServerError = Error & { code: number; error: number };
  * @param code - server error code
  * @param msg - message, if any
  */
-export function ServerError(this: ServerError, code: number, msg?: string) {
+export function ServerError(this: ServerErrorType, code: number, msg?: string) {
     const type = serverErrorMap[code] || 'Unknown server error';
     this.message = msg || type;
     const error = Error.call(this, this.message);

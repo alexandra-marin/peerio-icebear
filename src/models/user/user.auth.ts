@@ -221,7 +221,7 @@ export default function mixUserAuthModule(this: User) {
         this.authSalt = authSalt && cryptoUtil.b64ToBytes(authSalt);
         this.bootKey = bootKey && cryptoUtil.b64ToBytes(bootKey);
         if (authKeys) {
-            let { secretKey, publicKey } = authKeys;
+            const { secretKey, publicKey } = authKeys;
             const binSecretKey = secretKey ? cryptoUtil.b64ToBytes(secretKey) : null;
             const binPublicKey = publicKey ? cryptoUtil.b64ToBytes(publicKey) : null;
             if (secretKey && publicKey) {

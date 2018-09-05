@@ -32,7 +32,8 @@ enum STATES {
     closing = 'closing'
 }
 
-// socket.io event
+// socket.io events
+/* eslint-disable camelcase */
 enum SOCKET_EVENTS {
     connect = 'connect',
     connect_error = 'connect_error',
@@ -49,6 +50,7 @@ enum SOCKET_EVENTS {
     pong = 'pong',
     authenticated = 'authenticated'
 }
+/* eslint-enable camelcase */
 
 // application events sent by app server
 enum APP_EVENTS {
@@ -58,7 +60,8 @@ enum APP_EVENTS {
     channelInvitesUpdate = 'channelInvitesUpdate',
     channelDeleted = 'channelDeleted',
     volumeDeleted = 'volumeDeleted',
-    fileMigrationUnlocked = 'fileMigrationUnlocked'
+    fileMigrationUnlocked = 'fileMigrationUnlocked',
+    volumeInvitesUpdate = 'volumeInvitesUpdate'
 }
 
 /**

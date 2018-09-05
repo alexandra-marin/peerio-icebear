@@ -10,12 +10,12 @@
 import './helpers/performance-polyfill';
 
 // replacing native Promise with bluebird implementation
-import * as Bluebird from 'bluebird';
+import Bluebird from 'bluebird';
 import globalContext from './helpers/global-context';
 
 globalContext.Promise = Bluebird;
 
-//@ts-ignore
+// @ts-ignore
 Bluebird.coroutine.addYieldHandler(function(value) {
     return Bluebird.resolve(value);
 });
@@ -26,75 +26,50 @@ Bluebird.config({ warnings: { wForgottenReturn: false } });
 // extending native classes
 import './extensions/uint8array';
 
+// MEMO: Do NOT export NodeJsonStorage and NodeFileStream here for compatibility reasons
+
 // exporting Icebear Library Interface
-import socket from './network/socket';
-import User from './models/user/user';
-import PhraseDictionary from './models/phrase-dictionary';
-import config from './config';
-import * as errors from './errors';
-import contactStore from './models/contacts/contact-store';
-import tofuStore from './models/contacts/tofu-store';
-import chatStore from './models/chats/chat-store';
-import fileStore from './models/files/file-store';
-import volumeStore from './models/volumes/volume-store';
-import validation from './helpers/validation/field-validation';
-import FileStreamBase from '~/models/files/file-stream-base';
-import FileNonceGenerator from './models/files/file-nonce-generator';
-import * as util from './util';
-import warnings from './models/warnings';
+export * from './network/socket';
+export * from './models/user/user';
+export * from './models/phrase-dictionary';
+export * from './config';
+export * from './models/contacts/contact-store';
+export * from './models/contacts/tofu-store';
+export * from './models/chats/chat-store';
+export * from './models/files/file-store';
+export * from './models/volumes/volume-store';
+export * from './helpers/validation/field-validation';
+export * from '~/models/files/file-stream-base';
+export * from './models/files/file-nonce-generator';
+export * from './models/warnings';
+export * from './db/tiny-db';
+export * from './helpers/observable-clock';
+export * from './helpers/mru-list';
+export { WarningStates as warningStates } from './models/warnings/system-warning';
+export * from './models/client-app';
+export * from './helpers/system-messages';
+export * from './models/server-settings';
+export * from './models/chats/chat-invite-store';
+export * from './models/contacts/contact';
+export * from './models/update-tracker';
+export * from './db/cache-engine-base';
+
+import * as _util from './util';
+export const util = _util;
+
+import * as _errors from './errors';
+export const errors = _errors;
+
+import * as _fileHelpers from './helpers/file';
+export const fileHelpers = _fileHelpers;
+
 import * as cryptoUtil from './crypto/util';
 import * as keys from './crypto/keys';
 import * as publicCrypto from './crypto/public';
 import * as secret from './crypto/secret';
 import * as sign from './crypto/sign';
 import { setScrypt } from './crypto/scrypt-proxy';
-import TinyDb from './db/tiny-db';
-import Clock from './helpers/observable-clock';
-import * as fileHelpers from './helpers/file';
-import MRUList from './helpers/mru-list';
-import { WarningStates as warningStates } from './models/warnings/system-warning';
-import clientApp from './models/client-app';
-import systemMessages from './helpers/system-messages';
-import serverSettings from './models/server-settings';
-import chatInviteStore from './models/chats/chat-invite-store';
-import Contact from './models/contacts/contact';
-import * as prombservable from './helpers/prombservable';
-import tracker from './models/update-tracker';
-import CacheEngineBase from './db/cache-engine-base';
+export const crypto = { cryptoUtil, keys, publicCrypto, secret, sign, setScrypt };
 
-const crypto = { cryptoUtil, keys, publicCrypto, secret, sign, setScrypt };
-
-// MEMO: Do NOT export NodeJsonStorage and NodeFileStream here for compatibility reasons
-export default {
-    errors,
-    config,
-    socket,
-    crypto,
-    User,
-    PhraseDictionary,
-    TinyDb,
-    contactStore,
-    tofuStore,
-    chatStore,
-    chatInviteStore,
-    fileStore,
-    volumeStore,
-    validation,
-    FileStreamBase,
-    FileNonceGenerator,
-    util,
-    warnings,
-    warningStates,
-    Clock,
-    fileHelpers,
-    MRUList,
-    clientApp,
-    systemMessages,
-    serverSettings,
-    Contact, // mostly for its utility static functions
-    prombservable,
-    CacheEngineBase,
-    __: {
-        tracker
-    }
-};
+import * as _prombservable from './helpers/prombservable';
+export const prombservable = _prombservable;

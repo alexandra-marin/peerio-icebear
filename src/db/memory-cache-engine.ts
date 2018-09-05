@@ -1,6 +1,6 @@
 import CacheEngineBase from '~/db/cache-engine-base';
-
-class MemoryCacheEngine implements CacheEngineBase {
+type Storage = { [name: string]: { [key: string]: any } };
+class MemoryCacheEngine implements CacheEngineBase<any> {
     // pass an empty(or existing) object as storage - MemoryCacheEngine will read and write objects to it
     constructor(name) {
         this.name = name;
@@ -10,14 +10,16 @@ class MemoryCacheEngine implements CacheEngineBase {
         }
     }
 
-    static defaultStorage = {};
+    static defaultStorage: Storage = {};
 
     static setStorage(val) {
         MemoryCacheEngine.defaultStorage = val;
     }
 
     name: string;
-    storage: { [key: string]: {} };
+    storage: Storage;
+    isOpen: boolean;
+    keyPath: string;
 
     get db() {
         return this.storage[this.name];
@@ -26,6 +28,12 @@ class MemoryCacheEngine implements CacheEngineBase {
     open() {
         this.isOpen = true;
         return Promise.resolve();
+    }
+    openInternal(): void {
+        // not needed
+    }
+    deleteDatabase(name: string): void {
+        delete this.storage[name];
     }
 
     getValue(key: string) {
@@ -49,7 +57,7 @@ class MemoryCacheEngine implements CacheEngineBase {
                 this.db[key] = newVal;
                 resolve();
             });
-        });
+        }) as Promise<void>;
     }
 
     removeValue(key) {
@@ -58,19 +66,19 @@ class MemoryCacheEngine implements CacheEngineBase {
                 delete this.db[key];
                 resolve();
             });
-        });
+        }) as Promise<void>;
     }
 
     getAllKeys() {
         return new Promise(resolve => {
             setTimeout(() => resolve(Object.keys(this.db)));
-        });
+        }) as Promise<string[]>;
     }
 
     getAllValues() {
         return new Promise(resolve => {
             setTimeout(() => resolve(Object.values(this.db)));
-        });
+        }) as Promise<any[]>;
     }
 
     clear() {

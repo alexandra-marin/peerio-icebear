@@ -74,11 +74,13 @@ class ChatMessageHandler {
         );
     }
 
+    chat: Chat;
     maxUpdateId = '';
     downloadedUpdateId = '';
     _loadingUpdates = false; // todo: make this observable in Chat
-
     _reactionsToDispose = [];
+    _markAsSeenTimer: any;
+    _removeMarkerTimer: any;
 
     cancelTimers() {
         if (this._markAsSeenTimer !== null) {
@@ -144,7 +146,8 @@ class ChatMessageHandler {
                 this._loadingUpdates = false;
             })
             .then(
-                action(async resp => {
+                // TODO: response types
+                action(async (resp: any) => {
                     this._loadingUpdates = false;
                     // there's way more updates then we are allowed to load
                     // so we jump to most recent messages
@@ -253,7 +256,8 @@ class ChatMessageHandler {
             5
         )
             .then(
-                action(resp => {
+                // TODO: response types
+                action((resp: any) => {
                     this.chat.canGoUp = resp.hasMore;
                     this.chat._cancelTopPageLoad = false;
                     this.chat._cancelBottomPageLoad = false;
@@ -326,7 +330,8 @@ class ChatMessageHandler {
                 }
             })
             .then(
-                action(resp => {
+                // TODO: response types
+                action((resp: any) => {
                     console.debug(
                         'Received page',
                         pagingUp ? 'UP' : 'DOWN',

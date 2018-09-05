@@ -27,7 +27,11 @@ class FileFolder {
     }
 
     isShared: boolean;
+    // TODO: this is for  compatibility with File, to be able to process them in the same list
+    isLegacy = false;
+    shared = false;
     store: FileStoreBase;
+    // ----
 
     // unique global id (local folder id, or volume id)
     @observable id = null;
@@ -131,14 +135,11 @@ class FileFolder {
 
     @computed
     get foldersSortedByName() {
-        return this.folders.sort(
-            (f1, f2) =>
-                f1.normalizedName > f2.normalizedName
-                    ? -1
-                    : f1.normalizedName < f2.normalizedName
-                        ? 1
-                        : 0
-        );
+        return this.folders.sort((f1, f2) => {
+            if (f1.normalizedName > f2.normalizedName) return -1;
+            if (f1.normalizedName < f2.normalizedName) return 1;
+            return 0;
+        });
     }
 
     @computed

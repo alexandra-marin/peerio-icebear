@@ -7,6 +7,7 @@ import { retryUntilSuccess } from '../../helpers/retry';
 import { getChatStore } from '../../helpers/di-chat-store';
 import { getContactStore } from '../../helpers/di-contact-store';
 import { asPromise } from '../../helpers/prombservable';
+import { FileStore } from '~/models/files/file-store';
 
 /**
  * File store migration module
@@ -17,9 +18,10 @@ import { asPromise } from '../../helpers/prombservable';
  * 3. UI calls confirmMigration()
  */
 class FileStoreMigration {
-    constructor(fileStore) {
+    constructor(fileStore: FileStore) {
         this.fileStore = fileStore;
     }
+    fileStore: FileStore;
 
     @observable pending = false;
     @observable started = false;
@@ -62,6 +64,7 @@ class FileStoreMigration {
                     this.migrationKeg.migration = {
                         files: this.legacySharedFiles
                     };
+                    return true;
                 })
                 .catch(err => {
                     console.error(err);
@@ -243,6 +246,7 @@ class FileStoreMigration {
         this.migrationKeg.save(() => {
             this.migrationKeg.migration.files = [];
             this.migrationKeg.accountVersion = 1;
+            return true;
         });
         if (this.legacySharedFiles.length) warnings.add('title_fileUpdateComplete');
     }

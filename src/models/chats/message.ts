@@ -12,6 +12,7 @@ import TaskQueue from '../../helpers/task-queue';
 import socket from '../../network/socket';
 import SharedKegDb from '~/models/kegs/shared-keg-db';
 import Contact from '~/models/contacts/contact';
+import ReadReceipt from '~/models/chats/read-receipt';
 
 interface ExternalImage {
     url: string;
@@ -61,7 +62,7 @@ class Message extends Keg<MessagePayload, MessageProps> {
     /**
      * array of usernames to render receipts for
      */
-    @observable receipts: IObservableArray<string>;
+    @observable receipts: IObservableArray<{ username: string; receipt: ReadReceipt }>;
     /**
      * Which usernames are mentioned in this message.
      */

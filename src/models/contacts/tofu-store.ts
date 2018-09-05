@@ -10,8 +10,9 @@ import CacheEngineBase from '~/db/cache-engine-base';
 export class TofuStore {
     @observable loaded = false;
     loading = false;
-    cache: CacheEngineBase;
-    cacheMeta: CacheEngineBase;
+    // TODO: raw keg types
+    cache: CacheEngineBase<any>;
+    cacheMeta: CacheEngineBase<{ key: string; value: string }>;
 
     @action.bound
     async load() {
@@ -90,8 +91,8 @@ export class TofuStore {
     }
 
     async getFromCache(username) {
-        //TODO: raw keg types
-        const cached = await this.cache.getValue<any>(username);
+        // TODO: raw keg types
+        const cached = await this.cache.getValue(username);
         if (cached && (!cached.encryptionPublicKey || !cached.signingPublicKey)) {
             // Broken cached tofu.
             return null;

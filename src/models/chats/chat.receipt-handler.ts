@@ -1,4 +1,4 @@
-import { action, reaction, observable } from 'mobx';
+import { action, reaction, observable, IObservableArray } from 'mobx';
 import User from '../user/user';
 import tracker from '../update-tracker';
 import socket from '../../network/socket';
@@ -11,7 +11,7 @@ class ChatReceiptHandler {
     constructor(chat: Chat) {
         this.chat = chat;
         // receipts cache {username: ReadReceipt}
-        this.chat.receipts = observable.shallowMap();
+        this.chat.receipts = observable.shallowMap<ReadReceipt>();
         tracker.subscribeToKegUpdates(chat.id, 'read_receipt', this.onDigestUpdate);
         this.onDigestUpdate();
         this._reactionsToDispose.push(
@@ -22,7 +22,7 @@ class ChatReceiptHandler {
                     if (!updated || !this.pendingReceipt) return;
                     const pos = this.pendingReceipt;
                     this.pendingReceipt = null;
-                    this.sendReceipt(pos);
+                    this.sendReceipt(pos.toString());
                 }
             )
         );
@@ -36,9 +36,11 @@ class ChatReceiptHandler {
         );
     }
 
+    chat: Chat;
+    _ownReceipt: ReadReceipt;
     downloadedCollectionVersion = '';
     // this value means that something is scheduled to send
-    pendingReceipt = null;
+    pendingReceipt: number = null;
     _reactionsToDispose = [];
 
     loadQueue = new TaskQueue(1, 1000);
@@ -55,30 +57,22 @@ class ChatReceiptHandler {
      * Sends receipt for message id seen
      */
     sendReceipt(pos: string) {
-        // console.debug(`sendReceipt(${pos})`);
-        pos = +pos; // eslint-disable-line no-param-reassign
-        // console.debug('asked to send receipt: ', pos);
+        const posNum = +pos;
         // if something is currently in progress of sending we just want to adjust max value
         if (this.pendingReceipt) {
-            // console.debug('Pending receipt exists ', this.pendingReceipt);
             // we don't want to send older receipt if newer one exists already
-            this.pendingReceipt = Math.max(pos, this.pendingReceipt);
-            // console.debug('receipt was pending. now pending: ', this.pendingReceipt);
+            this.pendingReceipt = Math.max(posNum, this.pendingReceipt);
             return; // will be send after current receipt finishes sending
         }
-        this.pendingReceipt = pos;
+        this.pendingReceipt = posNum;
         // getting it from cache or from server
         retryUntilSuccess(this.loadOwnReceipt).then(r => {
-            // console.debug('Loaded own receipt pos: ', r.chatPosition, ' pending: ', this.pendingReceipt);
             if (r.chatPosition >= this.pendingReceipt) {
                 // ups, keg has a bigger position then we are trying to save
-                // console.debug('it is higher then pending one too:', this.pendingReceipt);
                 this.pendingReceipt = null;
-                return;
+                return Promise.resolve();
             }
             r.chatPosition = this.pendingReceipt;
-            // console.debug('Saving receipt: ', pos);
-            // eslint-disable-next-line consistent-return
             return r
                 .saveToServer()
                 .then(() => {
@@ -86,21 +80,19 @@ class ChatReceiptHandler {
                         this.pendingReceipt = null;
                     }
                     if (this.pendingReceipt) {
-                        // eslint-disable-next-line no-param-reassign
-                        pos = this.pendingReceipt;
+                        const pendingPos = this.pendingReceipt.toString();
                         this.pendingReceipt = null;
-                        this.sendReceipt(pos);
+                        this.sendReceipt(pendingPos);
                     }
                 })
                 .catch(err => {
                     // normally, this is a connection issue or concurrency.
                     // to resolve concurrency error we reload the cached keg
                     console.error(err);
-                    // eslint-disable-next-line no-param-reassign
-                    pos = this.pendingReceipt;
+                    const pendingPos = this.pendingReceipt.toString();
                     this.pendingReceipt = null;
                     this._ownReceipt.load().then(() => {
-                        this.sendReceipt(pos);
+                        this.sendReceipt(pendingPos);
                     });
                 });
         });
@@ -184,7 +176,9 @@ class ChatReceiptHandler {
                 if (+msg.id !== receipt.chatPosition) continue;
                 // receiptError is already calculated, signature error MIGHT already have been calculated
                 if (receipt.receiptError || receipt.signatureError) continue;
-                msg.receipts = msg.receipts || [];
+                msg.receipts =
+                    msg.receipts ||
+                    ([] as IObservableArray<{ username: string; receipt: ReadReceipt }>);
                 msg.receipts.push({ username, receipt });
             }
         }
@@ -193,7 +187,7 @@ class ChatReceiptHandler {
     dispose() {
         this._reactionsToDispose.forEach(d => d());
         tracker.unsubscribe(this.onDigestUpdate);
-        this.receipts = {};
+        this.chat.receipts.clear();
     }
 }
 

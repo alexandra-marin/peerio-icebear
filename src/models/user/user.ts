@@ -551,6 +551,7 @@ export default class User {
         if (this._firstLoginInSession) {
             return this._checkForPasscode();
         }
+        return false;
     }
 
     /**

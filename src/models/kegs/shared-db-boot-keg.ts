@@ -24,8 +24,8 @@ interface IEncryptedKeys {
         createdAt: number;
         keys: {
             [username: string]: {
-                key: string; //b64
-                publicKey: string; //b64
+                key: string; // b64
+                publicKey: string; // b64
             };
         };
     };

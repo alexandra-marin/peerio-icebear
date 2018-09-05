@@ -151,7 +151,7 @@ export default class Keg<TPayload, TProps extends {} = {}> {
      * null when signature has not been verified yet (it's async) or it will never be because this keg is not supposed
      * to be signed.
      */
-    @observable protected signatureError: boolean | null = null;
+    @observable signatureError: boolean | null = null;
 
     @observable id: string | null;
 
@@ -439,7 +439,6 @@ export default class Keg<TPayload, TProps extends {} = {}> {
 
             let binPayload: Uint8Array;
             let stringPayload: string;
-            let payloadKey: Uint8Array = null;
 
             if (this.plaintext) {
                 stringPayload = keg.payload as string;
@@ -453,7 +452,7 @@ export default class Keg<TPayload, TProps extends {} = {}> {
                 this.signatureError = false;
             }
             if (!this.plaintext) {
-                let decryptionKey: Uint8Array = payloadKey || this.overrideKey;
+                let decryptionKey: Uint8Array = this.overrideKey;
                 if (!decryptionKey) {
                     const keyObj = this.db.boot.keys[keg.keyId || '0']; // optimization, avoids async
                     if (keyObj) decryptionKey = keyObj.key;

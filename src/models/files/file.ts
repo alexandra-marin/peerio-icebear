@@ -67,11 +67,14 @@ export default class File extends Keg<IFilePayload, IFileProps> {
 
     downloader: FileDownloader;
     uploader: FileUploader;
-    // files and folders get in mixed lists, so this helps
-    isFolder = false;
-    isShared = false; //TODO: rename this to 'isVolume'
 
-    //TODO: this is a pretty dirty hack to support UI, needs refactor
+    // files and folders get in mixed lists, so adding these properties helps for now
+    isFolder = false;
+    isShared = false; // TODO: rename this to 'isVolume'
+    hasLegacyFiles = false;
+    // ---
+
+    // TODO: this is a pretty dirty hack to support UI, needs refactor
     uploadQueue?: IObservableArray<File>;
 
     get data() {
@@ -585,7 +588,7 @@ export default class File extends Keg<IFilePayload, IFileProps> {
             this.deleted = true;
         });
     }
-    //TODO: better way to do this. Optional, so tsc won't complain, but it will always be defined.
+    // TODO: better way to do this. Optional, so tsc won't complain, but it will always be defined.
     _resetDownloadState?(stream?: FileStreamBase): void;
     _resetUploadState?(stream?: FileStreamBase): void;
 

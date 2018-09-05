@@ -198,7 +198,7 @@ class ChatInviteStore {
 
     updateLeftUsers = () => {
         return socket.send('/auth/kegs/channel/users-left').then(
-            action(res => {
+            action((res: { [kegDbId: string]: string[] }) => {
                 this.left.clear();
                 for (const kegDbId in res) {
                     const leavers = res[kegDbId];

@@ -23,7 +23,7 @@ export function getFileNameWithoutExtension(path: string) {
  * @returns file extension
  */
 export function getFileExtension(path: string) {
-    let matches = path.toLocaleLowerCase().match(/\.\w+$/);
+    const matches = path.toLocaleLowerCase().match(/\.\w+$/);
     const extension = matches ? matches[0].substring(1) : '';
     return extension;
 }

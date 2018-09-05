@@ -1,4 +1,12 @@
-import { observable, computed, action, when, reaction, IObservableArray } from 'mobx';
+import {
+    observable,
+    computed,
+    action,
+    when,
+    reaction,
+    IObservableArray,
+    ObservableMap
+} from 'mobx';
 import Message from './message';
 import ChatKegDb from '../kegs/chat-keg-db';
 import User from '../user/user';
@@ -24,6 +32,7 @@ import FileFolder from '../files/file-folder';
 import { ChatStore } from '~/models/chats/chat-store';
 import Volume from '~/models/volumes/volume';
 import File from '../files/file';
+import ReadReceipt from '~/models/chats/read-receipt';
 // to assign when sending a message and don't have an id yet
 let temporaryChatId = 0;
 function getTemporaryChatId() {
@@ -96,6 +105,8 @@ class Chat {
      * Render these messages at the bottom of the chat, they don't have Id yet, you can use tempId.
      */
     @observable.shallow limboMessages = [] as IObservableArray<Message>;
+
+    receipts: ObservableMap<ReadReceipt>;
 
     // performance helper, to lookup messages by id and avoid duplicates
     _messageMap = {};

@@ -31,7 +31,7 @@ class ChatStorePending {
             s => s.isInvite && s.dmPartnerUsername === username
         );
         if (existing && existing.isInvite) {
-            //@ts-ignore fix this mess with Pending DMs being placed with regular chats
+            // @ts-ignore fix this mess with Pending DMs being placed with regular chats
             existing.dismiss();
         }
     }

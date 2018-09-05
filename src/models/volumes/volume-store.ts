@@ -112,7 +112,7 @@ export class VolumeStore {
         this.volumes.remove(volume);
     }
 
-    getVolumeWhenReady(id) {
+    getVolumeWhenReady(id: string): Promise<Volume> {
         return new Promise(resolve => {
             when(
                 () => {
@@ -126,14 +126,11 @@ export class VolumeStore {
 
     @computed
     get sortedVolumes() {
-        return this.volumes.sort(
-            (f1, f2) =>
-                f1.normalizedName > f2.normalizedName
-                    ? -1
-                    : f1.normalizedName < f2.normalizedName
-                        ? 1
-                        : 0
-        );
+        return this.volumes.sort((f1, f2) => {
+            if (f1.normalizedName > f2.normalizedName) return -1;
+            if (f1.normalizedName < f2.normalizedName) return 1;
+            return 0;
+        });
     }
 
     @action.bound

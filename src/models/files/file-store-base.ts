@@ -31,7 +31,7 @@ class FileStoreBase {
         this.fileMapObservable = m.observableMap;
         this.folderStore = new FileStoreFolders(this, root);
         if (id !== 'main') {
-            //FileStoreBase.instances.set(this.id, this as FileStoreBase<SharedKegDb>);
+            // FileStoreBase.instances.set(this.id, this as FileStoreBase<SharedKegDb>);
         } else {
             tracker.onceUpdated(this.onFileDigestUpdate);
         }
@@ -94,7 +94,7 @@ class FileStoreBase {
         let ret = this.files;
         if (this.isMainStore) {
             FileStoreBase.instances.forEach(store => {
-                //@ts-ignore can't make this work without refactor
+                // @ts-ignore can't make this work without refactor
                 ret = ret.concat(store.files.slice());
             });
         }
@@ -268,7 +268,7 @@ class FileStoreBase {
     async cacheDescriptor(d) {
         const file = this.getById(d.fileId);
         if (!file) return null;
-        //TODO: raw keg types
+        // TODO: raw keg types
         const cached = await this.cache.getValue(file.id);
         if (!cached) {
             console.error('cacheDescriptor was called, but cached keg not found');

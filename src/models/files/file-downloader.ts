@@ -153,7 +153,7 @@ export default class FileDownloader extends FileProcessor {
             this.partialChunkSize = 0;
         }
         this.stream.write(chunk);
-        //.then(this._onWriteEnd)
+        // .then(this._onWriteEnd)
         // .catch(this._error);
     }
 

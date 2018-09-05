@@ -35,11 +35,11 @@ class FileUploader extends FileProcessor {
     /**
      * read chunks go here
      */
-    encryptQueue: Uint8Array[] = [];
+    encryptQueue: Array<{ id: number; buffer: Uint8Array }> = [];
     /**
      * encrypted chunks go here
      */
-    uploadQueue: Uint8Array[] = [];
+    uploadQueue: Array<{ id: number; buffer: Uint8Array }> = [];
     /**
      * end of file reached while reading file
      */

@@ -62,10 +62,14 @@ export { default as Contact } from './models/contacts/contact';
 export { default as __tracker } from './models/update-tracker'; // Clients do not need it. Exported just for debugging.
 export { default as CacheEngineBase } from './db/cache-engine-base';
 
-export { default as util } from './util';
-export { default as errors } from './errors';
-export { default as fileHelpers } from './helpers/file';
-export { default as prombservable } from './helpers/prombservable';
+import * as util from './util';
+export { util };
+import * as errors from './errors';
+export { errors };
+import * as fileHelpers from './helpers/file';
+export { fileHelpers };
+import * as prombservable from './helpers/prombservable';
+export { prombservable };
 
 import * as cryptoUtil from './crypto/util';
 import * as keys from './crypto/keys';

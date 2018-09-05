@@ -47,17 +47,30 @@ export default class File extends Keg<IFilePayload, IFileProps> {
     }
     static copyQueue = new TaskQueue(1, 200);
 
-    _getUlResumeParams: typeof uploadModule._getUlResumeParams;
-    _saveUploadEndFact: typeof uploadModule._saveUploadEndFact;
-    _saveUploadStartFact: typeof uploadModule._saveUploadStartFact;
-    cancelUpload: typeof uploadModule.cancelUpload;
-    upload: typeof uploadModule.upload;
+    _getUlResumeParams?(path: string): Promise<any>;
+    _saveUploadEndFact?(): void;
+    _saveUploadStartFact?(path: string): void;
+    cancelUpload?(): Promise<void>;
+    upload?(filePath: string, fileName?: string, resume?: boolean): Promise<void>;
 
-    _getDlResumeParams: typeof downloadModule._getDlResumeParams;
-    _saveDownloadStartFact: typeof downloadModule._saveDownloadStartFact;
-    _saveDownloadEndFact: typeof downloadModule._saveDownloadEndFact;
-    cancelDownload: typeof downloadModule.cancelDownload;
-    download: typeof downloadModule.download;
+    _getDlResumeParams?(
+        path: string
+    ): Promise<
+        | boolean
+        | {
+              wholeChunks: number;
+              partialChunkSize: number;
+          }
+    >;
+    _saveDownloadStartFact?(path: string): void;
+    _saveDownloadEndFact?(): void;
+    cancelDownload?(): void;
+    download?(
+        filePath: string,
+        resume?: boolean,
+        isTmpCacheDownload?: boolean,
+        suppressSnackbar?: boolean
+    ): Promise<void>;
 
     hidden: boolean;
     store: FileStoreBase;
@@ -65,8 +78,8 @@ export default class File extends Keg<IFilePayload, IFileProps> {
     descriptorKey: string;
     unmigrated: boolean;
 
-    downloader: FileDownloader;
-    uploader: FileUploader;
+    downloader?: FileDownloader;
+    uploader?: FileUploader;
 
     // files and folders get in mixed lists, so adding these properties helps for now
     isFolder = false;
@@ -483,7 +496,7 @@ export default class File extends Keg<IFilePayload, IFileProps> {
             // to be filled by caller
             size: 0,
             chunkSize: 0,
-            version: 0
+            version: undefined as number
         };
         return descriptor;
     }
@@ -722,6 +735,5 @@ export default class File extends Keg<IFilePayload, IFileProps> {
         );
     }
 }
-
 Object.assign(File.prototype, uploadModule);
 Object.assign(File.prototype, downloadModule);

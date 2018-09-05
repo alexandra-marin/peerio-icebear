@@ -49,10 +49,16 @@ class ServerSettings {
                 this.mixPanelClientToken = res.mixPanelClientToken;
                 console.log(
                     'Server settings retrieved.',
+                    res,
+                    '/ tag:',
                     this.tag,
+                    '/ file base url:',
                     this.avatarServer,
-                    this.acceptableClientVersions,
+                    '/ accepts sdk versions:',
+                    this.acceptableClientVersions.slice(),
+                    '/ maintenance:',
                     this.maintenanceWindow,
+                    '/ mixpanel:',
                     this.mixPanelClientToken
                 );
             });

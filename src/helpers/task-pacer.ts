@@ -5,9 +5,11 @@ type Task = (() => any) & { __debugName?: string };
  * - Tasks will always get executed asynchronously
  * - Execution order of the tasks will be the same
  * - It's ok for tasks to throw
- * @param rate - how many tasks are allowed to execute in 1 second interval
  */
 class TaskPacer {
+    /**
+     * @param rate - how many tasks are allowed to execute in 1 second interva
+     */
     constructor(rate: number) {
         if (!rate) throw new Error('Task execution rate is not specified.');
         this.rate = rate;

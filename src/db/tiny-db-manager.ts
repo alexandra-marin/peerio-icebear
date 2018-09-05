@@ -4,9 +4,11 @@ import { TinyDBStorageEngine } from '~/defs/tiny-db';
 /**
  * TinyDbManager manages system and user instances, and allows opening
  * other instances.
- * @param createStorageEngine - function returning a new storage engine for the name
  */
 class TinyDbManager {
+    /**
+     * @param createStorageEngine - function returning a new storage engine for the name
+     */
     constructor(createStorageEngine: (name: string) => TinyDBStorageEngine) {
         this.createStorageEngine = createStorageEngine;
         this.systemInstance = null;

@@ -9,9 +9,11 @@ import Chat from './chat';
 
 /**
  * File handling module for Chat. Extracted for readability.
- * @param  chat - chat creates an instance and passes itself to it.
  */
 class ChatFileHandler {
+    /**
+     * @param  chat - chat creates an instance and passes itself to it.
+     */
     constructor(chat: Chat) {
         this.chat = chat;
         tracker.subscribeToKegUpdates(chat.id, 'file', this.onFileDigestUpdate);

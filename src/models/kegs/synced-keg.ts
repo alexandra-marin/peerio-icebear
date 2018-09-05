@@ -9,14 +9,16 @@ import { IKegDb } from '~/defs/interfaces';
 /**
  * This class allows named kegs to share sync/save logic.
  * This is for named kegs only! Named kegs assume there's just one instance of it.
- * @param kegName - kegName === kegType currently
- * @param db - this keg owner database
- * @param plaintext - encrypted or not
- * @param forceSign - force signature of plaintext kegs or not
- * @param noSync - in rare cases we want to use some keg that extends synced keg out of normal flow,
- *                 like one-time decryption, for that we need to disable synced keg sync automation.
  */
 class SyncedKeg<TPayload, TProps> extends Keg<TPayload, TProps> {
+    /**
+     * @param kegName - kegName === kegType currently
+     * @param db - this keg owner database
+     * @param plaintext - encrypted or not
+     * @param forceSign - force signature of plaintext kegs or not
+     * @param noSync - in rare cases we want to use some keg that extends synced keg out of normal flow,
+     *                 like one-time decryption, for that we need to disable synced keg sync automation.
+     */
     constructor(
         kegName: string,
         db: IKegDb,

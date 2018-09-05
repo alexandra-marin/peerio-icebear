@@ -6,9 +6,11 @@ import config from '../config';
  * Provides clock.now property that is mobx observable and changes at specified time interval.
  * Doesn't tick when no one is observing.
  * Create your own clock or use default one.
- * @param interval - clock update interval in seconds
  */
 export default class Clock {
+    /**
+     * @param interval - clock update interval in seconds
+     */
     constructor(interval: number) {
         this._atom = new Atom('Clock', this._startTicking, this._stopTicking);
         this._interval = interval;

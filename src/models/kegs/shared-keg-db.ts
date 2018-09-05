@@ -45,11 +45,13 @@ import { IKegDb } from '~/defs/interfaces';
  * - 3.3 load failed: retry is triggered
  * , 'Unique retry id')
  * ```
- * @param id - specific id for shared databases
- * @param participants - participants list, EXCLUDING own username
- * @param isChannel - does this db belong to a DM or Channel
  */
 abstract class SharedKegDb implements IKegDb {
+    /**
+     * @param id - specific id for shared databases
+     * @param participants - participants list, EXCLUDING own username
+     * @param isChannel - does this db belong to a DM or Channel
+     */
     constructor(
         id?: string,
         participants: Contact[] = [],

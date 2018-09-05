@@ -11,11 +11,10 @@ import clientApp from '../client-app';
 import { getChatStore } from '../../helpers/di-chat-store';
 import Chat from '~/models/chats/chat';
 
-/**
- *
- * @param chat - chat creates instance and passes itself to the constructor.
- */
 class ChatMessageHandler {
+    /**
+     * @param chat - chat creates instance and passes itself to the constructor.
+     */
     constructor(chat: Chat) {
         this.chat = chat;
         // asynchronously. to avoid changing unreadCount in reaction to unreadCount change

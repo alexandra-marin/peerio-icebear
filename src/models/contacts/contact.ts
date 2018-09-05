@@ -39,11 +39,13 @@ interface LookupMatch {
  * loading === true - trying to load contact, will make many attempts in case of connection issues
  * loading === false && notFound === false - success
  * loading === false && notFound === true  - fail
- * @param username - this can also be an email which will be replaced with username if user found
- * @param prefetchedData - if, for some reason you have the contact data from server, feed it here
- * @param noAutoLoad - don't automatically call this.load() in constructor (needed for tests only)
  */
 class Contact {
+    /**
+     * @param username - this can also be an email which will be replaced with username if user found
+     * @param prefetchedData - if, for some reason you have the contact data from server, feed it here
+     * @param noAutoLoad - don't automatically call this.load() in constructor (needed for tests only)
+     */
     constructor(username: string, prefetchedData?, noAutoLoad = false) {
         this.username = username.toLowerCase();
         if (getUser().username === this.username) this.isMe = true;

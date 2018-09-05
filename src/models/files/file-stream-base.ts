@@ -7,10 +7,12 @@ import { AbstractCallError } from '~/errors';
  * 1. create you own class and inherit from FileStreamBase.
  * 2. override required functions.
  * 3. set config.FileStream = YourFileStreamImplementation.
- * @param filePath - will be used by 'open' function
- * @param mode - 'read' or 'write' or 'append'
  */
 class FileStreamBase {
+    /**
+     * @param filePath - will be used by 'open' function
+     * @param mode - 'read' or 'write' or 'append'
+     */
     constructor(filePath: string, mode: string) {
         this.filePath = filePath;
         if (mode !== 'read' && mode !== 'write' && mode !== 'append') {

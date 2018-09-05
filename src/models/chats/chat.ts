@@ -45,9 +45,11 @@ const ACK_MSG = '👍';
 
 /**
  * at least one of two arguments should be set
- * @param participants - chat participants, will be used to create chat or find it by participant list
  */
 class Chat {
+    /**
+     * @param participants - chat participants, will be used to create chat or find it by participant list
+     */
     constructor(id: string, participants: Contact[] = [], store: ChatStore, isChannel = false) {
         this.id = id;
         this.store = store;

@@ -96,12 +96,13 @@ interface IEncryptedKeys {
  *   accepted: boolean
  * }
  * ```
- *
- * @param db - owner instance
- * @param user - currently authenticated user
  */
 class SharedDbBootKeg extends SyncedKeg<ISharedDbBootKegPayload, ISharedDbBootKegProps>
     implements IBootKeg {
+    /**
+     * @param db - owner instance
+     * @param user - currently authenticated user
+     */
     constructor(db: SharedKegDb, user: User) {
         // named kegs are pre-created, so we know the id already and only going to update boot keg
         super('boot', db, true, true, true, true);

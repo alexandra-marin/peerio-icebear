@@ -4,10 +4,12 @@ import { observable, action, IObservableArray } from 'mobx';
 /**
  * Base class for any Most Recently Used implementations.
  * Gotcha: Don't create 2+ instances for the same list name. Due to caching it will lead to conflicts.
- * @param name - unique name for the list
- * @param limit - maximum number of elements in the list (will remove least recent)
  */
 export default class MRUList {
+    /**
+     * @param name - unique name for the list
+     * @param limit - maximum number of elements in the list (will remove least recent)
+     */
     constructor(name: string, limit = 10) {
         this._name = `MRU_${name}`;
         this._limit = limit;

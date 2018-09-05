@@ -8,9 +8,11 @@ import FileNonceGenerator from '~/models/files/file-nonce-generator';
 import File from './file';
 /**
  * Handles file upload process
- * @param startFromChunk - in case of resume, start uploading from the chunk after this one
  */
 class FileUploader extends FileProcessor {
+    /**
+     * @param startFromChunk - in case of resume, start uploading from the chunk after this one
+     */
     constructor(
         file: File,
         stream: FileStreamBase,

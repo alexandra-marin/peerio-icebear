@@ -10,10 +10,12 @@ import * as util from '../../crypto/util';
  * 2-5  - chunk counter
  * 6-24 - random
  * ```
- * @param startChunkId - chunk id to start with (next nonce will use this id)
- * @param nonce - leave empty to generate random one
  */
 class FileNonceGenerator {
+    /**
+     * @param startChunkId - chunk id to start with (next nonce will use this id)
+     * @param nonce - leave empty to generate random one
+     */
     constructor(startChunkId: number, maxChunkId: number, nonce = util.getRandomNonce()) {
         this.nonce = nonce;
         this.chunkId = startChunkId;

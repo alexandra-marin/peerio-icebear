@@ -9,10 +9,12 @@ interface TaskInfo {
 }
 /**
  * Observable task queue implementation
- * @param parallelism - how many tasks can run(wait to be finished) at the same time
- * @param throttle - how many milliseconds delay to make before running every task
  */
 class TaskQueue {
+    /**
+     * @param parallelism - how many tasks can run(wait to be finished) at the same time
+     * @param throttle - how many milliseconds delay to make before running every task
+     */
     constructor(parallelism = 1, throttle = 0) {
         this.parallelism = parallelism;
         this.throttle = throttle;

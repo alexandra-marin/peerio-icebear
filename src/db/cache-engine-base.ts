@@ -17,12 +17,11 @@ const CACHE_RESET_COUNTER = 3;
 
 const CACHE_RESET_KEY = 'cacheResetCounter';
 
-/**
- * CacheEngineBase
- * @param shortName - unique(per user) database short name (will be converted to longer and safer name)
- * @param keyPath - how to find the key in saved objects
- */
 export default class CacheEngineBase<TValue> {
+    /**
+     * @param shortName - unique(per user) database short name (will be converted to longer and safer name)
+     * @param keyPath - how to find the key in saved objects
+     */
     constructor(shortName: string, keyPath: string) {
         if (!shortName || !keyPath) throw new Error('Invalid arguments');
         this.name =

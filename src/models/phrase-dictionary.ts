@@ -2,10 +2,12 @@ import * as util from '../crypto/util';
 
 /**
  * Passphrase dictionary module.
- * @param locale - locale code for dict
- * @param dictString - '\n' separated word list
  */
 class PhraseDictionary {
+    /**
+     * @param locale - locale code for dict
+     * @param dictString - '\n' separated word list
+     */
     constructor(locale: string, dictString: string) {
         this.locale = locale;
         this._buildDict(dictString);

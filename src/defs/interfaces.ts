@@ -61,8 +61,7 @@ export interface Address {
     address: string;
     confirmed: boolean;
     primary: boolean;
-    /** currently always == 'email' */
-    type: string;
+    type: 'email';
 }
 
 /**

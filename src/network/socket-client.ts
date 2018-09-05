@@ -337,7 +337,7 @@ export default class SocketClient {
      * @param hasBinaryData - if you know for sure, set this to true/false to increase performance
      * @returns - server response, always returns `{}` if response is empty
      */
-    send(name: string, data?: {}, hasBinaryData: boolean = null) {
+    send(name: string, data?: {}, hasBinaryData: boolean = null): Promise<any> {
         const id = this.requestId++;
         return (new Promise((resolve, reject) => {
             this.awaitingRequests[id] = { name, data, reject };

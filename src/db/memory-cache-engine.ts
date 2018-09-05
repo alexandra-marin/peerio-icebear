@@ -42,7 +42,7 @@ class MemoryCacheEngine implements CacheEngineBase<any> {
         });
     }
 
-    async setValue(key, value, callback) {
+    async setValue(key, value, callback): Promise<void> {
         let newVal = value;
         if (callback) {
             const old = await this.getValue(key);
@@ -60,25 +60,25 @@ class MemoryCacheEngine implements CacheEngineBase<any> {
         }) as Promise<void>;
     }
 
-    removeValue(key) {
+    removeValue(key): Promise<void> {
         return new Promise(resolve => {
             setTimeout(() => {
                 delete this.db[key];
                 resolve();
             });
-        }) as Promise<void>;
+        });
     }
 
-    getAllKeys() {
+    getAllKeys(): Promise<string[]> {
         return new Promise(resolve => {
             setTimeout(() => resolve(Object.keys(this.db)));
-        }) as Promise<string[]>;
+        });
     }
 
-    getAllValues() {
+    getAllValues(): Promise<any[]> {
         return new Promise(resolve => {
             setTimeout(() => resolve(Object.values(this.db)));
-        }) as Promise<any[]>;
+        });
     }
 
     clear() {

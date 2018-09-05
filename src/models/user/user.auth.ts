@@ -71,7 +71,7 @@ export default function mixUserAuthModule(this: User) {
                 this.authSalt = new Uint8Array(response.authSalt);
             }) as Promise<void>;
     };
-    this._getAuthToken = () => {
+    this._getAuthToken = (): Promise<AuthToken> => {
         console.log('Requesting auth token.');
         return Promise.all([this._getDeviceId(), this._get2faCookieData()])
             .then(([deviceId, cookieData]) => {
@@ -102,7 +102,7 @@ export default function mixUserAuthModule(this: User) {
                 }
                 return socket.send('/noauth/auth-token/get', req, true);
             })
-            .then(resp => util.convertBuffers(resp)) as Promise<AuthToken>;
+            .then(resp => util.convertBuffers(resp));
     };
 
     this._authenticateAuthToken = data => {
@@ -177,11 +177,14 @@ export default function mixUserAuthModule(this: User) {
             });
     };
 
-    this._getAuthDataFromPasscode = (passcode: string, passcodeSecret: Uint8Array) => {
+    this._getAuthDataFromPasscode = (
+        passcode: string,
+        passcodeSecret: Uint8Array
+    ): Promise<AuthData> => {
         return keys
             .deriveKeyFromPasscode(this.username, passcode)
             .then(passcodeKey => secret.decryptString(passcodeSecret, passcodeKey))
-            .then(authDataJSON => JSON.parse(authDataJSON)) as Promise<AuthData>;
+            .then(authDataJSON => JSON.parse(authDataJSON));
     };
 
     /**

@@ -230,7 +230,7 @@ class SharedKegDb implements IKegDb {
     /**
      * Create boot keg for this database
      */
-    createBootKeg() {
+    createBootKeg(): Promise<[SharedDbBootKeg, boolean]> {
         console.log(
             `Creating ${this.urlName} boot keg for ${this.id}, isChannel:${this.isChannel}`
         );

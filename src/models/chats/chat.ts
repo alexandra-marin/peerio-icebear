@@ -477,7 +477,7 @@ class Chat {
      * @param prepend - add message to top of bottom
      */
     @action
-    addMessages(kegs: Array<{}>, prepend = false) {
+    addMessages(kegs: Array<{}>, prepend = false): Promise<void> {
         if (!kegs || !kegs.length) return Promise.resolve();
         return new Promise(resolve => {
             // we need this because we don't want to add messages one by one causing too many renders
@@ -491,7 +491,7 @@ class Chat {
                 [accumulator, prepend, kegs],
                 resolve
             );
-        }) as Promise<void>;
+        });
     }
 
     // decrypting a bunch of kegs in one call is tough on mobile, so we do it asynchronously one by one

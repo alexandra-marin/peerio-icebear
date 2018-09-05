@@ -181,10 +181,10 @@ export default class FileDownloader extends FileProcessor {
         });
     };
 
-    _getChunkUrl(from, to) {
+    _getChunkUrl(from, to): Promise<string> {
         return socket
             .send('/auth/file/url', this.getUrlParams, false)
-            .then(f => `${f.url}?rangeStart=${from}&rangeEnd=${to}`) as Promise<string>;
+            .then(f => `${f.url}?rangeStart=${from}&rangeEnd=${to}`);
     }
 
     _download = (url, expectedSize): Promise<ArrayBuffer> => {

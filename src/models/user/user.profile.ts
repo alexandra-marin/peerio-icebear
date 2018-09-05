@@ -92,7 +92,7 @@ export default function mixUserProfileModule(this: User) {
         });
     };
 
-    this.resendEmailConfirmation = function(email: string) {
+    this.resendEmailConfirmation = function(email: string): Promise<void> {
         return socket
             .send('/auth/address/resend-confirmation', {
                 address: {
@@ -109,7 +109,7 @@ export default function mixUserProfileModule(this: User) {
             }) as Promise<void>;
     };
 
-    this.removeEmail = function(email: string) {
+    this.removeEmail = function(email: string): Promise<void> {
         return socket
             .send('/auth/address/remove', {
                 address: {
@@ -146,7 +146,7 @@ export default function mixUserProfileModule(this: User) {
         });
     };
 
-    this.makeEmailPrimary = function(email: string) {
+    this.makeEmailPrimary = function(email: string): Promise<void> {
         return socket
             .send('/auth/address/make-primary', {
                 address: {

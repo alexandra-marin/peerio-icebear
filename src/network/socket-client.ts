@@ -339,7 +339,7 @@ export default class SocketClient {
      */
     send(name: string, data?: {}, hasBinaryData: boolean = null) {
         const id = this.requestId++;
-        return new Promise((resolve, reject) => {
+        return (new Promise((resolve, reject) => {
             this.awaitingRequests[id] = { name, data, reject };
             this.taskPacer.run(() => {
                 if (!this.awaitingRequests[id]) {
@@ -380,7 +380,7 @@ export default class SocketClient {
                     this.socket.binary(hasBinaryData).emit(name, data, handler);
                 }
             }, name);
-        })
+        }) as Promise<any>)
             .timeout(60000)
             .finally(() => {
                 delete this.awaitingRequests[id];

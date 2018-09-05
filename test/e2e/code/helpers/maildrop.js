@@ -34,8 +34,8 @@
         DELETE https://maildrop.peerio.com/api/inbox/:name/:id
  */
 
-const { getUrl, deleteRequest } = require('./https');
-const quotedPrintable = require('quoted-printable');
+import { getUrl, deleteRequest } from './https';
+import quotedPrintable from 'quoted-printable';
 
 /**
  * Retrieves inbox items
@@ -63,7 +63,7 @@ function getEmail(name, id) {
         });
 }
 
-function deleteEmail(name, id) {
+export function deleteEmail(name, id) {
     name = normalizeName(name); // eslint-disable-line no-param-reassign
     return deleteRequest(`https://maildrop.peerio.com/api/inbox/${name}/${id}`);
 }
@@ -95,7 +95,7 @@ function normalizeName(name) {
  * @param {string} subject
  * @param {number} [timeout=360000]
  */
-function waitForEmail(name, subject, timeout = 360000) {
+export function waitForEmail(name, subject, timeout = 360000) {
     name = normalizeName(name); // eslint-disable-line no-param-reassign
     const start = Date.now();
     return new Promise((resolve, reject) => {
@@ -120,5 +120,3 @@ function waitForEmail(name, subject, timeout = 360000) {
         makeAttempt();
     });
 }
-
-module.exports = { waitForEmail, deleteEmail };

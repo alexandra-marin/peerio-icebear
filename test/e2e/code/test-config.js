@@ -1,6 +1,6 @@
 // just extracting common constants to be able to change them based on environment later
 
-module.exports = {
+export default {
     // all our test emails will be in this domain
     emailDomain: 'test.lan',
     // all new test accounts will be created with this passphrase by default

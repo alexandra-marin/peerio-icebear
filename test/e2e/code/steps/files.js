@@ -1,6 +1,6 @@
-const { When, Then } = require('cucumber');
-const { createRandomTempFile, getTempFileName, filesEqual } = require('../helpers/files');
-const { startDmWithCucumbot } = require('./dm.helpers');
+import { When, Then } from 'cucumber';
+import { createRandomTempFile, getTempFileName, filesEqual } from '../helpers/files';
+import { startDmWithCucumbot } from './dm.helpers';
 
 When('I upload a {int} byte file', async function(int) {
     const name = await createRandomTempFile(int);

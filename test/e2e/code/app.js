@@ -1,8 +1,12 @@
 if (!console.debug) console.debug = console.log.bind(console);
-global.XMLHttpRequest = require('w3c-xmlhttprequest').XMLHttpRequest;
-global.WebSocket = require('websocket').w3cwebsocket;
-const safeJsonStringify = require('safe-json-stringify');
-const testConfig = require('./test-config');
+import XMLHttpRequest from 'w3c-xmlhttprequest';
+import w3cwebsocket from 'websocket';
+
+global.XMLHttpRequest = XMLHttpRequest;
+global.WebSocket = w3cwebsocket;
+
+import safeJsonStringify from 'safe-json-stringify';
+import testConfig from './test-config';
 
 /**
  * App class is supposed to emulate real-world application (sdk consumer).
@@ -18,7 +22,7 @@ const testConfig = require('./test-config');
  *    Arrow function will get bound to a wrong object and you won't be able to access the world.
  * 4. One scenario can have multiple App instances. But one App instance can only belong to one scenario (world).
  */
-class App {
+export default class App {
     constructor(world) {
         this.world = world;
         this._captureConsole();
@@ -43,8 +47,8 @@ class App {
     _configure() {
         const path = require('path');
         const os = require('os');
-        const FileStream = require('~/models/files/node-file-stream');
-        const StorageEngine = require('~/models/storage/node-json-storage');
+        const FileStream = require('~/models/files/node-file-stream').default;
+        const StorageEngine = require('~/models/storage/node-json-storage').default;
         const cfg = this.world.ice.config;
         // todo: make special test platform?
         cfg.appVersion = '2.37.1';
@@ -65,7 +69,7 @@ class App {
                 socketLogEnabled: true
             };
         }
-        const MemoryCacheEngine = require('~/db/memory-cache-engine');
+        const MemoryCacheEngine = require('~/db/memory-cache-engine').default;
         MemoryCacheEngine.setStorage(this.world.cacheStorage);
         cfg.CacheEngine = MemoryCacheEngine;
     }
@@ -152,7 +156,7 @@ class App {
         console.log(`===== STARTING TEST APP ${process.env.CUCUMBOT ? 'CUCUMBOT' : ''} =====`);
         App.lastInstanceDisposed = false;
         this._setupChai();
-        global.ice = this.world.ice = require('~/');
+        global.ice = this.world.ice = require('../../../dist');
         this._configure();
         this._addLibraries();
         this.world.ice.socket.start();
@@ -223,4 +227,3 @@ class App {
         App.lastInstanceDisposed = true;
     }
 }
-module.exports = App;

@@ -1,7 +1,7 @@
-const { setWorldConstructor } = require('cucumber');
-const { getRandomUsername } = require('./helpers/random-data');
-const testConfig = require('./test-config');
-const ContactsHelper = require('./helpers/contacts');
+import { setWorldConstructor } from 'cucumber';
+import { getRandomUsername } from './helpers/random-data';
+import testConfig from './test-config';
+import ContactsHelper from './helpers/contacts';
 
 /**
  * Cucumber creates an instance of this class for each scenario.

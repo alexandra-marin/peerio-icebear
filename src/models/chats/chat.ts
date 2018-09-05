@@ -491,7 +491,7 @@ class Chat {
                 [accumulator, prepend, kegs],
                 resolve
             );
-        });
+        }) as Promise<void>;
     }
 
     // decrypting a bunch of kegs in one call is tough on mobile, so we do it asynchronously one by one

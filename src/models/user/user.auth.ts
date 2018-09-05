@@ -153,10 +153,10 @@ export default function mixUserAuthModule(this: User) {
             .catch(err => {
                 if (err && err.name === 'NoPasscodeFoundError') {
                     console.log(err.message);
-                    return;
                 }
                 console.log(normalize(err));
-            });
+                return false;
+            }) as Promise<boolean>;
     };
 
     //

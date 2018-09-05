@@ -248,11 +248,11 @@ export default class Keg<TPayload, TProps extends {} = {}> {
      * Updates existing server keg with new data.
      * This function assumes keg id exists so always use `saveToServer()` to be safe.
      */
-    protected internalSave(): Promise<unknown> {
+    protected internalSave(): Promise<void> {
         let payload,
             props,
             lastVersion,
-            signingPromise: Promise<true | undefined> = Promise.resolve<true>(true);
+            signingPromise = Promise.resolve<void>(undefined);
         try {
             payload = this.serializeKegPayload();
             props = this.serializeProps();
@@ -278,9 +278,7 @@ export default class Keg<TPayload, TProps extends {} = {}> {
                         }
                         this.signatureError = false;
                     })
-                    .tapCatch(err => console.error('Failed to sign keg', err)) as Promise<
-                    undefined
-                >;
+                    .tapCatch(err => console.error('Failed to sign keg', err)) as Promise<void>;
             }
         } catch (err) {
             console.error('Failed preparing keg to save.', err);
@@ -356,7 +354,7 @@ export default class Keg<TPayload, TProps extends {} = {}> {
                     };
                     return keg;
                 }
-                return Promise.reject(err);
+                return err;
             })
             .then(async keg => {
                 const ret = await this.loadFromKeg(keg);

@@ -1,6 +1,6 @@
-const { EventEmitter } = require('eventemitter3');
+import { EventEmitter } from 'eventemitter3';
 
-class CucumbotBase extends EventEmitter {
+export default class CucumbotBase extends EventEmitter {
     constructor(world) {
         super();
         this.world = world;
@@ -99,5 +99,3 @@ class CucumbotBase extends EventEmitter {
         else handler.call(this, msg);
     };
 }
-
-module.exports = CucumbotBase;

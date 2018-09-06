@@ -268,7 +268,9 @@ export default class FileDownloader extends FileProcessor {
             };
 
             xhr.onprogress = function(event) {
-                progressEventFired = true;
+                // in mobile and in node with polyfill weird things can happen
+                // sometimes onprogress is never called, sometimes 'loaded' is always zero
+                if (event.loaded > 0) progressEventFired = true;
                 if (p.isRejected()) return;
                 if (event.loaded > lastLoaded) {
                     self.file.progress += event.loaded - lastLoaded;

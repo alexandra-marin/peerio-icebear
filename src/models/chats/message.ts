@@ -28,7 +28,7 @@ interface MessagePayload {
     userMentions: string[];
     files?: string; // stringified array if file ids
     folders?: string; // stringified array if folder ids
-    systemData?: { action: string } & { [key: string]: any };
+    systemData?: { action: string; [key: string]: any };
 }
 
 interface MessageProps {

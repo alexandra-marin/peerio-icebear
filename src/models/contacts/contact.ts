@@ -24,7 +24,7 @@ interface LookupProfile {
     lastName: string;
     urlSalt: string;
     isDeleted: boolean;
-    props?: { mcrRoles: 'doctor' | 'admin' };
+    props?: { mcrRoles: string[] };
     profileVersion: number;
 }
 
@@ -70,7 +70,7 @@ class Contact {
 
     isMe = false;
     mentionRegex: RegExp;
-    mcrRoles: [string];
+    mcrRoles: string[];
     /**
      * This flag means that we are making attempts to load contact
      * once it's 'false' it means that we are done trying with ether positive (notFound=false) result
@@ -351,7 +351,7 @@ class Contact {
      * Helper function to execute callback when contact is loaded.
      * Executes immediately if already loaded.
      */
-    whenLoaded(callback) {
+    whenLoaded(callback: (contact: Contact) => void) {
         // it is important for this to be async
         when(
             () => !this.loading && getContactStore().myContacts.loaded,

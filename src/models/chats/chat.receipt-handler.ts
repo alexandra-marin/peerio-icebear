@@ -70,7 +70,7 @@ class ChatReceiptHandler {
             if (r.chatPosition >= this.pendingReceipt) {
                 // ups, keg has a bigger position then we are trying to save
                 this.pendingReceipt = null;
-                return Promise.resolve();
+                return null;
             }
             r.chatPosition = this.pendingReceipt;
             return r

@@ -1,5 +1,6 @@
 import ChatPendingDM from './chat-pending-dm';
 import { ChatStore } from './chat-store';
+import Chat from './chat';
 
 class ChatStorePending {
     constructor(store: ChatStore) {
@@ -8,7 +9,7 @@ class ChatStorePending {
 
     store: ChatStore;
 
-    add(username, email, received, isAutoImport = false) {
+    add(username: string, email: string, received: boolean, isAutoImport = false) {
         // edge case: if the chat list loaded before invites
         // and there was already a DM created
         if (this.store.directMessages.find(s => s.dmPartnerUsername === username)) {
@@ -19,7 +20,7 @@ class ChatStorePending {
         this.store.addChat(pendingDM);
     }
 
-    onChatAdded(chat) {
+    onChatAdded(chat: Chat | ChatPendingDM) {
         // TODO: invitation logic for channel will go here, too
         if (chat.isChannel) return;
         // we're not gonna remove invites we just added

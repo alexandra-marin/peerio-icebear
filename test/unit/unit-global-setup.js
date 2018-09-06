@@ -10,6 +10,10 @@ const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 const { Promise } = require('bluebird');
 
+const NodeFileStream = require('../../src/models/files/node-file-stream').default;
+const config = require('../../src/config').default;
+config.FileStream = NodeFileStream;
+
 chai.should();
 chai.use(chaiAsPromised);
 

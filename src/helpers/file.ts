@@ -34,7 +34,7 @@ const fileIconTypes = {
     ai: 'ai',
     psd: 'psd'
 };
-function createFileType(ext, type) {
+function createFileType(ext: string, type: string) {
     fileIconTypes[ext] = type;
 }
 ['bmp', 'gif', 'jpeg', 'jpg', 'png', 'svg', 'tif', 'tiff'].forEach(ext =>
@@ -62,7 +62,7 @@ export function getFileIconType(ext: string): string {
 
 const IMAGE_EXTS = { png: true, jpg: true, jpeg: true, bmp: true, gif: true };
 
-export function isImage(ext) {
+export function isImage(ext: string) {
     return !!IMAGE_EXTS[ext.toLowerCase().trim()];
 }
 

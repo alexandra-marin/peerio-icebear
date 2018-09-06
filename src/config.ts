@@ -29,7 +29,7 @@ class UploadConfig {
      * Is not supposed to be changed ever.
      * If you do change it for some reason - remember to restart paused uploads as file chunk size might change.
      */
-    get chunkSizes() {
+    get chunkSizes(): Array<{ maxFileSize: null | number; chunkSize: number }> {
         return [
             // up to ~10Mb file
             { maxFileSize: 192 * 1024 * 54, chunkSize: 192 * 1024 },

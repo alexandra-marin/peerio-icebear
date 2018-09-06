@@ -112,10 +112,7 @@ export default class CacheEngineBase<TValue> {
 
     name: string;
     keyPath: string;
-    /**
-     * {boolean}
-     */
-    @observable isOpen;
+    @observable isOpen: boolean;
 
     async open() {
         // not the best design, if we invoke reset for meta db it's gonna lock,

@@ -10,6 +10,7 @@ export SHOW_APP_LOGS=0
 if [ $CI ]
 then
     if [ $CIRCLE_BRANCH == 'master' ] || [ $CIRCLE_BRANCH == 'dev' ]
+    then
         tags='not @off'
     else
         tags='not @off and not @long'

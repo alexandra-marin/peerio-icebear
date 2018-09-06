@@ -177,7 +177,7 @@ export class ChatStore {
      * List of chats that don't belong to a space
      */
     @computed
-    get nonSpaceRooms() {
+    get nonSpaceRooms(): Chat[] {
         return this.allRooms.filter(c => !c.isInSpace);
     }
 

@@ -131,7 +131,7 @@ export class TofuStore {
                         },
                         false
                     ),
-                null,
+                undefined,
                 10
             );
         } catch (err) {

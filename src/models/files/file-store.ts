@@ -176,7 +176,7 @@ export class FileStore extends FileStoreBase {
                 file.format = file.latestFormat;
                 file.descriptorKey = file.blobKey;
                 this.migrationQueue.addTask(() =>
-                    retryUntilSuccess(() => file.saveToServer(), null, 2)
+                    retryUntilSuccess(() => file.saveToServer(), undefined, 2)
                 );
             }
         }

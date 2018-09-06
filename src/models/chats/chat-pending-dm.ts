@@ -59,9 +59,7 @@ class ChatPendingDM extends Chat {
         return true;
     }
 
-    get isInvite() {
-        return true;
-    }
+    isInvite = true;
 
     // To prevent startChat from returning ChatPendingDM instance
     hasSameParticipants() {

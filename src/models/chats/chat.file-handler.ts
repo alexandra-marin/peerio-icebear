@@ -26,7 +26,7 @@ class ChatFileHandler {
     maxUpdateId = '';
     copyingFiles: boolean;
 
-    onFileDigestUpdate = async (_kegDbId, digestEnsured) => {
+    onFileDigestUpdate = async (_kegDbId: string, digestEnsured: boolean) => {
         const msgDigest = tracker.getDigest(this.chat.id, 'file');
         this.maxUpdateId = msgDigest.maxUpdateId;
         if (this.knownUpdateId < msgDigest.knownUpdateId)

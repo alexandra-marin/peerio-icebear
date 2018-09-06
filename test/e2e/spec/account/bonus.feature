@@ -15,7 +15,7 @@ Feature: account storage bonus
         Then I unlock 100MB of storage
         When I upload an avatar
         Then I unlock 100MB of storage
-        When I create a room 
+        When I create a room
         Then I unlock 100MB of storage
         When I install the mobile app
         Then I unlock 100MB of storage

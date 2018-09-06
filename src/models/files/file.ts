@@ -493,9 +493,9 @@ export default class File extends Keg<IFilePayload, IFileProps> {
             format: this.descriptorFormat,
             signature,
             signedBy: getUser().username,
-            // to be filled by caller
-            size: 0,
-            chunkSize: 0,
+            // to be filled by caller, server can accept or reject these props based on descriptor version
+            size: undefined as number,
+            chunkSize: undefined as number,
             version: undefined as number
         };
         return descriptor;

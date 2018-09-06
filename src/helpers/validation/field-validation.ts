@@ -3,7 +3,7 @@
  */
 
 import { reaction, extendObservable, computed } from 'mobx';
-import userValidators from './user-validators';
+export { default as validators } from './user-validators';
 
 interface IValidationStore {
     byName: object;
@@ -25,7 +25,7 @@ interface IValidator {
  * in peerio-desktop, the ValidatedInput can be used
  *
  */
-function addValidation(
+export function addValidation(
     store: IValidationStore,
     fieldName: string,
     validatorOrArray: Array<IValidator> | IValidator,
@@ -135,8 +135,3 @@ function addValidation(
         true
     );
 }
-
-export default {
-    validators: userValidators,
-    addValidation
-};

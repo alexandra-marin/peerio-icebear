@@ -147,7 +147,7 @@ export default class FileDownloader extends FileProcessor {
         if (this.partialChunkSize) {
             chunk = new Uint8Array(
                 chunk.buffer,
-                this.partialChunkSize,
+                chunk.byteOffset + this.partialChunkSize,
                 chunk.length - this.partialChunkSize
             );
             this.partialChunkSize = 0;

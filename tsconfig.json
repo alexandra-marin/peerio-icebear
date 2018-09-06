@@ -12,10 +12,7 @@
     "noImplicitAny": false, // TODO: enable (default enabled under `strict`, so just remove this line)
     "strictNullChecks": false, // TODO: enable (default enabled under `strict`, so just remove this line)
     "lib": ["dom", "esnext"],
-    "baseUrl": ".",
-    "paths": {
-      "~/*": ["src/*"]
-    }
+    "baseUrl": "."
   },
   "include": ["src/**/*", "test/**/*"]
 }

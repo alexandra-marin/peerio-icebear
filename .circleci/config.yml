@@ -6,7 +6,7 @@ test_defaults: &test_defaults
 
 version: 2
 jobs:
-  test1:
+  test:
     <<: *test_defaults
     steps:
       - checkout

@@ -7,13 +7,14 @@ class Beacons extends SyncedKeg {
     }
 
     serializeKegPayload() {
-        return {
-            beacons: this.user.beacons
-        };
+        const beacons = [];
+        this.user.beacons.forEach((value, key) => beacons.push({ key, value }));
+        return { beacons };
     }
 
     deserializeKegPayload(data) {
-        this.user.beacons = data.beacons || new Map();
+        this.user.beacons.clear();
+        data.beacons.forEach(({ key, value }) => this.user.beacons.set(key, value));
     }
 }
 

@@ -9,17 +9,13 @@ Feature: Personal files
         When  I download the uploaded file
         Then  the uploaded and the downloaded files are the same
 
-    Scenario: Upload and download a 3-megabyte file with interruptions
-        Given I upload a 1024 byte file with interruptions
+    @debug
+    @wip
+    @long
+    Scenario: Upload and download a 10-megabyte file with interruptions
+        Given I upload a 10485760 byte file with interruptions
         And   I see the uploaded file in my drive
         When  I download the uploaded file with interruptions
-        Then  the uploaded and the downloaded files are the same
-
-    @long
-    Scenario: Upload and download a 10-megabyte file
-        Given I upload a 10485760 byte file
-        And   I see the uploaded file in my drive
-        When  I download the uploaded file
         Then  the uploaded and the downloaded files are the same
 
     @BOT_NO_ACCOUNT_rename_a_file

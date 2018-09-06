@@ -48,10 +48,15 @@ export function _getUlResumeParams(this: File, path: string) {
  * @param resume - system sets this param to true when it detects unfinished upload
  */
 export function upload(this: File, filePath: string, fileName?: string, resume = false) {
-    if (this.downloading || this.uploading) {
+    if (this.downloading) {
         return Promise.reject(
             new Error(`File is already ${this.downloading ? 'downloading' : 'uploading'}`)
         );
+    }
+    if (this.uploading || this.uploaded) {
+        // resume logic gets confused and calls upload twice sometimes,
+        // it's safer this way in any case, because if we reject second call, download will be cancelled.
+        return Promise.resolve();
     }
     try {
         this.selected = false;
@@ -112,6 +117,7 @@ export function upload(this: File, filePath: string, fileName?: string, resume =
                 return this.uploader.start();
             })
             .then(() => {
+                this.uploaded = true;
                 this._saveUploadEndFact();
                 this._resetUploadState(stream);
             })

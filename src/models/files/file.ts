@@ -27,7 +27,7 @@ const signDetached = sign.signDetached;
 
 // TODO: deleted/unshared files will leak FileData object memory
 // need ideas how to fix it without hooking into file stores
-const fileDataMap = new Map();
+const fileDataMap = new Map<string, FileData>();
 
 interface IFilePayload {}
 
@@ -174,7 +174,7 @@ export default class File extends Keg<IFilePayload, IFileProps> {
     }
 
     @observable uploading = false;
-
+    uploaded: boolean;
     get downloading() {
         return this.data.downloading;
     }

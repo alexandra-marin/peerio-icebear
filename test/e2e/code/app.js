@@ -182,7 +182,7 @@ export default class App {
     }
 
     // This function emulates application termination and should be run after every scenario.
-    stop() {
+    stop(keepTinyDb = false) {
         if (!this.started) throw new Error('The test app is not started.');
         console.log('===== STOPPING TEST APP =====');
         const { when } = require('mobx');
@@ -194,10 +194,14 @@ export default class App {
                 () => !this.world.ice.socket.connected,
                 async () => {
                     this.world.ice.socket.dispose();
-                    console.log('clearing tinydb');
                     // delete TinyDbs
-                    if (this.world.ice.TinyDb.user) await this.world.ice.TinyDb.user.clear();
-                    await this.world.ice.TinyDb.system.clear();
+                    if (!keepTinyDb) {
+                        console.log('clearing tinydb');
+                        if (this.world.ice.TinyDb.user) await this.world.ice.TinyDb.user.clear();
+                        await this.world.ice.TinyDb.system.clear();
+                    } else {
+                        console.log('tinydb not cleared, as requested');
+                    }
                     console.log('clearing modules');
                     this._clearModuleCache();
                     console.log('invoking GC');
@@ -210,8 +214,8 @@ export default class App {
         });
     }
 
-    async restart() {
-        await this.stop();
+    async restart(keepTinyDb = false) {
+        await this.stop(keepTinyDb);
         this.start();
     }
 

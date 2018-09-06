@@ -522,29 +522,33 @@ export class FileStore extends FileStoreBase {
                 warnings.addSevere('error_fileUploadSizeExceeded', 'error_uploadFailed');
                 return;
             }
-            this.uploadQueue.addTask(() => {
-                const ret = keg.upload(filePath, fileName);
-                this.files.unshift(keg);
+            this.uploadQueue
+                .addTask(() => {
+                    const ret = keg.upload(filePath, fileName);
+                    this.files.unshift(keg);
 
-                const disposer = when(
-                    () => keg.deleted,
-                    () => {
-                        this.files.remove(keg);
+                    const disposer = when(
+                        () => keg.deleted,
+                        () => {
+                            this.files.remove(keg);
+                        }
+                    );
+                    when(
+                        () => keg.readyForDownload,
+                        () => {
+                            disposer();
+                        }
+                    );
+                    // move file into folder as soon as we have file id
+                    // it will either move it to local folder or volume
+                    if (folder) {
+                        when(() => keg.version > 1, () => folder.attach(keg));
                     }
-                );
-                when(
-                    () => keg.readyForDownload,
-                    () => {
-                        disposer();
-                    }
-                );
-                // move file into folder as soon as we have file id
-                // it will either move it to local folder or volume
-                if (folder) {
-                    when(() => keg.version > 1, () => folder.attach(keg));
-                }
-                return ret;
-            });
+                    return ret;
+                })
+                .catch(err => {
+                    console.log(err);
+                });
         });
 
         return keg;
@@ -564,7 +568,12 @@ export class FileStore extends FileStoreBase {
                 const file = this.getById(match[1]);
                 if (file) {
                     console.log(`Requesting download resume for ${keys[i]}`);
-                    TinyDb.user.getValue(keys[i]).then(dlInfo => file.download(dlInfo.path, true));
+                    TinyDb.user
+                        .getValue(keys[i])
+                        .then(dlInfo => file.download(dlInfo.path, true))
+                        .catch(err => {
+                            console.error(err);
+                        });
                 } else {
                     TinyDb.user.removeValue(keys[i]);
                 }
@@ -585,9 +594,16 @@ export class FileStore extends FileStoreBase {
                 const file = this.getById(match[1]);
                 if (file) {
                     console.log(`Requesting upload resume for ${keys[i]}`);
-                    TinyDb.user.getValue(keys[i]).then(dlInfo => {
-                        return this.uploadQueue.addTask(() => file.upload(dlInfo.path, null, true));
-                    });
+                    TinyDb.user
+                        .getValue(keys[i])
+                        .then(dlInfo => {
+                            return this.uploadQueue.addTask(() =>
+                                file.upload(dlInfo.path, null, true)
+                            );
+                        })
+                        .catch(err => {
+                            console.error(err);
+                        });
                 }
             }
         });

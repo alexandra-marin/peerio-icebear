@@ -40,13 +40,15 @@ const usernameLength = 16;
 //     /^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$/i;
 
 const serverValidationStore = { request: {} };
+
+export type ValidationContext = 'signup' | 'medcryptor_doctor' | 'medcryptor_admin';
 /**
  * Throttled & promisified call to validation API.
  * @param context - context for field, e.g "signup"
  * @param name - field name
  */
 function _callServer(
-    context: string,
+    context: ValidationContext,
     name: string,
     value: string | number,
     subkey: string
@@ -73,38 +75,38 @@ function _callServer(
     });
 }
 
-function isValidUsernameLength(name) {
+function isValidUsernameLength(name: string) {
     if (name) {
         return Promise.resolve(name.length <= usernameLength);
     }
     return Promise.resolve(false);
 }
 
-function isValidUsername(name) {
+function isValidUsername(name: string) {
     if (name) {
         return Promise.resolve(!!name.match(usernameRegex));
     }
     return Promise.resolve(false);
 }
 
-function isValidEmail(val) {
+function isValidEmail(val: string) {
     return Promise.resolve(emailRegex.test(val));
 }
 
-function isValidMedicalId(val) {
+function isValidMedicalId(val: string) {
     return Promise.resolve(medicalIdRegex.test(val));
 }
 
-function isValid(context, name, subKey?) {
-    return (value, n?) =>
+function isValid(context: ValidationContext, name: string, subKey?: string) {
+    return (value: string, n?: string) =>
         value ? _callServer(context, name || n, value, subKey) : Promise.resolve(false);
 }
 
-function isNonEmptyString(name) {
+function isNonEmptyString(name: string) {
     return Promise.resolve(name.length > 0);
 }
 
-function isValidLoginUsername(name) {
+function isValidLoginUsername(name: string) {
     return (
         isValid('signup', 'username')(name)
             // we get undefined for throttled requests and false for completed
@@ -151,7 +153,7 @@ const isValidMcrAdminAhpra = isValid('medcryptor_admin', 'ahpra');
 const mcrDoctorAhpraAvailability = pair(isValidMcrDoctorAhpra, 'mcr_error_ahrpa');
 const mcrAdminAhpraAvailability = pair(isValidMcrAdminAhpra, 'mcr_error_ahrpa');
 
-const suggestUsername = async (firstName, lastName) => {
+const suggestUsername = async (firstName: string, lastName: string): Promise<string[]> => {
     const initial = getFirstLetter(firstName);
     const maxSuggestions = 3;
     const suggestions = [];

@@ -1,6 +1,7 @@
 import { computed, observable } from 'mobx';
 import config from '../../config';
 import { ChatStore } from './chat-store';
+import Chat from './chat';
 
 class Space {
     constructor(store: ChatStore) {
@@ -13,7 +14,7 @@ class Space {
     store: ChatStore;
 
     @computed
-    get allRooms() {
+    get allRooms(): Chat[] {
         return this.store.allRooms
             .filter(c => c.isInSpace)
             .filter(c => c.chatHead.spaceId === this.spaceId);
@@ -60,14 +61,15 @@ class ChatStoreSpaces {
         if (config.whiteLabel.name !== 'medcryptor') {
             return [];
         }
-
-        // aggregate all spaces by id
-        const spacesMap = new Map<string, Space>(
-            this.roomsWithinSpaces.map(chat => [
-                chat.chatHead.spaceId, // key: the space's id
-                this.getSpaceFrom(chat) // value: the space object
-            ])
+        const mapData = this.roomsWithinSpaces.map(
+            chat =>
+                [
+                    chat.chatHead.spaceId, // key: the space's id
+                    this.getSpaceFrom(chat) // value: the space object
+                ] as [string, Space]
         );
+        // aggregate all spaces by id
+        const spacesMap = new Map<string, Space>(mapData);
 
         // return all unique spaces as array
         const spaces = [...spacesMap.values()].sort((a, b) => {

@@ -157,12 +157,13 @@ export class ChatStore {
 
     /**
      * List of user's channels and invites
+     * TODO: typings/refactor
      */
     @computed
-    get allRooms() {
-        // @ts-ignore continuation of the mess with concatenating very different things
+    get allRooms(): any[] {
+        // continuation of the mess with concatenating very different things
         // probably better let UI do this, extracting interface or making union types seems like too much work for this
-        const allRooms = chatInviteStore.received.concat(this.channels);
+        const allRooms = (chatInviteStore.received as any[]).concat(this.channels);
         allRooms.sort((a, b) => {
             const first = a.name || a.channelName;
             const second = b.name || b.channelName;

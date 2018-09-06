@@ -1,6 +1,6 @@
 import { Given, When, Then } from 'cucumber';
 import { getRandomEmail, getRandomUsername } from '../helpers/random-data';
-import otplib from 'otplib';
+import { otplib } from 'otplib';
 
 Given('I confirm the primary email', { timeout: 4000000 }, async function() {
     await this.confirmEmail(ice.User.current.username, ice.User.current.addresses[0].address);

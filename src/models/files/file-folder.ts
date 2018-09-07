@@ -8,15 +8,22 @@ import * as cryptoUtil from '../../crypto/util';
 import FileStoreBase from './file-store-base';
 import File from './file';
 
-function isLegacyFilePredicate(f) {
+function isLegacyFilePredicate(f: File) {
     return !!(f && f.isLegacy);
 }
-function hasLegacyFilesPredicate(f) {
+function hasLegacyFilesPredicate(f: FileFolder) {
     return !!(f && f.hasLegacyFiles);
 }
 
-class FileFolder {
-    constructor(store, name?, isShared = false) {
+interface FileFolderData {
+    folderId: string;
+    name: string;
+    createdAt: number;
+    folders: FileFolderData[];
+}
+
+export default class FileFolder {
+    constructor(store: FileStoreBase, name?: string, isShared = false) {
         this.store = store;
         this.isRoot = name === '/';
         this.name = this.isRoot ? '' : name;
@@ -34,7 +41,7 @@ class FileFolder {
     // ----
 
     // unique global id (local folder id, or volume id)
-    @observable id = null;
+    @observable id: string = null;
     // to be able to filter easier when files and folders are in the same list
     isFolder = true;
     // to indicate root folder or volume root
@@ -42,13 +49,12 @@ class FileFolder {
     // this folder is a volume root
     // isShared = false;
 
-    @observable name;
-    // string, `parent` property depends on it
-    @observable folderId;
-    // number
-    @observable createdAt;
+    @observable name: string;
+    // `parent` property depends on it
+    @observable folderId: string;
+    @observable createdAt: number;
     // to let systems know that this instance is no good anymore
-    @observable isDeleted;
+    @observable isDeleted: boolean;
 
     @observable convertingToVolume = false;
 
@@ -122,7 +128,7 @@ class FileFolder {
     @observable progress = 0;
     @observable progressMax = 0;
     // optional text for progress actions
-    @observable progressText = null;
+    @observable progressText: string = null;
 
     get progressPercentage() {
         return Math.round(this.progress / (this.progressMax * 0.01 || 1));
@@ -144,7 +150,7 @@ class FileFolder {
 
     @computed
     get filesSortedByDate() {
-        return this.files.sort((f1, f2) => f2.uploadedAt - f1.uploadedAt);
+        return this.files.sort((f1, f2) => f2.uploadedAt.valueOf() - f1.uploadedAt.valueOf());
     }
 
     @computed
@@ -329,10 +335,10 @@ class FileFolder {
 
     // private api
     @action
-    async copyFolderStructureTo(dst, skipRootFolder = false) {
+    async copyFolderStructureTo(dst: FileFolder, skipRootFolder = false) {
         const src = this;
-        const folderIdMap = {}; // mapping between source folder ids and destination
-        const copyFolders = (parentSrc, parentDst) => {
+        const folderIdMap: { [folderId: string]: string } = {}; // mapping between source folder ids and destination
+        const copyFolders = (parentSrc: FileFolder, parentDst: FileFolder) => {
             parentSrc.folders.forEach(f => {
                 const folder = parentDst.createFolder(f.name, null, true);
                 folderIdMap[f.id] = folder.id;
@@ -350,7 +356,7 @@ class FileFolder {
         return dst.store.folderStore.save().return(folderIdMap);
     }
     // creates new child folder
-    createFolder(name, id, skipSave = false) {
+    createFolder(name: string, id: string, skipSave = false) {
         if (this.findFolderByName(name)) {
             warnings.addSevere('error_folderAlreadyExists');
             throw new Error('error_folderAlreadyExists');
@@ -374,7 +380,7 @@ class FileFolder {
         this.store.folderStore.save(); // retry handled inside
     }
 
-    rename(name) {
+    rename(name: string) {
         if (this.parent.findFolderByName(name)) {
             warnings.addSevere('error_folderAlreadyExists');
             return;
@@ -383,14 +389,14 @@ class FileFolder {
         this.store.folderStore.save();
     }
 
-    serialize() {
+    serialize(): FileFolderData {
         // folderId is same as this.id, due to historical reasons.
         const { name, id, createdAt } = this;
         const folders = this.folders.filter(f => !f.isShared).map(f => f.serialize());
         return { name, folderId: id, createdAt, folders };
     }
 
-    deserialize(data, parentId) {
+    deserialize(data: FileFolderData, parentId: string) {
         if (this.id && data.folderId !== this.id) {
             throw new Error('Trying to deserialize folder from a different folder data');
         }
@@ -401,5 +407,3 @@ class FileFolder {
         return this;
     }
 }
-
-export default FileFolder;

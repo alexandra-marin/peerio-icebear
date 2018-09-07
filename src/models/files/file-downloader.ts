@@ -182,13 +182,13 @@ export default class FileDownloader extends FileProcessor {
         });
     };
 
-    _getChunkUrl(from, to): Promise<string> {
+    _getChunkUrl(from: number, to: number): Promise<string> {
         return socket
             .send('/auth/file/url', this.getUrlParams, false)
             .then(f => `${f.url}?rangeStart=${from}&rangeEnd=${to}`);
     }
 
-    _download = (url, expectedSize): Promise<ArrayBuffer> => {
+    _download = (url: string, expectedSize: number): Promise<ArrayBuffer> => {
         const LOADING = 3,
             DONE = 4; // XMLHttpRequest readyState constants.
         const self = this;
@@ -197,7 +197,7 @@ export default class FileDownloader extends FileProcessor {
         let xhr;
         // For refactoring lovers: (yes, @anri, you)
         // - don't convert event handlers to arrow functions
-        const p = new Promise((resolve, reject) => {
+        const p = new Promise<ArrayBuffer>((resolve, reject) => {
             xhr = new XMLHttpRequest();
             self.currentXhrs.push(xhr);
 
@@ -290,6 +290,6 @@ export default class FileDownloader extends FileProcessor {
             }
         });
 
-        return p as Promise<ArrayBuffer>;
+        return p;
     };
 }

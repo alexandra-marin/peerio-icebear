@@ -91,11 +91,10 @@ class FileStoreBase {
     // all files currently loaded in RAM, including volumes, excluding chats
     @computed
     get allFiles() {
-        let ret = this.files;
+        let ret: File[] = this.files;
         if (this.isMainStore) {
             FileStoreBase.instances.forEach(store => {
-                // @ts-ignore can't make this work without refactor
-                ret = ret.concat(store.files.slice());
+                ret = ret.concat(store.files);
             });
         }
         return ret;

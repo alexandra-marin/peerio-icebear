@@ -14,7 +14,7 @@
     "test-build": "rm -rf dist && ./node_modules/.bin/babel src --out-dir dist --source-maps --extensions \".js,.ts\"",
     "mocha": "mocha \"test/unit/**/*.test{.ts,.js}\" --require test/unit/unit-global-setup --timeout 15000",
     "test": "run-s test:ts test:unit test:e2e",
-    "test:ts": "npm run test-build && tsc --noEmit -p test/tsconfig.json",
+    "test:ts": "tsc --noEmit -p test/tsconfig.json",
     "test:unit": "nyc --reporter=text --reporter=html --report-dir=test-results/unit npm run mocha",
     "test:e2e": "./test/e2e/run.sh",
     "test:e2e:wip": "./test/e2e/run-wip.sh",

@@ -21,6 +21,12 @@ import _ from 'lodash';
 import FileFolder from './file-folder';
 import CacheEngineBase from '../../db/cache-engine-base';
 
+export interface IUploadFolder {
+    name: string;
+    files: string[];
+    folders: IUploadFolder[];
+}
+
 export class FileStore extends FileStoreBase {
     constructor() {
         super(null, null, 'main');
@@ -29,6 +35,7 @@ export class FileStore extends FileStoreBase {
 
         when(() => this.allStoresLoaded, this.onFinishLoading);
     }
+
     isMainStore = true;
     knownDescriptorVersion: string;
     descriptorsCache: CacheEngineBase<{
@@ -79,7 +86,7 @@ export class FileStore extends FileStoreBase {
                 : undefined;
             retryUntilSuccess(() => socket.send('/auth/file/ids/fetch', opts, false), taskId).then(
                 async resp => {
-                    await Promise.map(resp, fileId => {
+                    await Promise.map(resp, (fileId: string) => {
                         const file = this.getAnyById(fileId);
                         if (!file) return Promise.resolve();
                         return socket
@@ -135,7 +142,7 @@ export class FileStore extends FileStoreBase {
     );
 
     @action.bound
-    onFileAdded(keg, file) {
+    onFileAdded(keg, file: File) {
         if (!file.format) {
             if (file.fileOwner === User.current.username) {
                 file.migrating = true;
@@ -215,7 +222,7 @@ export class FileStore extends FileStoreBase {
         this.updateDescriptors();
     }
 
-    onAfterUpdate(dirty) {
+    onAfterUpdate(dirty: boolean) {
         if (dirty) {
             this.resumeBrokenDownloads();
             this.resumeBrokenUploads();
@@ -226,8 +233,8 @@ export class FileStore extends FileStoreBase {
      * Finds all loaded file kegs by fileId
      *
      */
-    getAllById(fileId) {
-        const files = [];
+    getAllById(fileId: string) {
+        const files: File[] = [];
         const personal = this.getById(fileId);
         if (personal && personal.loaded && !personal.deleted && personal.version > 1) {
             files.push(personal);
@@ -246,14 +253,14 @@ export class FileStore extends FileStoreBase {
         });
         return files;
     }
-    getAnyById(fileId) {
+    getAnyById(fileId: string) {
         // looking in SELF
         const personal = this.getById(fileId);
         if (personal && personal.loaded && !personal.deleted && personal.version > 1) {
             return personal;
         }
         // looking in volumes
-        let found;
+        let found: File;
         FileStoreBase.instances.values().every(store => {
             found = store.getById(fileId);
             return !found;
@@ -274,7 +281,7 @@ export class FileStore extends FileStoreBase {
         return found;
     }
 
-    loadRecentFilesForChat(kegDbId) {
+    loadRecentFilesForChat(kegDbId: string) {
         return retryUntilSuccess(
             () =>
                 socket.send(
@@ -321,7 +328,7 @@ export class FileStore extends FileStoreBase {
         });
     }
 
-    getCachedRecentFilesForChat(kegDbId) {
+    getCachedRecentFilesForChat(kegDbId: string): File[] {
         const fileMap = this.chatFileMap.get(kegDbId);
         if (!fileMap) {
             return [];
@@ -453,7 +460,7 @@ export class FileStore extends FileStoreBase {
         return file;
     }
 
-    removeCachedChatKeg(chatId, kegId) {
+    removeCachedChatKeg(chatId: string, kegId: string) {
         const map = this.chatFileMap.get(chatId);
         if (!map) return;
         for (const f of map.values()) {
@@ -463,7 +470,7 @@ export class FileStore extends FileStoreBase {
             }
         }
     }
-    updateCachedChatKeg(chatId, keg) {
+    updateCachedChatKeg(chatId: string, keg) {
         const map = this.chatFileMap.get(chatId);
         if (!map) return;
         this.setChatFile(chatId, keg);
@@ -471,15 +478,10 @@ export class FileStore extends FileStoreBase {
 
     /**
      * Uploads a folder reconstructing folder structure in Peerio
-     * @param {{
-     *           name: 'folderName',
-     *           files: ['path', ...],
-     *           folders: [same object recursively]
-     *        }} tree - folder tree info
      * @param folder - existing folder to attach uploading folder to
      */
-    async uploadFolder(tree, folder) {
-        const uploadOneLevel = async (folders, parent) => {
+    async uploadFolder(tree: IUploadFolder, folder: FileFolder): Promise<void> {
+        const uploadOneLevel = async (folders: IUploadFolder[], parent: FileFolder) => {
             // we received a list of folder and we iterate them
             for (const f of folders) {
                 // we create the next folder in list
@@ -487,7 +489,7 @@ export class FileStore extends FileStoreBase {
                 // we upload files in the folder
                 f.files.forEach(file => this.upload(file, null, newParent));
                 // we recursively upload folders in this folder
-                await new Promise((resolve: () => void, reject) => {
+                await new Promise<void>((resolve, reject) => {
                     setTimeout(() => {
                         uploadOneLevel(f.folders, newParent).then(resolve, reject);
                     });

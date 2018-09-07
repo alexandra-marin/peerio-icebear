@@ -12,9 +12,9 @@ export default class FileData {
         this.fileId = fileId;
     }
     @observable size = 0;
-    @observable uploadedAt = null;
-    @observable updatedAt = null;
-    @observable fileOwner;
+    @observable uploadedAt: Date = null;
+    @observable updatedAt: Date = null;
+    @observable fileOwner: string;
     @observable unsanitizedName = '';
     @observable cachingFailed = false;
     @observable readyForDownload = false;
@@ -25,17 +25,17 @@ export default class FileData {
     @observable progressMax = 0;
     @observable cached = false;
     @observable tmpCached = false;
-    @observable originalUploadPath;
+    @observable originalUploadPath: string;
     @observable shared = false;
     @observable sharedBy = '';
     @observable visibleCounter = 0;
     @observable role = '';
-    fileId = null;
+    fileId: string = null;
     descriptorVersion = 0;
     descriptorFormat = 1;
     chunkSize = 0;
-    blobKey = null;
-    blobNonce = null;
+    blobKey: string = null; // b64
+    blobNonce: string = null; // b64
 
     @computed
     get name() {

@@ -113,7 +113,7 @@ class Chat {
     // performance helper, to lookup messages by id and avoid duplicates
     _messageMap = {};
 
-    compareContacts = (c1, c2) => {
+    compareContacts = (c1: Contact, c2: Contact) => {
         if (this.isAdmin(c1) && !this.isAdmin(c2)) return -1;
         if (!this.isAdmin(c1) && this.isAdmin(c2)) return 1;
         return c1.fullNameAndUsername.localeCompare(c2.fullNameAndUsername);
@@ -124,8 +124,8 @@ class Chat {
      * Including current user.
      */
     @computed
-    get allParticipants() {
-        if (!this.db.boot || !this.db.boot.participants) return [] as IObservableArray<Contact>;
+    get allParticipants(): IObservableArray<Contact> {
+        if (!this.db.boot || !this.db.boot.participants) return observable.shallow([]);
         return this.db.boot.participants.sort(this.compareContacts);
     }
 

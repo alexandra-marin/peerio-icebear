@@ -194,7 +194,7 @@ export class ContactStore {
     });
 
     applyInvitesData = action(() => {
-        this.pendingContacts = this.invites.issued as IObservableArray<InvitedContact>;
+        this.pendingContacts = observable.shallow(this.invites.issued);
         when(
             () => this.invites.loaded && tofuStore.loaded && getChatStore().loaded,
             () => {

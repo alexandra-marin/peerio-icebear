@@ -80,7 +80,7 @@ class Message extends Keg<MessagePayload, MessageProps> {
     /**
      * External image urls mentioned in this chat and safe to render in agreement with all settings.
      */
-    @observable externalImages = [] as IObservableArray<ExternalImage>;
+    @observable.shallow externalImages = [] as IObservableArray<ExternalImage>;
 
     /**
      * Indicates if current message contains at least one url.
@@ -323,13 +323,15 @@ class Message extends Keg<MessagePayload, MessageProps> {
 
     serializeKegPayload() {
         this.format = this.latestFormat;
-        this.userMentions = (this.text
-            ? _.uniq(
-                  this.db.participants
-                      .filter(u => this.text.match(u.mentionRegex))
-                      .map(u => u.username)
-              )
-            : []) as IObservableArray<string>;
+        this.userMentions = observable.shallow(
+            this.text
+                ? _.uniq(
+                      this.db.participants
+                          .filter(u => this.text.match(u.mentionRegex))
+                          .map(u => u.username)
+                  )
+                : []
+        );
         const ret: MessagePayload = {
             text: this.text,
             timestamp: this.timestamp.valueOf(),

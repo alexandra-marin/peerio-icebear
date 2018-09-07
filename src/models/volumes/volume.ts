@@ -1,6 +1,4 @@
-import { observable, computed, IObservableArray } from 'mobx';
-// import createMap from '../../helpers/dynamic-array-map';
-// import warnings from '../warnings';
+import { observable, computed } from 'mobx';
 import FileFolder from '../files/file-folder';
 import VolumeKegDb from '../kegs/volume-keg-db';
 import ChatHead from '../chats/chat-head';
@@ -40,7 +38,7 @@ export default class Volume extends FileFolder {
 
     @computed
     get allParticipants() {
-        if (!this.db.boot || !this.db.boot.participants) return [] as IObservableArray<Contact>;
+        if (!this.db.boot || !this.db.boot.participants) return observable.shallow([]);
         return this.db.boot.participants.sort(this.compareContacts);
     }
 

@@ -191,7 +191,7 @@ class ChatInviteStore {
                         });
                     });
                 }
-                this.received = newReceivedInvites as IObservableArray<ReceivedInvite>;
+                this.received = observable.shallow(newReceivedInvites);
             })
         );
     };

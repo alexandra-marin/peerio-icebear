@@ -1,8 +1,7 @@
-import { observable, computed, action, when, IObservableArray } from 'mobx';
+import { observable, computed, action, when } from 'mobx';
 import Chat from '../chats/chat';
 import { getChatStore } from '../../helpers/di-chat-store';
 import { getContactStore } from '../../helpers/di-contact-store';
-import Contact from '../../models/contacts/contact';
 
 /**
  * Pending DM helper class
@@ -30,7 +29,7 @@ class ChatPendingDM extends Chat {
 
     @computed
     get allParticipants() {
-        return [getContactStore().getContact(this.username)] as IObservableArray<Contact>;
+        return observable.shallow([getContactStore().getContact(this.username)]);
     }
     @computed
     get otherParticipants() {

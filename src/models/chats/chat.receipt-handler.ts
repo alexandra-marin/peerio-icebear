@@ -1,4 +1,4 @@
-import { action, reaction, observable, IObservableArray } from 'mobx';
+import { action, reaction, observable } from 'mobx';
 import User from '../user/user';
 import tracker from '../update-tracker';
 import socket from '../../network/socket';
@@ -176,9 +176,7 @@ class ChatReceiptHandler {
                 if (+msg.id !== receipt.chatPosition) continue;
                 // receiptError is already calculated, signature error MIGHT already have been calculated
                 if (receipt.receiptError || receipt.signatureError) continue;
-                msg.receipts =
-                    msg.receipts ||
-                    ([] as IObservableArray<{ username: string; receipt: ReadReceipt }>);
+                msg.receipts = msg.receipts || observable.shallow([]);
                 msg.receipts.push({ username, receipt });
             }
         }

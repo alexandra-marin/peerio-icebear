@@ -125,7 +125,7 @@ class Chat {
      */
     @computed
     get allParticipants(): IObservableArray<Contact> {
-        if (!this.db.boot || !this.db.boot.participants) return observable.shallow([]);
+        if (!this.db.boot || !this.db.boot.participants) return observable.shallowArray([]);
         return this.db.boot.participants.sort(this.compareContacts);
     }
 

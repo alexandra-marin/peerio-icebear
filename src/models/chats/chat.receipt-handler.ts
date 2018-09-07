@@ -176,7 +176,7 @@ class ChatReceiptHandler {
                 if (+msg.id !== receipt.chatPosition) continue;
                 // receiptError is already calculated, signature error MIGHT already have been calculated
                 if (receipt.receiptError || receipt.signatureError) continue;
-                msg.receipts = msg.receipts || observable.shallow([]);
+                msg.receipts = msg.receipts || observable.shallowArray([]);
                 msg.receipts.push({ username, receipt });
             }
         }

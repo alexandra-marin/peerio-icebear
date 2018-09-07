@@ -112,7 +112,7 @@ class SharedKegDb implements IKegDb {
      */
     @computed
     get participants(): IObservableArray<Contact> {
-        return (this.boot && this.boot.participants) || observable.shallow([]);
+        return (this.boot && this.boot.participants) || observable.shallowArray([]);
     }
 
     /**
@@ -204,7 +204,7 @@ class SharedKegDb implements IKegDb {
                     // (rooms are all in new format from the start)
                     // Migrating boot keg
                     if (!boot.format) {
-                        boot.participants = observable.shallow(this._metaParticipants);
+                        boot.participants = observable.shallowArray(this._metaParticipants);
                         //     // prevent spamming server on bootkeg migration
                         //     return Promise.delay(Math.round(Math.random() * 3000 + 2000))
                         //         .then(() => Contact.ensureAllLoaded(boot.participants))

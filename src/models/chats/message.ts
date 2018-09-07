@@ -323,7 +323,7 @@ class Message extends Keg<MessagePayload, MessageProps> {
 
     serializeKegPayload() {
         this.format = this.latestFormat;
-        this.userMentions = observable.shallow(
+        this.userMentions = observable.shallowArray(
             this.text
                 ? _.uniq(
                       this.db.participants

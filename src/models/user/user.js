@@ -128,6 +128,13 @@ class User {
     @observable trustedDevice = undefined;
 
     /**
+     * UI beacons
+     * @type {Map<beaconName: string, seen: bool>}
+     */
+    @observable beacons = observable.shallowMap();
+    /**
+
+    /**
      * Computed `firstName+' '+lastName`
      * @type {string}
      */

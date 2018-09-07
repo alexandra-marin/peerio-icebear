@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "esnext",
     "experimentalDecorators": true,
-    "allowJs": true,
+    "allowJs": false,
     "moduleResolution": "node",
     "module": "commonjs",
     "esModuleInterop": true,

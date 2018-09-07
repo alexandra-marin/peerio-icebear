@@ -71,6 +71,7 @@ export default {
     SYNC_CONTACTS: 'Sync Contacts',
     TERMS_OF_SERVICE: 'Terms Of Service',
     TERMS_OF_USE: 'Terms Of Use',
+    TERMS_OF_USE_SUMMARY: 'Terms Of Use Summary',
     TERMS_TOP_DRAWER: 'Terms of Use Top Drawer',
     TEXT_INPUT: 'Text Input',
     TOGGLE_VISIBILITY: 'Toggle Visibility',

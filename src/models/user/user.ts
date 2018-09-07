@@ -69,7 +69,9 @@ export default class User {
     saveSettings: (updateFunction: (settingsKeg: Settings) => void) => Promise<void>;
     loadProfile: () => void;
     loadQuota: () => void;
-    saveProfile: () => void;
+    loadBeacons: () => void;
+    saveProfile: () => Promise<void>;
+    saveBeacons: () => Promise<void>;
     resendEmailConfirmation: (email: string) => Promise<void>;
     removeEmail: (email: string) => Promise<void>;
     addEmail: (email: string) => void;
@@ -151,6 +153,13 @@ export default class User {
      *
      */
     @observable trustedDevice: boolean;
+
+    /**
+     * UI beacons
+     * @type {Map<beaconName: string, seen: bool>}
+     */
+    @observable beacons = observable.shallowMap<boolean>();
+    /**
 
     /**
      * Computed `firstName+' '+lastName`

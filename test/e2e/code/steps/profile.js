@@ -110,3 +110,15 @@ When('I delete my avatar', function() {
 Then('my avatar should be empty', function() {
     ice.contactStore.currentUser.hasAvatar.should.be.false;
 });
+
+Then('I am shown a beacon', async function() {
+    ice.User.current.beacons.set('mobile_files_zero', true);
+    ice.User.current.beacons.set('desktop_files_zero', false);
+
+    await ice.User.current.saveBeacons();
+});
+
+Then('the beacon appears as seen', function() {
+    ice.User.current.beacons.get('mobile_files_zero').should.be.true;
+    ice.User.current.beacons.get('desktop_files_zero').should.be.false;
+});

@@ -11,11 +11,14 @@ import contactStore from '../contacts/contact-store';
 import AccountVersion from './account-version';
 import { getFileStore } from '../../helpers/di-file-store';
 import User from './user';
+import Beacons from './beacons';
+
 //
 // These are still members of User class, they're just split across several mixins to make User file size sensible.
 //
 export default function mixUserProfileModule(this: User) {
     const _profileKeg = new Profile(this);
+    const _beaconsKeg = new Beacons(this);
     const _quotaKeg = new Quota(this);
     this.accountVersionKeg = new AccountVersion(this);
     this.settings = new Settings(this);
@@ -61,6 +64,10 @@ export default function mixUserProfileModule(this: User) {
         loadSimpleKeg(_quotaKeg);
     };
 
+    this.loadBeacons = () => {
+        loadSimpleKeg(_beaconsKeg);
+    };
+
     function loadSimpleKeg(keg) {
         if (keg.loading) return;
         if (keg.loaded) {
@@ -78,17 +85,25 @@ export default function mixUserProfileModule(this: User) {
     tracker.subscribeToKegUpdates('SELF', 'profile', this.loadProfile);
     tracker.subscribeToKegUpdates('SELF', 'quotas', this.loadQuota);
     tracker.subscribeToKegUpdates('SELF', 'settings', this.loadSettings);
+    tracker.subscribeToKegUpdates('SELF', 'beacons', this.loadBeacons);
 
     tracker.onUpdated(() => {
         this.loadProfile();
         this.loadQuota();
         this.loadSettings();
+        this.loadBeacons();
     });
 
     this.saveProfile = function() {
         return _profileKeg.saveToServer().tapCatch(err => {
             console.error(err);
             warnings.add('error_saveSettings');
+        });
+    };
+
+    this.saveBeacons = function() {
+        return _beaconsKeg.saveToServer().tapCatch(err => {
+            console.error(err);
         });
     };
 

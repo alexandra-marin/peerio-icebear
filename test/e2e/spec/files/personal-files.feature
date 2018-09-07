@@ -9,8 +9,6 @@ Feature: Personal files
         When  I download the uploaded file
         Then  the uploaded and the downloaded files are the same
 
-    @debug
-    @wip
     @long
     Scenario: Upload and download a 10-megabyte file with interruptions
         Given I upload a 10485760 byte file with interruptions

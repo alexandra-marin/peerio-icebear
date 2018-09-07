@@ -36,6 +36,7 @@ const VALIDATION_THROTTLING_PERIOD_MS = 400;
 const usernameRegex = /^\w{1,16}$/;
 const emailRegex = /^[^ ]+@[^ ]+/i;
 const medicalIdRegex = /MED\d{10}/i;
+const usernameLength = 16;
 // const phoneRegex =
 //     /^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$/i;
 
@@ -48,8 +49,8 @@ const serverValidationStore = { request: {} };
  * @param {*} value
  * @returns {Promise<boolean>}
  */
-function _callServer(context, name, value) {
-    const key = `${context}::${name}`;
+function _callServer(context, name, value, subkey) {
+    const key = `${context}::${name}::${subkey}`;
     const pending = serverValidationStore.request[key];
     if (pending) {
         clearTimeout(pending.timeout);
@@ -71,6 +72,13 @@ function _callServer(context, name, value) {
     });
 }
 
+function isValidUsernameLength(name) {
+    if (name) {
+        return Promise.resolve(name.length <= usernameLength);
+    }
+    return Promise.resolve(false);
+}
+
 function isValidUsername(name) {
     if (name) {
         return Promise.resolve(!!name.match(usernameRegex));
@@ -86,17 +94,14 @@ function isValidMedicalId(val) {
     return Promise.resolve(medicalIdRegex.test(val));
 }
 
-function isValid(context, name) {
-    return (value, n) => (value ? _callServer(context, name || n, value) : Promise.resolve(false));
+function isValid(context, name, subKey) {
+    return (value, n) =>
+        value ? _callServer(context, name || n, value, subKey) : Promise.resolve(false);
 }
 
 function isNonEmptyString(name) {
     return Promise.resolve(name.length > 0);
 }
-
-// function isValidPhone(val) {
-//     return Promise.resolve(phoneRegex.test(val));
-// }
 
 function isValidLoginUsername(name) {
     return (
@@ -126,12 +131,14 @@ function pair(action, message) {
 
 const isValidSignupEmail = isValid('signup', 'email');
 const isValidSignupUsername = isValid('signup', 'username');
+const isValidSignupUsernameSuggestion = isValid('signup', 'username', 'suggestion');
 const isValidSignupFirstName = isValid('signup', 'firstName');
 const isValidSignupLastName = isValid('signup', 'lastName');
 const emailFormat = pair(isValidEmail, 'error_invalidEmail');
 const medicalIdFormat = pair(isValidMedicalId, 'mcr_error_ahrpa');
 const emailAvailability = pair(isValidSignupEmail, 'error_addressNotAvailable');
 const usernameFormat = pair(isValidUsername, 'error_usernameBadFormat');
+const usernameLengthCheck = pair(isValidUsernameLength, 'error_usernameLengthExceeded');
 const usernameAvailability = pair(isValidSignupUsername, 'error_usernameNotAvailable');
 const usernameExistence = pair(isValidLoginUsername, 'error_usernameNotFound');
 const stringExists = pair(isNonEmptyString, 'error_fieldRequired');
@@ -153,17 +160,24 @@ const suggestUsername = async (firstName, lastName) => {
         `${firstName}${lastName}`,
         `${firstName}_${lastName}`,
         `${lastName}`,
-        `${firstName}${initial}${lastName}`,
-        `${firstName}${lastName}${initial}`,
-        `${firstName}${lastName}_${lastName}`,
-        `${firstName}_${lastName}${lastName}`
+        `${initial}${lastName}`,
+        `${lastName}${initial}`
     ];
 
-    for (const option of options) {
+    const validOptions = options.map(x =>
+        x
+            .trim()
+            .replace(/[^a-z|A-Z|0-9|_]/g, '')
+            .substring(0, usernameLength - 1)
+            .toLocaleLowerCase()
+    );
+
+    for (const option of validOptions) {
         if (suggestions.length >= maxSuggestions) break;
-        const available = await isValidSignupUsername(option);
+        const normalized = option.toLocaleLowerCase();
+        const available = await isValidSignupUsernameSuggestion(normalized);
         if (available) {
-            suggestions.push(option);
+            suggestions.push(normalized);
         }
     }
 
@@ -185,7 +199,7 @@ const validators = {
     firstNameReserved,
     lastNameReserved,
     email: [emailFormat, emailAvailability],
-    username: [usernameFormat, usernameAvailability],
+    username: [usernameLengthCheck, usernameFormat, usernameAvailability],
     usernameLogin: [usernameFormat, usernameExistence],
     firstName: [stringExists, firstNameReserved],
     lastName: [stringExists, lastNameReserved],

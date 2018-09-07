@@ -36,15 +36,15 @@ Then('I should have default account settings', async function() {
 });
 
 When('I change my account settings', async function() {
-    const { settings } = ice.User.current;
-    settings.contactNotifications = true;
-    settings.contactRequestNotifications = true;
-    settings.messageNotifications = false;
-    settings.errorTracking = true;
-    settings.dataCollection = true;
-    settings.subscribeToPromoEmails = true;
-    await ice.User.current.saveSettings();
-    return this.waitFor(() => settings.version === 2);
+    await ice.User.current.saveSettings(settings => {
+        settings.contactNotifications = true;
+        settings.contactRequestNotifications = true;
+        settings.messageNotifications = false;
+        settings.errorTracking = true;
+        settings.dataCollection = true;
+        settings.subscribeToPromoEmails = true;
+    });
+    return this.waitFor(() => ice.User.current.settings.version === 2);
 });
 
 Then('my account settings are changed', async function() {

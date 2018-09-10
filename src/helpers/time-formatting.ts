@@ -1,7 +1,8 @@
 import { t } from 'peerio-translator';
-const moment = require('moment');
-const defaultClock = require('./observable-clock').default;
+import moment from 'moment';
+import Clock from './observable-clock';
 
+const defaultClock = Clock.default;
 // 21 hour limit for displaying relative timestamp (because moment.js says '1 day' starting from 21h)
 const hour = 60 * 60 * 1000;
 const day = 24 * hour;

@@ -289,13 +289,11 @@ export default new class {
     user = {
         /**
          * Max number of characters in username
-         * @type {number}
          */
         maxUsernameLength: 16,
 
         /**
          * Max number of characters in first name or last name
-         * @type {number}
          */
         maxNameLength: 40
     };

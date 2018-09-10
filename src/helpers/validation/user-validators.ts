@@ -29,8 +29,8 @@
  *
  */
 import socket from '../../network/socket';
-const { getFirstLetter } = require('../string');
-const config = require('../../config');
+import { getFirstLetter } from '../string';
+import config from '../../config';
 
 const VALIDATION_THROTTLING_PERIOD_MS = 400;
 const usernameRegex = /^\w{1,16}$/;

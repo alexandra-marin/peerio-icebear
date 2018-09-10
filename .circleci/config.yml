@@ -6,52 +6,14 @@ test_defaults: &test_defaults
 
 version: 2
 jobs:
-  test1:
+  test:
     <<: *test_defaults
     steps:
       - checkout
       - run: npm install
       - run: npm run validate
       - run: npm run test:unit
-      - store_artifacts:
-          path: test-results
-          prefix: test-results
-
-  test2:
-    <<: *test_defaults
-    steps:
-      - checkout
-      - run: npm install
-      - run: ./test/e2e/run.sh 1 4
-      - store_artifacts:
-          path: test-results
-          prefix: test-results
-  test3:
-    <<: *test_defaults
-    steps:
-      - checkout
-      - run: npm install
-      - run: ./test/e2e/run.sh 2 4
-      - store_artifacts:
-          path: test-results
-          prefix: test-results
-
-  test4:
-    <<: *test_defaults
-    steps:
-      - checkout
-      - run: npm install
-      - run: ./test/e2e/run.sh 3 4
-      - store_artifacts:
-          path: test-results
-          prefix: test-results
-
-  test5:
-    <<: *test_defaults
-    steps:
-      - checkout
-      - run: npm install
-      - run: ./test/e2e/run.sh 4 4
+      - run: npm run test:e2e
       - store_artifacts:
           path: test-results
           prefix: test-results
@@ -81,18 +43,10 @@ workflows:
   version: 2
   test-deploy:
     jobs:
-      - test1
-      - test2
-      - test3
-      - test4
-      - test5
+      - test
       - deploy:
           requires:
-            - test1
-            - test2
-            - test3
-            - test4
-            - test5
+            - test
           filters:
             branches:
               only:

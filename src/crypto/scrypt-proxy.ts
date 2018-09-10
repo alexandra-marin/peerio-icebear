@@ -3,7 +3,9 @@
  */
 
 // default implementation is the normal one
-let scryptImplementation = require('scrypt-async');
+const defaultScryptImplementation = require('scrypt-async');
+
+let scryptImplementation: Scrypt = defaultScryptImplementation;
 
 export interface ScryptConfig {
     /**

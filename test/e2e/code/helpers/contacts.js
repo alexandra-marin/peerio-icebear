@@ -1,6 +1,6 @@
-const { getRandomEmail } = require('../helpers/random-data');
+import { getRandomEmail } from './random-data';
 
-class ContactsHelper {
+export default class ContactsHelper {
     constructor(world) {
         this.world = world;
     }
@@ -22,5 +22,3 @@ class ContactsHelper {
         await this.world.ice.contactStore.invite(this.world.invitedEmail, template);
     };
 }
-
-module.exports = ContactsHelper;

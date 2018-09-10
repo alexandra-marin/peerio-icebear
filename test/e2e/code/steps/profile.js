@@ -1,12 +1,7 @@
-const { Given, When, Then } = require('cucumber');
-const { getRandomEmail } = require('../helpers/random-data');
-const {
-    getTempFileName,
-    filesEqual,
-    downloadFile,
-    createRandomTempFile
-} = require('../helpers/files');
-const fs = require('fs');
+import { Given, When, Then } from 'cucumber';
+import { getRandomEmail } from '../helpers/random-data';
+import { getTempFileName, filesEqual, downloadFile, createRandomTempFile } from '../helpers/files';
+import fs from 'fs';
 
 /**
  * Creates a random file and populates an array with it

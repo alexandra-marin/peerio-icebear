@@ -8,5 +8,5 @@ npm run test-build
 node --expose-gc ./node_modules/.bin/cucumber-js test/e2e/spec \
         -r test/e2e/code \
         --format node_modules/cucumber-pretty \
-        --tags '@wip and not @off and not @long' \
+        --tags '@wip' \
         --exit

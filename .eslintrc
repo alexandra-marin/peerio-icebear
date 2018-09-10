@@ -1,10 +1,7 @@
 {
     "root": true,
     "parser": "babel-eslint",
-    "extends": [
-        "peerio/index.base.js",
-        "prettier"
-    ],
+    "extends": ["peerio/index.base.js", "prettier"],
     "rules": {
         "no-labels": 0,
         "no-mixed-operators": 0,
@@ -16,7 +13,9 @@
         "prefer-destructuring": 0,
         "no-await-in-loop": 0,
         "import/extensions": 0,
-        "import/newline-after-import": 0
+        "import/newline-after-import": 0,
+        "import/first": 0,
+        "import/no-mutable-exports": 0
     },
     "globals": {
         "TextEncoder": false,
@@ -31,10 +30,7 @@
     "settings": {
         "import/resolver": {
             "node": {
-                "extensions": [
-                    ".js",
-                    ".ts"
-                ]
+                "extensions": [".js", ".ts"]
             }
         }
     }

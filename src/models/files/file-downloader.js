@@ -3,6 +3,7 @@ const secret = require('../../crypto/secret');
 const config = require('../../config');
 const FileProcessor = require('./file-processor');
 const { DisconnectedError } = require('../../errors');
+const { retryUntilSuccess } = require('../../helpers/retry');
 
 const { CHUNK_OVERHEAD } = config;
 
@@ -111,12 +112,16 @@ class FileDownloader extends FileProcessor {
 
         // Start download.
         this.activeDownloads++;
-        const promise = new Promise((resolve, reject) => {
-            this._getChunkUrl(pos, pos + size - 1)
-                .then(url => this._download(url, size))
-                .then(resolve)
-                .catch(reject);
-        });
+        const promise = retryUntilSuccess(
+            () => {
+                if (this.stopped) return Promise.reject(new Error('User cancelled download'));
+                return this._getChunkUrl(pos, pos + size - 1).then(url =>
+                    this._download(url, size)
+                );
+            },
+            Math.random(),
+            5
+        );
 
         // Add download result processing to the chain.
         this.downloadChain = this.downloadChain
@@ -206,7 +211,7 @@ class FileDownloader extends FileProcessor {
 
             const trySend = () => {
                 // had to do this bcs uploaded blob takes some time to propagate through cloud
-                if (retryCount++ >= 5) return false;
+                if (self.stopped || retryCount++ >= 5) return false;
                 if (retryCount > 0) {
                     console.log('Blob download retry attempt: ', retryCount, url);
                 }
@@ -236,6 +241,13 @@ class FileDownloader extends FileProcessor {
                 if (this.status === 0) {
                     console.error('Blob download cancelled.');
                     reject(new Error(`Blob download cancelled: ${url}`));
+                    return;
+                }
+                if (this.status === 423) {
+                    // Reject and do not retry XHR request, since this chunk
+                    // download should be retried from the beginning by getting
+                    // a new URL token.
+                    reject(new Error(`Blob download got 423 error: ${url}`));
                     return;
                 }
                 if (

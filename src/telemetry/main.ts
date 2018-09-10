@@ -45,7 +45,7 @@ export async function send(eventObj: EventObject): Promise<void> {
             Device: config.isMobile ? 'Mobile' : 'Desktop',
             'Version Number': 1, // refers to our own tracker library versioning,
             'App Version': config.appVersion,
-            token: serverSettings.mixPanelClientToken
+            token: serverSettings.mixPanelClientToken // TODO: await here so events can't send before token available
         };
 
         // Marketing wants all items (property names and values) to be in Title Case, but this breaks code style.

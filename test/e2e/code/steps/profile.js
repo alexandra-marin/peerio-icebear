@@ -1,12 +1,7 @@
-const { Given, When, Then } = require('cucumber');
-const { getRandomEmail } = require('../helpers/random-data');
-const {
-    getTempFileName,
-    filesEqual,
-    downloadFile,
-    createRandomTempFile
-} = require('../helpers/files');
-const fs = require('fs');
+import { Given, When, Then } from 'cucumber';
+import { getRandomEmail } from '../helpers/random-data';
+import { getTempFileName, filesEqual, downloadFile, createRandomTempFile } from '../helpers/files';
+import fs from 'fs';
 
 /**
  * Creates a random file and populates an array with it
@@ -114,4 +109,16 @@ When('I delete my avatar', function() {
 
 Then('my avatar should be empty', function() {
     ice.contactStore.currentUser.hasAvatar.should.be.false;
+});
+
+Then('I am shown a beacon', async function() {
+    ice.User.current.beacons.set('mobile_files_zero', true);
+    ice.User.current.beacons.set('desktop_files_zero', false);
+
+    await ice.User.current.saveBeacons();
+});
+
+Then('the beacon appears as seen', function() {
+    ice.User.current.beacons.get('mobile_files_zero').should.be.true;
+    ice.User.current.beacons.get('desktop_files_zero').should.be.false;
 });

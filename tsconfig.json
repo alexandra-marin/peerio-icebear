@@ -2,8 +2,9 @@
   "compilerOptions": {
     "target": "esnext",
     "experimentalDecorators": true,
-    "allowJs": true,
+    "allowJs": false,
     "moduleResolution": "node",
+    "module": "commonjs",
     "esModuleInterop": true,
     "strict": true,
     "noUnusedLocals": true,
@@ -11,10 +12,7 @@
     "noImplicitAny": false, // TODO: enable (default enabled under `strict`, so just remove this line)
     "strictNullChecks": false, // TODO: enable (default enabled under `strict`, so just remove this line)
     "lib": ["dom", "esnext"],
-    "baseUrl": ".",
-    "paths": {
-      "~/*": ["src/*"]
-    }
+    "baseUrl": "."
   },
   "include": ["src/**/*", "test/**/*"]
 }

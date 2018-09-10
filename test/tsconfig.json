@@ -1,0 +1,16 @@
+// This is needed because if  "~/*": ["../src/*"] is set in the root tsconfig, vscode automatically inserts
+// ~/ prefixed imports and it breaks sdk compilation in desktop and mobile.
+// At the same time, getting rid of ~/ and using relative paths from tests is also not feasible,
+// because in devtime they have to point to /src but in runtime to /dist
+//
+// TODO: This solution leads to 'module not found' errors in vscode for imports in tests, because vscode doesn't see
+// the second tsconfig.json I assume. But if it does, there's no guarantee it will not apply auto prefixing with ~/
+// to all files. Switching to prebuilt sdk should fix this issue.
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "~/*": ["src/*"]
+    }
+  }
+}

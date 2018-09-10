@@ -1,5 +1,4 @@
 #!/bin/bash
-
 set -x
 mkdir -p ./test-results/e2e
 
@@ -10,21 +9,19 @@ export SHOW_APP_LOGS=0
 
 if [ $CI ]
 then
-    tags='not @wip and not @long and not @off'
+    if [ $CIRCLE_BRANCH == 'master' ] || [ $CIRCLE_BRANCH == 'dev' ]
+    then
+        tags='not @off'
+    else
+        tags='not @off and not @long'
+    fi
     export DEFAULT_TIMEOUT=300000
 else
-    tags='not @wip and not @off'
+    tags='not @wip and not @debug and not @off'
     export DEFAULT_TIMEOUT=180000
 fi
 
-if [ $1 ]
-then
-    scenarios=("`${BASH_SOURCE%/*}/split.js $1 $2`")
-else
-    scenarios=test/e2e/spec
-fi
-
-node --expose-gc ./node_modules/.bin/cucumber-js $scenarios \
+node --expose-gc ./node_modules/.bin/cucumber-js test/e2e/spec \
         -r test/e2e/code \
         --format node_modules/cucumber-pretty \
         --format usage:./test-results/e2e/usage.txt \

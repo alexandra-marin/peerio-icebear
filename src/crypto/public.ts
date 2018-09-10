@@ -4,8 +4,7 @@
 
 import * as nacl from 'tweetnacl';
 import * as secret from './secret';
-
-const { DecryptionError } = require('../errors');
+import { DecryptionError } from '../errors';
 
 /**
  * This is a classic variant of decryption function for server compatibility.

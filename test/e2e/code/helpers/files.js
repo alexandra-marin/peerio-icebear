@@ -1,14 +1,14 @@
-const os = require('os');
-const path = require('path');
-const crypto = require('crypto');
-const Promise = require('bluebird');
-const fs = Promise.promisifyAll(require('fs'));
-const https = require('https');
-
+import os from 'os';
+import path from 'path';
+import crypto from 'crypto';
+import Promise from 'bluebird';
+import _fs from 'fs';
+import https from 'https';
+const fs = Promise.promisifyAll(_fs);
 /**
  * Synchronously deletes file at the given path.
  */
-const deleteFile = filename => {
+export const deleteFile = filename => {
     try {
         fs.unlinkSync(filename);
     } catch (err) {
@@ -23,7 +23,7 @@ const deleteFile = filename => {
  * @param {string} [suffix] optional file suffix ('.tmp' by default)
  * @returns {string}
  */
-const getTempFileName = (suffix = '.tmp') => {
+export const getTempFileName = (suffix = '.tmp') => {
     return path.join(os.tmpdir(), crypto.randomBytes(10).toString('hex') + suffix);
 };
 
@@ -36,7 +36,7 @@ const getTempFileName = (suffix = '.tmp') => {
  * @param {string} [suffix] optional file suffix ('.tmp' by default)
  * @returns {Promise<string>} file name
  */
-const createRandomTempFile = async (length, suffix) => {
+export const createRandomTempFile = async (length, suffix) => {
     const name = getTempFileName(suffix);
     const fd = await fs.openAsync(name, 'w');
 
@@ -79,7 +79,7 @@ async function readAll(fd, buffer) {
  * @param {string} filename2 second file path
  * @returns Promise<boolean>
  */
-const filesEqual = async (filename1, filename2) => {
+export const filesEqual = async (filename1, filename2) => {
     let fd1, fd2;
     try {
         fd1 = await fs.openAsync(filename1, 'r');
@@ -117,7 +117,7 @@ const filesEqual = async (filename1, filename2) => {
  * @param {string} url URL to download from
  * @returns Promise<file>
  */
-const downloadFile = (filename, url) => {
+export const downloadFile = (filename, url) => {
     return new Promise((resolve, reject) => {
         const file = fs.createWriteStream(filename);
         https
@@ -131,12 +131,4 @@ const downloadFile = (filename, url) => {
             })
             .on('error', reject);
     });
-};
-
-module.exports = {
-    getTempFileName,
-    createRandomTempFile,
-    deleteFile,
-    filesEqual,
-    downloadFile
 };

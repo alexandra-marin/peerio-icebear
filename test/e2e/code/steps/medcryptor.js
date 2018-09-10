@@ -1,5 +1,5 @@
-const { Given, Then } = require('cucumber');
-const { getRandomUsername, getRandomMcrId } = require('../helpers/random-data');
+import { Given, Then } from 'cucumber';
+import { getRandomUsername, getRandomMcrId } from '../helpers/random-data';
 
 async function createRole(role, world) {
     world.role = role;

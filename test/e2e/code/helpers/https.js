@@ -1,11 +1,11 @@
-const https = require('https');
-const request = require('request');
+import https from 'https';
+import request from 'request';
 /**
  * Makes a GET request, returns a result in a promise.
  * @param {string} url
  * @returns {Promise<string>}
  */
-function getUrl(url) {
+export function getUrl(url) {
     console.log('Requesting url', url);
     return new Promise((resolve, reject) => {
         https
@@ -37,7 +37,7 @@ function getUrl(url) {
     });
 }
 
-function deleteRequest(url) {
+export function deleteRequest(url) {
     console.log('Sending delete request', url);
     return new Promise((resolve, reject) => {
         request.del(url, err => {
@@ -46,5 +46,3 @@ function deleteRequest(url) {
         });
     });
 }
-
-module.exports = { getUrl, deleteRequest };

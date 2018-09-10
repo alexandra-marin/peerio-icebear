@@ -55,7 +55,6 @@ export function b64ToBytes(str: string): Uint8Array {
 
 /**
  * Converts Uint8Array or ArrayBuffer to Base64 string.
- * @param bytes
  * @returns B64 string encoded bytes
  */
 export function bytesToB64(bytes: Uint8Array | ArrayBuffer): string {
@@ -75,13 +74,13 @@ export function bytesToB64(bytes: Uint8Array | ArrayBuffer): string {
  */
 export function bytesToHex(bytes: Uint8Array | ArrayBuffer): string {
     if (bytes instanceof Uint8Array) {
-        return Buffer.from(
-            bytes.buffer as ArrayBuffer,
-            bytes.byteOffset,
-            bytes.byteLength
-        ).toString('hex');
+        return Buffer.from(bytes.buffer as ArrayBuffer, bytes.byteOffset, bytes.byteLength)
+            .toString('hex')
+            .toLowerCase();
     }
-    return Buffer.from(bytes, 0, bytes.byteLength).toString('hex');
+    return Buffer.from(bytes, 0, bytes.byteLength)
+        .toString('hex')
+        .toLowerCase();
 }
 
 /**

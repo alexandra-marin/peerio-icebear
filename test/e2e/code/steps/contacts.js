@@ -1,5 +1,5 @@
-const { Then, When } = require('cucumber');
-const { getRandomUsername } = require('../helpers/random-data');
+import { Then, When } from 'cucumber';
+import { getRandomUsername } from '../helpers/random-data';
 
 Then('I can not find unregistered account by random username', function() {
     const username = getRandomUsername();

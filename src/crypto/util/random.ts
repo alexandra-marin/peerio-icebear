@@ -5,8 +5,8 @@
 import * as convert from './conversion';
 import * as hashing from './hashing';
 
-const globalContext = require('../../helpers/global-context');
-const { InvalidArgumentError } = require('../../errors');
+import globalContext from '../../helpers/global-context';
+import { InvalidArgumentError } from '../../errors';
 
 /**
  * Generates random bytes suitable for crypto use
@@ -14,7 +14,7 @@ const { InvalidArgumentError } = require('../../errors');
  * @returns random bytes array of `num` size
  */
 // eslint-disable-next-line import/no-mutable-exports
-export let getRandomBytes: (num: number) => Buffer | Uint8Array;
+export let getRandomBytes: (num: number) => Uint8Array;
 
 // do we have crypto shim?
 if (globalContext.cryptoShim) {
@@ -103,10 +103,9 @@ export function getRandomNonce(): Uint8Array {
 /**
  * Generates random id bytes.
  * Partially consists of hashed username and timestamp.
- * @param {string} username
- * @returns {Uint8Array} 42 bytes, [16: username+timestamp hash][26: random bytes]
+ * @returns 42 bytes, [16: username+timestamp hash][26: random bytes]
  */
-export function getRandomUserSpecificIdBytes(username) {
+export function getRandomUserSpecificIdBytes(username: string) {
     const id = new Uint8Array(42);
     const hash = hashing.getByteHash(16, convert.strToBytes(username + Date.now().toString()));
     id.set(hash);
@@ -115,20 +114,17 @@ export function getRandomUserSpecificIdBytes(username) {
 }
 
 /**
- * Same as {@link crypto/util:getRandomUserSpecificIdBytes} but returns B64 string
- * @param {string} username
- * @returns {string} id in base64 encoding
+ * Same as getRandomUserSpecificIdBytes but returns B64 string
+ * @returns id in base64 encoding
  */
-export function getRandomUserSpecificIdB64(username) {
+export function getRandomUserSpecificIdB64(username: string): string {
     return convert.bytesToB64(getRandomUserSpecificIdBytes(username));
 }
 
 /**
- * @see crypto/util:getRandomUserSpecificIdBytes
- * @param {string} username
- * @returns {string} id in hex encoding
+ * @returns id in hex encoding
  */
-export function getRandomUserSpecificIdHex(username) {
+export function getRandomUserSpecificIdHex(username: string): string {
     return convert.bytesToHex(getRandomUserSpecificIdBytes(username));
 }
 
@@ -149,9 +145,9 @@ export function getRandomGlobalUrlSafeShortIdB64() {
 
 /**
  * Generates hex string of 10-byte unique random id suitable for personal use (one keg db).
- * @returns {string} 10 bytes id in hex encoding
+ * @returns 10 bytes id in hex encoding
  */
-export function getRandomShortIdHex() {
+export function getRandomShortIdHex(): string {
     const id = new Uint8Array(10);
     // we take last 4 bytes of current date timestamp
     id.set(convert.numberToByteArray(Date.now() >>> 32));
@@ -163,11 +159,8 @@ export function getRandomShortIdHex() {
 /**
  * Calculates deviceId from username and an optional device unique identifier.
  * If device unique identifier is not specified, a random value is used.
- *
- * @param {string} username
- * @param {[string]} deviceUID
  */
-export function getDeviceId(username, deviceUID) {
+export function getDeviceId(username: string, deviceUID?: string) {
     const h = hashing.getHashObject(32, convert.strToBytes(username), 'PRIDevId');
     if (deviceUID && deviceUID.length > 0) {
         h.update(convert.strToBytes(deviceUID));

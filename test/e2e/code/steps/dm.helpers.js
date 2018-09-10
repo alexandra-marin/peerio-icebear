@@ -1,4 +1,4 @@
-async function startDmWithCucumbot() {
+export async function startDmWithCucumbot() {
     const contact = ice.contactStore.getContact(
         (this.cucumbotClient || this.cucumbotServer).username
     );
@@ -13,12 +13,12 @@ async function startDmWithCucumbot() {
     chat.id.should.be.equal(ice.chatStore.activeChat.id);
 }
 
-async function sendMessage(string) {
+export async function sendMessage(string) {
     await this.waitFor(() => ice.chatStore.activeChat && ice.chatStore.activeChat.metaLoaded);
     return ice.chatStore.activeChat.sendMessage(string);
 }
 
-function findIncomingMessage(string) {
+export function findIncomingMessage(string) {
     return this.waitFor(() => {
         if (!ice.chatStore.activeChat) return false;
         const msg = ice.chatStore.activeChat.messages.find(
@@ -28,17 +28,10 @@ function findIncomingMessage(string) {
         return !!msg;
     });
 }
-function findAnyMessage(string) {
+export function findAnyMessage(string) {
     return this.waitFor(() => {
         if (!ice.chatStore.activeChat) return false;
         const msg = ice.chatStore.activeChat.messages.find(m => m.text === string);
         return !!msg;
     });
 }
-
-module.exports = {
-    startDmWithCucumbot,
-    sendMessage,
-    findIncomingMessage,
-    findAnyMessage
-};

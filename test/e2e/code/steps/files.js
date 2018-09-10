@@ -1,11 +1,23 @@
-const { When, Then } = require('cucumber');
-const { createRandomTempFile, getTempFileName, filesEqual } = require('../helpers/files');
-const { startDmWithCucumbot } = require('./dm.helpers');
+import { When, Then } from 'cucumber';
+import { createRandomTempFile, getTempFileName, filesEqual } from '../helpers/files';
+import { startDmWithCucumbot } from './dm.helpers';
 
 When('I upload a {int} byte file', async function(int) {
     const name = await createRandomTempFile(int);
     this.filesToCleanup.push(name);
     const keg = ice.fileStore.upload(name);
+    await this.waitFor(() => !keg.uploading && keg.readyForDownload);
+    this.uploadedFile = { name, fileId: keg.fileId };
+});
+When('I upload a {int} byte file with interruptions', async function(int) {
+    const name = await createRandomTempFile(int);
+    this.filesToCleanup.push(name);
+    let keg = ice.fileStore.upload(name);
+    await this.waitFor(() => keg.uploading && keg.progress / keg.progressMax >= 0.3);
+    await this.app.restart(true);
+    await this.login();
+    // we restarted so we need a new instance
+    keg = ice.fileStore.getById(keg.fileId);
     await this.waitFor(() => !keg.uploading && keg.readyForDownload);
     this.uploadedFile = { name, fileId: keg.fileId };
 });
@@ -72,6 +84,23 @@ When('I download the uploaded file', function() {
         .then(() => {
             this.filesToCleanup.push(name);
         });
+});
+
+When('I download the uploaded file with interruptions', { timeout: 200000 }, async function() {
+    const name = getTempFileName();
+    this.downloadedFile = { name, fileId: this.uploadedFile.fileId };
+    let file = ice.fileStore.getById(this.uploadedFile.fileId);
+    file.download(name).catch(() => {}); // expected to throw while interrupted
+    await this.waitFor(() => file.downloading && file.progress / file.progressMax >= 0.3);
+    await this.app.restart(true);
+    await this.login();
+    // we restarted so we need a new instance
+    file = ice.fileStore.getById(this.uploadedFile.fileId);
+
+    // it's a bit hacky, 'cached' flag exists for mobile and is not very thought through
+    return this.waitFor(() => file.cached).then(() => {
+        this.filesToCleanup.push(name);
+    });
 });
 
 Then('the uploaded and the downloaded files are the same', async function() {

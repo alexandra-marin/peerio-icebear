@@ -1,8 +1,8 @@
-const { setDefaultTimeout, Before, After, setDefinitionFunctionWrapper } = require('cucumber');
-const App = require('./app');
-const { deleteFile } = require('./helpers/files');
-const CucumbotClient = require('./helpers/cucumbot-client');
-const CucumbotServer = require('./helpers/cucumbot-server');
+import { setDefaultTimeout, Before, After, setDefinitionFunctionWrapper } from 'cucumber';
+import App from './app';
+import { deleteFile } from './helpers/files';
+import CucumbotClient from './helpers/cucumbot-client';
+import CucumbotServer from './helpers/cucumbot-server';
 
 setDefaultTimeout(process.env.DEFAULT_TIMEOUT || 60000);
 

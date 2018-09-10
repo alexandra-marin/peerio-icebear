@@ -1,4 +1,4 @@
-const { Given, When, Then } = require('cucumber');
+import { Given, When, Then } from 'cucumber';
 
 Given('I create my account', async function() {
     await this.createAccount();

@@ -1,6 +1,10 @@
-const { EventEmitter } = require('eventemitter3');
+import { EventEmitter } from 'eventemitter3';
 
-class CucumbotBase extends EventEmitter {
+export default class CucumbotBase extends EventEmitter {
+    constructor(world) {
+        super();
+        this.world = world;
+    }
     // positive number indicates the amount of times current process has permission
     // to execute a step it's supposed to execute
     hasControl = 0;
@@ -15,11 +19,6 @@ class CucumbotBase extends EventEmitter {
         credentials: this.onCredentials,
         remoteEval: this.onRemoteEval
     };
-
-    constructor(world) {
-        super();
-        this.world = world;
-    }
 
     onceHaveControl(fn) {
         if (this.controlAwaitingFn)
@@ -100,5 +99,3 @@ class CucumbotBase extends EventEmitter {
         else handler.call(this, msg);
     };
 }
-
-module.exports = CucumbotBase;

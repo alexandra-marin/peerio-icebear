@@ -1,10 +1,8 @@
 import pdfform from 'pdfform.js';
-import { FileStream, assetPathResolver, whiteLabel } from '../config';
-
+import config from '../config';
 /**
  * Generates and saves a pdf file with account recovery information
  * @param destination file path
- * @param username
  */
 export default async function saveAccountKeyBackup(
     destination: string,
@@ -12,6 +10,7 @@ export default async function saveAccountKeyBackup(
     username: string,
     accountKey: string
 ) {
+    const { assetPathResolver, whiteLabel, FileStream } = config;
     let file = 'account_key_backup';
     if (whiteLabel.name && whiteLabel.name !== 'peerio') {
         file += `_${whiteLabel.name}`;
@@ -21,7 +20,7 @@ export default async function saveAccountKeyBackup(
     const templatePath = assetPathResolver(file);
     const templateStream = new FileStream(templatePath, 'read');
     await templateStream.open();
-    const { size } = await FileStream.getStat(templatePath);
+    const { size } = await config.FileStream.getStat(templatePath);
     const template = await templateStream.read(size);
     templateStream.close();
     // performing substitution (filling pdf form fields)
@@ -31,11 +30,11 @@ export default async function saveAccountKeyBackup(
         accountKey: [accountKey],
         date: [new Date().toLocaleDateString()]
     };
-    const outBuffer = pdfform().transform(template.buffer, fields);
+    const outBuffer = pdfform().transform(template.buffer as ArrayBuffer, fields);
 
     // writing out destination file
-    const outStream = new FileStream(destination, 'write');
+    const outStream = new config.FileStream(destination, 'write');
     await outStream.open();
-    await outStream.write(outBuffer);
+    await outStream.write(new Uint8Array(outBuffer));
     await outStream.close();
 }

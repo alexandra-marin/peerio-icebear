@@ -6,11 +6,13 @@
   "button_gotIt": "Got it",
   "button_submit": "Submit",
   "button_cancel": "Cancel",
+  "button_confirmCancel": "Cancel Signup",
   "button_continue": "Continue",
   "button_skip": "Skip",
   "button_open": "Open",
   "button_close": "Close",
   "button_go": "Go",
+  "button_goBack": "Go back",
   "button_retry": "Try again",
   "button_enable": "Enable",
   "button_disable": "Disable",
@@ -34,13 +36,15 @@
   "title_name": "Name",
   "title_wait": "Working...",
   "title_error": "Error",
-  "warning_deprecated": "We’ve made Peerio better! Please get the <a-download>latest version</> to sign in.",
+  "warning_deprecated":
+    "We’ve made Peerio better! Please get the <a-download>latest version</> to sign in.",
   "title_search": "Search",
   "title_searchResults": "Search results",
   "title_networkLatency": "Latency",
   "title_dontShowAgain": "Don't show this again",
   "title_gotYourKeys": "Got your keys?",
-  "title_signOutConfirmKeys": "You’re about to lock the door to your Peerio account. You will need your account key when you return.",
+  "title_signOutConfirmKeys":
+    "You’re about to lock the door to your Peerio account. You will need your account key when you return.",
   "button_CreateAccount": "Create account",
   "button_next": "Next",
   "button_back": "Back",
@@ -59,33 +63,124 @@
   "button_useAccountKey": "Use Account Key",
   "title_showAccountKey": "Show Account Key",
   "title_hideAccountKey": "Hide Account Key",
-  "title_autologinSetFail": "Unable to enable autologin, you will need your Account Key to sign in.",
-  "title_autologinDisableFail": "Unable to disable autologin, you will be logged in automatically when Peerio Messenger starts.",
+  "title_autologinSetFail":
+    "Unable to enable autologin, you will need your Account Key to sign in.",
+  "title_autologinDisableFail":
+    "Unable to disable autologin, you will be logged in automatically when Peerio Messenger starts.",
   "title_enableAutomatic": "Enable Automatic Sign-in?",
-  "title_enableAutomatic1": "<i>Account Key</> is never required to sign in on this device. Sign out to disable.",
+  "title_enableAutomatic1":
+    "<i>Account Key</> is never required to sign in on this device. Sign out to disable.",
   "title_enableAutomatic2": "<i>Account Key</> is always required to sign in.",
   "title_newUser": "New user?",
-  "title_welcomeBack": "Welcome back,",
+  "title_welcomeBack": "Welcome back",
   "title_signupStep1": "Signup (1 of 2)",
   "title_signupStep2": "Signup (2 of 2)",
   "title_avatarInstructions": "Add photo",
   "title_createAccount": "Create Account",
-  "title_TOSRequestText": "By creating a Peerio account, you agree to our <tosButton>terms of use.</>",
+  "title_newUserWelcome": "Hi there!",
+  "title_newUserWelcomeDescription":
+    "Welcome to Peerio.<br/>Your best choice for private and secure collaboration.",
+  "button_logIn": "Sign in",
+  "title_createYourAccount": "Create your account",
+  "title_nameHeading": "Enter your name.",
+  "title_nameHint": "Letters A-z, accents, dashes and spaces are allowed.",
+  "title_whatIsYourEmail": "Enter your email address",
+  "title_subscribeNewsletter": "Subscribe to monthly Peerio Newsletter",
+  "title_available": "Available:",
+  "title_try": "Try:",
+  "title_demoNamePlaceholder": "Firstname Lastname",
+  "title_demoNamePurpose": "Your name lets others know who you are. You can edit it later.",
+  "title_usernameHeading": "Enter a unique username.",
+  "title_demoUsername":
+    "Hey <username>username</>, you can tag people like this in conversations to get their attention.",
+  "title_emailHeading": "Enter your email.",
+  "title_subscribePrompt": "Subscribe to monthly Peerio Newsletter.",
+  "title_generatingAk": "Generating Account Key",
+  "title_generatingAkDescription": "You will use this to sign in to your account.",
+  "title_generatingAkExplanation":
+    "Research shows that computers make stronger passwords than humans.<br/><br/><b>Fun fact:</> This account key will be so strong, 1,000,000 King Kongs on bicycle generators wouldn't create enough power to crack it.",
+  "title_akBackupDescription":
+    "<b>Important:</> Download this recovery document, and store it somewhere safe to ensure you don't lose access to your account.",
+  "title_demoPdfUsernameLabel": "Your Peerio <b>USERNAME</>:",
+  "title_demoPdfAkLabel": "Your Peerio <b>ACCOUNT KEY</>:",
+  "button_downloadPdf": "Save PDF",
+  "title_backupAk": "Back up your Account Key",
+  "title_backupAkReminder":
+    "Save your Account Key. Peerio can’t reset your Account Key or unlock your account for you.",
+  "title_backupAkReminderMobile":
+    "Peerio can’t reset your Account Key or unlock your account for you.",
+  "button_backupNow": "Back up now",
+  "button_skipBackup": "Skip backup",
+  "title_termsOfUseSentenceCase": "Terms of use.",
+  "title_termsDescription":
+    "The main points of our <openTerms>Terms of Use</> and <openPrivacy>Privacy policy</> are summed up below:",
+  "title_termsMainPoints": "Terms Of Use Summary",
+  "title_termsIntro":
+    "These terms set out the legal agreements you make when using the Peerio service. These are designed to protect both you and Peerio. You’ll need to read the full terms for full legal detail, but some of the main points are...",
+  "title_content": "Content",
+  "title_termsContentParagraph":
+    "You agree to not steal Peerio’s copyrighted and trademarked content. For our open source content, you agree to respect the open source licensing specified in our terms (GNU GPL v3). You recognize that as an encrypted service, Peerio cannot access user generated content — users are responsible for their own content.",
+  "title_behaviour": "Behaviour",
+  "title_termsBehaviourParagraph":
+    "You agree to not do anything illegal or abusive with the Peerio service. Peerio reserves the right to deny service to any user found to be committing crimes, abusing other users, or breaking the terms of service agreement.",
+  "title_security": "Security",
+  "title_termsSecurityParagraph":
+    "You recognize that Peerio has gone through great lengths to provide you with an extraordinarily strong security platform, but we won’t be held responsible for things beyond our control. You will be responsible for things like keeping your Account Key safe.",
+  "title_termsDataCollection": "What data does Peerio collect?",
+  "title_termsDataCollectionIntro":
+    "Peerio collects data required for the service to operate as intended and to provide you with the best possible user experience.",
+  "title_metadata": "Metadata",
+  "title_termsMetadataParagraph":
+    "End-to-end encryption means the content of all your messages and files is hidden from our servers in the form of “ciphertext”. Peerio collects this encrypted ciphertext and metadata such as timestamps and recipient information to store and deliver your encrypted messages and files.",
+  "title_accountInformation": "Account Information",
+  "title_termsAccountInfoParagraph":
+    "Peerio collects data you provide to setup your account, such as your name, username, and email address. If you choose to sync your address book or invite contacts, Peerio collects this information to deliver invites and connect you with your contacts.",
+  "title_ipAddress": "IP Address",
+  "title_termsIpParagraph":
+    "Peerio collects IP address information to connect you to our data centers. This can reveal location information. IP addresses can also help identify suspicious activity with your account or on the network to protect you and provide reliable service.",
+  "title_termsDataThirdParty": "What data is handled by third parties?",
+  "title_service": "Service",
+  "title_termsServiceParagraph":
+    "Encrypted data, metadata, and operational data such as IP addresses are shared with our data hosts in order to provide the service. These data hosts cannot access the contents of your messages and files.",
+  "title_communications": "Communications",
+  "title_termsCommunicationsParagraph":
+    "Account information such as your name, email address, and contacts’ email addresses may be shared with our customer support service and mail delivery service. This is done to deliver email based notifications and communicate with you regarding your account.",
+  "title_analytics": "Analytics",
+  "title_termsAnalyticsParagraph":
+    "If you opt-in to send crash reports and anonymized usage data, data will be shared with our data analytics services to help improve your experience with Peerio. This data may also be shared with our customer support service in the event you seek support regarding an issue.",
+  "title_cancelSignup": "Cancel Signup?",
+  "title_declineExplanation": "Declining Peerio’s terms of use means you won’t have an account.",
+  "title_whyRequired": "Why is this required?",
+  "title_whyRequiredExplanation":
+    "Our commitment and terms of service are intended to help everyone in Peerio better understand what to expect from us, and what we expect from them. <br/>Learn more about our <openPrivacy>Privacy policy</> and <openTerms>Terms of Use</>.",
+  "title_signupAgain": "If you want to sign up again.",
+  "title_signupAgainExplanation":
+    "If you change your mind, you can accept our terms of use  and finish signing up for an account on Peerio.",
+  "button_yesCancel": "Yes, cancel",
+  "title_shareUsageData": "Share anonymous usage data?",
+  "title_shareUsageDataDescription":
+    "Sharing anonymous usage data and error reports helps improve Peerio and your experience with the app. This will never reveal any of your messages, files, or other private information to Peerio or anyone else.<br/><br/>You can change this setting at anytime by going to <i>Settings > Privacy</>.",
+  "title_TOSRequestText":
+    "By creating a Peerio account, you agree to our <tosButton>terms of use.</>",
   "title_username": "Username",
   "title_AccountKey": "Account Key",
   "title_yourAccountKey": "Your Account Key",
   "title_AKwarn1": "Don't get <b>locked out!</>",
-  "title_AKwarn3": "Peerio doesn’t use <i>passwords</> like other apps. This key protects all your info, <b>so keep it safe!</>",
+  "title_AKwarn3":
+    "Peerio doesn’t use <i>passwords</> like other apps. This key protects all your info, <b>so keep it safe!</>",
   "title_AKwarn4": "<b>Save this now.</> You’re going to need it later.",
   "title_saveNow1": "No really, <b>this is important!</>",
   "title_saveNow3": "We never store your key, so we can’t recover or reset your account for you.",
-  "title_saveNow4": "If you lose this key you will lose all your Peerio contacts and files, and you’ll have to create a new account. Save it now!",
+  "title_saveNow4":
+    "If you lose this key you will lose all your Peerio contacts and files, and you’ll have to create a new account. Save it now!",
   "title_discoverNetwork": "Discover your network",
   "title_findYourContacts": "Find your contacts on Peerio",
-  "title_findYourContactsDescription": "See who's already on Peerio, or quickly invite your contacts who aren't here yet.",
+  "title_findYourContactsDescription":
+    "See who's already on Peerio, or quickly invite your contacts who aren't here yet.",
   "title_syncContacts": "Sync contacts",
   "title_permissionContacts": "Permission to access contacts",
-  "title_permissionContactsDescroption": "Peerio would like to access your contact list. Peerio will only use this to connect you with your contacts on Peerio.",
+  "title_permissionContactsDescroption":
+    "Peerio would like to access your contact list. Peerio will only use this to connect you with your contacts on Peerio.",
   "title_zeroStateFindContacts": "Find contacts",
   "title_contactsOnPeerio": "Contacts on Peerio",
   "title_deselectAll": "Deselect All",
@@ -98,7 +193,8 @@
   "title_inviteByEmail": "Invite by email",
   "title_contactsInvited": "{contactsInvited} contacts invited.",
   "title_contactsAdded": "{contactsAdded} contacts added.",
-  "title_contactsAddedAndInvited": "{contactsAdded} contacts added and {contactsInvited} contacts invited.",
+  "title_contactsAddedAndInvited":
+    "{contactsAdded} contacts added and {contactsInvited} contacts invited.",
   "title_welcome": "Welcome to Peerio",
   "title_login": "Sign-in",
   "title_firstName": "First name",
@@ -106,38 +202,58 @@
   "title_email": "Email",
   "title_enterEmail": "Enter an email address",
   "title_hintUsername": "a-Z, 0-9, and _ only.",
-  "title_hintEmail": "ex. info@example.com",
+  "title_emailPlaceholderSignup": "eg. alice@peerio.com",
+  "title_hintUsernameValid":
+    "You picked a good one!<br/>Share this with your contacts so they can add you on Peerio.",
+  "title_hintEmail": "Your email lets your contacts find you in Peerio.",
   "title_language": "Language",
   "warning_emailConfirmationSent": "Email confirmation was sent.",
   "warning_emailConfirmationResent": "Email confirmation was sent again.",
-  "title_AKlogin": "Find your <b>Account Key</> in the <b>security settings</> of a device you've used before.",
-  "serverWarning_emailConfirmationSent": "Check your email to confirm your address. Emails <b>MUST</> be confirmed for other users to find you.",
-  "serverWarning_emailNotConfirmed": "Your email hasn't been confirmed. Go to your profile to resend the confirmation link.",
+  "title_AKlogin":
+    "Find your <b>Account Key</> in the <b>security settings</> of a device you've used before.",
+  "serverWarning_emailConfirmationSent":
+    "Check your email to confirm your address. Emails <b>MUST</> be confirmed for other users to find you.",
+  "serverWarning_emailNotConfirmed":
+    "Your email hasn't been confirmed. Go to your profile to resend the confirmation link.",
   "serverWarning_addressConfirmed": "Your email address was confirmed.",
-  "serverWarning_scheduledDowntime": "Peerio will be unavailable due to scheduled maintenance between {time1} and {time2}. Thank you for your understanding.",
+  "serverWarning_scheduledDowntime":
+    "Peerio will be unavailable due to scheduled maintenance between {time1} and {time2}. Thank you for your understanding.",
   "title_newFeatureSharedFolders": "New Feature: Shared Folders",
   "title_upgradeFileSystem": "Your Peerio files leveled up!",
-  "title_upgradeFileSystemDescription1": "This update adds improved security for our users. We've also added bulk actions for files, fixed some bothersome bugs, and improved UI to make things more intuitive.",
-  "title_upgradeFileSystemDescription2": "Additionally, the changes we've made under the hood will allow us to create awesome new features in the future",
-  "title_upgradeFileSystemDescription3": "Before completing the update take this opportunity to <download>download</> this list of your currently shared files.",
+  "title_upgradeFileSystemDescription1":
+    "This update adds improved security for our users. We've also added bulk actions for files, fixed some bothersome bugs, and improved UI to make things more intuitive.",
+  "title_upgradeFileSystemDescription2":
+    "Additionally, the changes we've made under the hood will allow us to create awesome new features in the future",
+  "title_upgradeFileSystemDescription3":
+    "Before completing the update take this opportunity to <download>download</> this list of your currently shared files.",
   "error_fileNotFound": "File not found",
   "title_fileUpdateProgress": "File update in progress",
   "title_fileUpdateProgressPercent": "{progress}%",
   "title_fileUpdateComplete": "File update complete. Enjoy!",
   "title_migrationInProgressStaticMessage": "<b>Did you know...?</>",
-  "title_migrationInProgressMessage1": "Files shared with you don't count towards your personal file storage.",
-  "title_migrationInProgressMessage2": "You can share and sync folders with your team. So everyone always has the latest GIFs",
+  "title_migrationInProgressMessage1":
+    "Files shared with you don't count towards your personal file storage.",
+  "title_migrationInProgressMessage2":
+    "You can share and sync folders with your team. So everyone always has the latest GIFs",
   "title_migrationInProgressMessage3": "Your chats automatically sync across your devices.",
   "title_migrationInProgressMessage4a": "You can upload files as large as 500MB",
   "title_migrationInProgressMessage4b": "Upgrading to Pro lets you upload files of any size.",
-  "title_migrationInProgressMessage5": "You can drag and drop files into the desktop app to quickly share in a chat or upload to access later.",
-  "title_migrationInProgressMessage6": "All your data in Peerio is end-to-end encrypted, meaning no one but you and your intended recipients can access your messages and files.",
-  "title_migrationInProgressMessage7": "We have a mobile app! Install it while you wait to access your data wherever you go.",
-  "title_migrationInProgressMessage8": "You can create rooms to have group conversations about a topic.",
-  "title_migrationInProgressMessage9": "You can create as many rooms as you have teams, projects, or ideas to discuss!",
-  "title_migrationInProgressMessage10": "When you open a room you can control who’s allowed to join.",
-  "title_migrationInProgressMessage11": "If you ever need help, you can message us at @support in Peerio!",
-  "title_migrationInProgressMessage12": "If you’ve got a complaint, a feature idea, or just want to send some love, you can message us @feedback in Peerio.",
+  "title_migrationInProgressMessage5":
+    "You can drag and drop files into the desktop app to quickly share in a chat or upload to access later.",
+  "title_migrationInProgressMessage6":
+    "All your data in Peerio is end-to-end encrypted, meaning no one but you and your intended recipients can access your messages and files.",
+  "title_migrationInProgressMessage7":
+    "We have a mobile app! Install it while you wait to access your data wherever you go.",
+  "title_migrationInProgressMessage8":
+    "You can create rooms to have group conversations about a topic.",
+  "title_migrationInProgressMessage9":
+    "You can create as many rooms as you have teams, projects, or ideas to discuss!",
+  "title_migrationInProgressMessage10":
+    "When you open a room you can control who’s allowed to join.",
+  "title_migrationInProgressMessage11":
+    "If you ever need help, you can message us at @support in Peerio!",
+  "title_migrationInProgressMessage12":
+    "If you’ve got a complaint, a feature idea, or just want to send some love, you can message us @feedback in Peerio.",
   "title_newfsUpgradeImageError": "Image cannot be displayed.",
   "title_pending": "Pending",
   "title_pending2": "Pending",
@@ -148,7 +264,8 @@
   "title_sharedFilesUnshared": "All shared files were unshared.",
   "error_fieldRequired": "Required",
   "error_usernameBadFormat": "Only letters, numbers or underscore allowed.",
-  "error_usernameNotAvailable": "Username already exists, try another one.",
+  "error_usernameLengthExceeded": "Usernames must not have more than 16 characters",
+  "error_usernameNotAvailable": "This username is already taken. Try suggested.",
   "error_invalidName": "Name is not allowed.",
   "error_invalidEmail": "Enter a valid email.",
   "error_invalidEmailOrUsername": "Enter a valid email or username.",
@@ -177,12 +294,18 @@
   "button_upgrade": "Upgrade",
   "title_upgradeMessage": "Upgrade to get additional storage and unlimited file upload size.",
   "error_fileQuotaExceeded": "You don't have enough space. <a-upgrade>Upgrade</> for more storage.",
-  "error_fileUploadSizeExceeded": "The file you are trying to upload is too big. <a-upgrade>Upgrade</> to be able to upload bigger files.",
-  "serverWarning_Welcome": "A paid plan has been registered to your account. You can view your plan benefits and learn <a-proWelcome>how to manage your account</>.",
-  "serverWarning_Cancelled": "Your Peerio plan has been cancelled. Your paid benefits will expire on the end date of your plan and your plan will not be renewed.",
-  "serverWarning_Expire": "Your Peerio paid plan will expire in 7 days. Please renew your plan to ensure your service is uninterrupted. If you do not renew and have stored more data than what is offered in Peerio's free service, you may experience limited functionality until your account is within its storage limit.",
-  "serverWarning_PaymentError": "Your Peerio paid plan could not be renewed due to a problem with your payment method. Please review your <a-proAccount>account information</>.",
-  "serverWarning_QuotaExceeded": "You're over your storage limit! Your account will have limited functionality until you purchase additional storage or remove some files from your account.",
+  "error_fileUploadSizeExceeded":
+    "The file you are trying to upload is too big. <a-upgrade>Upgrade</> to be able to upload bigger files.",
+  "serverWarning_Welcome":
+    "A paid plan has been registered to your account. You can view your plan benefits and learn <a-proWelcome>how to manage your account</>.",
+  "serverWarning_Cancelled":
+    "Your Peerio plan has been cancelled. Your paid benefits will expire on the end date of your plan and your plan will not be renewed.",
+  "serverWarning_Expire":
+    "Your Peerio paid plan will expire in 7 days. Please renew your plan to ensure your service is uninterrupted. If you do not renew and have stored more data than what is offered in Peerio's free service, you may experience limited functionality until your account is within its storage limit.",
+  "serverWarning_PaymentError":
+    "Your Peerio paid plan could not be renewed due to a problem with your payment method. Please review your <a-proAccount>account information</>.",
+  "serverWarning_QuotaExceeded":
+    "You're over your storage limit! Your account will have limited functionality until you purchase additional storage or remove some files from your account.",
   "title_features": "Features",
   "title_encryptedStorage": "Encrypted storage",
   "title_subscriptionDetails": "Subscription details",
@@ -242,7 +365,8 @@
   "error_chatPurposeChange": "Unable to change chat purpose",
   "error_invalidMessageSignature": "The message's signature is invalid. It may be a forgery.",
   "error_invalidFileSignature": "The file's signature is invalid. It may be a forgery.",
-  "error_invalidFileSignatureLong": "This file signature could not be verified. It is possible that the file was forged by a third party.",
+  "error_invalidFileSignatureLong":
+    "This file signature could not be verified. It is possible that the file was forged by a third party.",
   "error_changeChatFavoriteState": "Unable to change chat state",
   "title_readMore": "Read more",
   "title_files": "Files",
@@ -250,19 +374,24 @@
   "title_moveFileTo": "Move file or folder to:",
   "dialog_fileMoved": "Your {fileOrFolder} was moved to {folderName}.",
   "title_moveToSharedFolder": "Move to shared folder?",
-  "title_moveToSharedFolderDescription": "Items in a shared folder are available to anyone with access to that folder.",
+  "title_moveToSharedFolderDescription":
+    "Items in a shared folder are available to anyone with access to that folder.",
   "title_dontShowMessageAgain": "Don't show this message again",
   "title_sharedFolderCannotBeMoved": "Cannot move shared folder",
-  "title_sharedFolderCannotBeMovedDescription": "Shared folders currently cannot be moved into other folders",
+  "title_sharedFolderCannotBeMovedDescription":
+    "Shared folders currently cannot be moved into other folders",
   "button_rename": "Rename",
   "button_newFolder": "Add folder",
   "title_folderName": "Folder name",
   "title_deleteFolder": "Are you sure you want to delete {folderName}?",
   "title_deleteFolder_mobile": "Delete folder",
   "dialog_deleteFolderTitle": "Delete the folder {folderName}?",
-  "dialog_deleteFolderText": "Deleting this folder will also delete all of its content. This action cannot be undone.",
-  "dialog_deleteSharedFolderText": "All of your files will be deleted, and all members will lose access to this folder.",
-  "dialog_deleteSharedFolderNonOwnerText": "You will no longer have access to any files in the folder.  Files owned by you will be deleted for everyone including you.",
+  "dialog_deleteFolderText":
+    "Deleting this folder will also delete all of its content. This action cannot be undone.",
+  "dialog_deleteSharedFolderText":
+    "All of your files will be deleted, and all members will lose access to this folder.",
+  "dialog_deleteSharedFolderNonOwnerText":
+    "You will no longer have access to any files in the folder.  Files owned by you will be deleted for everyone including you.",
   "warning_folderDeleted": "{folderName} was deleted.",
   "title_draggingMultipleItems": "{count} items",
   "warning_oneFileOrFolderMoved": "{fileOrFolderName} was moved to {targetFolderName}.",
@@ -289,7 +418,8 @@
   "title_sharingCountInFolder": "Sharing {count} files in {name}",
   "title_invalidFileSignature": "Invalid file signature",
   "title_filesNull1": "Let's encrypt a file.",
-  "title_filesNull2": "Drag and drop a file from your desktop, or use the button below to upload and encrypt your first file!",
+  "title_filesNull2":
+    "Drag and drop a file from your desktop, or use the button below to upload and encrypt your first file!",
   "title_upgradeCTA": "<a-upgrade>Upgrade</> your account?",
   "title_selected": "Selected",
   "button_download": "Download",
@@ -318,7 +448,7 @@
   "title_you": "You",
   "title_uploaded": "Uploaded",
   "title_uploadShareAndManage": "Upload, share and manage",
-  "title_uploadSomething": "Upload something.",
+  "title_uploadSomething": "Upload and keep your files safe.",
   "title_fileStatus": "File status ({number} files)",
   "title_uploads": "Uploads",
   "title_downloads": "Downloads",
@@ -348,21 +478,25 @@
   "button_emojis": "Emojis",
   "button_thumbsUp": "Thumbs up",
   "title_shareFromFiles": "Share from Peerio files",
+  "title_preparingForUpload": "Preparing for upload...",
   "title_uploadAndShare": "Upload and share file",
   "title_uploadAndShareCount": "Upload and share file ({current} of {total})",
   "title_labelText": "Label text",
   "title_confirmCancelUpload": "Cancel upload?",
   "title_confirmRemoveEmail": "Remove email?",
   "title_confirmRemoveFiles": "Remove {count} file(s)?",
-  "title_confirmRemoveSharedFiles": "Deleting shared files will also unshare them with other users.",
-  "dialog_confirmRemoveFileNonOwner": "This will remove this file from your account. The owner will still have access.",
+  "title_confirmRemoveSharedFiles":
+    "Deleting shared files will also unshare them with other users.",
+  "dialog_confirmRemoveFileNonOwner":
+    "This will remove this file from your account. The owner will still have access.",
   "title_confirmRemoveFilename": "Remove file {name}?",
   "title_confirmRemoveFile": "Remove file",
   "title_fileWillBeShared": "File(s) will be shared with {chatName}",
   "title_dropToUpload": "Drop {count} file(s) to upload",
   "title_uploadPastedFile": "The file you pasted will be uploaded and shared with the current chat",
   "title_enableImagePreviews": "Enable image previews",
-  "title_imagePreviewWarning": "Preview images will be downloaded and saved to your device without encryption, and will be removed as soon as you quit or signout of Peerio.<br/><br/>Would you like to enable previews?",
+  "title_imagePreviewWarning":
+    "Preview images will be downloaded and saved to your device without encryption, and will be removed as soon as you quit or signout of Peerio.<br/><br/>Would you like to enable previews?",
   "title_previewUnavailable": "Preview unavailable",
   "title_shareWith": "Share with",
   "title_shareWithOthers": "Share with others",
@@ -373,13 +507,18 @@
   "title_roomSharedWith": "1 chat",
   "title_plusRoomSharedWith": "+1 chat",
   "title_numberOfChatsSharedWith": "+{chatNumberSharedWith}",
-  "title_unshareUserWarning": "{fileCount} files shared by {user} in this folder will also be removed.",
-  "title_removedFromFolder": "You've been removed from the <b>{folderName}</> shared folder. The files you shared in that folder have been moved here.",
-  "title_itemMovedToFolder": "{item} moved to {folder} and shared with everyone who can see the folder",
-  "title_sharedFolderRemovalNotif": "You have been removed from the <b>{folderName}</> shared folder.",
+  "title_unshareUserWarning":
+    "{fileCount} files shared by {user} in this folder will also be removed.",
+  "title_removedFromFolder":
+    "You've been removed from the <b>{folderName}</> shared folder. The files you shared in that folder have been moved here.",
+  "title_itemMovedToFolder":
+    "{item} moved to {folder} and shared with everyone who can see the folder",
+  "title_sharedFolderRemovalNotif":
+    "You have been removed from the <b>{folderName}</> shared folder.",
   "title_sharedFoldersRemovalNotif": "You have been removed from <b>{number} shared folders</>.",
   "title_sharedFolderRemovalNotifDesc": "The files you shared in that folder have been moved here.",
-  "title_sharedFoldersRemovalNotifDesc": "The files you shared in those folders have been moved here.",
+  "title_sharedFoldersRemovalNotifDesc":
+    "The files you shared in those folders have been moved here.",
   "warning_folderAccessUpdated": "Your access to {folderName} was updated",
   "title_enterRoomOrContact": "Enter Room or contact",
   "title_addComment": "Add a comment",
@@ -392,15 +531,21 @@
   "title_imageSizeWarning": "Images larger than {size} are not displayed.",
   "button_displayThisImageAfterWarning": "Display this image anyway",
   "title_EnableUrlPreviews": "Enable URL previews",
-  "title_UrlPreviewsWarning": "URL previews may increase the chance of being tracked from outside sources. Would you like to enable previews?",
-  "title_UrlPreviewsWarning2": "URL previews may increase the chance of being tracked from outside sources.<br/><br/>Would you like to enable previews?",
+  "title_UrlPreviewsWarning":
+    "URL previews may increase the chance of being tracked from outside sources. Would you like to enable previews?",
+  "title_UrlPreviewsWarning2":
+    "URL previews may increase the chance of being tracked from outside sources.<br/><br/>Would you like to enable previews?",
   "title_poorConnection": "Poor connection. Still working...",
-  "dialog_androidEncryptionStatusOff": "Your device supports full disk encryption, but it is not currently enabled. Peerio highly recommends the use of disk encryption. Would you like to learn more?",
-  "dialog_androidEncryptionStatusPartial": "Your device has encryption turned on but your PIN is still set to the default. We recommend setting a unique PIN. Would you like to learn more?",
+  "dialog_androidEncryptionStatusOff":
+    "Your device supports full disk encryption, but it is not currently enabled. Peerio highly recommends the use of disk encryption. Would you like to learn more?",
+  "dialog_androidEncryptionStatusPartial":
+    "Your device has encryption turned on but your PIN is still set to the default. We recommend setting a unique PIN. Would you like to learn more?",
   "dialog_confirmDeleteFile": "Are you sure you want to delete this file?",
   "dialog_confirmDeleteFiles": "Are you sure you want to delete {count} files?",
-  "dialog_confirmLogOutDuringTransfer": "Are you sure you want to sign out and stop file transfers?",
-  "dialog_toExternal": "Downloads will be decrypted and saved to a shared directory to give access to other apps.",
+  "dialog_confirmLogOutDuringTransfer":
+    "Are you sure you want to sign out and stop file transfers?",
+  "dialog_toExternal":
+    "Downloads will be decrypted and saved to a shared directory to give access to other apps.",
   "snackbar_uploadComplete": "Upload complete",
   "snackbar_downloadComplete": "Download complete",
   "snackbar_downloadsComplete": "Downloads complete",
@@ -424,16 +569,21 @@
   "title_settingsProfile": "Public Profile",
   "title_publicKey": "Public ID#",
   "error_saveSettings": "Unable to save changes",
-  "error_emailTaken": "This email is already registered to a Peerio account. Please contact support if you think this is a mistake.",
+  "error_emailTaken":
+    "This email is already registered to a Peerio account. Please contact support if you think this is a mistake.",
   "error_unconfirmedEmail": "Unconfirmed email",
   "button_updateAvatar": "Update avatar",
   "error_resendConfirmation": "Unable to email confirmation link, please try again later.",
-  "error_contactFingerprintChangedDetail": "This contact's Public ID# has changed. Verify the new ID# with your contact by calling them or using another messaging service to be sure of their identity. <a-contactFingerprint>Find out more.</>",
+  "error_contactFingerprintChangedDetail":
+    "This contact's Public ID# has changed. Verify the new ID# with your contact by calling them or using another messaging service to be sure of their identity. <a-contactFingerprint>Find out more.</>",
   "error_contactAddFail": "Failed to add contact",
   "error_contactRemoveFail": "Failed to remove contact",
-  "title_inviteContactByEmail": "<b>{email}</> could not be found.<br/>Would you like to ask them to join you on Peerio?",
-  "title_inviteContactByEmail2": "<b>{email}</> could not be found.<br/>Invite them to join you on Peerio.",
-  "title_inviteContactByEmailGeneric": "<b>{email}</> could not be found.<br/>Would you like to invite them via email?",
+  "title_inviteContactByEmail":
+    "<b>{email}</> could not be found.<br/>Would you like to ask them to join you on Peerio?",
+  "title_inviteContactByEmail2":
+    "<b>{email}</> could not be found.<br/>Invite them to join you on Peerio.",
+  "title_inviteContactByEmailGeneric":
+    "<b>{email}</> could not be found.<br/>Would you like to invite them via email?",
   "title_inviteDoctorOrAdmin": "Send doctor/admin invite",
   "title_invitePatient": "Send patient invite",
   "button_resend": "Resend link",
@@ -447,7 +597,8 @@
   "title_autologinSetting": "Sign in automatically on this device",
   "title_touchID": "Touch ID",
   "dialog_enableTouchID": "Would you like to use your fingerprint to sign in?",
-  "title_AKDetail": "Keep your Account Key safe by writing it down or storing it in a password manager. You will need it to set up Peerio on a new device. <a-mpDetail>Find out more</>.",
+  "title_AKDetail":
+    "Keep your Account Key safe by writing it down or storing it in a password manager. You will need it to set up Peerio on a new device. <a-mpDetail>Find out more</>.",
   "title_whereToFind": "<a-mpDetail>Where to find your Account Key</>.",
   "title_AKDetail2": "Don't share your Account Key with anyone.",
   "title_securityDeviceSettings": "Device settings",
@@ -477,13 +628,15 @@
   "title_imageFilePreviews": "Image file previews",
   "title_showImagePreviews": "Show previews of image files",
   "title_showImagePreviewsDescription": "Previews will be stored unencrypted on this device",
-  "title_showImagePreviewsDescription2": "Previews will be downloaded and stored unencrypted on this device",
+  "title_showImagePreviewsDescription2":
+    "Previews will be downloaded and stored unencrypted on this device",
   "title_showLargeImages": "Show images larger than {size}",
   "title_showLargeImages10MB": "Show images larger than 10 MB",
   "title_urlPreview": "URL Preview",
   "title_enableAllUrlPreview": "Enable all URL preview",
   "title_onlyFromFavourites": "Only from Favourites",
-  "title_EnableUrlPreviewWarning": "Enabling URL Preview may increase the chance of tracking by third party web services.",
+  "title_EnableUrlPreviewWarning":
+    "Enabling URL Preview may increase the chance of tracking by third party web services.",
   "title_learnMore": "<a-learnUrlTracking>Learn more.</>",
   "title_learnMoreLegacyFiles": "<a-learnLegacyFiles>Learn more</>",
   "button_learnMore": "Learn more",
@@ -502,16 +655,21 @@
   "title_disable": "Disable",
   "button_notNow": "Not now",
   "title_dataPreferences": "Data",
-  "title_dataDetail": "Help us improve your experience and fix bugs faster by sharing data with us automatically",
+  "title_dataDetail":
+    "Help us improve your experience and fix bugs faster by sharing data with us automatically",
   "title_errorTrackingMessage": "Share crash & error reports",
   "title_dataCollectionMessage": "Share anonymous usage data",
   "button_accountDelete": "Delete account",
   "title_accountDelete": "Do you want to delete your account?",
   "title_accountDeleted": "Account deleted",
-  "title_accountDeleteDescription1": "If you choose to delete your account, it's gone. Forever. We can't recover it for you.",
-  "title_accountDeleteDescription2": "Your files will be deleted and shared files will no longer be available to recipients.",
-  "title_accountDeleteDescription3": "Your acount will be locked for 24 hours starting immediately. Meanwhile, a confirmation email will be sent to your primary address. You must click the confirmation link in the email to delete the account fully.",
-  "serverWarning_promoConsentRequest": "Would you like to receive occasional emails from Peerio regarding updates and new products?",
+  "title_accountDeleteDescription1":
+    "If you choose to delete your account, it's gone. Forever. We can't recover it for you.",
+  "title_accountDeleteDescription2":
+    "Your files will be deleted and shared files will no longer be available to recipients.",
+  "title_accountDeleteDescription3":
+    "Your acount will be locked for 24 hours starting immediately. Meanwhile, a confirmation email will be sent to your primary address. You must click the confirmation link in the email to delete the account fully.",
+  "serverWarning_promoConsentRequest":
+    "Would you like to receive occasional emails from Peerio regarding updates and new products?",
   "title_promoConsent": "Receive emails from Peerio regarding updates and new products.",
   "title_promoConsentRequestTitle": "Product updates",
   "title_version": "Version",
@@ -540,7 +698,8 @@
   "title_updateDownloading": "Peerio is downloading an update.",
   "title_updateWillBeInstalled": "Restart Peerio to get the latest version.",
   "title_updateFailed": "Update failed",
-  "title_updateFailedMessage": "Unfortunately, the new version of Peerio failed to install. We recommend trying to install it again or download it manually. Alternatively, you can continue using the older version for some time, but you will miss bug fixes and new features.",
+  "title_updateFailedMessage":
+    "Unfortunately, the new version of Peerio failed to install. We recommend trying to install it again or download it manually. Alternatively, you can continue using the older version for some time, but you will miss bug fixes and new features.",
   "button_continueUsingOlderVersion": "Update later",
   "button_downloadManually": "Download manually",
   "button_tryAgain": "Try again",
@@ -570,7 +729,8 @@
   "title_couldntLocateContact2": "Invite them to join you on Peerio?",
   "title_importInviteText": "Peerio is more fun with friends",
   "title_contactZeroState": "You have no pending invites. Invite a friend to join you on Peerio",
-  "mcr_title_contactZeroState": "You have no pending invites. Invite your colleagues to join you on Peerio",
+  "mcr_title_contactZeroState":
+    "You have no pending invites. Invite your colleagues to join you on Peerio",
   "button_invite": "Invite",
   "button_inviteEmailContact": "Invite contact",
   "button_addFavourite": "Add favourite",
@@ -592,16 +752,20 @@
   "title_allContacts": "All Contacts",
   "title_exactMatch": "Exact match",
   "title_findAContact": "Search your contacts",
-  "error_contactNotFound": "Nope, there's no one in sight with the username <b>{searchString}</>.<br/>Would you like to <toAddContact>add a new contact</>?",
+  "error_contactNotFound":
+    "Nope, there's no one in sight with the username <b>{searchString}</>.<br/>Would you like to <toAddContact>add a new contact</>?",
   "title_shareSocial": "Invite elsewhere",
   "button_addToYourContacts": "Add to your favourites",
   "button_removeFromYourContacts": "Remove from your favourites",
   "title_socialShareInvite": "Join me on Peerio!",
-  "title_socialShareInviteContent": "I’m communicating securely on Peerio. Add me under the username {username}, let's chat – {socialShareUrl}",
+  "title_socialShareInviteContent":
+    "I’m communicating securely on Peerio. Add me under the username {username}, let's chat – {socialShareUrl}",
   "title_randomMessage1": "Peerio is <b>always</> encrypted. Pretty cool, eh?",
   "title_randomMessage2": "Got any <b>big</> files today? I could use the workout.",
-  "title_randomMessage3": "Want to make Peerio even better? Let us know how: message <b>@feedback</>.",
-  "title_randomMessage4": "It's okay to pick favourites. You’ll see your favourite contacts first when starting chats.",
+  "title_randomMessage3":
+    "Want to make Peerio even better? Let us know how: message <b>@feedback</>.",
+  "title_randomMessage4":
+    "It's okay to pick favourites. You’ll see your favourite contacts first when starting chats.",
   "title_waitingToConnect": "Waiting to connect",
   "title_connecting": "Connecting...",
   "title_authenticating": "Authenticating...",
@@ -609,14 +773,18 @@
   "title_confirming": "Confirming data...",
   "title_done": "Done!...",
   "error_accountSuspendedTitle": "Account suspended",
-  "error_accountSuspendedText": "Please <a-mailSupport>contact support</> to restore your account. Also, check the primary email address associated with your account, as you may have already been contacted.",
+  "error_accountSuspendedText":
+    "Please <a-mailSupport>contact support</> to restore your account. Also, check the primary email address associated with your account, as you may have already been contacted.",
   "error_keychainRead": "Error reading data from keychain. Try again?",
-  "error_deletingAccountNoConfirmedEmail": "Error deleting account. You must have confirmed your email address to delete your account.",
-  "error_upgradingAccountNoConfirmedEmail": "Please confirm your email address before upgrading your Peerio account.",
+  "error_deletingAccountNoConfirmedEmail":
+    "Error deleting account. You must have confirmed your email address to delete your account.",
+  "error_upgradingAccountNoConfirmedEmail":
+    "Please confirm your email address before upgrading your Peerio account.",
   "error_deletingAccount": "Error deleting account",
   "title_zeroChat": "Welcome to secure chats",
   "title_startConversations": "Start conversations",
-  "title_zeroChatSubtitle": "All chats are automatically protected with <b>true</> end-to-end encryption",
+  "title_zeroChatSubtitle":
+    "All chats are automatically protected with <b>true</> end-to-end encryption",
   "button_createRooms": "Create Rooms",
   "title_headerZeroState": "Start your first chat",
   "title_descriptionZeroState": "Chat privately 1-on-1 or collaborate securely with a group",
@@ -637,14 +805,21 @@
   "title_addedPeopleLimit": "{added}/{limit} people in this chat.",
   "title_goCreateChannel": "If you need to chat with multiple people, try a Room instead.",
   "title_goCreateChat": "Don't need a Room? Use DM instead.",
-  "title_channelUpgradeOffer": "Oops!\nYour account has run out of free rooms on this plan. Upgrade your plan for more.",
-  "title_channelCreateOffer": "Hi there! Want to chat with multiple people? Try creating a Room instead.",
+  "title_channelUpgradeOffer":
+    "Oops!\nYour account has run out of free rooms on this plan. Upgrade your plan for more.",
+  "title_channelCreateOffer":
+    "Hi there! Want to chat with multiple people? Try creating a Room instead.",
   "title_limitDialog": "Limit reached!",
   "title_limitDialogText1": "Your account allows for only {limit} Rooms at a time",
-  "title_limitDialogText2": "If you wish to join or create another Room, please delete an existing one or upgrade your account",
-  "dialog_chatZeroState": "Use the <plusIcon>+</> to start a direct message, or create a Room to meet with a group.",
-  "title_descriptionZeroChatState": "All chats and shared files in Peerio are\n automatically protected with true\n end-to-end encryption",
+  "title_limitDialogText2":
+    "If you wish to join or create another Room, please delete an existing one or upgrade your account",
+  "dialog_chatZeroState":
+    "Use the <plusIcon>+</> to start a direct message, or create a Room to meet with a group.",
+  "title_descriptionZeroChatState":
+    "All chats and shared files in Peerio are\n automatically protected with true\n end-to-end encryption",
   "title_startSecureChat": "Start a secure chat",
+  "title_zeroFirstLoginTitle": "Thanks for joining!",
+  "title_zeroFirstLoginMessage": "Welcome to your all encrypted environment",
   "title_zeroChatRoomDescription": "For group discussions",
   "title_zeroChatDmHeading": "Direct Messages",
   "title_zeroChatDmDescription": "For 1-on-1 conversations",
@@ -671,17 +846,22 @@
   "title_invitedUserViaEmail": "You invited {firstName} via email ({email})",
   "button_nay": "Nay, decline",
   "button_aye": "Aye, accept",
-  "title_roomInviteUpgradeNotice": "Hi there. Basic Peerio accounts have access to <b>3 free rooms</>. Upgrade your account to get more, or decline this invite.",
+  "title_roomInviteUpgradeNotice":
+    "Hi there. Basic Peerio accounts have access to <b>3 free rooms</>. Upgrade your account to get more, or decline this invite.",
   "title_hostedBy": "Hosted by",
   "title_whoIsAlreadyIn": "Who is already in",
   "title_userOut": "{name} out! Peace!",
   "title_new": "new",
   "title_channelInviteRevoked": "Invite to Room revoked.",
   "title_createChannel": "Open a Room",
-  "title_createChannelDetails": "Rooms have unlimited participants, and work best when organized by topic.",
-  "title_offerNewDM": "Want to chat just with one person? <toCreateDM>Create a Direct Message instead.</>",
-  "title_createChannelUpgradeOffer": "Free accounts are limited to 3 Rooms. <a-upgrade>Upgrade for unlimited Rooms</>.",
-  "title_acceptedInvitationDismissed": "You can start a Direct Message with your contacts using the <plusIcon>+</> button",
+  "title_createChannelDetails":
+    "Rooms have unlimited participants, and work best when organized by topic.",
+  "title_offerNewDM":
+    "Want to chat just with one person? <toCreateDM>Create a Direct Message instead.</>",
+  "title_createChannelUpgradeOffer":
+    "Free accounts are limited to 3 Rooms. <a-upgrade>Upgrade for unlimited Rooms</>.",
+  "title_acceptedInvitationDismissed":
+    "You can start a Direct Message with your contacts using the <plusIcon>+</> button",
   "title_channelName": "Name:",
   "title_channelNamePlaceholder": "this Room is called",
   "title_channelNameLimit": "Limit of {maxChatNameLength} characters",
@@ -696,7 +876,8 @@
   "title_channelRecentInvitations": "Recent Invitations",
   "title_confirmChannelDelete": "Are you sure you want to delete this Room?",
   "title_confirmChannelLeave": "Are you sure you want to leave this Room?",
-  "title_confirmChannelLeaveDescription": "You will lose access to files you have received here and will need a new invitation to enter this room again.",
+  "title_confirmChannelLeaveDescription":
+    "You will lose access to files you have received here and will need a new invitation to enter this room again.",
   "error_volumeLeave": "Unable to leave Shared Folder.",
   "error_channelLeave": "Unable to leave Room.",
   "error_channelDelete": "Unable to delete Room.",
@@ -718,7 +899,8 @@
   "title_2FA": "Two Step Verification",
   "title_2FARequired": "Two Step Verification required",
   "title_2FADetail": "Input the verification code provided by your authenticator app:",
-  "title_2FADetailDesktop": "Add another layer of security to your account. Use a third party authenticator app to switch it on.",
+  "title_2FADetailDesktop":
+    "Add another layer of security to your account. Use a third party authenticator app to switch it on.",
   "title_2FASecretKey": "Secret key",
   "dialog_enter2FA": "enter code",
   "title_2FAHelperText": "ex. 012345",
@@ -740,54 +922,69 @@
   "title_authApps": "Let's get you started",
   "title_trustThisDevice": "This is a trusted device",
   "title_stopTrustingThisDevice": "Stop trusting this device",
-  "title_authAppsDetails": "To enable Two Step Verification use an authenticator app such as Google Authenticator for <a-googleAuthA>Android</> or <a-googleAuthI>iOS</> or <a-authy>Authy</> on your desktop or mobile device, and follow the steps on the screen.",
+  "title_authAppsDetails":
+    "To enable Two Step Verification use an authenticator app such as Google Authenticator for <a-googleAuthA>Android</> or <a-googleAuthI>iOS</> or <a-authy>Authy</> on your desktop or mobile device, and follow the steps on the screen.",
   "title_2FAEnabledThanks": "Thanks for adding another layer of security to your account.",
-  "title_2FABackupDetail": "If you can't access your second verification method, save these backup codes to avoid getting locked out of Peerio.",
+  "title_2FABackupDetail":
+    "If you can't access your second verification method, save these backup codes to avoid getting locked out of Peerio.",
   "button_2FABackupDownload": "Save backup codes",
   "title_2FALoginAuth": "Two step verification required",
   "title_2FABackupCodeAuth": "Generate new backup codes?",
   "title_2FADisableAuth": "Disable Two Step Verification?",
   "title_2FALoginAuthPreText": "Input the verification code found in your authenticator app.",
   "title_2FAInputPlaceholder": "enter code",
-  "title_2FALoginAuthPostText": "Trusted devices will be getting less 2fa requests on login to minimize inconvenience.",
-  "title_2FABackupCodeAuthPreText": "Please input your verification code to generate new backup codes.",
-  "title_2FABackupCodeAuthPostText": "Generating new backup codes will make your old codes invalid.",
+  "title_2FALoginAuthPostText":
+    "Trusted devices will be getting less 2fa requests on sign in to minimize inconvenience.",
+  "title_2FABackupCodeAuthPreText":
+    "Please input your verification code to generate new backup codes.",
+  "title_2FABackupCodeAuthPostText":
+    "Generating new backup codes will make your old codes invalid.",
   "title_2FADisableAuthPreText": "Please input your verification code to disable this option.",
-  "title_2FADisableAuthPostText": "By disabling Two Step Verification, you are removing a layer of security from your account.",
+  "title_2FADisableAuthPostText":
+    "By disabling Two Step Verification, you are removing a layer of security from your account.",
   "title_kickedFromChannel": "You have been removed from Room '{name}'",
   "title_kickedFromVolume": "You have been removed from Shared Folder '{name}'",
   "title_addedToVolume": "User(s) added to shared folder",
   "title_removedFromVolume": "User(s) removed from shared folder",
-  "title_pendingEmailChannelInvites": "Your have pending Room invites. After you confirm your email address, the admin of the Room will be able to send you an invite.",
-  "title_onboardingInstallMobileApp": "Install mobile app. (<a-iosApp>iOS</>, <a-androidApp>Android</>)",
+  "title_pendingEmailChannelInvites":
+    "Your have pending Room invites. After you confirm your email address, the admin of the Room will be able to send you an invite.",
+  "title_onboardingInstallMobileApp":
+    "Install mobile app. (<a-iosApp>iOS</>, <a-androidApp>Android</>)",
   "title_onboardingInstallMobileAppContent": "Unlock 100 MB storage and access Peerio on the go.",
   "title_welcomeHeading": "Welcome to Peerio!",
   "title_welcomeSubHeading": "Your private and secure collaboration platform",
-  "title_alreadyHaveAccount": "Already have an account?",
+  "title_alreadyHaveAccount": "Already have an account? <toSignIn>Sign in</>.",
   "title_welcomePrivate": "Private",
-  "title_welcomePrivateContent": "Peerio’s end-to-end encryption keeps your data safe from breaches.",
+  "title_welcomePrivateContent":
+    "Peerio’s end-to-end encryption keeps your data safe from breaches.",
   "title_welcomeSafe": "Safe",
-  "title_welcomeSafeContent": "Only you can access your account. Your data is safe and secure 24/7.",
+  "title_welcomeSafeContent":
+    "Only you can access your account. Your data is safe and secure 24/7.",
   "title_welcomeFast": "Fast",
   "title_welcomeFastContent": "So fast, you’ll forget that everything is always encrypted.",
   "title_confirmTextSample": "I have saved my account key",
-  "title_confirmTextInput": "Confirm that you’ve saved your key by entering  “{sample}” in the input below.",
+  "title_confirmTextInput":
+    "Confirm that you’ve saved your key by entering  “{sample}” in the input below.",
   "title_confirmTextInputLabel": "Have you saved your account key?",
   "title_confirmHeadline": "Got your keys?",
   "title_confirmTitle": "Remember, we can’t access your data.",
   "title_confirmContent1": "Only you have a copy of your Account Key.",
   "title_confirmContent2": "If you lose it, we cannot help you access your account.",
-  "title_accountKey1": "Passwords are way stronger when computers make them. This Account Key was generated just for you.",
-  "title_accountKey2": "Since Peerio cannot access any of your data, including this Account Key, saving a backup may help you in the future.",
+  "title_accountKey1":
+    "Passwords are way stronger when computers make them. This Account Key was generated just for you.",
+  "title_accountKey2":
+    "Since Peerio cannot access any of your data, including this Account Key, saving a backup may help you in the future.",
   "title_onboarding1": "Thanks for joining Peerio!",
   "title_onboarding2": "Get more free storage by completing these tasks!",
   "title_onboardingLink": "Click the cloud icon in the lower left to return to this list.",
   "title_onboardingAvatar": "Upload your Avatar",
   "title_onboardingAvatarContent": "Unlock 100 MB and personalize your account.",
   "title_onboardingAccountKey": "Save your Account Key PDF document",
-  "title_onboardingAccountKeyContent": "Unlock 100 MB and ensure you can access your account at any time.",
+  "title_onboardingAccountKeyContent":
+    "Unlock 100 MB and ensure you can access your account at any time.",
   "title_onboardingConfirmEmail": "Confirm your email",
-  "title_onboardingConfirmEmailContent": "Unlock 100 MB storage and unlock additional functionality.",
+  "title_onboardingConfirmEmailContent":
+    "Unlock 500 MB storage and unlock additional functionality.",
   "title_onboardingCreateARoom": "Create a Room",
   "title_onboardingCreateARoomContent": "Unlock 100 MB for opening a Room.",
   "title_onboardingInvitePeople": "Invite friends to join Peerio ({current}/{max})",
@@ -809,15 +1006,18 @@
   "error_invalid2faCode": "Invalid two step verification code",
   "title_earned": "{current} MB of {max} MB earned",
   "title_recentFiles": "Recent files",
-  "title_noRecentFiles": "You have no recent files.<br/><clickHere>Click here</> to share a file in this chat.",
+  "title_noRecentFiles":
+    "You have no recent files.<br/><clickHere>Click here</> to share a file in this chat.",
   "title_updateSettingsAnyTime": "Update your <toSettings>settings</> at any time.",
   "button_clickHere": "Click here",
   "title_ratingDialogHeading": "How would you rate Peerio?",
-  "dialog_ratingInstructions": "Select how many stars you'd give us on a scale of 1-5.<br/>We read all comments and feedback ☺️",
+  "dialog_ratingInstructions":
+    "Select how many stars you'd give us on a scale of 1-5.<br/>We read all comments and feedback ☺️",
   "dialog_suggestionsPlaceholder": "How could we do better?",
   "title_maintenance": "Upcoming Maintenance",
   "dialog_scheduledMaintenance": "Scheduled Maintenance",
-  "dialog_scheduledMaintenanceDates": "Peerio may be unavailable while we perform a scheduled maintenance between {start} and {end} (local time). We apologize for the inconvenience.",
+  "dialog_scheduledMaintenanceDates":
+    "Peerio may be unavailable while we perform a scheduled maintenance between {start} and {end} (local time). We apologize for the inconvenience.",
   "dialog_rating1Star": "Hate it",
   "dialog_rating2Star": "Dislike it",
   "dialog_rating3Star": "It's okay",
@@ -828,7 +1028,8 @@
   "title_messageInfo": "Message info",
   "title_videoCallLink": "{fullName} has started a video call, join them here:",
   "title_videoCall": "Confirm video call",
-  "dialog_videoCall": "You are about to share a link to a Jitsi Meet video call. Jitsi Meet is a free and open source video conference and screen sharing service. You can learn more at <a-jitsiLink>jitsi.org</>.",
+  "dialog_videoCall":
+    "You are about to share a link to a Jitsi Meet video call. Jitsi Meet is a free and open source video conference and screen sharing service. You can learn more at <a-jitsiLink>jitsi.org</>.",
   "button_startVideoCall": "Start video call",
   "title_imageTooBigCutoff": "Preview not available for images over {size}",
   "snackbar_couldntOpenFile": "Couldn't find an application that can open this file",
@@ -842,17 +1043,20 @@
   "error_messageErrorMessageRichtext": "Message Rich Text",
   "error_messageErrorAdditionalInfo": "Additional information about this error",
   "error_messageErrorNotAvailable": "Not available",
-  "title_verifyUserIdentity": "You can verify this user’s identity with their Public ID#. <a-identityVerification>Show me how</>",
+  "title_verifyUserIdentity":
+    "You can verify this user’s identity with their Public ID#. <a-identityVerification>Show me how</>",
   "title_addPeopleToRoom": "Add people to this room",
   "title_contactAdded": "{name} has been added",
   "dialog_fileTypeForExtension": "{extension} File",
   "dialog_fileTypeAllFiles": "All Files",
   "warning_sharingHistory": "Your sharing history has been kept.",
   "dialog_unshareTitle": "Unshare all your files?",
-  "dialog_unshareText": "You are about to unshare all files you have ever shared with others on Peerio. This action cannot be reversed. Are you sure you want to unshare all your files?",
+  "dialog_unshareText":
+    "You are about to unshare all files you have ever shared with others on Peerio. This action cannot be reversed. Are you sure you want to unshare all your files?",
   "warning_unsharedAll": "All shared files have been unshared.",
   "title_limitedActions": "Limited actions available",
-  "dialog_limitedActionsContent": "This file has not been upgraded yet. You will only be able to <b>download</> or <b>remove</> this file until its owner updates to a more recent version of Peerio. <a-limitedActions>Read more</>",
+  "dialog_limitedActionsContent":
+    "This file has not been upgraded yet. You will only be able to <b>download</> or <b>remove</> this file until its owner updates to a more recent version of Peerio. <a-limitedActions>Read more</>",
   "mcr_title_zero_screen": "Find your fellow doctors and administrators",
   "title_medicalId": "AHPRA number",
   "title_medicalIdDescription": "Example: MED1234567890",
@@ -863,7 +1067,8 @@
   "title_enterValidAhpra": "Please enter a valid AHPRA number.",
   "title_selectYourRole": "Select your role.",
   "mcr_title_thankYou": "Thank you for signing up!",
-  "mcr_title_upgrade": "You can use the same account credentials to sign in to the MedCryptor desktop app. You will have access to more features such as:",
+  "mcr_title_upgrade":
+    "You can use the same account credentials to sign in to the MedCryptor desktop app. You will have access to more features such as:",
   "mcr_title_patientInvites": "Patient invites",
   "mcr_title_consultationRooms": "Consultation Rooms for doctors",
   "mcr_title_discussionRooms": "Discussion Rooms for practitioners",
@@ -873,14 +1078,18 @@
   "mcr_title_roomsDescription1": "Group messages for your practice",
   "mcr_title_roomsDescription2": "Organize Room by topic to chat among your peers",
   "mcr_title_newRoom": "Open a Room for your practice",
-  "mcr_title_offerNewPatient": "Want to open a consultation room for a patient? <toCreatePatient>Create a Patient File instead</>.",
-  "mcr_title_offerNewRoom": "Want to chat with a group, or have a consultation space for your patient? <toCreateRoom>Create a Room instead</>.",
+  "mcr_title_offerNewPatient":
+    "Want to open a consultation room for a patient? <toCreatePatient>Create a Patient File instead</>.",
+  "mcr_title_offerNewRoom":
+    "Want to chat with a group, or have a consultation space for your patient? <toCreateRoom>Create a Room instead</>.",
   "mcr_title_newInternalRoomPlaceholder": "New Internal Room",
   "mcr_title_newInternalRoom": "Open a Room inside Patient Space",
-  "mcr_title_newInternalRoomDescription": "Rooms created inside this space work best if topic of conversation pertain to the patient.",
+  "mcr_title_newInternalRoomDescription":
+    "Rooms created inside this space work best if topic of conversation pertain to the patient.",
   "mcr_title_newPatientRoomPlaceholder": "New Patient Room",
   "mcr_title_newPatientRoom": "Open additional Patient Room for {patientName}",
-  "mcr_title_newPatientRoomDescription": "Add a Room to consult your patient on a different topic, with different participants.",
+  "mcr_title_newPatientRoomDescription":
+    "Add a Room to consult your patient on a different topic, with different participants.",
   "mcr_button_addPatient": "Add a Patient",
   "mcr_title_addPatientDescription1": "For consultation and internal discussions",
   "mcr_title_addPatientDescription2": "Keep a history of your patient with grouped Rooms",
@@ -891,7 +1100,8 @@
   "mcr_title_internalRooms": "Internal Rooms",
   "mcr_title_internalRoom": "Internal Room",
   "mcr_title_internalRoomsDescription1": "Rooms to discuss about your patient",
-  "mcr_title_internalRoomsDescription2": "Open new Rooms with <plusIcon>+</> and organize them by topics",
+  "mcr_title_internalRoomsDescription2":
+    "Open new Rooms with <plusIcon>+</> and organize them by topics",
   "mcr_title_internalRoomsDescription3": "Invite doctors to join you in the Room <b>#general</>",
   "mcr_title_patientRooms": "Patient Rooms",
   "mcr_title_patientRoom": "Patient Room",
@@ -902,16 +1112,22 @@
   "mcr_title_patientFiles": "Patients",
   "mcr_title_general": "general",
   "mcr_title_newPatient": "New Patient",
-  "mcr_title_newPatientDescription": "Adding a Patient automatically creates an Internal Discussion Room and a Consultation Room for the patient. Want to open a general Room for your practice? <toCreateRoom>Create a Room instead</>.",
+  "mcr_title_newPatientDescription":
+    "Adding a Patient automatically creates an Internal Discussion Room and a Consultation Room for the patient. Want to open a general Room for your practice? <toCreateRoom>Create a Room instead</>.",
   "mcr_title_newPatientRecord": "Name of the Patient Record",
-  "mcr_title_newPatientRecordHint": "Name appears alphabetically in your chatlist. Example: Doe, John",
+  "mcr_title_newPatientRecordHint":
+    "Name appears alphabetically in your chatlist. Example: Doe, John",
   "mcr_title_patientUsernameOrEmail": "Patient username or email address",
   "mcr_title_noParticipants": "No participants",
   "mcr_title_chatHeaderPatientRoom": "This is the beginning of Patient Room <b>{patientName}</>.",
-  "mcr_title_patientRoomNotice": "Both patient and doctor must be present for a consultation. <toAddMembers>Add members</> to start the conversation.",
+  "mcr_title_patientRoomNotice":
+    "Both patient and doctor must be present for a consultation. <toAddMembers>Add members</> to start the conversation.",
   "mcr_title_chatHeaderInternalRoom": "This is the beginning of Internal Room <b># {roomName}</>.",
-  "mcr_title_internalRoomNotice": "This Room is intended for internal discussion about the patient. <toAddMembers>Add members</> to start the conversation.",
+  "mcr_title_internalRoomNotice":
+    "This Room is intended for internal discussion about the patient. <toAddMembers>Add members</> to start the conversation.",
   "mcr_title_consultation": "Consultation",
-  "mcr_warning_addContact": "This invite is intended for <b>medical practitioners</> only. Invite your patients via MedCryptor Desktop.",
+  "mcr_warning_addContact":
+    "This invite is intended for <b>medical practitioners</> only. Invite your patients via MedCryptor Desktop.",
+  "mcr_title_practitionerDetails": "Medical practitioner details",
   "mcr_error_ahrpa": "Please enter a valid AHPRA number"
 }

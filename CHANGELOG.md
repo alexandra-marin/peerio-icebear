@@ -2,6 +2,120 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.20.2"></a>
+## [5.20.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.20.1...v5.20.2) (2018-08-30)
+
+
+
+<a name="5.20.1"></a>
+## [5.20.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.20.0...v5.20.1) (2018-08-30)
+
+
+### Bug Fixes
+
+* hack for progress downloads in case onprogress does not work [ch12982] ([618878a](https://github.com/PeerioTechnologies/peerio-icebear/commit/618878a))
+
+
+
+<a name="5.20.0"></a>
+# [5.20.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.19.2...v5.20.0) (2018-08-29)
+
+
+### Features
+
+* medcryptor pdf ([b34ddcf](https://github.com/PeerioTechnologies/peerio-icebear/commit/b34ddcf))
+
+
+
+<a name="5.19.2"></a>
+## [5.19.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.19.1...v5.19.2) (2018-08-29)
+
+
+
+<a name="5.19.1"></a>
+## [5.19.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.19.0...v5.19.1) (2018-08-29)
+
+
+
+<a name="5.19.0"></a>
+# [5.19.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.18.0...v5.19.0) (2018-08-29)
+
+
+### Bug Fixes
+
+* add files in a single action ([3277f61](https://github.com/PeerioTechnologies/peerio-icebear/commit/3277f61))
+* copy ([493282e](https://github.com/PeerioTechnologies/peerio-icebear/commit/493282e))
+* do not rely on lastMentionID to show mentions [ch12327] ([442201b](https://github.com/PeerioTechnologies/peerio-icebear/commit/442201b))
+* lint ([620ac58](https://github.com/PeerioTechnologies/peerio-icebear/commit/620ac58))
+* prettier ([17b7f58](https://github.com/PeerioTechnologies/peerio-icebear/commit/17b7f58))
+* prevent UI freeze when uploading large trees ([4c270ba](https://github.com/PeerioTechnologies/peerio-icebear/commit/4c270ba))
+* rename ([c221d7f](https://github.com/PeerioTechnologies/peerio-icebear/commit/c221d7f))
+* save settings in a concurrent-safe way [ch12811] ([e1ae617](https://github.com/PeerioTechnologies/peerio-icebear/commit/e1ae617))
+* username length ([59a2585](https://github.com/PeerioTechnologies/peerio-icebear/commit/59a2585))
+
+
+### Features
+
+* [ch12151] support for mixpanel token in settings ([c3cd2c4](https://github.com/PeerioTechnologies/peerio-icebear/commit/c3cd2c4))
+
+
+
+<a name="5.18.0"></a>
+# [5.18.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.17.1...v5.18.0) (2018-08-28)
+
+
+### Bug Fixes
+
+* bold tag ([044132b](https://github.com/PeerioTechnologies/peerio-icebear/commit/044132b))
+* fix suggestion validator ([30a8fc8](https://github.com/PeerioTechnologies/peerio-icebear/commit/30a8fc8))
+* fix suggestion validator ([be6ceef](https://github.com/PeerioTechnologies/peerio-icebear/commit/be6ceef))
+
+
+### Features
+
+* title_usernameHeading ([1c0239c](https://github.com/PeerioTechnologies/peerio-icebear/commit/1c0239c))
+* title_usernameHeading ([1ed4133](https://github.com/PeerioTechnologies/peerio-icebear/commit/1ed4133))
+
+
+
+<a name="5.17.1"></a>
+## [5.17.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.17.0...v5.17.1) (2018-08-28)
+
+
+
+<a name="5.17.0"></a>
+# [5.17.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.16.0...v5.17.0) (2018-08-27)
+
+
+### Bug Fixes
+
+* format ([9028b0b](https://github.com/PeerioTechnologies/peerio-icebear/commit/9028b0b))
+
+
+### Features
+
+* contact search should work with emails ([c901d7c](https://github.com/PeerioTechnologies/peerio-icebear/commit/c901d7c))
+
+
+
+<a name="5.16.0"></a>
+# [5.16.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.15.2...v5.16.0) (2018-08-27)
+
+
+### Bug Fixes
+
+* attempting to fix consumer build errors ([f6e690a](https://github.com/PeerioTechnologies/peerio-icebear/commit/f6e690a))
+* export ([0524e5a](https://github.com/PeerioTechnologies/peerio-icebear/commit/0524e5a))
+* update tracker should ignore unknown digest type ([b958ebf](https://github.com/PeerioTechnologies/peerio-icebear/commit/b958ebf))
+
+
+### Features
+
+* pdf generator ([2d91165](https://github.com/PeerioTechnologies/peerio-icebear/commit/2d91165))
+* username suggestions ([#278](https://github.com/PeerioTechnologies/peerio-icebear/issues/278)) ([9629cb5](https://github.com/PeerioTechnologies/peerio-icebear/commit/9629cb5))
+
+
+
 <a name="5.15.2"></a>
 ## [5.15.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.15.1...v5.15.2) (2018-08-14)
 

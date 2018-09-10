@@ -1,4 +1,4 @@
-const { When, Then } = require('cucumber');
+import { When, Then } from 'cucumber';
 
 function isInvitedMember(world, chat, username) {
     const predicate = p => p.username === username;

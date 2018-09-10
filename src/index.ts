@@ -79,3 +79,5 @@ import * as secret from './crypto/secret';
 import * as sign from './crypto/sign';
 import { setScrypt } from './crypto/scrypt-proxy';
 export const crypto = { cryptoUtil, keys, publicCrypto, secret, sign, setScrypt };
+
+export { default as saveAccountKeyBackup } from './helpers/pdf';

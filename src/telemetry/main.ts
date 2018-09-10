@@ -1,8 +1,8 @@
-const config = require('../config');
-const TinyDb = require('../db/tiny-db');
-const { cryptoUtil } = require('../crypto');
-const g = require('../helpers/global-context');
-const serverSettings = require('../models/server-settings');
+import config from '../config';
+import TinyDb from '../db/tiny-db';
+import * as cryptoUtil from '../crypto/util';
+import g from '../helpers/global-context';
+import serverSettings from '../models/server-settings';
 
 async function getUserId(): Promise<string> {
     const userId: string = await TinyDb.system.getValue('telemetryUserId');

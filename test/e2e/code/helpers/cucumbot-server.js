@@ -1,6 +1,6 @@
-const CucumbotBase = require('./cucumbot-base');
+import CucumbotBase from './cucumbot-base';
 
-class CucumbotServer extends CucumbotBase {
+export default class CucumbotServer extends CucumbotBase {
     constructor(world) {
         super(world);
         process.on('message', this.processMessage);
@@ -11,5 +11,3 @@ class CucumbotServer extends CucumbotBase {
         this.sendReady();
     }
 }
-
-module.exports = CucumbotServer;

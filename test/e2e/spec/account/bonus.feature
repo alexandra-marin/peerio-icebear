@@ -12,10 +12,10 @@ Feature: account storage bonus
         When I invite other users and they sign up
         Then I unlock 250MB of storage
         When I confirm the primary email
-        Then I unlock 100MB of storage
+        Then I unlock 500MB of storage
         When I upload an avatar
         Then I unlock 100MB of storage
-        When I create a room 
+        When I create a room
         Then I unlock 100MB of storage
         When I install the mobile app
         Then I unlock 100MB of storage

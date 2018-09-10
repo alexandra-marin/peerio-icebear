@@ -6,7 +6,7 @@ import * as nacl from 'tweetnacl';
 import { scryptPromise } from './scrypt-proxy';
 import { bytesToHex, strToBytes, concatTypedArrays, getRandomBytes } from './util';
 import * as errors from '../errors';
-import { KeyPair } from '../interfaces';
+import { KeyPair } from '../defs/interfaces';
 
 // ------------------------------------------------------------------------------------------
 // WARNING: changing scrypt params will break compatibility with older scrypt-generated data

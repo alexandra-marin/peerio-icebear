@@ -8,7 +8,7 @@ const day = 24 * hour;
 const relativeTimeDisplayLimit = 21 * hour;
 
 /**
- * Formatted time stamp that changes baseds on how much time has passed since the given time.
+ * Formatted time stamp that changes based on how much time has passed since the given time.
  * < 24hr passed    => H:MM timestamp
  * < 48hr passed    => "Yesterday"
  * < 7 days passed  => day of week
@@ -27,7 +27,7 @@ export default function relativeTimestamp(time: number): string {
     } else if (timeFromNow > 2 * day) {
         return moment(time).format('dddd');
     } else if (timeFromNow > relativeTimeDisplayLimit) {
-        return t('title_yesterday');
+        return t('title_yesterday') as string;
     }
     return moment(time).fromNow();
 }

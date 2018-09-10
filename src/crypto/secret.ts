@@ -17,8 +17,7 @@
 
 import * as nacl from 'tweetnacl';
 import * as util from './util';
-
-const { DecryptionError } = require('../errors');
+import { DecryptionError } from '../errors';
 
 interface NaclLowlevel {
     lowlevel: {
@@ -49,7 +48,6 @@ export const NONCE_SIZE = 24;
 /**
  * Encrypts and authenticates data using symmetric encryption.
  * This is a refactored version of nacl.secretbox().
- * @param msgBytes
  * @param key - 32 bytes symmetric key
  * @param nonce - in case you want to set your own nonce. 24 bytes.
  * @param appendNonce - appends nonce to the end of encrypted bytes

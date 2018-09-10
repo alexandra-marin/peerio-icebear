@@ -1,17 +1,16 @@
-const cp = require('child_process');
-const CucumbotBase = require('./cucumbot-base');
-const testConfig = require('../test-config');
+import cp from 'child_process';
+import CucumbotBase from './cucumbot-base';
+import testConfig from '../test-config';
 
-class CucumbotClient extends CucumbotBase {
-    finished = false;
-    finishedWithError = false;
-
-    hasControl = 0;
-
+export default class CucumbotClient extends CucumbotBase {
     constructor(name, world) {
         super(world);
         this.name = name;
     }
+    finished = false;
+    finishedWithError = false;
+
+    hasControl = 0;
 
     start(noAccount) {
         let env = Object.assign({ CUCUMBOT: 1 }, process.env);
@@ -63,5 +62,3 @@ class CucumbotClient extends CucumbotBase {
         });
     }
 }
-
-module.exports = CucumbotClient;

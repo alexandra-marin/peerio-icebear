@@ -1,6 +1,6 @@
-const { Given, When, Then } = require('cucumber');
-const { getRandomEmail, getRandomUsername } = require('../helpers/random-data');
-const otplib = require('otplib');
+import { Given, When, Then } from 'cucumber';
+import { getRandomEmail, getRandomUsername } from '../helpers/random-data';
+import { authenticator } from 'otplib';
 
 Given('I confirm the primary email', { timeout: 4000000 }, async function() {
     await this.confirmEmail(ice.User.current.username, ice.User.current.addresses[0].address);
@@ -36,15 +36,15 @@ Then('I should have default account settings', async function() {
 });
 
 When('I change my account settings', async function() {
-    const { settings } = ice.User.current;
-    settings.contactNotifications = true;
-    settings.contactRequestNotifications = true;
-    settings.messageNotifications = false;
-    settings.errorTracking = true;
-    settings.dataCollection = true;
-    settings.subscribeToPromoEmails = true;
-    await ice.User.current.saveSettings();
-    return this.waitFor(() => settings.version === 2);
+    await ice.User.current.saveSettings(settings => {
+        settings.contactNotifications = true;
+        settings.contactRequestNotifications = true;
+        settings.messageNotifications = false;
+        settings.errorTracking = true;
+        settings.dataCollection = true;
+        settings.subscribeToPromoEmails = true;
+    });
+    return this.waitFor(() => ice.User.current.settings.version === 2);
 });
 
 Then('my account settings are changed', async function() {
@@ -96,7 +96,7 @@ When('I invite other users and they sign up', { timeout: 1000000 }, async functi
 
 When('I enable two-step verification', async function() {
     this.TOTPSecret = await ice.User.current.setup2fa();
-    this.token = otplib.authenticator.generate(this.TOTPSecret);
+    this.token = authenticator.generate(this.TOTPSecret);
     return ice.User.current.confirm2faSetup(this.token);
 });
 

@@ -11,6 +11,8 @@ import warnings from '../warnings';
 import clientApp from '../client-app';
 import User from './user';
 import { AuthToken, AuthData } from '../../defs/interfaces';
+import { retryUntilSuccess } from '../../helpers/retry';
+
 //
 // Authentication mixin for User model.
 // TODO: authentication code is a bit hard to read and follow, needs refactoring
@@ -65,11 +67,13 @@ export default function mixUserAuthModule(this: User) {
     this._loadAuthSalt = () => {
         console.log('Loading auth salt');
         if (this.authSalt) return Promise.resolve();
-        return socket
-            .send('/noauth/auth-salt/get', { username: this.username }, false)
-            .then(response => {
-                this.authSalt = new Uint8Array(response.authSalt);
-            }) as Promise<void>;
+        return retryUntilSuccess(
+            () => socket.send('/noauth/auth-salt/get', { username: this.username }, false),
+            undefined,
+            3
+        ).then(response => {
+            this.authSalt = new Uint8Array(response.authSalt);
+        }) as Promise<void>;
     };
     this._getAuthToken = (): Promise<AuthToken> => {
         console.log('Requesting auth token.');
@@ -100,7 +104,11 @@ export default function mixUserAuthModule(this: User) {
                     this.trustedDevice = cookieData.trusted;
                     req.twoFACookie = cookieData.cookie;
                 }
-                return socket.send('/noauth/auth-token/get', req, true);
+                return retryUntilSuccess(
+                    () => socket.send('/noauth/auth-token/get', req, true),
+                    undefined,
+                    3
+                );
             })
             .then(resp => util.convertBuffers(resp));
     };
@@ -117,16 +125,19 @@ export default function mixUserAuthModule(this: User) {
         if (decrypted[0] !== 65 || decrypted[1] !== 84 || decrypted.length !== 32) {
             throw new Error('Auth token plaintext is of invalid format.');
         }
-        return socket
-            .send('/noauth/authenticate', { decryptedAuthToken: decrypted.buffer }, true)
-            .then(resp => {
-                if (this.sessionId && resp.sessionId !== this.sessionId) {
-                    console.log('Digest session has expired.');
-                    clientApp.clientSessionExpired = true;
-                    throw new Error('Digest session was expired, application restart is needed.');
-                }
-                this.sessionId = resp.sessionId;
-            });
+        return retryUntilSuccess(
+            () =>
+                socket.send('/noauth/authenticate', { decryptedAuthToken: decrypted.buffer }, true),
+            undefined,
+            3
+        ).then(resp => {
+            if (this.sessionId && resp.sessionId !== this.sessionId) {
+                console.log('Digest session has expired.');
+                clientApp.clientSessionExpired = true;
+                throw new Error('Digest session was expired, application restart is needed.');
+            }
+            this.sessionId = resp.sessionId;
+        });
     };
 
     this._checkForPasscode = async (skipCache = false): Promise<boolean> => {

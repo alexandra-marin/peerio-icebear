@@ -520,7 +520,7 @@
   "title_securityDeviceSettings": "Device settings",
   "title_securityDeviceSettingsDetail": "These settings will only apply to this device",
   "button_showAK": "Show Account Key",
-  "error_wrongAK": "Invalid Account Key",
+  "error_wrongAK": "Account Key does not match the username",
   "title_never": "Never",
   "title_notifications": "Notifications",
   "title_emailNotifications": "Emails",

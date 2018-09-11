@@ -61,7 +61,6 @@ export { default as Contact } from './models/contacts/contact';
 export { default as __tracker } from './models/update-tracker'; // Clients do not need it. Exported just for debugging.
 export { default as CacheEngineBase } from './db/cache-engine-base';
 export { default as saveAccountKeyBackup } from './helpers/pdf';
-export * from './telemetry';
 
 import * as validation from './helpers/validation/field-validation';
 export { validation };
@@ -73,6 +72,8 @@ import * as fileHelpers from './helpers/file';
 export { fileHelpers };
 import * as prombservable from './helpers/prombservable';
 export { prombservable };
+import * as telemetry from './telemetry';
+export { telemetry };
 
 import * as cryptoUtil from './crypto/util';
 import * as keys from './crypto/keys';

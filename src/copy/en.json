@@ -981,5 +981,15 @@
   "mcr_title_consultation": "Consultation",
   "mcr_warning_addContact": "This invite is intended for <b>medical practitioners</> only. Invite your patients via MedCryptor Desktop.",
   "mcr_title_practitionerDetails": "Medical practitioner details",
-  "mcr_error_ahrpa": "Please enter a valid AHPRA number"
+  "mcr_error_ahrpa": "Please enter a valid AHPRA number",
+  "title_contact_beacon": "See all your contacts here.",
+  "description_contact_beacon": "Invite people or see who already uses peerio in your contacts.",
+  "title_chat_beacon": "Start a secure chat",
+  "description_chat_beacon": "Go ahead and create a chat with @support or with yourself.",
+  "title_files_beacon": "Encrypt and upload files",
+  "description_files_beacon": "Upload your files to make secure cloud backups and to share with others.",
+  "title_search_beacon": "Add contacts, build your network",
+  "description_search_beacon": "Add contacts, or invite people to communicate securely with you.",
+  "title_startChat_beacon": "See all your conversations here.",
+  "description_startChat_beacon": "Start a new conversation or check-in on your direct messages and rooms."
 }

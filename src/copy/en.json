@@ -986,10 +986,12 @@
   "description_contact_beacon": "Invite people or see who already uses peerio in your contacts.",
   "title_chat_beacon": "Start a secure chat",
   "description_chat_beacon": "Go ahead and create a chat with @support or with yourself.",
-  "title_files_beacon": "Encrypt and upload files",
-  "description_files_beacon": "Upload your files to make secure cloud backups and to share with others.",
+  "title_files_beacon": "Encrypt your files.",
+  "description_files_beacon": "Encrypt your file library, simply upload them here.",
   "title_search_beacon": "Add contacts, build your network",
   "description_search_beacon": "Add contacts, or invite people to communicate securely with you.",
   "title_startChat_beacon": "See all your conversations here.",
-  "description_startChat_beacon": "Start a new conversation or check-in on your direct messages and rooms."
+  "description_startChat_beacon": "Start a new conversation or check-in on your direct messages and rooms.",
+  "title_uploadFiles_beacon": "Encrypt and upload files",
+  "description_uploadFiles_beacon": "Upload your files to make secure cloud backups and to share with others."
 }

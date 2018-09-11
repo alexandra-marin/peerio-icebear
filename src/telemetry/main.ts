@@ -1,16 +1,33 @@
+import { observable } from 'mobx';
+import { asPromise } from '../helpers/prombservable';
 import config from '../config';
 import TinyDb from '../db/tiny-db';
 import * as cryptoUtil from '../crypto/util';
 import g from '../helpers/global-context';
 import serverSettings from '../models/server-settings';
 
+let userId: string;
+const userIdState = observable({
+    locked: false
+});
+
 async function getUserId(): Promise<string> {
-    const userId: string = await TinyDb.system.getValue('telemetryUserId');
+    if (userId) return userId;
+    await asPromise(userIdState, 'locked', false);
 
     if (!userId) {
-        const newId: string = cryptoUtil.getRandomGlobalShortIdHex();
-        await TinyDb.system.setValue('telemetryUserId', newId);
-        return newId;
+        userIdState.locked = true;
+        try {
+            userId = await TinyDb.system.getValue('telemetryUserId');
+            if (!userId) {
+                userId = cryptoUtil.getRandomGlobalShortIdHex();
+                await TinyDb.system.setValue('telemetryUserId', userId);
+            }
+        } catch (e) {
+            console.error(e);
+            throw e;
+        }
+        userIdState.locked = false;
     }
     return userId;
 }

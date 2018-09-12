@@ -69,8 +69,7 @@ export default function mixUserAuthModule(this: User) {
         if (this.authSalt) return Promise.resolve();
         return retryUntilSuccess(
             () => socket.send('/noauth/auth-salt/get', { username: this.username }, false),
-            undefined,
-            3
+            { id: 'requesting auth salt', maxRetries: 3, retryOnlyOnDisconnect: true }
         ).then(response => {
             this.authSalt = new Uint8Array(response.authSalt);
         }) as Promise<void>;
@@ -104,11 +103,11 @@ export default function mixUserAuthModule(this: User) {
                     this.trustedDevice = cookieData.trusted;
                     req.twoFACookie = cookieData.cookie;
                 }
-                return retryUntilSuccess(
-                    () => socket.send('/noauth/auth-token/get', req, true),
-                    undefined,
-                    3
-                );
+                return retryUntilSuccess(() => socket.send('/noauth/auth-token/get', req, true), {
+                    id: 'requesting auth token',
+                    maxRetries: 3,
+                    retryOnlyOnDisconnect: true
+                });
             })
             .then(resp => util.convertBuffers(resp));
     };
@@ -128,8 +127,7 @@ export default function mixUserAuthModule(this: User) {
         return retryUntilSuccess(
             () =>
                 socket.send('/noauth/authenticate', { decryptedAuthToken: decrypted.buffer }, true),
-            undefined,
-            3
+            { id: 'authenticating auth token', maxRetries: 3, retryOnlyOnDisconnect: true }
         ).then(resp => {
             if (this.sessionId && resp.sessionId !== this.sessionId) {
                 console.log('Digest session has expired.');

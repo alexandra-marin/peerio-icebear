@@ -1216,11 +1216,10 @@ class Chat {
 
     async ensureDigestLoaded() {
         if (this.digestLoaded) return;
-        await retryUntilSuccess(
-            () => tracker.loadDigestFor(this.id),
-            `loading digest for ${this.id}`,
-            5
-        );
+        await retryUntilSuccess(() => tracker.loadDigestFor(this.id), {
+            id: `loading digest for ${this.id}`,
+            maxRetries: 5
+        });
         this.digestLoaded = true;
     }
 

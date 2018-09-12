@@ -1,15 +1,19 @@
 {
     "root": true,
-    "parser": "babel-eslint",
+    "parser": "typescript-eslint-parser",
+    "plugins": [
+        "typescript"
+    ],
     "extends": ["peerio/index.base.js", "prettier"],
     "rules": {
-        "no-labels": 0,
+        "no-undef": 0,
+        "no-unused-vars": 0,
         "no-mixed-operators": 0,
         "no-multi-assign": 0,
         "no-restricted-properties": 1,
         "no-void": 0,
         "prefer-arrow-callback": 0,
-        "no-debugger": 0,
+        "no-debugger": 1,
         "prefer-destructuring": 0,
         "no-await-in-loop": 0,
         "import/extensions": 0,
@@ -17,22 +21,10 @@
         "import/first": 0,
         "import/no-mutable-exports": 0,
         "import/prefer-default-export": 0
-    },
-    "globals": {
-        "TextEncoder": false,
-        "TextDecoder": false,
-        "crypto": false,
-        "window": false,
-        "xdescribe": false,
-        "WebSocket": false,
-        "XMLHttpRequest": false,
-        "performance": false
-    },
-    "settings": {
-        "import/resolver": {
-            "node": {
-                "extensions": [".js", ".ts"]
-            }
-        }
+        "import/export": 0,
+        "import/no-unresolved": 0,
+        "typescript/class-name-casing": 2,
+        "typescript/no-angle-bracket-type-assertion": 2,
+        "typescript/no-array-constructor": 2
     }
 }

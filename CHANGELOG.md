@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.21.1"></a>
+## [5.21.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.21.0...v5.21.1) (2018-09-12)
+
+
+### Bug Fixes
+
+* auth retry ([94e9c9c](https://github.com/PeerioTechnologies/peerio-icebear/commit/94e9c9c))
+* improve auth sequence stability ([d244007](https://github.com/PeerioTechnologies/peerio-icebear/commit/d244007))
+* socket event order on fatal error response ([a9263e3](https://github.com/PeerioTechnologies/peerio-icebear/commit/a9263e3))
+
+
+
 <a name="5.21.0"></a>
 # [5.21.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.20.2...v5.21.0) (2018-09-10)
 

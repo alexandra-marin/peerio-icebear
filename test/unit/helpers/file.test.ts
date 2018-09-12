@@ -86,18 +86,22 @@ describe('File helper should', () => {
         );
     });
 
-    paths.forEach(testCase => {
-        it(`return file name from path "${testCase.data}"`, () => {
+    it(`return file name from path`, () => {
+        paths.forEach(testCase => {
             const actual = helper.getFileName(testCase.data);
             actual.should.equal(testCase.expectedFullName);
         });
+    });
 
-        it(`return file name without extension from path "${testCase.data}"`, () => {
+    it(`return file name without extension from path`, () => {
+        paths.forEach(testCase => {
             const actual = helper.getFileNameWithoutExtension(testCase.data);
             actual.should.equal(testCase.expectedName);
         });
+    });
 
-        it(`return extension from path "${testCase.data}"`, () => {
+    it(`return extension from path`, () => {
+        paths.forEach(testCase => {
             const actual = helper.getFileExtension(testCase.data);
             actual.should.equal(testCase.expectedExt);
         });

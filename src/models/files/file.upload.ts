@@ -67,6 +67,10 @@ export function upload(this: File, filePath: string, fileName?: string, resume =
         let p = Promise.resolve(null);
         if (resume) {
             p = this._getUlResumeParams(filePath);
+        } else {
+            // only set values if it's not a resume
+            this.uploadedAt = new Date();
+            this.name = fileName || this.name || fileHelper.getFileName(filePath);
         }
         // we need fileId to be set before function returns
         this.generateFileId();
@@ -76,8 +80,6 @@ export function upload(this: File, filePath: string, fileName?: string, resume =
                 nextChunkId = nextChunk;
                 // no need to set values when it's a resume
                 if (nextChunkId === null) {
-                    this.uploadedAt = new Date(); // todo: should we update this when upload actually finishes?
-                    this.name = fileName || this.name || fileHelper.getFileName(filePath);
                     this.descriptorKey = cryptoUtil.bytesToB64(keys.generateEncryptionKey());
                     this.blobKey = cryptoUtil.bytesToB64(keys.generateEncryptionKey());
                 }

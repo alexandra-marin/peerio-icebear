@@ -34,7 +34,7 @@ import config from '../../config';
 
 const VALIDATION_THROTTLING_PERIOD_MS = 400;
 const usernameRegex = /^\w{1,16}$/;
-const emailRegex = /^[\w]+@[\w]+\.+[\w]+/i;
+const emailRegex = /^[\w]+@[\w]+\.+[\w]/i;
 const medicalIdRegex = /MED\d{10}/i;
 const usernameLength = config.user.maxUsernameLength;
 // const phoneRegex =

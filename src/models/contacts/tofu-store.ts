@@ -56,8 +56,10 @@ export class TofuStore {
                         filter: { collectionVersion: { $gt: knownUpdateId } }
                     });
                 },
-                'loading tofu kegs',
-                10
+                {
+                    id: 'loading tofu kegs',
+                    maxRetries: 10
+                }
             );
         } catch (err) {
             console.error(err);
@@ -131,8 +133,7 @@ export class TofuStore {
                         },
                         false
                     ),
-                undefined,
-                10
+                { maxRetries: 10 }
             );
         } catch (err) {
             console.error(err);

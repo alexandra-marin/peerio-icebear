@@ -119,8 +119,7 @@ export default class FileDownloader extends FileProcessor {
                     this._download(url, size)
                 );
             },
-            undefined,
-            5
+            { maxRetries: 5 }
         );
 
         // Add download result processing to the chain.

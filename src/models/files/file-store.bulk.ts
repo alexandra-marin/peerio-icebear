@@ -6,6 +6,7 @@ import config from '../../config';
 import warnings from '../warnings';
 import FileStoreBase from './file-store-base';
 import FileFolder from './file-folder';
+import File from './file';
 
 /**
  * Extension to operate with selected files and folders in bulk
@@ -44,11 +45,11 @@ class FileStoreBulk {
         );
     }
 
-    async removeOne(i, batch) {
+    async removeOne(i: File | FileFolder) {
         if (i.isFolder && this.deleteFolderConfirmator) {
             if (!(await this.deleteFolderConfirmator(i))) return Promise.reject();
         }
-        return i.remove(batch);
+        return i.remove();
     }
 
     @action.bound
@@ -61,7 +62,7 @@ class FileStoreBulk {
         }
         let promise = Promise.resolve();
         items.forEach(i => {
-            promise = promise.then(() => this.removeOne(i, true));
+            promise = promise.then(() => this.removeOne(i));
         });
         await promise;
         this.fileStore.folderStore.save();

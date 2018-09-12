@@ -121,6 +121,7 @@ class FileStoreBulk {
         }
     }
 
+    /** Bulk-move all files and folders that have `selected` state. */
     @action.bound
     async move(targetFolder) {
         const items = getFileStore().selectedFilesOrFolders;
@@ -147,6 +148,7 @@ class FileStoreBulk {
         await this.fileStore.folderStore.save();
     }
 
+    /** Download the given `item` to the destination `path`. */
     @action.bound
     async downloadOne(item, path, suppressSnackbar) {
         item.selected = false;
@@ -163,6 +165,7 @@ class FileStoreBulk {
         }
     }
 
+    /** Bulk-download all files and folders that have `selected` state. */
     @action.bound
     async download() {
         if (!this.downloadFolderSelector) {

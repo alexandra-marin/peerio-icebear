@@ -43,7 +43,7 @@ export default class FileFolder {
     // unique global id (local folder id, or volume id)
     @observable id: string = null;
     // to be able to filter easier when files and folders are in the same list
-    isFolder = true;
+    readonly isFolder = true;
     // to indicate root folder or volume root
     isRoot = false;
     // this folder is a volume root

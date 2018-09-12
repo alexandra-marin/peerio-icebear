@@ -90,8 +90,7 @@ class FileStoreBulk {
             promise = promise.then(() => {
                 i.selected = false;
             });
-            // TODO: instanceof check is for typescript, how to avoid it?
-            if (i.isFolder || i instanceof FileFolder) {
+            if (i.isFolder === true) {
                 promise = promise.then(() => getVolumeStore().shareFolder(i, usernamesAccessList));
             } else {
                 usernamesAccessList.forEach(contact => {
@@ -149,17 +148,17 @@ class FileStoreBulk {
     }
 
     @action.bound
-    async downloadOne(item, path, suppressSnackbar) {
+    async downloadOne(item: File | FileFolder, path: string, suppressSnackbar: boolean) {
         item.selected = false;
+        // TODO: maybe run in parallel?
+        if (item.isFolder === true) {
+            await item.download(path, this.pickPathSelector, config.FileStream.createDir);
+        } else {
         const downloadPath = await this.pickPathSelector(
             path,
             item.nameWithoutExtension || item.name,
             item.ext || ''
         );
-        // TODO: maybe run in parallel?
-        if (item.isFolder) {
-            await item.download(path, this.pickPathSelector, config.FileStream.createDir);
-        } else {
             await item.download(downloadPath, false, false, suppressSnackbar);
         }
     }

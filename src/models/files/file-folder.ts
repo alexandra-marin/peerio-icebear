@@ -219,7 +219,11 @@ export default class FileFolder {
     }
 
     // downloads all files in current folder, reconstructing folder structure and showing progress
-    async download(path, pickPathSelector, createDirFunctor) {
+    async download(
+        path: string,
+        pickPathSelector: (path: string, name: string, ext?: string) => Promise<string>,
+        createDirFunctor: (path: string) => Promise<void>
+    ) {
         const downloadPath = await pickPathSelector(path, this.name);
         this.progress = 0;
         this.progressMax = this.files.length + this.folders.length;
@@ -234,7 +238,7 @@ export default class FileFolder {
         this.files.forEach(file => {
             promise = promise.then(async () => {
                 await file.download(
-                    pickPathSelector(downloadPath, file.nameWithoutExtension, file.ext)
+                    await pickPathSelector(downloadPath, file.nameWithoutExtension, file.ext)
                 );
                 this.progress++;
             });

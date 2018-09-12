@@ -90,10 +90,10 @@ export function retryUntilSuccess<T = any>(
             console.error(err);
             callInfo.lastError = err;
             if (err) {
-                if ((<ServerErrorType>err).code === serverErrorCodes.notFound) {
+                if ((err as ServerErrorType).code === serverErrorCodes.notFound) {
                     callInfo.fatalErrorCount++;
                 }
-                if ((<ServerErrorType>err).code === serverErrorCodes.accountBlacklisted) {
+                if ((err as ServerErrorType).code === serverErrorCodes.accountBlacklisted) {
                     callInfo.fatalErrorCount = maxFatalErrorsCount + 1;
                 }
                 if (options.errorHandler && !(err instanceof DisconnectedError)) {

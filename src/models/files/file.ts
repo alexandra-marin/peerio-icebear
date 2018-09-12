@@ -633,7 +633,7 @@ export default class File extends Keg<IFilePayload, IFileProps> {
                 id: `hiding ${this.fileId} in ${this.db.id}`,
                 maxRetries: 5,
                 errorHandler: async (err: Error | ServerErrorType) => {
-                    if ((<ServerErrorType>err).code === serverErrorCodes.malformedRequest) {
+                    if ((err as ServerErrorType).code === serverErrorCodes.malformedRequest) {
                         await this.load();
                     }
                 }
@@ -650,7 +650,7 @@ export default class File extends Keg<IFilePayload, IFileProps> {
                 id: `unhiding ${this.fileId} in ${this.db.id}`,
                 maxRetries: 5,
                 errorHandler: async (err: Error | ServerErrorType) => {
-                    if ((<ServerErrorType>err).code === serverErrorCodes.malformedRequest) {
+                    if ((err as ServerErrorType).code === serverErrorCodes.malformedRequest) {
                         await this.load();
                     }
                 }

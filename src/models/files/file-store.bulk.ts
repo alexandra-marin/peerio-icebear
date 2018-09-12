@@ -105,7 +105,7 @@ class FileStoreBulk {
     }
 
     @action.bound
-    moveOne(item, folder, bulk) {
+    moveOne(item: File | FileFolder, folder: FileFolder, bulk: boolean) {
         item.selected = false;
         if (item.folderId === folder.id) return;
         if (item.isShared) return;
@@ -122,7 +122,7 @@ class FileStoreBulk {
     }
 
     @action.bound
-    async move(targetFolder) {
+    async move(targetFolder: FileFolder) {
         const items = getFileStore().selectedFilesOrFolders;
         // currently progress is too quick, but in the future
         // it may make sense to show progress bar
@@ -154,11 +154,11 @@ class FileStoreBulk {
         if (item.isFolder === true) {
             await item.download(path, this.pickPathSelector, config.FileStream.createDir);
         } else {
-        const downloadPath = await this.pickPathSelector(
-            path,
-            item.nameWithoutExtension || item.name,
-            item.ext || ''
-        );
+            const downloadPath = await this.pickPathSelector(
+                path,
+                item.nameWithoutExtension || item.name,
+                item.ext || ''
+            );
             await item.download(downloadPath, false, false, suppressSnackbar);
         }
     }

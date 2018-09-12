@@ -1,6 +1,8 @@
 import { observable, computed, action, when, IObservableArray } from 'mobx';
 import { setVolumeStore } from '../../helpers/di-volume-store';
 import Volume from './volume';
+import FileFolder from '../files/file-folder';
+import Contact from '../contacts/contact';
 import socket from '../../network/socket';
 import warnings from '../warnings';
 import dbListProvider from '../../helpers/keg-db-list-provider';
@@ -17,7 +19,7 @@ export class VolumeStore {
 
     shareQueue = new TaskQueue(1);
     @observable.shallow volumes = [] as IObservableArray<Volume>;
-    volumeMap = {};
+    readonly volumeMap: { [volumeId: string]: Volume } = {};
     @observable loading = false;
     @observable loaded = false;
 
@@ -33,9 +35,9 @@ export class VolumeStore {
     };
 
     @action.bound
-    addVolume(volume) {
+    addVolume(volume: string | Volume): Volume {
         if (!volume) throw new Error(`Invalid volume id. ${volume}`);
-        let v;
+        let v: Volume;
         if (typeof volume === 'string') {
             if (volume === 'SELF' || this.volumeMap[volume] || !volume.startsWith('volume:')) {
                 return this.volumeMap[volume];
@@ -50,7 +52,6 @@ export class VolumeStore {
 
         this.volumeMap[v.id] = v;
         this.volumes.push(v);
-        v.added = true;
         v.loadMetadata().then(() => v.store.updateFiles());
         return v;
     }
@@ -80,7 +81,7 @@ export class VolumeStore {
     }
 
     @action
-    async createVolume(participants = [], name) {
+    async createVolume(participants = [], name: string): Promise<Volume | null> {
         try {
             // 1. we can't add participants before setting volume name because
             // server will trigger invites and send empty volume name to user
@@ -105,7 +106,7 @@ export class VolumeStore {
     }
 
     @action
-    unloadVolume(volume) {
+    unloadVolume(volume: Volume) {
         volume.isDeleted = true;
         volume.dispose();
         delete this.volumeMap[volume.id];
@@ -134,9 +135,9 @@ export class VolumeStore {
     }
 
     @action.bound
-    async shareFolder(folder, participants) {
+    async shareFolder(folder: Volume | FileFolder, participants: (Contact | string)[]) {
         if (folder.isShared && participants) {
-            return folder.addParticipants(participants);
+            return (folder as Volume).addParticipants(participants); // FIXME: automatic discrimination between Volume and FileFolder?
         }
         if (folder.store.id !== 'main') throw new Error('Can only share local folders');
         return this.shareQueue.addTask(async () => {

@@ -72,7 +72,7 @@ class NodeFileStream extends FileStreamBase {
         this.pos = pos;
     }
 
-    static getStat(filePath) {
+    static getStat(filePath: string) {
         try {
             const stat = fs.statSync(filePath);
             return Promise.resolve(stat);
@@ -81,7 +81,7 @@ class NodeFileStream extends FileStreamBase {
         }
     }
 
-    static delete(filePath): Promise<void> {
+    static delete(filePath: string): Promise<void> {
         return new Promise((resolve, reject) => {
             fs.unlink(filePath, err => {
                 if (err) reject(err);
@@ -110,7 +110,7 @@ class NodeFileStream extends FileStreamBase {
         return Promise.resolve(fs.existsSync(filePath));
     }
 
-    static createDir(folderPath): Promise<void> {
+    static createDir(folderPath: string): Promise<void> {
         return new Promise((resolve, reject) => {
             mkdirp(folderPath, err => {
                 if (err) reject(err);
@@ -119,7 +119,7 @@ class NodeFileStream extends FileStreamBase {
         });
     }
 
-    static removeDir(folderPath): Promise<void> {
+    static removeDir(folderPath: string): Promise<void> {
         return new Promise((resolve, reject) => {
             rimraf(folderPath, { disableGlob: true }, err => {
                 if (err) reject(err);

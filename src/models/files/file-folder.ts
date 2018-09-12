@@ -265,7 +265,7 @@ export default class FileFolder {
 
     // move file to this folder
     @action.bound
-    async attachFile(file) {
+    async attachFile(file: File) {
         if (file.store !== this.store) {
             if (file.isLegacy) {
                 console.error('can not share legacy file', file.fileId);
@@ -298,7 +298,7 @@ export default class FileFolder {
 
     // adds exiting folder instance to this folder
     @action.bound
-    async attachFolder(folder, skipSave = false, skipRootFolder?) {
+    async attachFolder(folder: FileFolder, skipSave = false, skipRootFolder?: boolean) {
         if (folder === this) return Promise.resolve();
         if (folder.store !== this.store) {
             // 1. we copy folder structure to another kegdb
@@ -319,7 +319,7 @@ export default class FileFolder {
 
     // private api, copies files from one db to another, preserving folder ids
     @action
-    async copyFilesTo(dst, folderIdMap) {
+    protected async copyFilesTo(dst, folderIdMap) {
         const src = this;
         src.progress = dst.progress = 0;
         src.progressMax = dst.progressMax = src.allFiles.length;
@@ -338,7 +338,7 @@ export default class FileFolder {
 
     // private api
     @action
-    async copyFolderStructureTo(dst: FileFolder, skipRootFolder = false) {
+    protected async copyFolderStructureTo(dst: FileFolder, skipRootFolder = false) {
         const src = this;
         const folderIdMap: { [folderId: string]: string } = {}; // mapping between source folder ids and destination
         const copyFolders = (parentSrc: FileFolder, parentDst: FileFolder) => {

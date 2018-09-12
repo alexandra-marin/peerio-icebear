@@ -362,8 +362,7 @@ export class ContactStore {
     removeInvite(email: string) {
         return retryUntilSuccess(
             () => socket.send('/auth/contacts/issued-invites/remove', { email }),
-            undefined,
-            10
+            { maxRetries: 10 }
         );
     }
 
@@ -377,8 +376,7 @@ export class ContactStore {
                 socket.send('/auth/contacts/received-invites/remove', {
                     username
                 }),
-            undefined,
-            10
+            { maxRetries: 10 }
         );
     }
 

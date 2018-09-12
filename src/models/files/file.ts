@@ -1,5 +1,5 @@
 import relativeTimestamp from '../../helpers/time-formatting';
-import { serverErrorCodes } from '../../errors';
+import { serverErrorCodes, ServerErrorType } from '../../errors';
 import Keg from './../kegs/keg';
 import { observable, computed, action, IObservableArray } from 'mobx';
 import * as cryptoUtil from '../../crypto/util';
@@ -603,11 +603,10 @@ export default class File extends Keg<IFilePayload, IFileProps> {
         this._resetUploadState();
         this._resetDownloadState();
         if (!this.id) return Promise.resolve();
-        return retryUntilSuccess(
-            () => super.remove(),
-            `remove file ${this.id} from ${this.db.id}`,
-            5
-        ).then(() => {
+        return retryUntilSuccess(() => super.remove(), {
+            id: `remove file ${this.id} from ${this.db.id}`,
+            maxRetries: 5
+        }).then(() => {
             this.deleted = true;
         });
     }
@@ -630,8 +629,7 @@ export default class File extends Keg<IFilePayload, IFileProps> {
                     return Promise.reject(err);
                 });
             },
-            undefined,
-            5
+            { maxRetries: 5 }
         );
     }
 
@@ -641,9 +639,15 @@ export default class File extends Keg<IFilePayload, IFileProps> {
                 this.hidden = true;
                 return this.saveToServer();
             },
-            `hiding ${this.fileId} in ${this.db.id}`,
-            5,
-            () => this.load()
+            {
+                id: `hiding ${this.fileId} in ${this.db.id}`,
+                maxRetries: 5,
+                errorHandler: async (err: Error | ServerErrorType) => {
+                    if ((err as ServerErrorType).code === serverErrorCodes.malformedRequest) {
+                        await this.load();
+                    }
+                }
+            }
         );
     }
     unhide() {
@@ -652,9 +656,15 @@ export default class File extends Keg<IFilePayload, IFileProps> {
                 this.hidden = false;
                 return this.saveToServer();
             },
-            `unhiding ${this.fileId} in ${this.db.id}`,
-            5,
-            () => this.load()
+            {
+                id: `unhiding ${this.fileId} in ${this.db.id}`,
+                maxRetries: 5,
+                errorHandler: async (err: Error | ServerErrorType) => {
+                    if ((err as ServerErrorType).code === serverErrorCodes.malformedRequest) {
+                        await this.load();
+                    }
+                }
+            }
         );
     }
 
@@ -737,8 +747,10 @@ export default class File extends Keg<IFilePayload, IFileProps> {
                     }
                     return null;
                 },
-                `copying ${this.fileId} to ${db.id}`,
-                5
+                {
+                    id: `copying ${this.fileId} to ${db.id}`,
+                    maxRetries: 5
+                }
             ).then(() => {
                 if (dstIsVolume && this.db.id === 'SELF') this.hide();
             })

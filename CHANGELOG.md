@@ -2,6 +2,70 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.21.1"></a>
+## [5.21.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.21.0...v5.21.1) (2018-09-12)
+
+
+### Bug Fixes
+
+* auth retry ([94e9c9c](https://github.com/PeerioTechnologies/peerio-icebear/commit/94e9c9c))
+* improve auth sequence stability ([d244007](https://github.com/PeerioTechnologies/peerio-icebear/commit/d244007))
+* socket event order on fatal error response ([a9263e3](https://github.com/PeerioTechnologies/peerio-icebear/commit/a9263e3))
+
+
+
+<a name="5.21.0"></a>
+# [5.21.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.20.2...v5.21.0) (2018-09-10)
+
+
+### Bug Fixes
+
+* Address interface ([b180ba1](https://github.com/PeerioTechnologies/peerio-icebear/commit/b180ba1))
+* annotate user-validators ([2b5f0a2](https://github.com/PeerioTechnologies/peerio-icebear/commit/2b5f0a2))
+* annotation ([009a863](https://github.com/PeerioTechnologies/peerio-icebear/commit/009a863))
+* better export of field-validation.ts ([7715fa2](https://github.com/PeerioTechnologies/peerio-icebear/commit/7715fa2))
+* ci ([35230a5](https://github.com/PeerioTechnologies/peerio-icebear/commit/35230a5))
+* clear and refill map ([21e0faa](https://github.com/PeerioTechnologies/peerio-icebear/commit/21e0faa))
+* default val ([050eebc](https://github.com/PeerioTechnologies/peerio-icebear/commit/050eebc))
+* descriptor serializer ([354f44d](https://github.com/PeerioTechnologies/peerio-icebear/commit/354f44d))
+* download ([f7852e5](https://github.com/PeerioTechnologies/peerio-icebear/commit/f7852e5))
+* e2e tests ([0136519](https://github.com/PeerioTechnologies/peerio-icebear/commit/0136519))
+* eslint ([2954115](https://github.com/PeerioTechnologies/peerio-icebear/commit/2954115))
+* export pdf helper ([98ce512](https://github.com/PeerioTechnologies/peerio-icebear/commit/98ce512))
+* file download ([6653e46](https://github.com/PeerioTechnologies/peerio-icebear/commit/6653e46))
+* fix errors in models/kegs/keg ([0ccf884](https://github.com/PeerioTechnologies/peerio-icebear/commit/0ccf884))
+* jsdoc ([4d37d9f](https://github.com/PeerioTechnologies/peerio-icebear/commit/4d37d9f))
+* less typecasts ([c8eed84](https://github.com/PeerioTechnologies/peerio-icebear/commit/c8eed84))
+* lint ([6a7e19f](https://github.com/PeerioTechnologies/peerio-icebear/commit/6a7e19f))
+* many things ([46c4fd3](https://github.com/PeerioTechnologies/peerio-icebear/commit/46c4fd3))
+* misc ([2361029](https://github.com/PeerioTechnologies/peerio-icebear/commit/2361029))
+* module path shortcuts only for files in /test folder ([3252609](https://github.com/PeerioTechnologies/peerio-icebear/commit/3252609))
+* more annotations ([c383ce2](https://github.com/PeerioTechnologies/peerio-icebear/commit/c383ce2))
+* more annotations ([95b3bce](https://github.com/PeerioTechnologies/peerio-icebear/commit/95b3bce))
+* more test fixed ([036ce38](https://github.com/PeerioTechnologies/peerio-icebear/commit/036ce38))
+* more test fixes, bump deps ([99006d8](https://github.com/PeerioTechnologies/peerio-icebear/commit/99006d8))
+* move some Promise cases to fn declaration ([e013f9c](https://github.com/PeerioTechnologies/peerio-icebear/commit/e013f9c))
+* observable wrappers ([d32ed81](https://github.com/PeerioTechnologies/peerio-icebear/commit/d32ed81))
+* onboarding bonus test changes ([dee03fd](https://github.com/PeerioTechnologies/peerio-icebear/commit/dee03fd))
+* otplib import ([b1b57be](https://github.com/PeerioTechnologies/peerio-icebear/commit/b1b57be))
+* paths ([61188f5](https://github.com/PeerioTechnologies/peerio-icebear/commit/61188f5))
+* remove extension in require ([0c745dd](https://github.com/PeerioTechnologies/peerio-icebear/commit/0c745dd))
+* remove ts-ignore from allRooms ([6535efb](https://github.com/PeerioTechnologies/peerio-icebear/commit/6535efb))
+* retry downloads by fetching URL token ([7bac2a9](https://github.com/PeerioTechnologies/peerio-icebear/commit/7bac2a9))
+* retryUntilSuccess usage ([cae0fbb](https://github.com/PeerioTechnologies/peerio-icebear/commit/cae0fbb))
+* satisfy linter ([661f1a9](https://github.com/PeerioTechnologies/peerio-icebear/commit/661f1a9))
+* serialize format ([6f2f163](https://github.com/PeerioTechnologies/peerio-icebear/commit/6f2f163))
+* tests ([4cb50b7](https://github.com/PeerioTechnologies/peerio-icebear/commit/4cb50b7))
+* unit tests ([81ac4eb](https://github.com/PeerioTechnologies/peerio-icebear/commit/81ac4eb))
+* use observable map ([ae32824](https://github.com/PeerioTechnologies/peerio-icebear/commit/ae32824))
+
+
+### Features
+
+* models export ([134ec9e](https://github.com/PeerioTechnologies/peerio-icebear/commit/134ec9e))
+
+
+
 <a name="5.20.2"></a>
 ## [5.20.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.20.1...v5.20.2) (2018-08-30)
 

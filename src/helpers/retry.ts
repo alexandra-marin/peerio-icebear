@@ -9,6 +9,7 @@ const maxRetryCount = 120; // will bail out after this amount of retries
 const minRetryInterval = 1000; // will start with this interval between retries
 const maxRetryInterval = 10000; // this will be the maximum interval between retries
 const retryIntervalMultFactor = 250; // every retry will add this amount to retry interval
+const maxFatalErrorsCount = 2;
 
 interface CallInfo {
     options: RetryOptions;
@@ -92,6 +93,9 @@ export function retryUntilSuccess<T = any>(
                 if ((<ServerErrorType>err).code === serverErrorCodes.notFound) {
                     callInfo.fatalErrorCount++;
                 }
+                if ((<ServerErrorType>err).code === serverErrorCodes.accountBlacklisted) {
+                    callInfo.fatalErrorCount = maxFatalErrorsCount + 1;
+                }
                 if (options.errorHandler && !(err instanceof DisconnectedError)) {
                     options
                         .errorHandler(err)
@@ -117,7 +121,10 @@ export function retryUntilSuccess<T = any>(
 // todo: don't retry if throttled
 function scheduleRetry(fn: () => Promise<any>, id: string): void {
     const callInfo = callsInProgress[id];
-    if (++callInfo.retryCount > callInfo.options.maxRetries || callInfo.fatalErrorCount > 2) {
+    if (
+        ++callInfo.retryCount > callInfo.options.maxRetries ||
+        callInfo.fatalErrorCount > maxFatalErrorsCount
+    ) {
         console.error(
             `Maximum retry count reached for action id ${id}. Giving up, rejecting promise.`
         );

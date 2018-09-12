@@ -78,7 +78,9 @@ export default function mixUserProfileModule(this: User) {
             }
         }
         console.log(`Loading ${keg.type} keg`);
-        retryUntilSuccess(() => keg.load().then(() => loadSimpleKeg(keg)), `${keg.type} Load`);
+        retryUntilSuccess(() => keg.load().then(() => loadSimpleKeg(keg)), {
+            id: `${keg.type} Load`
+        });
     }
 
     // will be triggered first time after login

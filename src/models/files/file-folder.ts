@@ -284,11 +284,10 @@ export default class FileFolder {
         }
         file.folderId = this.isRoot ? null : this.id;
 
-        return retryUntilSuccess(
-            () => file.saveToServer(),
-            `saving file ${file.fileId}`,
-            5
-        ).tapCatch(() => {
+        return retryUntilSuccess(() => file.saveToServer(), {
+            id: `saving file ${file.fileId}`,
+            maxRetries: 5
+        }).tapCatch(() => {
             file.load();
         });
     }

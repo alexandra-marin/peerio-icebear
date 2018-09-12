@@ -123,7 +123,10 @@ Object.keys(serverErrorCodes).forEach(key => {
     serverErrorMap[serverErrorCodes[key]] = key;
 });
 
-type ServerErrorType = Error & { code: number; error: number };
+export interface ServerErrorType extends Error {
+    code: number;
+    error: number;
+}
 
 /**
  * Server error, socket throws it when server returns error.

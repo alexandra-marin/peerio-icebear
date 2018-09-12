@@ -40,29 +40,32 @@ class ServerSettings {
      * (Re)loads server settings from server.
      */
     loadSettings() {
-        retryUntilSuccess(() => {
-            return socket.send('/noauth/server/settings').then(res => {
-                this.avatarServer = res.fileBaseUrl;
-                this.acceptableClientVersions = res.acceptsClientVersions;
-                this.tag = res.tag;
-                this.maintenanceWindow = res.maintenance;
-                this.mixPanelClientToken = res.mixPanelClientToken;
-                console.log(
-                    'Server settings retrieved.',
-                    res,
-                    '/ tag:',
-                    this.tag,
-                    '/ file base url:',
-                    this.avatarServer,
-                    '/ accepts sdk versions:',
-                    this.acceptableClientVersions.slice(),
-                    '/ maintenance:',
-                    this.maintenanceWindow,
-                    '/ mixpanel:',
-                    this.mixPanelClientToken
-                );
-            });
-        }, 'Server Settings Load');
+        retryUntilSuccess(
+            () => {
+                return socket.send('/noauth/server/settings').then(res => {
+                    this.avatarServer = res.fileBaseUrl;
+                    this.acceptableClientVersions = res.acceptsClientVersions;
+                    this.tag = res.tag;
+                    this.maintenanceWindow = res.maintenance;
+                    this.mixPanelClientToken = res.mixPanelClientToken;
+                    console.log(
+                        'Server settings retrieved.',
+                        res,
+                        '/ tag:',
+                        this.tag,
+                        '/ file base url:',
+                        this.avatarServer,
+                        '/ accepts sdk versions:',
+                        this.acceptableClientVersions.slice(),
+                        '/ maintenance:',
+                        this.maintenanceWindow,
+                        '/ mixpanel:',
+                        this.mixPanelClientToken
+                    );
+                });
+            },
+            { id: 'Server Settings Load' }
+        );
     }
 }
 

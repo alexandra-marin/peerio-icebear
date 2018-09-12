@@ -84,58 +84,58 @@ export class FileStore extends FileStoreBase {
             const opts = this.knownDescriptorVersion
                 ? { minCollectionVersion: this.knownDescriptorVersion }
                 : undefined;
-            retryUntilSuccess(() => socket.send('/auth/file/ids/fetch', opts, false), taskId).then(
-                async resp => {
-                    await Promise.map(resp, (fileId: string) => {
-                        const file = this.getAnyById(fileId);
-                        if (!file) return Promise.resolve();
-                        return socket
-                            .send('/auth/file/descriptor/get', { fileId }, false)
-                            .then(async d => {
-                                if (!file.format) {
-                                    // time to migrate keg
-                                    file.format = file.latestFormat;
-                                    file.descriptorKey = file.blobKey;
-                                    file.deserializeDescriptor(d);
-                                    this.migrationQueue.addTask(() => file.saveToServer());
-                                } else {
-                                    file.deserializeDescriptor(d);
-                                }
-                                if (this.knownDescriptorVersion < d.collectionVersion) {
-                                    this.knownDescriptorVersion = d.collectionVersion;
-                                }
-                                if (this.isMainStore) {
-                                    await this.cacheDescriptor(d);
-                                }
-                                for (const store of this.getFileStoreInstances().values()) {
-                                    await store.cacheDescriptor(d);
-                                }
-                            });
-                    });
-                    // we might not have loaded all updated descriptors
-                    // because corresponding files are not loaded (out of scope)
-                    // so we don't know their individual collection versions
-                    // but we still need to mark the known version
-                    if (maxUpdateIdBefore === tracker.fileDescriptorDigest.maxUpdateId) {
-                        this.knownDescriptorVersion = maxUpdateIdBefore;
-                    }
-                    tracker.seenThis(tracker.DESCRIPTOR_PATH, null, this.knownDescriptorVersion);
-                    this.descriptorsCache.setValue(
-                        'knownDescriptorVersion',
-                        {
-                            key: 'knownDescriptorVersion',
-                            value: this.knownDescriptorVersion
-                        },
-                        (oldVal, newVal) => {
-                            if (!oldVal) return newVal;
-                            if (oldVal.value >= newVal.value) return false;
-                            return newVal;
-                        }
-                    );
-                    if (this.knownDescriptorVersion < tracker.fileDescriptorDigest.maxUpdateId)
-                        this.updateDescriptors();
+            retryUntilSuccess(() => socket.send('/auth/file/ids/fetch', opts, false), {
+                id: taskId
+            }).then(async resp => {
+                await Promise.map(resp, (fileId: string) => {
+                    const file = this.getAnyById(fileId);
+                    if (!file) return Promise.resolve();
+                    return socket
+                        .send('/auth/file/descriptor/get', { fileId }, false)
+                        .then(async d => {
+                            if (!file.format) {
+                                // time to migrate keg
+                                file.format = file.latestFormat;
+                                file.descriptorKey = file.blobKey;
+                                file.deserializeDescriptor(d);
+                                this.migrationQueue.addTask(() => file.saveToServer());
+                            } else {
+                                file.deserializeDescriptor(d);
+                            }
+                            if (this.knownDescriptorVersion < d.collectionVersion) {
+                                this.knownDescriptorVersion = d.collectionVersion;
+                            }
+                            if (this.isMainStore) {
+                                await this.cacheDescriptor(d);
+                            }
+                            for (const store of this.getFileStoreInstances().values()) {
+                                await store.cacheDescriptor(d);
+                            }
+                        });
+                });
+                // we might not have loaded all updated descriptors
+                // because corresponding files are not loaded (out of scope)
+                // so we don't know their individual collection versions
+                // but we still need to mark the known version
+                if (maxUpdateIdBefore === tracker.fileDescriptorDigest.maxUpdateId) {
+                    this.knownDescriptorVersion = maxUpdateIdBefore;
                 }
-            );
+                tracker.seenThis(tracker.DESCRIPTOR_PATH, null, this.knownDescriptorVersion);
+                this.descriptorsCache.setValue(
+                    'knownDescriptorVersion',
+                    {
+                        key: 'knownDescriptorVersion',
+                        value: this.knownDescriptorVersion
+                    },
+                    (oldVal, newVal) => {
+                        if (!oldVal) return newVal;
+                        if (oldVal.value >= newVal.value) return false;
+                        return newVal;
+                    }
+                );
+                if (this.knownDescriptorVersion < tracker.fileDescriptorDigest.maxUpdateId)
+                    this.updateDescriptors();
+            });
         },
         1500,
         { leading: true, maxWait: 3000 }
@@ -169,8 +169,10 @@ export class FileStore extends FileStoreBase {
                                     return Promise.reject(err);
                                 });
                         },
-                        `migrating file ${file.fileId}`,
-                        10
+                        {
+                            id: `migrating file ${file.fileId}`,
+                            maxRetries: 10
+                        }
                     ).catch(err => {
                         file.format = 0;
                         file.migrating = false;
@@ -183,7 +185,7 @@ export class FileStore extends FileStoreBase {
                 file.format = file.latestFormat;
                 file.descriptorKey = file.blobKey;
                 this.migrationQueue.addTask(() =>
-                    retryUntilSuccess(() => file.saveToServer(), undefined, 2)
+                    retryUntilSuccess(() => file.saveToServer(), { maxRetries: 2 })
                 );
             }
         }
@@ -299,8 +301,10 @@ export class FileStore extends FileStoreBase {
                     },
                     false
                 ),
-            `loading recent files for ${kegDbId}`,
-            10
+            {
+                id: `loading recent files for ${kegDbId}`,
+                maxRetries: 10
+            }
         ).then(async resp => {
             for (const keg of resp.kegs) {
                 if (keg.deleted || keg.hidden) {
@@ -377,8 +381,7 @@ export class FileStore extends FileStoreBase {
                         false
                     );
                 },
-                undefined,
-                3
+                { maxRetries: 3 }
             );
             if (!resp || !resp.kegs[0] || !(await file.loadFromKeg(resp.kegs[0]))) {
                 return null;
@@ -431,8 +434,7 @@ export class FileStore extends FileStoreBase {
                         false
                     );
                 },
-                undefined,
-                5
+                { maxRetries: 5 }
             )
                 .then(async resp => {
                     if (!resp.kegs[0]) {

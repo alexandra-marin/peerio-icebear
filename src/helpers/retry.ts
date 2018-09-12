@@ -24,6 +24,7 @@ interface RetryOptions {
     id?: string;
     maxRetries?: number;
     errorHandler?: (err: Error | ServerErrorType) => Promise<void>;
+    retryOnlyOnDisconnect?: boolean;
 }
 
 const callsInProgress: { [id: string]: CallInfo } = {};
@@ -38,16 +39,32 @@ const callsInProgress: { [id: string]: CallInfo } = {};
  * @param options.errorHandler - specify handler for errors with specific name,
  *                                retry attempts will continue if handler promise resolves.
  *                                Error handler will not get called if DisconnectedError occurs.
+ * @param options.retryOnlyOnDisconnect - retry only occurs if task got rejected because of disconnection.
+ *                                        If this option is set to 'true', errorHandler will be ignored.
  * @param thisIsRetry - for internal use only
  * @returns A Promise that resolves when action is finally executed or rejects after all attempts are exhausted
  */
 export function retryUntilSuccess<T = any>(
     fn: () => Promise<T>,
-    options: RetryOptions = { id: Math.random().toString(), maxRetries: maxRetryCount },
+    options: RetryOptions = {
+        id: Math.random().toString(),
+        maxRetries: maxRetryCount,
+        retryOnlyOnDisconnect: false
+    },
     thisIsRetry?: boolean
 ): Promise<T> {
     if (!options.id) options.id = Math.random().toString();
     if (!options.maxRetries) options.maxRetries = maxRetryCount;
+    if (options.retryOnlyOnDisconnect) {
+        if (options.errorHandler)
+            throw new Error('errorHandler can not be set together with retryOnlyOnDisconnect');
+        // any error leads to stopping retry
+        // disconnect error never triggers errorHandler call
+        options.errorHandler = async err => {
+            if (err && err.name === 'NotAuthenticatedError') return;
+            throw err;
+        };
+    }
     let callInfo = callsInProgress[options.id];
     // don't make parallel calls
     if (!thisIsRetry && callInfo) return callInfo.promise;

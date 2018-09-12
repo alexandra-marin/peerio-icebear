@@ -44,7 +44,7 @@ describe('Retry helper should', function() {
                 reject();
             });
 
-        await retryUntilSuccess(task, 'task 1', 3).should.be.rejected;
+        await retryUntilSuccess(task, { id: 'task 1', maxRetries: 3 }).should.be.rejected;
         attemptNumber.should.equal(4); // 4 because it's attempt number, first one doesn't count as retry
     });
 

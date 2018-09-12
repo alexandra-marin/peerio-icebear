@@ -307,10 +307,9 @@ class FileStoreBase {
 
         // get kegs from cache or server
         if (this.cacheLoaded) {
-            resp = await retryUntilSuccess(
-                () => this.getFileKegsFromServer(),
-                `Updating file list for ${this.id}`
-            );
+            resp = await retryUntilSuccess(() => this.getFileKegsFromServer(), {
+                id: `Updating file list for ${this.id}`
+            });
         } else {
             performance.mark(`start loading files cache ${this.id}`);
             resp = { kegs: await this.cache.getAllValues(), hasMore: true };

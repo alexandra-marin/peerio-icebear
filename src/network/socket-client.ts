@@ -217,8 +217,14 @@ export default class SocketClient {
             this.preauthenticated = false;
             this.authenticated = false;
             this.connected = false;
-            clearBuffers();
-            this.cancelAwaitingRequests();
+            // timeout is needed because for some reason,
+            // if server sends a fatal error(user blacklisted for example) in response and immediately disconnects,
+            // socket io calls disconnect handler before passing error response to message handler.
+            // so request gets canceled with 'DisconnectedError' instead of error returned in the response.
+            setTimeout(() => {
+                clearBuffers();
+                this.cancelAwaitingRequests();
+            });
         });
 
         this.socket.on('reconnect_attempt', num => {
@@ -367,7 +373,8 @@ export default class SocketClient {
                             getUser().blacklisted = true;
                             this.close();
                         }
-                        console.error(name, data, resp);
+                        console.error('Socket response error.');
+                        console.log(name, data, resp);
                         reject(new ServerError(resp.error, resp.message));
                         return;
                     }

@@ -208,8 +208,9 @@ class FileStoreMigration {
                         chat = await getChatStore().startChat([contact], false, '', '', true);
                         return chat.loadMetadata();
                     },
-                    undefined,
-                    10
+                    {
+                        maxRetries: 10
+                    }
                 ).catch(() => {
                     console.error(`Can't create DM with ${item.username} to share ${item.fileId}`);
                 });

@@ -3,12 +3,8 @@
   "tslint.enable": false,
   "eslint.validate": [
     "javascript",
-    "javascriptreact"
-    // TODO: re-enable when any one of the the following issues is resolved:
-    // https://github.com/babel/babel-eslint/issues/573
-    // https://github.com/babel/babel-eslint/issues/505
-    // https://github.com/eslint/typescript-eslint-parser/issues/471
-    // "typescript",
-    // "typescriptreact"
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
   ]
 }

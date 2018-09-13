@@ -286,6 +286,18 @@ export default new class {
         }
     };
 
+    user = {
+        /**
+         * Max number of characters in username
+         */
+        maxUsernameLength: 16,
+
+        /**
+         * Max number of characters in first name or last name
+         */
+        maxNameLength: 40
+    };
+
     /**
      * How long to wait for external server to respond when unfurling urls posted in messages.
      */

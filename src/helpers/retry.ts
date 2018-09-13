@@ -76,15 +76,20 @@ export function retryUntilSuccess<T = any>(
             fatalErrorCount: 0
         } as CallInfo;
         callInfo.promise = new Promise((resolve, reject) => {
-            callInfo.resolve = resolve;
-            callInfo.reject = reject;
+            callInfo.resolve = data => {
+                delete callsInProgress[options.id];
+                resolve(data);
+            };
+            callInfo.reject = error => {
+                delete callsInProgress[options.id];
+                reject(error);
+            };
         });
         callsInProgress[options.id] = callInfo;
     }
     fn()
         .tap(res => {
             callInfo.resolve(res);
-            delete callsInProgress[options.id];
         })
         .catch((err: Error | ServerErrorType) => {
             console.error(err);

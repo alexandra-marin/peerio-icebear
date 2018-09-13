@@ -160,9 +160,9 @@ export default class FileFolder {
         );
     }
 
-    // number of bytes, total size of all files in this folder tree
+    /** The total size, in bytes, of all files in this folder tree. */
     @computed
-    get size() {
+    get size(): number {
         let currentSize = 0;
         for (const folder of this.folders) {
             currentSize += folder.size;
@@ -172,14 +172,15 @@ export default class FileFolder {
         }
         return currentSize;
     }
-    // string
+
     @computed
-    get sizeFormatted() {
+    get sizeFormatted(): string {
         return util.formatBytes(this.size);
     }
-    // number, total file count in this folder tree
+
+    /** The total file count in this folder tree. */
     @computed
-    get totalFileCount() {
+    get totalFileCount(): number {
         let count = 0;
         for (const folder of this.folders) {
             count += folder.totalFileCount;
@@ -190,7 +191,7 @@ export default class FileFolder {
 
     // array of all files in this folder tree
     @computed
-    get allFiles() {
+    get allFiles(): File[] {
         let ret = this.files;
         this.folders.forEach(f => {
             ret = ret.concat(f.allFiles);
@@ -199,7 +200,7 @@ export default class FileFolder {
     }
 
     @computed
-    get allFolders() {
+    get allFolders(): FileFolder[] {
         let ret = this.folders;
         this.folders.forEach(f => {
             ret = ret.concat(f.allFolders);
@@ -208,12 +209,12 @@ export default class FileFolder {
     }
 
     // has nested folders?
-    get hasNested() {
-        return this.folders && this.folders.length;
+    get hasNested(): boolean {
+        return this.folders && this.folders.length > 0;
     }
 
     // searches in this folder root
-    findFolderByName(name) {
+    findFolderByName(name: string): FileFolder {
         const normalizedName = name.toUpperCase();
         return this.folders.find(f => f.normalizedName === normalizedName);
     }
@@ -245,7 +246,7 @@ export default class FileFolder {
     }
 
     @computed
-    get hasLegacyFiles() {
+    get hasLegacyFiles(): boolean {
         return !!(
             this.folders.find(hasLegacyFilesPredicate) || this.files.find(isLegacyFilePredicate)
         );
@@ -261,7 +262,7 @@ export default class FileFolder {
 
     // move file to this folder
     @action.bound
-    async attachFile(file) {
+    async attachFile(file: File): Promise<void> {
         if (file.store !== this.store) {
             if (file.isLegacy) {
                 console.error('can not share legacy file', file.fileId);
@@ -294,7 +295,11 @@ export default class FileFolder {
 
     // adds exiting folder instance to this folder
     @action.bound
-    async attachFolder(folder, skipSave = false, skipRootFolder?) {
+    async attachFolder(
+        folder: FileFolder,
+        skipSave = false,
+        skipRootFolder?: boolean
+    ): Promise<void> {
         if (folder === this) return Promise.resolve();
         if (folder.store !== this.store) {
             // 1. we copy folder structure to another kegdb

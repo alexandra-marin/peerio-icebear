@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.21.3"></a>
+## [5.21.3](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.21.2...v5.21.3) (2018-09-13)
+
+
+### Bug Fixes
+
+* actually export models ([8561fab](https://github.com/PeerioTechnologies/peerio-icebear/commit/8561fab))
+* cache existing files ([78cfc9c](https://github.com/PeerioTechnologies/peerio-icebear/commit/78cfc9c))
+* don't dump folder contents to root when bulk-deleting folders ([e51ec60](https://github.com/PeerioTechnologies/peerio-icebear/commit/e51ec60))
+* pickPathSelector needed await ([a88cbd7](https://github.com/PeerioTechnologies/peerio-icebear/commit/a88cbd7))
+
+
+
 <a name="5.21.2"></a>
 ## [5.21.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.21.1...v5.21.2) (2018-09-13)
 

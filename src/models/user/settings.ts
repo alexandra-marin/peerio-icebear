@@ -10,11 +10,12 @@ interface ISettingsPayload {
     subscribeToPromoEmails: boolean;
 }
 interface ISettingsProps {}
+
 /**
  * Plaintext named system keg, server controlled.
  * User can update this keg, but server verifies contract.
  */
-class Settings extends Keg<ISettingsPayload, ISettingsProps> {
+export default class Settings extends Keg<ISettingsPayload, ISettingsProps> {
     constructor(user: User) {
         super('settings', 'settings', user.kegDb, true);
         this.user = user;
@@ -49,5 +50,3 @@ class Settings extends Keg<ISettingsPayload, ISettingsProps> {
         this.loaded = true;
     }
 }
-
-export default Settings;

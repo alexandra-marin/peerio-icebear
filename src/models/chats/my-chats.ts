@@ -8,14 +8,16 @@ interface MyChatsProps {}
 /**
  * MyChats keg holds chat groups for user.
  */
-class MyChats extends SyncedKeg<MyChatsPayload, MyChatsProps> {
+export default class MyChats extends SyncedKeg<MyChatsPayload, MyChatsProps> {
     constructor() {
         super('my_chats', getUser().kegDb as IKegDb);
     }
+
     /**
      * Favorite chat ids
      */
     favorites: string[] = [];
+
     /**
      * Hidden chat ids
      */
@@ -33,13 +35,13 @@ class MyChats extends SyncedKeg<MyChatsPayload, MyChatsProps> {
         this.hidden = payload.hidden;
     }
 
-    _add(array, value) {
+    protected _add(array, value) {
         if (array.indexOf(value) >= 0) return false;
         array.push(value);
         return true;
     }
 
-    _remove(array, value) {
+    protected _remove(array, value) {
         const ind = array.indexOf(value);
         if (ind >= 0) {
             array.splice(ind, 1);
@@ -47,6 +49,7 @@ class MyChats extends SyncedKeg<MyChatsPayload, MyChatsProps> {
         }
         return false;
     }
+
     /**
      * Adds favorite chat and removes it from hidden list if it was there.
      * @returns true - if added, false - if already had been in the list
@@ -87,5 +90,3 @@ class MyChats extends SyncedKeg<MyChatsPayload, MyChatsProps> {
         return this._remove(this.hidden, chatId);
     }
 }
-
-export default MyChats;

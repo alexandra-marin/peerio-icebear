@@ -43,7 +43,7 @@ export default class FileFolder {
     // unique global id (local folder id, or volume id)
     @observable id: string = null;
     // to be able to filter easier when files and folders are in the same list
-    isFolder = true;
+    readonly isFolder = true;
     // to indicate root folder or volume root
     isRoot = false;
     // this folder is a volume root
@@ -220,7 +220,11 @@ export default class FileFolder {
     }
 
     // downloads all files in current folder, reconstructing folder structure and showing progress
-    async download(path, pickPathSelector, createDirFunctor) {
+    async download(
+        path: string,
+        pickPathSelector: (path: string, name: string, ext?: string) => Promise<string>,
+        createDirFunctor: (path: string) => Promise<void>
+    ) {
         const downloadPath = await pickPathSelector(path, this.name);
         this.progress = 0;
         this.progressMax = this.files.length + this.folders.length;
@@ -235,7 +239,7 @@ export default class FileFolder {
         this.files.forEach(file => {
             promise = promise.then(async () => {
                 await file.download(
-                    pickPathSelector(downloadPath, file.nameWithoutExtension, file.ext)
+                    await pickPathSelector(downloadPath, file.nameWithoutExtension, file.ext)
                 );
                 this.progress++;
             });
@@ -320,7 +324,7 @@ export default class FileFolder {
 
     // private api, copies files from one db to another, preserving folder ids
     @action
-    async copyFilesTo(dst, folderIdMap) {
+    protected async copyFilesTo(dst, folderIdMap) {
         const src = this;
         src.progress = dst.progress = 0;
         src.progressMax = dst.progressMax = src.allFiles.length;
@@ -339,7 +343,7 @@ export default class FileFolder {
 
     // private api
     @action
-    async copyFolderStructureTo(dst: FileFolder, skipRootFolder = false) {
+    protected async copyFolderStructureTo(dst: FileFolder, skipRootFolder = false) {
         const src = this;
         const folderIdMap: { [folderId: string]: string } = {}; // mapping between source folder ids and destination
         const copyFolders = (parentSrc: FileFolder, parentDst: FileFolder) => {

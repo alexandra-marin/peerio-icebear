@@ -154,8 +154,8 @@ class FileStoreBase {
     }
 
     @computed
-    get selectedFilesOrFolders() {
-        return (this.selectedFolders as Array<File | FileFolder>).concat(this.selectedFiles);
+    get selectedFilesOrFolders(): (File | FileFolder)[] {
+        return (this.selectedFolders as (File | FileFolder)[]).concat(this.selectedFiles);
     }
 
     // #endregion

@@ -40,7 +40,7 @@ interface LookupMatch {
  * loading === false && notFound === false - success
  * loading === false && notFound === true  - fail
  */
-class Contact {
+export default class Contact {
     /**
      * @param username - this can also be an email which will be replaced with username if user found
      * @param prefetchedData - if, for some reason you have the contact data from server, feed it here
@@ -373,5 +373,3 @@ class Contact {
         return Promise.map(contacts, contact => contact.ensureLoaded());
     }
 }
-
-export default Contact;

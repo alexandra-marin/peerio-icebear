@@ -98,6 +98,12 @@ export default class FileFolder {
         });
     }
 
+    // does current folder have zero files/folders in it
+    @computed
+    get isEmpty() {
+        return this.files.length + this.folders.length === 0;
+    }
+
     // parent folder instance
     @computed
     get parent() {

@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.22.0"></a>
+# [5.22.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.21.4...v5.22.0) (2018-09-14)
+
+
+### Features
+
+* suppress individual snackbars when downloading folder ([9c52fd7](https://github.com/PeerioTechnologies/peerio-icebear/commit/9c52fd7))
+
+
+
 <a name="5.21.4"></a>
 ## [5.21.4](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.21.3...v5.21.4) (2018-09-13)
 

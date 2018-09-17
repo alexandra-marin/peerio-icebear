@@ -148,6 +148,14 @@ export default new class {
     deviceUID: string = null;
     arch: any;
 
+    telemetry = {
+        /**
+         * Mixpanel base URL. base64 encoded tracking events get added to this.
+         * @type {string}
+         */
+        baseUrl: 'https://api.mixpanel.com/track/?data='
+    };
+
     /**
      * For reference. Amount of bytes added to every file chunk in encrypted state.
      * DO NOT change this value unless you really know what you're doing.

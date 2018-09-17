@@ -34,7 +34,8 @@ import config from '../../config';
 
 const VALIDATION_THROTTLING_PERIOD_MS = 400;
 const usernameRegex = /^\w{1,16}$/;
-const emailRegex = /^[^ ]+@[^ ]+/i;
+// eslint-disable-next-line
+const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/i;
 const medicalIdRegex = /MED\d{10}/i;
 const usernameLength = config.user.maxUsernameLength;
 // const phoneRegex =
@@ -133,7 +134,7 @@ function pair(action, message) {
     return { action, message };
 }
 
-const isValidSignupEmail = isValid('signup', 'email');
+const isValidSignupEmail = isValid('signup', 'emailAvailability');
 const isValidSignupUsername = isValid('signup', 'username');
 const isValidSignupUsernameSuggestion = isValid('signup', 'username', 'suggestion');
 const isValidSignupFirstName = isValid('signup', 'firstName');

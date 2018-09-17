@@ -2,6 +2,47 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.23.0"></a>
+# [5.23.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.22.1...v5.23.0) (2018-09-17)
+
+
+### Bug Fixes
+
+* changed btoa encoding to work on mobile ([e72a058](https://github.com/PeerioTechnologies/peerio-icebear/commit/e72a058))
+* error message default case ([4b2e655](https://github.com/PeerioTechnologies/peerio-icebear/commit/4b2e655))
+* extended email regex ([93d101a](https://github.com/PeerioTechnologies/peerio-icebear/commit/93d101a))
+* imports ([85783e1](https://github.com/PeerioTechnologies/peerio-icebear/commit/85783e1))
+* make Object.assign non destructive to original objects ([0fef807](https://github.com/PeerioTechnologies/peerio-icebear/commit/0fef807))
+* save userId and add userIdState 'lock' ([b2ba4e8](https://github.com/PeerioTechnologies/peerio-icebear/commit/b2ba4e8))
+* telemetry export ([946078e](https://github.com/PeerioTechnologies/peerio-icebear/commit/946078e))
+
+
+### Features
+
+* more strings ([45fb7e3](https://github.com/PeerioTechnologies/peerio-icebear/commit/45fb7e3))
+
+
+
+<a name="5.22.1"></a>
+## [5.22.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.22.0...v5.22.1) (2018-09-17)
+
+
+### Bug Fixes
+
+* validate email regex only locally ([2419a23](https://github.com/PeerioTechnologies/peerio-icebear/commit/2419a23))
+
+
+
+<a name="5.22.0"></a>
+# [5.22.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.21.4...v5.22.0) (2018-09-14)
+
+
+### Features
+
+* suppress individual snackbars when downloading folder ([9c52fd7](https://github.com/PeerioTechnologies/peerio-icebear/commit/9c52fd7))
+
+
+
 <a name="5.21.4"></a>
 ## [5.21.4](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.21.3...v5.21.4) (2018-09-13)
 

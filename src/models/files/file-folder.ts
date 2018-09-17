@@ -239,7 +239,10 @@ export default class FileFolder {
         this.files.forEach(file => {
             promise = promise.then(async () => {
                 await file.download(
-                    await pickPathSelector(downloadPath, file.nameWithoutExtension, file.ext)
+                    await pickPathSelector(downloadPath, file.nameWithoutExtension, file.ext),
+                    false,
+                    false,
+                    true // suppress snackbar
                 );
                 this.progress++;
             });

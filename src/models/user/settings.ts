@@ -6,7 +6,6 @@ interface ISettingsPayload {
     contactNotifications: boolean;
     contactRequestNotifications: boolean;
     messageNotifications: boolean;
-    errorTrackingOptIn: boolean;
     dataCollectionOptIn: boolean;
     subscribeToPromoEmails: boolean;
 }
@@ -27,7 +26,6 @@ export default class Settings extends Keg<ISettingsPayload, ISettingsProps> {
     @observable contactNotifications = false;
     @observable contactRequestNotifications = false;
     @observable messageNotifications = false;
-    @observable errorTracking = false;
     @observable dataCollection = false;
     @observable subscribeToPromoEmails = false;
 
@@ -38,7 +36,6 @@ export default class Settings extends Keg<ISettingsPayload, ISettingsProps> {
             contactNotifications: this.contactNotifications,
             contactRequestNotifications: this.contactRequestNotifications,
             messageNotifications: this.messageNotifications,
-            errorTrackingOptIn: this.errorTracking,
             dataCollectionOptIn: this.dataCollection,
             subscribeToPromoEmails: this.subscribeToPromoEmails
         };
@@ -48,7 +45,6 @@ export default class Settings extends Keg<ISettingsPayload, ISettingsProps> {
         this.contactNotifications = data.contactNotifications;
         this.contactRequestNotifications = data.contactRequestNotifications;
         this.messageNotifications = data.messageNotifications;
-        this.errorTracking = data.errorTrackingOptIn;
         this.dataCollection = data.dataCollectionOptIn;
         this.subscribeToPromoEmails = data.subscribeToPromoEmails;
         this.loaded = true;

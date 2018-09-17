@@ -133,7 +133,7 @@ function pair(action, message) {
     return { action, message };
 }
 
-const isValidSignupEmail = isValid('signup', 'email');
+const isValidSignupEmail = isValid('signup', 'emailAvailability');
 const isValidSignupUsername = isValid('signup', 'username');
 const isValidSignupUsernameSuggestion = isValid('signup', 'username', 'suggestion');
 const isValidSignupFirstName = isValid('signup', 'firstName');

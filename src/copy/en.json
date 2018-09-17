@@ -890,6 +890,7 @@
   "title_maintenance": "Upcoming Maintenance",
   "dialog_scheduledMaintenance": "Scheduled Maintenance",
   "dialog_scheduledMaintenanceDates": "Peerio may be unavailable while we perform a scheduled maintenance between {start} and {end} (local time). We apologize for the inconvenience.",
+  "dialog_scheduledMaintenanceDates_mobile": "Peerio may be unavailable from {start} to {end} (local time).",
   "dialog_rating1Star": "Hate it",
   "dialog_rating2Star": "Dislike it",
   "dialog_rating3Star": "It's okay",

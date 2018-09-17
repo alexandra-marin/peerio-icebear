@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.22.2"></a>
+## [5.22.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.22.1...v5.22.2) (2018-09-17)
+
+
+### Bug Fixes
+
+* extended email regex ([93d101a](https://github.com/PeerioTechnologies/peerio-icebear/commit/93d101a))
+
+
+
 <a name="5.22.1"></a>
 ## [5.22.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.22.0...v5.22.1) (2018-09-17)
 

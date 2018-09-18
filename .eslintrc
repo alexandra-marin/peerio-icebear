@@ -20,6 +20,7 @@
         "import/newline-after-import": 0,
         "import/first": 0,
         "import/no-mutable-exports": 0,
+        "import/prefer-default-export": 0,
         "import/export": 0,
         "import/no-unresolved": 0,
         "typescript/class-name-casing": 2,

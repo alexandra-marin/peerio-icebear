@@ -6,6 +6,7 @@ import config from '../../config';
 import warnings from '../warnings';
 import FileStoreBase from './file-store-base';
 import FileFolder from './file-folder';
+import File from './file';
 
 /**
  * Extension to operate with selected files and folders in bulk
@@ -44,11 +45,11 @@ class FileStoreBulk {
         );
     }
 
-    async removeOne(i, batch) {
+    async removeOne(i: File | FileFolder) {
         if (i.isFolder && this.deleteFolderConfirmator) {
             if (!(await this.deleteFolderConfirmator(i))) return Promise.reject();
         }
-        return i.remove(batch);
+        return i.remove();
     }
 
     @action.bound
@@ -61,7 +62,7 @@ class FileStoreBulk {
         }
         let promise = Promise.resolve();
         items.forEach(i => {
-            promise = promise.then(() => this.removeOne(i, true));
+            promise = promise.then(() => this.removeOne(i));
         });
         await promise;
         this.fileStore.folderStore.save();
@@ -89,8 +90,7 @@ class FileStoreBulk {
             promise = promise.then(() => {
                 i.selected = false;
             });
-            // TODO: instanceof check is for typescript, how to avoid it?
-            if (i.isFolder || i instanceof FileFolder) {
+            if (i.isFolder === true) {
                 promise = promise.then(() => getVolumeStore().shareFolder(i, usernamesAccessList));
             } else {
                 usernamesAccessList.forEach(contact => {
@@ -105,7 +105,7 @@ class FileStoreBulk {
     }
 
     @action.bound
-    moveOne(item, folder, bulk) {
+    moveOne(item: File | FileFolder, folder: FileFolder, bulk: boolean) {
         item.selected = false;
         if (item.folderId === folder.id) return;
         if (item.isShared) return;
@@ -123,7 +123,7 @@ class FileStoreBulk {
 
     /** Bulk-move all files and folders that have `selected` state. */
     @action.bound
-    async move(targetFolder) {
+    async move(targetFolder: FileFolder) {
         const items = getFileStore().selectedFilesOrFolders;
         // currently progress is too quick, but in the future
         // it may make sense to show progress bar
@@ -150,17 +150,17 @@ class FileStoreBulk {
 
     /** Download the given `item` to the destination `path`. */
     @action.bound
-    async downloadOne(item, path, suppressSnackbar) {
+    async downloadOne(item: File | FileFolder, path: string, suppressSnackbar: boolean) {
         item.selected = false;
-        const downloadPath = await this.pickPathSelector(
-            path,
-            item.nameWithoutExtension || item.name,
-            item.ext || ''
-        );
         // TODO: maybe run in parallel?
-        if (item.isFolder) {
+        if (item.isFolder === true) {
             await item.download(path, this.pickPathSelector, config.FileStream.createDir);
         } else {
+            const downloadPath = await this.pickPathSelector(
+                path,
+                item.nameWithoutExtension || item.name,
+                item.ext || ''
+            );
             await item.download(downloadPath, false, false, suppressSnackbar);
         }
     }

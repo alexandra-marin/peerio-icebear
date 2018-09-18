@@ -83,7 +83,7 @@ export default class File extends Keg<IFilePayload, IFileProps> {
     uploader?: FileUploader;
 
     // files and folders get in mixed lists, so adding these properties helps for now
-    isFolder = false;
+    readonly isFolder = false;
     isShared = false; // TODO: rename this to 'isVolume'
     hasLegacyFiles = false;
     // ---

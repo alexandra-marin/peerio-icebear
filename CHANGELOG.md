@@ -2,6 +2,119 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.24.4"></a>
+## [5.24.4](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.24.3...v5.24.4) (2018-09-18)
+
+
+
+<a name="5.24.3"></a>
+## [5.24.3](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.24.1...v5.24.3) (2018-09-17)
+
+
+
+<a name="5.24.2"></a>
+## [5.24.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.24.1...v5.24.2) (2018-09-17)
+
+
+
+<a name="5.24.1"></a>
+## [5.24.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.24.0...v5.24.1) (2018-09-17)
+
+
+
+<a name="5.24.0"></a>
+# [5.24.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.23.0...v5.24.0) (2018-09-17)
+
+
+### Features
+
+* use isemail for email validation ([aacda8f](https://github.com/PeerioTechnologies/peerio-icebear/commit/aacda8f))
+
+
+
+<a name="5.23.0"></a>
+# [5.23.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.22.1...v5.23.0) (2018-09-17)
+
+
+### Bug Fixes
+
+* changed btoa encoding to work on mobile ([e72a058](https://github.com/PeerioTechnologies/peerio-icebear/commit/e72a058))
+* error message default case ([4b2e655](https://github.com/PeerioTechnologies/peerio-icebear/commit/4b2e655))
+* extended email regex ([93d101a](https://github.com/PeerioTechnologies/peerio-icebear/commit/93d101a))
+* imports ([85783e1](https://github.com/PeerioTechnologies/peerio-icebear/commit/85783e1))
+* make Object.assign non destructive to original objects ([0fef807](https://github.com/PeerioTechnologies/peerio-icebear/commit/0fef807))
+* save userId and add userIdState 'lock' ([b2ba4e8](https://github.com/PeerioTechnologies/peerio-icebear/commit/b2ba4e8))
+* telemetry export ([946078e](https://github.com/PeerioTechnologies/peerio-icebear/commit/946078e))
+
+
+### Features
+
+* more strings ([45fb7e3](https://github.com/PeerioTechnologies/peerio-icebear/commit/45fb7e3))
+
+
+
+<a name="5.22.1"></a>
+## [5.22.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.22.0...v5.22.1) (2018-09-17)
+
+
+### Bug Fixes
+
+* validate email regex only locally ([2419a23](https://github.com/PeerioTechnologies/peerio-icebear/commit/2419a23))
+
+
+
+<a name="5.22.0"></a>
+# [5.22.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.21.4...v5.22.0) (2018-09-14)
+
+
+### Features
+
+* suppress individual snackbars when downloading folder ([9c52fd7](https://github.com/PeerioTechnologies/peerio-icebear/commit/9c52fd7))
+
+
+
+<a name="5.21.4"></a>
+## [5.21.4](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.21.3...v5.21.4) (2018-09-13)
+
+
+
+<a name="5.21.3"></a>
+## [5.21.3](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.21.2...v5.21.3) (2018-09-13)
+
+
+### Bug Fixes
+
+* actually export models ([8561fab](https://github.com/PeerioTechnologies/peerio-icebear/commit/8561fab))
+* cache existing files ([78cfc9c](https://github.com/PeerioTechnologies/peerio-icebear/commit/78cfc9c))
+* don't dump folder contents to root when bulk-deleting folders ([e51ec60](https://github.com/PeerioTechnologies/peerio-icebear/commit/e51ec60))
+* pickPathSelector needed await ([a88cbd7](https://github.com/PeerioTechnologies/peerio-icebear/commit/a88cbd7))
+
+
+
+<a name="5.21.2"></a>
+## [5.21.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.21.1...v5.21.2) (2018-09-13)
+
+
+### Bug Fixes
+
+* add empty check on usernameLogin validator ([e16d39d](https://github.com/PeerioTechnologies/peerio-icebear/commit/e16d39d))
+* email regex more precise ([3a0d073](https://github.com/PeerioTechnologies/peerio-icebear/commit/3a0d073))
+* email validation ([cd4254c](https://github.com/PeerioTechnologies/peerio-icebear/commit/cd4254c))
+* imports ([0ae1bf2](https://github.com/PeerioTechnologies/peerio-icebear/commit/0ae1bf2))
+* retry options not deleted on reject ([7e30207](https://github.com/PeerioTechnologies/peerio-icebear/commit/7e30207))
+* set file uploadedAt and name before upload begins ([5e8bb11](https://github.com/PeerioTechnologies/peerio-icebear/commit/5e8bb11))
+* update email validation ([638a0a1](https://github.com/PeerioTechnologies/peerio-icebear/commit/638a0a1))
+* username signup validation ([f544626](https://github.com/PeerioTechnologies/peerio-icebear/commit/f544626))
+* yet more precise email regex ([5ba5c25](https://github.com/PeerioTechnologies/peerio-icebear/commit/5ba5c25))
+
+
+### Reverts
+
+* "fix: email regex more precise" ([8f26256](https://github.com/PeerioTechnologies/peerio-icebear/commit/8f26256))
+* "fix: yet more precise email regex" ([46b8383](https://github.com/PeerioTechnologies/peerio-icebear/commit/46b8383))
+
+
+
 <a name="5.21.1"></a>
 ## [5.21.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.21.0...v5.21.1) (2018-09-12)
 

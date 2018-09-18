@@ -31,10 +31,10 @@
 import socket from '../../network/socket';
 import { getFirstLetter } from '../string';
 import config from '../../config';
+import IsEmail from 'isemail';
 
 const VALIDATION_THROTTLING_PERIOD_MS = 400;
 const usernameRegex = /^\w{1,16}$/;
-const emailRegex = /^[^ ]+@[^ ]+/i;
 const medicalIdRegex = /MED\d{10}/i;
 const usernameLength = config.user.maxUsernameLength;
 // const phoneRegex =
@@ -91,7 +91,7 @@ function isValidUsername(name: string) {
 }
 
 function isValidEmail(val: string) {
-    return Promise.resolve(emailRegex.test(val));
+    return Promise.resolve(IsEmail.validate(val));
 }
 
 function isValidMedicalId(val: string) {
@@ -133,7 +133,7 @@ function pair(action, message) {
     return { action, message };
 }
 
-const isValidSignupEmail = isValid('signup', 'email');
+const isValidSignupEmail = isValid('signup', 'emailAvailability');
 const isValidSignupUsername = isValid('signup', 'username');
 const isValidSignupUsernameSuggestion = isValid('signup', 'username', 'suggestion');
 const isValidSignupFirstName = isValid('signup', 'firstName');

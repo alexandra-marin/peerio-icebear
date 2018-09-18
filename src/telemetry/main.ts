@@ -45,6 +45,17 @@ interface BaseProperties {
     'App Version': string;
 }
 
+async function getBaseProperties(): Promise<BaseProperties> {
+    return {
+        // eslint-disable-next-line camelcase, Mixpanel requires distinct_id in this format
+        distinct_id: await getUserId(),
+        Device: config.isMobile ? 'Mobile' : 'Desktop',
+        'Version Number': 1, // refers to our own tracker library versioning,
+        'App Version': config.appVersion,
+        token: serverSettings.mixPanelClientToken // TODO: await here so events can't send before token available
+    };
+}
+
 interface EventProperties {
     [key: string]: string | number | boolean;
 }
@@ -54,25 +65,24 @@ interface EventObject {
     properties: EventProperties;
 }
 
+// Marketing wants all items (property names and values) to be in Title Case, but this breaks code style.
+// So we still write props in camelCase when sending events from client, and convert them here.
+function convertEventPropertyCase(event: EventObject): EventProperties {
+    const eventProperties: EventProperties = {};
+
+    Object.keys(event.properties).forEach(itemInCamel => {
+        const item = camelToTitleCase(itemInCamel);
+        eventProperties[item] = event.properties[itemInCamel];
+    });
+
+    return eventProperties;
+}
+
 export async function send(eventObj: EventObject): Promise<void> {
     try {
-        const baseProperties: BaseProperties = {
-            // eslint-disable-next-line camelcase, Mixpanel requires distinct_id in this format
-            distinct_id: await getUserId(),
-            Device: config.isMobile ? 'Mobile' : 'Desktop',
-            'Version Number': 1, // refers to our own tracker library versioning,
-            'App Version': config.appVersion,
-            token: serverSettings.mixPanelClientToken // TODO: await here so events can't send before token available
-        };
+        const baseProperties = await getBaseProperties();
 
-        // Marketing wants all items (property names and values) to be in Title Case, but this breaks code style.
-        // So we still write props in camelCase when sending events from client, and convert them here.
-        const eventProperties: EventProperties = {};
-        Object.keys(eventObj.properties).forEach(itemInCamel => {
-            const item = camelToTitleCase(itemInCamel);
-            eventProperties[item] = eventObj.properties[itemInCamel];
-        });
-
+        const eventProperties = convertEventPropertyCase(eventObj);
         eventObj.properties = { ...baseProperties, ...eventProperties };
 
         const data = g.btoa(JSON.stringify(eventObj));
@@ -84,5 +94,26 @@ export async function send(eventObj: EventObject): Promise<void> {
         });
     } catch (e) {
         console.error('Could not send telemetry event.', e);
+    }
+}
+
+export async function bulkSend(events: EventObject[]): Promise<void> {
+    try {
+        const baseProperties = await getBaseProperties();
+
+        events.forEach(ev => {
+            const eventProperties = convertEventPropertyCase(ev);
+            ev.properties = { ...baseProperties, ...eventProperties };
+        });
+
+        const data = g.btoa(JSON.stringify(events));
+        // const url = `${config.telemetry.baseUrl}${data}`;
+
+        console.log(events);
+        // g.fetch(url, {
+        //     method: 'POST'
+        // });
+    } catch (e) {
+        console.error('Could not send bulk telemetry event.', e);
     }
 }

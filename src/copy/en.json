@@ -150,6 +150,8 @@
   "title_findYourContacts": "Find your contacts on Peerio",
   "title_findYourContactsDescription": "See who's already on Peerio, or quickly invite your contacts who aren't here yet.",
   "title_syncContacts": "Sync contacts",
+  "title_addYourContacts": "Add your contacts",
+  "button_syncAddressBook": "Sync Address Book",
   "title_permissionContacts": "Permission to access contacts",
   "title_permissionContactsDescroption": "Peerio would like to access your contact list. Peerio will only use this to connect you with your contacts on Peerio.",
   "title_zeroStateFindContacts": "Find contacts",

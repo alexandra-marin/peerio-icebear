@@ -9,7 +9,7 @@ interface ReadReceiptProps {}
 /**
  * Holds read position (kegId) for a user in a chat. Named keg, names contain usernames.
  */
-class ReadReceipt extends Keg<ReadReceiptPayload, ReadReceiptProps> {
+export default class ReadReceipt extends Keg<ReadReceiptPayload, ReadReceiptProps> {
     constructor(username: string, db: ChatKegDb) {
         super(
             username ? `read_receipt-${username}` : null,
@@ -41,5 +41,3 @@ class ReadReceipt extends Keg<ReadReceiptPayload, ReadReceiptProps> {
         this.receiptError = !this.id.endsWith(`-${this.owner}`);
     };
 }
-
-export default ReadReceipt;

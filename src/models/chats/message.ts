@@ -37,7 +37,7 @@ interface MessageProps {
 /**
  * Message keg and model
  */
-class Message extends Keg<MessagePayload, MessageProps> {
+export default class Message extends Keg<MessagePayload, MessageProps> {
     constructor(db: SharedKegDb) {
         super(null, 'message', db);
         // format 1 adds richText property to payload.
@@ -132,7 +132,7 @@ class Message extends Keg<MessagePayload, MessageProps> {
             (this.files && this.files.length) ||
             (this.folders && this.folders.length)
         ) {
-            promise = retryUntilSuccess(() => this.saveToServer(), undefined, 5);
+            promise = retryUntilSuccess(() => this.saveToServer(), { maxRetries: 5 });
         } else {
             promise = this.saveToServer();
         }
@@ -272,7 +272,7 @@ class Message extends Keg<MessagePayload, MessageProps> {
         }
     }
 
-    _queueUnfurl(url) {
+    protected _queueUnfurl(url: string) {
         Message.unfurlQueue.addTask(() => {
             return unfurl
                 .getContentHeaders(url)
@@ -303,7 +303,7 @@ class Message extends Keg<MessagePayload, MessageProps> {
         });
     }
 
-    _processUrlHeaders(url, headers) {
+    protected _processUrlHeaders(url: string, headers) {
         if (!headers || !headers['content-type']) return;
 
         const type = headers['content-type'].split(';')[0];
@@ -376,5 +376,3 @@ class Message extends Keg<MessagePayload, MessageProps> {
         // files are in props only for search
     }
 }
-
-export default Message;

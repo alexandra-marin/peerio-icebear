@@ -72,8 +72,10 @@ class FileStoreFolders {
                     null,
                     'error_savingFileFolders'
                 ),
-            `saving file folders keg for ${this.fileStore.id}`,
-            5
+            {
+                id: `saving file folders keg for ${this.fileStore.id}`,
+                maxRetries: 5
+            }
         ).catch(() => this.sync());
     }
 

@@ -251,8 +251,7 @@ class ChatMessageHandler {
                     },
                     false
                 ),
-            undefined,
-            5
+            { maxRetries: 5 }
         )
             .then(
                 // TODO: response types
@@ -318,8 +317,9 @@ class ChatMessageHandler {
                     },
                     false
                 ),
-            undefined,
-            5
+            {
+                maxRetries: 5
+            }
         )
             .catch(err => {
                 if (err && err.code === serverErrorCodes.accessForbidden) {

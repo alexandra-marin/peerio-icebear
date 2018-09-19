@@ -6,16 +6,16 @@ interface ISettingsPayload {
     contactNotifications: boolean;
     contactRequestNotifications: boolean;
     messageNotifications: boolean;
-    errorTrackingOptIn: boolean;
     dataCollectionOptIn: boolean;
     subscribeToPromoEmails: boolean;
 }
 interface ISettingsProps {}
+
 /**
  * Plaintext named system keg, server controlled.
  * User can update this keg, but server verifies contract.
  */
-class Settings extends Keg<ISettingsPayload, ISettingsProps> {
+export default class Settings extends Keg<ISettingsPayload, ISettingsProps> {
     constructor(user: User) {
         super('settings', 'settings', user.kegDb, true);
         this.user = user;
@@ -26,7 +26,6 @@ class Settings extends Keg<ISettingsPayload, ISettingsProps> {
     @observable contactNotifications = false;
     @observable contactRequestNotifications = false;
     @observable messageNotifications = false;
-    @observable errorTracking = false;
     @observable dataCollection = false;
     @observable subscribeToPromoEmails = false;
     /**
@@ -41,7 +40,6 @@ class Settings extends Keg<ISettingsPayload, ISettingsProps> {
             contactNotifications: this.contactNotifications,
             contactRequestNotifications: this.contactRequestNotifications,
             messageNotifications: this.messageNotifications,
-            errorTrackingOptIn: this.errorTracking,
             dataCollectionOptIn: this.dataCollection,
             subscribeToPromoEmails: this.subscribeToPromoEmails,
             soundSchema: this.soundSchema
@@ -52,12 +50,9 @@ class Settings extends Keg<ISettingsPayload, ISettingsProps> {
         this.contactNotifications = data.contactNotifications;
         this.contactRequestNotifications = data.contactRequestNotifications;
         this.messageNotifications = data.messageNotifications;
-        this.errorTracking = data.errorTrackingOptIn;
         this.dataCollection = data.dataCollectionOptIn;
         this.subscribeToPromoEmails = data.subscribeToPromoEmails;
         this.soundSchema = data.soundSchema;
         this.loaded = true;
     }
 }
-
-export default Settings;

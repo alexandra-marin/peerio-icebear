@@ -46,7 +46,7 @@ const ACK_MSG = '👍';
 /**
  * at least one of two arguments should be set
  */
-class Chat {
+export default class Chat {
     /**
      * @param participants - chat participants, will be used to create chat or find it by participant list
      */
@@ -496,7 +496,7 @@ class Chat {
 
     // decrypting a bunch of kegs in one call is tough on mobile, so we do it asynchronously one by one
     // TODO: raw keg types
-    async _parseMessageKeg(keg: any, accumulator: Message[]) {
+    protected async _parseMessageKeg(keg: any, accumulator: Message[]) {
         const msg = new Message(this.db);
         // no payload for some reason. probably because of connection break after keg creation
         if (!(await msg.loadFromKeg(keg)) || msg.isEmpty) {
@@ -527,7 +527,7 @@ class Chat {
         }
     }
 
-    _reTriggerPaging(prepend, kegs) {
+    protected _reTriggerPaging(prepend, kegs) {
         const ids = kegs.map(k => k.kegId);
         const startPoint = prepend ? Math.min(...ids) : Math.max(...ids);
         // protection against infinite loop in result of weird data
@@ -537,7 +537,7 @@ class Chat {
 
     // all kegs are decrypted and parsed, now we just push them to the observable array
     @action
-    _finishAddMessages(accumulator, prepend, kegs) {
+    protected _finishAddMessages(accumulator, prepend, kegs) {
         let newMessageCount = 0;
         let newMentionCount = 0;
         // let lastMentionId;
@@ -638,7 +638,7 @@ class Chat {
         return -1;
     }
 
-    _sendMessage(m: Message): Promise<void> {
+    protected _sendMessage(m: Message): Promise<void> {
         if (this.canGoDown) this.reset();
         // send() will fill message with data required for rendering
         const promise = m.send();
@@ -939,7 +939,7 @@ class Chat {
     /**
      * Detects and sets firstOfTheDay flag for all loaded messages
      */
-    _detectFirstOfTheDayFlag() {
+    protected _detectFirstOfTheDayFlag() {
         if (!this.messages.length) return;
         this.messages[0].firstOfTheDay = true;
 
@@ -953,7 +953,7 @@ class Chat {
         }
     }
 
-    _detectGrouping() {
+    protected _detectGrouping() {
         if (!this.messages.length) return;
         this.messages[0].groupWithPrevious = false;
 
@@ -973,7 +973,7 @@ class Chat {
         }
     }
 
-    _detectLimboGrouping() {
+    protected _detectLimboGrouping() {
         if (!this.limboMessages.length) return;
         const prev = this.messages.length ? this.messages[this.messages.length - 1] : null;
         const current = this.limboMessages[0];
@@ -983,7 +983,7 @@ class Chat {
         }
     }
 
-    _sendReceipt() {
+    protected _sendReceipt() {
         // messages are sorted at this point ;)
         if (!this.messages.length) return;
         if (!clientApp.isFocused || !clientApp.isInChatsView || !this.active) return;
@@ -1016,9 +1016,9 @@ class Chat {
     /**
      * Adds participants to a channel.
      * @param participants - mix of usernames and Contact objects.
-     *                                               Note that this function will ensure contacts are loaded
-     *                                               before proceeding. So if there are some invalid
-     *                                               contacts - entire batch will fail.
+     *                       Note that this function will ensure contacts are loaded
+     *                       before proceeding. So if there are some invalid
+     *                       contacts - entire batch will fail.
      */
     addParticipants(participants: Array<string | Contact>) {
         if (!participants || !participants.length) return Promise.resolve();
@@ -1203,7 +1203,7 @@ class Chat {
     };
 
     @action.bound
-    _doResetExternalContent() {
+    protected _doResetExternalContent() {
         for (let i = 0; i < this.messages.length; i++) {
             this.messages[i].parseExternalContent();
         }
@@ -1216,11 +1216,10 @@ class Chat {
 
     async ensureDigestLoaded() {
         if (this.digestLoaded) return;
-        await retryUntilSuccess(
-            () => tracker.loadDigestFor(this.id),
-            `loading digest for ${this.id}`,
-            5
-        );
+        await retryUntilSuccess(() => tracker.loadDigestFor(this.id), {
+            id: `loading digest for ${this.id}`,
+            maxRetries: 5
+        });
         this.digestLoaded = true;
     }
 
@@ -1235,5 +1234,3 @@ class Chat {
         }
     }
 }
-
-export default Chat;

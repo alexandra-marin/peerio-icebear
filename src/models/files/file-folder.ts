@@ -43,7 +43,7 @@ export default class FileFolder {
     // unique global id (local folder id, or volume id)
     @observable id: string = null;
     // to be able to filter easier when files and folders are in the same list
-    isFolder = true;
+    readonly isFolder = true;
     // to indicate root folder or volume root
     isRoot = false;
     // this folder is a volume root
@@ -96,6 +96,12 @@ export default class FileFolder {
             }
             return f.folderId === this.id;
         });
+    }
+
+    // does current folder have zero files/folders in it
+    @computed
+    get isEmpty() {
+        return this.files.length + this.folders.length === 0;
     }
 
     // parent folder instance
@@ -160,9 +166,9 @@ export default class FileFolder {
         );
     }
 
-    // number of bytes, total size of all files in this folder tree
+    /** The total size, in bytes, of all files in this folder tree. */
     @computed
-    get size() {
+    get size(): number {
         let currentSize = 0;
         for (const folder of this.folders) {
             currentSize += folder.size;
@@ -172,14 +178,15 @@ export default class FileFolder {
         }
         return currentSize;
     }
-    // string
+
     @computed
-    get sizeFormatted() {
+    get sizeFormatted(): string {
         return util.formatBytes(this.size);
     }
-    // number, total file count in this folder tree
+
+    /** The total file count in this folder tree. */
     @computed
-    get totalFileCount() {
+    get totalFileCount(): number {
         let count = 0;
         for (const folder of this.folders) {
             count += folder.totalFileCount;
@@ -190,7 +197,7 @@ export default class FileFolder {
 
     // array of all files in this folder tree
     @computed
-    get allFiles() {
+    get allFiles(): File[] {
         let ret = this.files;
         this.folders.forEach(f => {
             ret = ret.concat(f.allFiles);
@@ -199,7 +206,7 @@ export default class FileFolder {
     }
 
     @computed
-    get allFolders() {
+    get allFolders(): FileFolder[] {
         let ret = this.folders;
         this.folders.forEach(f => {
             ret = ret.concat(f.allFolders);
@@ -208,18 +215,22 @@ export default class FileFolder {
     }
 
     // has nested folders?
-    get hasNested() {
-        return this.folders && this.folders.length;
+    get hasNested(): boolean {
+        return this.folders && this.folders.length > 0;
     }
 
     // searches in this folder root
-    findFolderByName(name) {
+    findFolderByName(name: string): FileFolder {
         const normalizedName = name.toUpperCase();
         return this.folders.find(f => f.normalizedName === normalizedName);
     }
 
     // downloads all files in current folder, reconstructing folder structure and showing progress
-    async download(path, pickPathSelector, createDirFunctor) {
+    async download(
+        path: string,
+        pickPathSelector: (path: string, name: string, ext?: string) => Promise<string>,
+        createDirFunctor: (path: string) => Promise<void>
+    ) {
         const downloadPath = await pickPathSelector(path, this.name);
         this.progress = 0;
         this.progressMax = this.files.length + this.folders.length;
@@ -234,7 +245,10 @@ export default class FileFolder {
         this.files.forEach(file => {
             promise = promise.then(async () => {
                 await file.download(
-                    pickPathSelector(downloadPath, file.nameWithoutExtension, file.ext)
+                    await pickPathSelector(downloadPath, file.nameWithoutExtension, file.ext),
+                    false,
+                    false,
+                    true // suppress snackbar
                 );
                 this.progress++;
             });
@@ -245,7 +259,7 @@ export default class FileFolder {
     }
 
     @computed
-    get hasLegacyFiles() {
+    get hasLegacyFiles(): boolean {
         return !!(
             this.folders.find(hasLegacyFilesPredicate) || this.files.find(isLegacyFilePredicate)
         );
@@ -261,7 +275,7 @@ export default class FileFolder {
 
     // move file to this folder
     @action.bound
-    async attachFile(file) {
+    async attachFile(file: File): Promise<void> {
         if (file.store !== this.store) {
             if (file.isLegacy) {
                 console.error('can not share legacy file', file.fileId);
@@ -284,18 +298,21 @@ export default class FileFolder {
         }
         file.folderId = this.isRoot ? null : this.id;
 
-        return retryUntilSuccess(
-            () => file.saveToServer(),
-            `saving file ${file.fileId}`,
-            5
-        ).tapCatch(() => {
+        return retryUntilSuccess(() => file.saveToServer(), {
+            id: `saving file ${file.fileId}`,
+            maxRetries: 5
+        }).tapCatch(() => {
             file.load();
         });
     }
 
     // adds exiting folder instance to this folder
     @action.bound
-    async attachFolder(folder, skipSave = false, skipRootFolder?) {
+    async attachFolder(
+        folder: FileFolder,
+        skipSave = false,
+        skipRootFolder?: boolean
+    ): Promise<void> {
         if (folder === this) return Promise.resolve();
         if (folder.store !== this.store) {
             // 1. we copy folder structure to another kegdb
@@ -316,7 +333,7 @@ export default class FileFolder {
 
     // private api, copies files from one db to another, preserving folder ids
     @action
-    async copyFilesTo(dst, folderIdMap) {
+    protected async copyFilesTo(dst, folderIdMap) {
         const src = this;
         src.progress = dst.progress = 0;
         src.progressMax = dst.progressMax = src.allFiles.length;
@@ -335,7 +352,7 @@ export default class FileFolder {
 
     // private api
     @action
-    async copyFolderStructureTo(dst: FileFolder, skipRootFolder = false) {
+    protected async copyFolderStructureTo(dst: FileFolder, skipRootFolder = false) {
         const src = this;
         const folderIdMap: { [folderId: string]: string } = {}; // mapping between source folder ids and destination
         const copyFolders = (parentSrc: FileFolder, parentDst: FileFolder) => {

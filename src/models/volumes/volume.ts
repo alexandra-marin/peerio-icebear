@@ -13,7 +13,7 @@ import { getUser } from '../../helpers/di-current-user';
 import { getChatStore } from '../../helpers/di-chat-store';
 
 export default class Volume extends FileFolder {
-    constructor(id) {
+    constructor(id: string) {
         super(null, '/', true);
         this.id = id;
         this.db = new VolumeKegDb(id);
@@ -21,7 +21,7 @@ export default class Volume extends FileFolder {
 
     db: VolumeKegDb;
     chatHead: ChatHead;
-    _metaPromise: Promise<void>;
+    protected _metaPromise: Promise<void>;
     deletedByMyself: boolean;
     leaving: boolean;
     // currently everyone is an admin
@@ -32,7 +32,7 @@ export default class Volume extends FileFolder {
 
     @observable convertingFromFolder = false;
 
-    compareContacts = (c1, c2) => {
+    compareContacts = (c1: Contact, c2: Contact) => {
         return c1.fullNameAndUsername.localeCompare(c2.fullNameAndUsername);
     };
 
@@ -52,13 +52,13 @@ export default class Volume extends FileFolder {
         return this.chatHead && this.chatHead.loaded ? this.chatHead.chatName : '';
     }
 
-    set name(value) {
+    set name(value: string) {
         if (this.chatHead) this.rename(value);
     }
 
     /**
      */
-    rename(name) {
+    rename(name: string) {
         let validated = name || '';
         validated = validated.trim();
         if (this.chatHead.chatName === validated) {
@@ -92,7 +92,7 @@ export default class Volume extends FileFolder {
         this.mount();
     }
 
-    async addParticipants(participants) {
+    async addParticipants(participants: (Contact | string)[]) {
         if (!participants || !participants.length) return Promise.resolve();
         const contacts = participants.map(
             p => (typeof p === 'string' ? contactStore.getContactAndSave(p) : p)
@@ -114,12 +114,13 @@ export default class Volume extends FileFolder {
         return contacts.forEach(c => getChatStore().startChatAndShareVolume(c, this));
     }
 
-    async removeParticipant(participant) {
-        let contact = participant;
-        if (typeof contact === 'string') {
-            // we don't really care if it's loaded or not, we just need Contact instance
-            contact = contactStore.getContact(contact);
-        }
+    async removeParticipant(participant: Contact | string) {
+        const contact =
+            typeof participant === 'string'
+                ? // we don't really care if it's loaded or not, we just need Contact instance
+                  contactStore.getContact(participant)
+                : participant;
+
         const boot = this.db.boot;
         const wasAdmin = boot.admins.includes(contact);
 

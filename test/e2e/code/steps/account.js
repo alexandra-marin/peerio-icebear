@@ -30,7 +30,6 @@ Then('I should have default account settings', async function() {
     settings.contactNotifications.should.be.false;
     settings.contactRequestNotifications.should.be.false;
     settings.messageNotifications.should.be.true;
-    settings.errorTracking.should.be.false;
     settings.dataCollection.should.be.false;
     settings.subscribeToPromoEmails.should.be.false;
 });
@@ -40,7 +39,6 @@ When('I change my account settings', async function() {
         settings.contactNotifications = true;
         settings.contactRequestNotifications = true;
         settings.messageNotifications = false;
-        settings.errorTracking = true;
         settings.dataCollection = true;
         settings.subscribeToPromoEmails = true;
     });
@@ -52,7 +50,6 @@ Then('my account settings are changed', async function() {
     settings.contactNotifications.should.be.true;
     settings.contactRequestNotifications.should.be.true;
     settings.messageNotifications.should.be.false;
-    settings.errorTracking.should.be.true;
     settings.dataCollection.should.be.true;
     settings.subscribeToPromoEmails.should.be.true;
 });

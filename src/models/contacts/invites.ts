@@ -11,7 +11,7 @@ interface InvitesProps {}
  * Named readonly server-controlled keg. Contains data about contacts invited by email.
  * Invite data can be modified via separate api.
  */
-class Invites extends SyncedKeg<InvitesPayload, InvitesProps> {
+export default class Invites extends SyncedKeg<InvitesPayload, InvitesProps> {
     constructor() {
         super('invites', getUser().kegDb as IKegDb, true);
     }
@@ -34,5 +34,3 @@ class Invites extends SyncedKeg<InvitesPayload, InvitesProps> {
         return a.email === b.email;
     }
 }
-
-export default Invites;

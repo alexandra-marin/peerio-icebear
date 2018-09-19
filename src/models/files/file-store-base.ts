@@ -154,8 +154,8 @@ class FileStoreBase {
     }
 
     @computed
-    get selectedFilesOrFolders() {
-        return (this.selectedFolders as Array<File | FileFolder>).concat(this.selectedFiles);
+    get selectedFilesOrFolders(): (File | FileFolder)[] {
+        return (this.selectedFolders as (File | FileFolder)[]).concat(this.selectedFiles);
     }
 
     // #endregion
@@ -307,10 +307,9 @@ class FileStoreBase {
 
         // get kegs from cache or server
         if (this.cacheLoaded) {
-            resp = await retryUntilSuccess(
-                () => this.getFileKegsFromServer(),
-                `Updating file list for ${this.id}`
-            );
+            resp = await retryUntilSuccess(() => this.getFileKegsFromServer(), {
+                id: `Updating file list for ${this.id}`
+            });
         } else {
             performance.mark(`start loading files cache ${this.id}`);
             resp = { kegs: await this.cache.getAllValues(), hasMore: true };
@@ -326,8 +325,9 @@ class FileStoreBase {
         let newKnownUpdateId = this.knownUpdateId;
         let newMaxUpdateId = this.maxUpdateId;
 
-        const filesToAdd = []; // array of [ File, Keg ] tuples
-        const filesToRemove = []; // array of File
+        const filesToAdd: [File, any /* keg data */][] = [];
+        const filesToRemove: File[] = [];
+        const filesToCache: [File, any /* keg data */][] = [];
 
         for (const keg of resp.kegs) {
             if (keg.collectionVersion > newKnownUpdateId) {
@@ -374,6 +374,9 @@ class FileStoreBase {
                 dirty = true;
                 filesToAdd.push([file, keg]);
             }
+            if (!fromCache) {
+                filesToCache.push([file, keg]);
+            }
         }
 
         runInAction(() => {
@@ -385,13 +388,16 @@ class FileStoreBase {
             }
 
             for (const [file, keg] of filesToAdd) {
-                if (!fromCache) {
-                    // scheduling caching when signature is verified, unless we process cached keg
-                    this.cacheOnceVerified(file, keg);
-                }
                 this.files.push(file);
                 if (this.onFileAdded) {
                     this.onFileAdded(keg, file);
+                }
+            }
+
+            if (!fromCache) {
+                for (const [file, keg] of filesToCache) {
+                    // scheduling caching when signature is verified, unless we process cached keg
+                    this.cacheOnceVerified(file, keg);
                 }
             }
 

@@ -29,13 +29,14 @@
  *
  */
 import socket from '../../network/socket';
-const { getFirstLetter } = require('../string');
+import { getFirstLetter } from '../string';
+import config from '../../config';
+import IsEmail from 'isemail';
 
 const VALIDATION_THROTTLING_PERIOD_MS = 400;
 const usernameRegex = /^\w{1,16}$/;
-const emailRegex = /^[^ ]+@[^ ]+/i;
 const medicalIdRegex = /MED\d{10}/i;
-const usernameLength = 16;
+const usernameLength = config.user.maxUsernameLength;
 // const phoneRegex =
 //     /^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$/i;
 
@@ -90,7 +91,7 @@ function isValidUsername(name: string) {
 }
 
 function isValidEmail(val: string) {
-    return Promise.resolve(emailRegex.test(val));
+    return Promise.resolve(IsEmail.validate(val));
 }
 
 function isValidMedicalId(val: string) {
@@ -132,14 +133,14 @@ function pair(action, message) {
     return { action, message };
 }
 
-const isValidSignupEmail = isValid('signup', 'email');
+const isValidSignupEmail = isValid('signup', 'emailAvailability');
 const isValidSignupUsername = isValid('signup', 'username');
 const isValidSignupUsernameSuggestion = isValid('signup', 'username', 'suggestion');
 const isValidSignupFirstName = isValid('signup', 'firstName');
 const isValidSignupLastName = isValid('signup', 'lastName');
 const emailFormat = pair(isValidEmail, 'error_invalidEmail');
 const medicalIdFormat = pair(isValidMedicalId, 'mcr_error_ahrpa');
-const emailAvailability = pair(isValidSignupEmail, 'error_addressNotAvailable');
+const emailAvailability = pair(isValidSignupEmail, 'error_addressTaken');
 const usernameFormat = pair(isValidUsername, 'error_usernameBadFormat');
 const usernameLengthCheck = pair(isValidUsernameLength, 'error_usernameLengthExceeded');
 const usernameAvailability = pair(isValidSignupUsername, 'error_usernameNotAvailable');
@@ -201,9 +202,9 @@ const validators = {
     stringExists,
     firstNameReserved,
     lastNameReserved,
-    email: [emailFormat, emailAvailability],
-    username: [usernameLengthCheck, usernameFormat, usernameAvailability],
-    usernameLogin: [usernameFormat, usernameExistence],
+    email: [stringExists, emailFormat, emailAvailability],
+    username: [stringExists, usernameFormat, usernameAvailability, usernameLengthCheck],
+    usernameLogin: [stringExists, usernameFormat, usernameExistence],
     firstName: [stringExists, firstNameReserved],
     lastName: [stringExists, lastNameReserved],
     mcrDoctorAhpraAvailability,

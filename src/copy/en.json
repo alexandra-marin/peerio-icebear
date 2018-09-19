@@ -1011,5 +1011,6 @@
   "title_chat_beacon": "See all your conversations here.",
   "description_chat_beacon": "Start a new conversation or check-in on your direct messages and rooms.",
   "title_uploadFiles_beacon": "Encrypt and upload files",
-  "description_uploadFiles_beacon": "Upload your files to make secure cloud backups and to share with others."
+  "description_uploadFiles_beacon": "Upload your files to make secure cloud backups and to share with others.",
+  "description_sync_beacon": "See who you already know on Peerio, sync your contacts."
 }

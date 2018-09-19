@@ -1,3 +1,3 @@
 export { default as S } from './strings';
-export { send } from './main';
+export { send, bulkSend } from './main';
 export { duration, errorMessage } from './helpers';

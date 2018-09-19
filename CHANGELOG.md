@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.24.5"></a>
+## [5.24.5](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.24.4...v5.24.5) (2018-09-19)
+
+
+### Bug Fixes
+
+* better username normalization and ignoring @ symbol at start ([b692cf4](https://github.com/PeerioTechnologies/peerio-icebear/commit/b692cf4))
+
+
+
 <a name="5.24.4"></a>
 ## [5.24.4](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.24.3...v5.24.4) (2018-09-18)
 

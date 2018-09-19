@@ -107,12 +107,12 @@ export async function bulkSend(events: EventObject[]): Promise<void> {
         });
 
         const data = g.btoa(JSON.stringify(events));
-        // const url = `${config.telemetry.baseUrl}${data}`;
+        const url = `${config.telemetry.baseUrl}${data}`;
 
         console.log(events);
-        // g.fetch(url, {
-        //     method: 'POST'
-        // });
+        g.fetch(url, {
+            method: 'POST'
+        });
     } catch (e) {
         console.error('Could not send bulk telemetry event.', e);
     }

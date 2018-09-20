@@ -5,6 +5,7 @@ import TinyDb from '../db/tiny-db';
 import * as cryptoUtil from '../crypto/util';
 import g from '../helpers/global-context';
 import serverSettings from '../models/server-settings';
+import { EventObject, EventProperties } from './types';
 
 let userId: string;
 const userIdState = observable({
@@ -54,15 +55,6 @@ async function getBaseProperties(): Promise<BaseProperties> {
         'App Version': config.appVersion,
         token: serverSettings.mixPanelClientToken // TODO: await here so events can't send before token available
     };
-}
-
-interface EventProperties {
-    [key: string]: string | number | boolean;
-}
-
-interface EventObject {
-    event: string;
-    properties: EventProperties;
 }
 
 // Marketing wants all items (property names and values) to be in Title Case, but this breaks code style.

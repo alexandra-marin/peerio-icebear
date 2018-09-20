@@ -1,4 +1,3 @@
-import { bulkSend } from './main';
 import { EventObject } from './types';
 
 class TelemetryStore {
@@ -6,11 +5,6 @@ class TelemetryStore {
 
     save = (ev: EventObject) => {
         this.events.push(ev);
-    };
-
-    sendAll = () => {
-        bulkSend(this.events);
-        this.events = [];
     };
 }
 

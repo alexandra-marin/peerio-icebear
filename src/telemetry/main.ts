@@ -6,6 +6,8 @@ import * as cryptoUtil from '../crypto/util';
 import g from '../helpers/global-context';
 import serverSettings from '../models/server-settings';
 import { EventObject, EventProperties } from './types';
+import telemetryStore from './store';
+import User from '../models/user/user';
 
 let userId: string;
 const userIdState = observable({
@@ -72,8 +74,12 @@ function convertEventPropertyCase(event: EventObject): EventProperties {
 
 export async function send(eventObj: EventObject): Promise<void> {
     try {
-        const baseProperties = await getBaseProperties();
+        if (!User.current) {
+            telemetryStore.save(eventObj);
+            return;
+        }
 
+        const baseProperties = await getBaseProperties();
         const eventProperties = convertEventPropertyCase(eventObj);
         eventObj.properties = { ...baseProperties, ...eventProperties };
 
@@ -89,9 +95,10 @@ export async function send(eventObj: EventObject): Promise<void> {
     }
 }
 
-export async function bulkSend(events: EventObject[]): Promise<void> {
+export async function sendStored(): Promise<void> {
     try {
         const baseProperties = await getBaseProperties();
+        const events = telemetryStore.events;
 
         events.forEach(ev => {
             const eventProperties = convertEventPropertyCase(ev);
@@ -117,6 +124,7 @@ export async function bulkSend(events: EventObject[]): Promise<void> {
 
             console.log(chunk);
         }
+        telemetryStore.events = [];
     } catch (e) {
         console.error('Could not send bulk telemetry event.', e);
     }

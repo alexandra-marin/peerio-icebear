@@ -78,7 +78,7 @@ export async function send(eventObj: EventObject): Promise<void> {
         eventObj.properties = { ...baseProperties, ...eventProperties };
 
         const data = g.btoa(JSON.stringify(eventObj));
-        const url = `${config.telemetry.baseUrl}${data}`;
+        const url = `${config.telemetry.baseUrl}?data=${data}`;
 
         console.log(eventObj);
         g.fetch(url, {

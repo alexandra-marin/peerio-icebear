@@ -97,14 +97,22 @@ export async function bulkSend(events: EventObject[]): Promise<void> {
             const eventProperties = convertEventPropertyCase(ev);
             ev.properties = { ...baseProperties, ...eventProperties };
         });
-
-        const data = g.btoa(JSON.stringify(events));
-        const url = `${config.telemetry.baseUrl}${data}`;
-
         console.log(events);
-        g.fetch(url, {
-            method: 'POST'
-        });
+
+        // Mixpanel accepts batch events but up to a maximum of 50 "messages" This term is not explained.
+        // We are guessing here. "message" seems to be one property, rather than one entire event.
+        // Increment can be adjusted as we learn more.
+        const increment = 3;
+        for (let i = 0; i < events.length; i += increment) {
+            const chunk = events.slice(i, i + increment);
+            const data = g.btoa(JSON.stringify(chunk));
+            const url = `${config.telemetry.baseUrl}${data}`;
+            g.fetch(url, {
+                method: 'POST'
+            });
+
+            console.log(chunk);
+        }
     } catch (e) {
         console.error('Could not send bulk telemetry event.', e);
     }

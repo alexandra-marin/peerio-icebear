@@ -100,9 +100,9 @@ export async function bulkSend(events: EventObject[]): Promise<void> {
         console.log(events);
 
         // Mixpanel accepts batch events but up to a maximum of 50 "messages". This term is not explained.
-        // We are guessing here. "message" seems to be one property, rather than one entire event.
+        // We are guessing here. Currently assuming that "message" corresponds to an entire "event".
         // Increment can be adjusted as we learn more.
-        const increment = 3;
+        const increment = 50;
         for (let i = 0; i < events.length; i += increment) {
             const chunk = events.slice(i, i + increment);
             const data = g.btoa(JSON.stringify(chunk));

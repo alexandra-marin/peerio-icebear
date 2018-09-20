@@ -622,14 +622,6 @@ export default class User {
                     this.setAsLastAuthenticated().catch(err => console.error(err)); // not critical, we can ignore this error
                 }
             );
-            when(
-                () => this.settings.loaded,
-                () => {
-                    if (this.settings.dataCollection) {
-                        telemetryStore.sendAll();
-                    }
-                }
-            );
         }
     }
 

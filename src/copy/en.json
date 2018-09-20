@@ -1010,5 +1010,7 @@
   "description_chat_beacon": "Start a new conversation or check-in on your direct messages and rooms.",
   "title_uploadFiles_beacon": "Encrypt and upload files",
   "description_uploadFiles_beacon": "Upload your files to make secure cloud backups and to share with others.",
-  "description_sync_beacon": "See who you already know on Peerio, sync your contacts."
+  "description_sync_beacon": "See who you already know on Peerio, sync your contacts.",
+  "title_contacts_zeroState0": "Quickly and easily add your contacts",
+  "title_contacts_zeroState1": "Add your contacts to start chatting and sharing files securely."
 }

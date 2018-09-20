@@ -22,7 +22,6 @@ import {
 } from '../../defs/interfaces';
 import AccountVersion from './account-version';
 import Settings from './settings';
-import telemetryStore from '../../telemetry/store';
 
 let currentUser: User;
 

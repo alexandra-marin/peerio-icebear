@@ -148,8 +148,8 @@ export default class FileFolder {
     @computed
     get foldersSortedByName() {
         return this.folders.sort((f1, f2) => {
-            if (f1.normalizedName > f2.normalizedName) return -1;
-            if (f1.normalizedName < f2.normalizedName) return 1;
+            if (f1.normalizedName < f2.normalizedName) return -1;
+            if (f1.normalizedName > f2.normalizedName) return 1;
             return 0;
         });
     }

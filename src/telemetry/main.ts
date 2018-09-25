@@ -2,7 +2,7 @@ import { observable } from 'mobx';
 import { asPromise } from '../helpers/prombservable';
 import config from '../config';
 import TinyDb from '../db/tiny-db';
-import * as cryptoUtil from '../crypto/util';
+import { getRandomGlobalShortIdHex, strToBytes, bytesToB64 } from '../crypto/util';
 import g from '../helpers/global-context';
 import serverSettings from '../models/server-settings';
 import { EventObject, EventProperties } from './types';
@@ -22,7 +22,7 @@ async function getUserId(): Promise<string> {
         try {
             userId = await TinyDb.system.getValue('telemetryUserId');
             if (!userId) {
-                userId = cryptoUtil.getRandomGlobalShortIdHex();
+                userId = getRandomGlobalShortIdHex();
                 await TinyDb.system.setValue('telemetryUserId', userId);
             }
         } catch (e) {
@@ -84,7 +84,7 @@ export async function send(eventObj: EventObject): Promise<void> {
         const eventProperties = convertEventPropertyCase(eventObj);
         eventObj.properties = { ...baseProperties, ...eventProperties };
 
-        const data = g.btoa(JSON.stringify(eventObj));
+        const data = bytesToB64(strToBytes(JSON.stringify(eventObj)));
         const url = `${config.telemetry.baseUrl}?data=${data}`;
 
         console.log(eventObj);

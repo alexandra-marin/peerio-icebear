@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.25.2"></a>
+## [5.25.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.25.1...v5.25.2) (2018-09-24)
+
+
+### Bug Fixes
+
+* folder sorting ([b8714e0](https://github.com/PeerioTechnologies/peerio-icebear/commit/b8714e0))
+
+
+
+<a name="5.25.1"></a>
+## [5.25.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.25.0...v5.25.1) (2018-09-20)
+
+
+### Bug Fixes
+
+* File#deleteable ([cd55441](https://github.com/PeerioTechnologies/peerio-icebear/commit/cd55441))
+
+
+
 <a name="5.25.0"></a>
 # [5.25.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.24.7...v5.25.0) (2018-09-20)
 

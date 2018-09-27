@@ -73,7 +73,7 @@ export default function mixUserAuthModule(this: User) {
                 id: 'requesting auth salt',
                 maxRetries: 3,
                 retryOnlyOnDisconnect: true,
-                requiresUpdatedTracker: false
+                isPreAuthCall: true
             }
         ).then(response => {
             this.authSalt = new Uint8Array(response.authSalt);
@@ -112,7 +112,7 @@ export default function mixUserAuthModule(this: User) {
                     id: 'requesting auth token',
                     maxRetries: 3,
                     retryOnlyOnDisconnect: true,
-                    requiresUpdatedTracker: false
+                    isPreAuthCall: true
                 });
             })
             .then(resp => util.convertBuffers(resp));

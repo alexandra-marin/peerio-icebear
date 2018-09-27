@@ -26,7 +26,7 @@ interface RetryOptions {
     maxRetries?: number;
     errorHandler?: (err: Error | ServerErrorType) => Promise<void>;
     retryOnlyOnDisconnect?: boolean;
-    requiresUpdatedTracker?: boolean;
+    isPreAuthCall?: boolean;
 }
 
 const callsInProgress: { [id: string]: CallInfo } = {};
@@ -43,7 +43,7 @@ const callsInProgress: { [id: string]: CallInfo } = {};
  *                                Error handler will not get called if DisconnectedError occurs.
  * @param options.retryOnlyOnDisconnect - retry only occurs if task got rejected because of disconnection.
  *                                        If this option is set to 'true', errorHandler will be ignored.
- * @param options.requiresUpdatedTracker - this process can run/retry only if/after tracker.updated is true
+ * @param options.isPreAuthCall - this task can run/retry before socket is authenticated
  * @param thisIsRetry - for internal use only
  * @returns A Promise that resolves when action is finally executed or rejects after all attempts are exhausted
  */
@@ -53,7 +53,7 @@ export function retryUntilSuccess<T = any>(
         id: Math.random().toString(),
         maxRetries: maxRetryCount,
         retryOnlyOnDisconnect: false,
-        requiresUpdatedTracker: true
+        isPreAuthCall: false
     },
     thisIsRetry?: boolean
 ): Promise<T> {
@@ -147,10 +147,10 @@ function scheduleRetry(fn: () => Promise<any>, id: string): void {
     console.debug(`Retrying ${id} in ${delay} second`);
 
     setTimeout(() => {
-        if (callInfo.options.requiresUpdatedTracker) {
-            tracker.onceUpdated(() => retryUntilSuccess(fn, callInfo.options, true));
-        } else {
+        if (callInfo.options.isPreAuthCall) {
             socket.onceConnected(() => retryUntilSuccess(fn, callInfo.options, true));
+        } else {
+            tracker.onceUpdated(() => retryUntilSuccess(fn, callInfo.options, true));
         }
     }, delay);
 }

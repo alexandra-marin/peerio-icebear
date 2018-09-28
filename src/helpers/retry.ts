@@ -60,14 +60,17 @@ export function retryUntilSuccess<T = any>(
     if (!options.id) options.id = Math.random().toString();
     if (!options.maxRetries) options.maxRetries = maxRetryCount;
     if (options.retryOnlyOnDisconnect) {
-        if (options.errorHandler)
+        if (options.errorHandler && !thisIsRetry) {
             throw new Error('errorHandler can not be set together with retryOnlyOnDisconnect');
+        }
         // any error leads to stopping retry
         // disconnect error never triggers errorHandler call
-        options.errorHandler = async err => {
-            if (err && err.name === 'NotAuthenticatedError') return;
-            throw err;
-        };
+        if (!options.errorHandler) {
+            options.errorHandler = async err => {
+                if (err && err.name === 'NotAuthenticatedError') return;
+                throw err;
+            };
+        }
     }
     let callInfo = callsInProgress[options.id];
     // don't make parallel calls

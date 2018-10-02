@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.25.4"></a>
+## [5.25.4](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.25.3...v5.25.4) (2018-09-28)
+
+
+### Bug Fixes
+
+* retry ([ca0118d](https://github.com/PeerioTechnologies/peerio-icebear/commit/ca0118d))
+* validator ([195e8bb](https://github.com/PeerioTechnologies/peerio-icebear/commit/195e8bb))
+
+
+
+<a name="5.25.3"></a>
+## [5.25.3](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.25.2...v5.25.3) (2018-09-27)
+
+
+### Bug Fixes
+
+* ignore socket.open if resetting ([1df1947](https://github.com/PeerioTechnologies/peerio-icebear/commit/1df1947))
+* reauth issue ([a677cc2](https://github.com/PeerioTechnologies/peerio-icebear/commit/a677cc2))
+* retry logic ([10c9af1](https://github.com/PeerioTechnologies/peerio-icebear/commit/10c9af1))
+
+
+
 <a name="5.25.2"></a>
 ## [5.25.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.25.1...v5.25.2) (2018-09-24)
 

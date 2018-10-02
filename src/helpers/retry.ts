@@ -1,9 +1,9 @@
 /**
  * Retry operation tools.
  */
-
 import { normalize, serverErrorCodes, DisconnectedError, ServerErrorType } from '../errors';
 import tracker from '../models/update-tracker';
+import socket from '../network/socket';
 
 const maxRetryCount = 120; // will bail out after this amount of retries
 const minRetryInterval = 1000; // will start with this interval between retries
@@ -26,6 +26,7 @@ interface RetryOptions {
     maxRetries?: number;
     errorHandler?: (err: Error | ServerErrorType) => Promise<void>;
     retryOnlyOnDisconnect?: boolean;
+    isPreAuthCall?: boolean;
 }
 
 const callsInProgress: { [id: string]: CallInfo } = {};
@@ -42,6 +43,7 @@ const callsInProgress: { [id: string]: CallInfo } = {};
  *                                Error handler will not get called if DisconnectedError occurs.
  * @param options.retryOnlyOnDisconnect - retry only occurs if task got rejected because of disconnection.
  *                                        If this option is set to 'true', errorHandler will be ignored.
+ * @param options.isPreAuthCall - this task can run/retry before socket is authenticated
  * @param thisIsRetry - for internal use only
  * @returns A Promise that resolves when action is finally executed or rejects after all attempts are exhausted
  */
@@ -50,21 +52,25 @@ export function retryUntilSuccess<T = any>(
     options: RetryOptions = {
         id: Math.random().toString(),
         maxRetries: maxRetryCount,
-        retryOnlyOnDisconnect: false
+        retryOnlyOnDisconnect: false,
+        isPreAuthCall: false
     },
     thisIsRetry?: boolean
 ): Promise<T> {
     if (!options.id) options.id = Math.random().toString();
     if (!options.maxRetries) options.maxRetries = maxRetryCount;
     if (options.retryOnlyOnDisconnect) {
-        if (options.errorHandler)
+        if (options.errorHandler && !thisIsRetry) {
             throw new Error('errorHandler can not be set together with retryOnlyOnDisconnect');
+        }
         // any error leads to stopping retry
         // disconnect error never triggers errorHandler call
-        options.errorHandler = async err => {
-            if (err && err.name === 'NotAuthenticatedError') return;
-            throw err;
-        };
+        if (!options.errorHandler) {
+            options.errorHandler = async err => {
+                if (err && err.name === 'NotAuthenticatedError') return;
+                throw err;
+            };
+        }
     }
     let callInfo = callsInProgress[options.id];
     // don't make parallel calls
@@ -143,10 +149,13 @@ function scheduleRetry(fn: () => Promise<any>, id: string): void {
 
     console.debug(`Retrying ${id} in ${delay} second`);
 
-    setTimeout(
-        () => tracker.onceUpdated(() => retryUntilSuccess(fn, callInfo.options, true)),
-        delay
-    );
+    setTimeout(() => {
+        if (callInfo.options.isPreAuthCall) {
+            socket.onceConnected(() => retryUntilSuccess(fn, callInfo.options, true));
+        } else {
+            tracker.onceUpdated(() => retryUntilSuccess(fn, callInfo.options, true));
+        }
+    }, delay);
 }
 
 export function isRunning(id: string) {

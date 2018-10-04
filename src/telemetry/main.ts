@@ -105,7 +105,6 @@ export async function sendStored(): Promise<void> {
             const eventProperties = convertEventPropertyCase(ev);
             ev.properties = { ...baseProperties, ...eventProperties };
         });
-        // console.log(events);
 
         // Mixpanel accepts batch events but up to a maximum of 50 "messages". This term is not explained.
         // We are guessing here. Currently assuming that "message" corresponds to an entire "event".
@@ -122,8 +121,6 @@ export async function sendStored(): Promise<void> {
                 },
                 body: `data=${data}`
             });
-
-            console.log(chunk);
         }
         eventStore = [];
     } catch (e) {

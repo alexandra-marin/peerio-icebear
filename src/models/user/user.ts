@@ -22,6 +22,7 @@ import {
 } from '../../defs/interfaces';
 import AccountVersion from './account-version';
 import Settings from './settings';
+import { sendStored } from '../../telemetry';
 
 let currentUser: User;
 
@@ -619,6 +620,12 @@ export default class User {
                 () => this.profileLoaded,
                 () => {
                     this.setAsLastAuthenticated().catch(err => console.error(err)); // not critical, we can ignore this error
+                }
+            );
+            when(
+                () => this.settings.loaded && this.settings.dataCollection,
+                () => {
+                    sendStored();
                 }
             );
         }

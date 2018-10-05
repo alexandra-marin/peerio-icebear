@@ -806,7 +806,6 @@
   "title_2FACode": "Authenticator app code",
   "title_2FAEnabled": "Two factor authentication is enabled\n\n",
   "title_2FABackupCode": "Backup codes",
-  "button_2FADeactivate": "Deactivate 2FA",
   "button_2FACopyKey": "Copy Key",
   "button_2FAGenerateCodes": "Generate new codes",
   "button_2FAUsedCodes": "You have used {used}/{limit} of backup codes",

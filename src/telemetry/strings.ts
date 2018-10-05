@@ -46,6 +46,7 @@ export default {
     LAST_NAME: 'Last Name',
     LEFT: 'Left',
     LAW_ENFORCEMENT_GUIDE: 'Law Enforcement Guide',
+    MAX_CHARACTERS: 'Max Characters',
     NAVIGATE: 'Navigate',
     NEXT: 'Next',
     NEWSLETTER: 'Newsletter',

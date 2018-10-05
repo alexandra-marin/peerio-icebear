@@ -1,4 +1,4 @@
-import { observable } from 'mobx';
+import { observable, autorun } from 'mobx';
 import { asPromise } from '../helpers/prombservable';
 import config from '../config';
 import TinyDb from '../db/tiny-db';
@@ -127,3 +127,14 @@ export async function sendStored(): Promise<void> {
         console.error('Could not send bulk telemetry event.', e);
     }
 }
+
+autorun(() => {
+    if (
+        User.current &&
+        User.current.settings.loaded &&
+        User.current.settings.dataCollection &&
+        eventStore.length > 0
+    ) {
+        sendStored();
+    }
+});

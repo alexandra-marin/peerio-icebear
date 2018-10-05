@@ -88,7 +88,6 @@ export async function send(eventObj: EventObject): Promise<void> {
         const data = bytesToB64(strToBytes(JSON.stringify(eventObj)));
         const url = `${config.telemetry.baseUrl}?data=${data}`;
 
-        console.log(eventObj);
         g.fetch(url, {
             method: 'GET'
         });

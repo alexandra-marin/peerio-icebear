@@ -1,8 +1,9 @@
-node_modules
-test-results
-dist
+packages/icebear/node_modules
+packages/icebear/test-results
+packages/icebear/dist
+packages/icebear/tests/config/.chrome_dev_user
+
 npm-debug.log
-tests/config/.chrome_dev_user
 .idea
 .chrome_dev_user
 .DS_Store

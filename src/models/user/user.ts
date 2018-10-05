@@ -22,9 +22,8 @@ import {
 } from '../../defs/interfaces';
 import AccountVersion from './account-version';
 import Settings from './settings';
-import { sendStored } from '../../telemetry';
 
-let currentUser: User;
+const currentUser = observable.shallowBox<User | null>(null);
 
 /**
  * Class represents application user, you have to create and instance and assign it to `User.current`
@@ -640,12 +639,12 @@ export default class User {
     /**
      * Currently authenticated user.
      */
-    static get current() {
-        return currentUser;
+    static get current(): User | null {
+        return currentUser.get();
     }
 
-    static set current(val) {
-        currentUser = val;
+    static set current(val: User | null) {
+        currentUser.set(val);
         currentUserHelper.setUser(val);
     }
 

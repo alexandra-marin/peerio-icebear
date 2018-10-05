@@ -1,4 +1,5 @@
-packages/icebear/node_modules
+node_modules/
+
 packages/icebear/test-results
 packages/icebear/dist
 packages/icebear/tests/config/.chrome_dev_user

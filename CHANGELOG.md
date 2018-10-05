@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.25.6"></a>
+## [5.25.6](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.25.5...v5.25.6) (2018-10-05)
+
+
+
 <a name="5.25.5"></a>
 ## [5.25.5](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.25.4...v5.25.5) (2018-10-05)
 

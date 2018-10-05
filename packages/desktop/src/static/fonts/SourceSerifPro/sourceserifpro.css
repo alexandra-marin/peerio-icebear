@@ -1,0 +1,18 @@
+@font-face {
+    src: url(SourceSerifPro-Regular.ttf) format('truetype');
+    font-family: 'Source Serif Pro';
+    font-style: normal;
+    font-weight: 400; /* fallback */
+}
+@font-face {
+    src: url(SourceSerifPro-Semibold.ttf) format('truetype');
+    font-family: 'Source Serif Pro';
+    font-style: normal;
+    font-weight: 600; /* fallback */
+}
+@font-face {
+    src: url(SourceSerifPro-Bold.ttf) format('truetype');
+    font-family: 'Source Serif Pro';
+    font-style: normal;
+    font-weight: 700; /* fallback */
+}

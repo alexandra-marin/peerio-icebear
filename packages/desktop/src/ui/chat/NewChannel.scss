@@ -1,0 +1,83 @@
+.new-channel.create-new-chat {
+  width: calc(100vw - 336px);
+
+  // TODO: refactor to UserPicker, share with NewChat
+  .chat-creation-header {
+    padding: $padding-default $padding-xxl;
+    margin-right: auto;
+
+    .title {
+      margin-right: auto;
+
+      span {
+        display: block;
+      }
+    }
+
+    .description {
+      margin-top: $margin-small;
+      font-size: 14px;
+      font-weight: $font-weight-regular;
+      color: $text-dark-inactive;
+
+      > span {
+        display: block;
+      }
+    }
+  }
+
+  .create-channel-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+  }
+
+  .user-picker-container {
+    display: flex;
+    height: auto;
+    width: 100%;
+  }
+
+  .user-picker {
+    height: auto;
+
+    .p-list {
+      padding-left: $userpicker-margin-large;
+    }
+  }
+
+  // TODO: needs pretty serious refactor (in JSX) to share style with NewChat
+  .new-channel-inputs {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: $margin-small;
+  }
+
+  .message-search-wrapper {
+    margin-bottom: $margin-small;
+
+    &.message-search-wrapper-new-channel {
+      flex-shrink: 0;
+      width: calc(100% - 64px); // TODO: hardcoded values
+      max-width: calc(#{$userpicker-maxwidth} - 64px); // TODO: hardcoded values
+      margin: 0 auto $margin-default $margin-xxl;
+      overflow: hidden;
+    }
+  }
+
+  .helper-text {
+    height: $margin-default;
+  }
+
+  .new-channel-button-container {
+    max-width: 720px;
+
+    button {
+      display: flex;
+      margin: 0 $margin-default $margin-large auto;
+    }
+  }
+}

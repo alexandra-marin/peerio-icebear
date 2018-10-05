@@ -1,0 +1,53 @@
+.breadcrumb-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+  .breadcrumb {
+    @extend %title;
+
+    display: flex;
+    align-items: center;
+    max-width: 100%;
+    overflow: hidden;
+    font-weight: normal;
+
+    .breadcrumb-entry {
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+
+      .material-icons {
+        font-size: 32px;
+      }
+
+      .folder-name {
+        @extend %title;
+        align-items: center;
+        max-width: 120px;
+        overflow: hidden;
+        text-decoration: none;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: $text-dark-secondary;
+
+        &.selected-count {
+          max-width: none;
+        }
+      }
+
+      a.folder-name {
+        color: $peerio-blue;
+      }
+
+      &:last-of-type a {
+        cursor: default;
+        color: $text-dark-inactive;
+      }
+    }
+  }
+
+  .item-actions {
+    margin-right: auto;
+  }
+}

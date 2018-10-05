@@ -1,0 +1,116 @@
+.upload-dialog {
+  min-width: 608px;
+
+  .upload-dialog-contents {
+    display: flex;
+    flex-direction: row;
+
+    .image-or-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 190px;
+      width: 190px;
+      overflow: hidden;
+      border-radius: 4px;
+
+      &.icon-container {
+        border: 1px solid $black-12;
+
+        .icon-inner {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+
+          .material-icons {
+            font-size: 52px;
+          }
+
+          .preview-unavailable {
+            margin-top: $margin-tiny;
+            font-style: italic;
+          }
+        }
+      }
+
+      .thumbnail {
+        height: 100%;
+        width: 100%;
+        text-align: center;
+
+        img {
+          max-height: 100%;
+          max-width: 100%;
+        }
+      }
+    }
+
+    .info-and-inputs {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      min-width: 0;
+      margin-left: $margin-default;
+
+      .p-input {
+        padding-bottom: 0;
+        margin-bottom: $margin-small;
+      }
+
+      .share-with {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-left: $padding-small;
+        margin-bottom: $margin-small;
+
+        .user-list {
+          flex-grow: 1;
+          cursor: default;
+          max-width: calc(100% - 36px);
+
+          .label {
+            @extend %hint-error-label;
+            color: $text-dark-hint;
+          }
+
+          .user-or-room-names {
+            display: flex;
+            justify-content: flex-start;
+            max-width: 100%;
+            color: $text-dark-inactive;
+
+            .room-name,
+            .user-full-name {
+              overflow: hidden;
+              font-weight: 600;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            }
+
+            .user-username {
+              font-style: italic;
+            }
+          }
+        }
+      }
+
+      .add-a-message {
+        resize: none;
+        display: flex;
+        flex-grow: 1;
+        max-height: 100%;
+        margin-bottom: 0;
+
+        textarea {
+          resize: none;
+          height: 87px;
+          max-height: 100%;
+          overflow-y: auto;
+          word-wrap: break-word;
+        }
+      }
+    }
+  }
+}

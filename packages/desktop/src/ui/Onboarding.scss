@@ -1,0 +1,90 @@
+.onboarding {
+  @extend %flex-col;
+  @extend %flex-align-center;
+  @extend %flex-justify-center;
+  height: 100vh;
+  width: 100vw;
+  overflow: auto;
+  background: white;
+
+  .onboarding-content {
+    @extend %flex-col;
+    height: 100%;
+    margin-top: 64px;
+  }
+
+  .onboarding-to-dos {
+    margin: 32px auto 0;
+  }
+
+  .onboarding-to-do {
+    padding-left: $padding-default;
+    margin-bottom: $margin-default;
+
+    .done-container {
+      @extend %flex-row;
+      pointer-events: none;
+
+      a {
+        text-decoration: none;
+      }
+    }
+
+    .extraclass-container {
+      @extend %flex-col;
+    }
+
+    .material-icons {
+      height: 29px;
+      margin-right: $spacing-default;
+      margin-top: 3px;
+    }
+
+    .title {
+      font-weight: $font-weight-regular;
+      color: $peerio-blue;
+    }
+
+    .flex-col {
+      margin-left: $margin-default;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    &.clickable {
+      cursor: pointer;
+    }
+
+    &.clickable:not(.done):hover .title {
+      text-decoration: underline;
+    }
+
+    &.done-first {
+      padding-top: $padding-default;
+      border-top: 1px solid $divider-dark;
+    }
+
+    &.done {
+      color: $text-dark-hint;
+
+      .title {
+        text-decoration: line-through;
+        color: currentColor;
+      }
+
+      .material-icons {
+        color: $color-confirmation;
+      }
+
+      a {
+        color: currentColor;
+      }
+    }
+  }
+
+  .onboarding-info {
+    margin: auto auto 48px;
+  }
+}

@@ -1,0 +1,82 @@
+.move-file-confirm-share {
+  .share-warning-toggle {
+    display: flex;
+    align-items: center;
+    margin-top: $margin-default;
+  }
+}
+
+.move-file-dialog {
+  height: 75vh;
+
+  .body {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+  }
+
+  .title {
+    margin: 24px $margin-default 0;
+  }
+
+  .breadcrumb {
+    height: 48px;
+    padding: $padding-default $padding-large;
+    margin-top: $margin-small;
+
+    a {
+      @extend %list-title;
+    }
+
+    .material-icons {
+      font-size: 18px;
+    }
+  }
+
+  .move-folders-container {
+    overflow-y: auto;
+  }
+
+  .move-file-row {
+    display: flex;
+    align-items: center;
+    height: 48px;
+    padding: 0 $padding-large;
+    border-bottom: 1px solid $divider-dark;
+
+    > *:not(:last-child) {
+      margin-right: $margin-default;
+    }
+
+    > button:last-child {
+      margin-left: auto;
+    }
+  }
+
+  .folder-icon {
+    font-size: 32px;
+  }
+
+  .file-info {
+    .file-name {
+      color: $text-dark-default;
+    }
+
+    .file-meta {
+      @extend %hint-error-label;
+      color: $text-dark-hint;
+    }
+  }
+
+  .search {
+    align-self: center;
+    height: 50px;
+    width: calc(100% - 32px);
+    margin-top: $margin-large;
+    border-radius: 24px;
+
+    input {
+      font-size: 12px;
+    }
+  }
+}

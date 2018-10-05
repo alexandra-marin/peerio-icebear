@@ -1,0 +1,128 @@
+.settings {
+  width: 100%;
+  padding: 32px 64px 0;
+  overflow: auto;
+  background: $background-root;
+
+  .logo {
+    width: 300px;
+    margin: 0 0 32px;
+  }
+
+  .tab-wrapper {
+    @extend %flex-grow-1;
+    @extend %flex-col;
+    min-width: 0;
+  }
+
+  .tabs {
+    display: flex;
+    width: 100%;
+    margin-top: 24px;
+    border-bottom: 1px solid $divider-dark;
+
+    .p-button {
+      position: relative;
+      height: 100%;
+      padding: $padding-default;
+      border-radius: 0;
+
+      &.tab-notify::before {
+        @extend %notify;
+        z-index: 0;
+        left: 4px;
+        top: 19px;
+      }
+
+      &::after {
+        content: ' ';
+        position: absolute;
+        height: 4px;
+        min-width: 0;
+        left: 0;
+        bottom: 0;
+        background-color: $peerio-blue;
+      }
+
+      &.security::after {
+        background-color: $yellow;
+      }
+      &.prefs::after {
+        background-color: $darkteal;
+      }
+      &.account::after {
+        background-color: $peerio-purple;
+      }
+      &.about::after {
+        background-color: $peerio-teal;
+      }
+      &.help::after {
+        background-color: $peerio-violet;
+      }
+
+      &:disabled::after {
+        min-width: 100%;
+        transition: min-width 250ms;
+      }
+    }
+  }
+
+  .settings-view {
+    margin-top: $margin-xl;
+  }
+
+  section {
+    padding: $padding-xl 0;
+
+    &.section-divider {
+      border-bottom: 1px solid $divider-dark;
+    }
+
+    .title + label,
+    .title + .p-switch {
+      margin-top: $margin-default; // for instances where there is not details paragraph. - paul
+    }
+
+    &.with-bg {
+      padding: $padding-default;
+      margin-top: 20px;
+      background: $black-03;
+
+      .title {
+        font-weight: $font-weight-regular;
+        color: $black;
+      }
+
+      a {
+        cursor: pointer;
+        font-weight: $font-weight-semibold;
+        color: $black;
+      }
+    }
+
+    .material-icons {
+      vertical-align: middle;
+    }
+
+    .qr-code {
+      margin-right: 140px;
+    }
+
+    .totp-code {
+      .totp-progress {
+        height: 1.3em;
+        width: 1.3em;
+        margin-left: -1.6em;
+      }
+    }
+  }
+
+  .error {
+    margin-top: 4px;
+    font-size: 12px;
+  }
+
+  .p-switch {
+    margin-bottom: $margin-default;
+  }
+}

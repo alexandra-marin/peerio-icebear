@@ -1,0 +1,35 @@
+.user-search-error {
+  display: flex;
+  max-width: $userlist-maxwidth;
+  padding: 0 $padding-small;
+  margin: $margin-large 0;
+  color: $text-dark-inactive;
+
+  .search-error-text {
+    @extend %flex-row;
+
+    /* TODO change to flex */
+    .material-icons {
+      min-width: 24px;
+      margin-right: $margin-large;
+      overflow: hidden;
+    }
+  }
+
+  .radio-container {
+    display: flex;
+    flex-direction: column;
+
+    .p-radio {
+      padding-left: $padding-xxl;
+    }
+
+    .p-button {
+      margin-left: auto;
+    }
+  }
+}
+
+.user-search-error.medcryptor {
+  flex-direction: column;
+}

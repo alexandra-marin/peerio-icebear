@@ -1,0 +1,9 @@
+.file-folder-details-row {
+  @extend %hint-error-label;
+  font-weight: $font-weight-regular;
+  color: $text-dark-hint;
+
+  .updated-date {
+    margin-left: $margin-default;
+  }
+}

@@ -1,0 +1,295 @@
+/*
+  File type icons change colour with certain states in certain parts of app, but we can't directly recolour SVG files in Chromium. So, we need to change the background-image on states like "hover", but we can't just put a :hover selector because it needs to be triggered on the hover of the parent component, not icon itself. It's somewhat clunky but it makes more sense to track those elements here than to add hover event listeners on every file line, for example.
+*/
+
+// Image for hover/active/selected state
+.row.selected-row,
+.row-container:hover,
+.row-container.hover,
+.p-list-item:hover {
+  .file-sprite-icon {
+    background-image: url(./static/sprites/thumb-files-hoverSelected.svg);
+  }
+}
+
+.file-sprite-icon.active {
+  background-image: url(./static/sprites/thumb-files-hoverSelected.svg);
+}
+
+/*
+  Image for inactive/disabled state
+  TODO: add with file bulk actions
+
+  .file-sprite-icon {
+    opacity: .12;
+    background-image: url(./static/sprites/thumb-files-inactive.svg);
+  }
+*/
+
+// Default image & spritesheet positioning
+.file-sprite-icon {
+  display: block;
+  background-image: url(./static/sprites/thumb-files-default.svg);
+  background-repeat: no-repeat;
+  background-size: 2400px auto; /* width = half of bg img */
+
+  &.ic-56dp {
+    height: 56px;
+    width: 56px;
+  }
+
+  &.ic-48dp {
+    height: 48px;
+    width: 48px;
+  }
+
+  &.ic-32dp {
+    height: 32px;
+    width: 32px;
+  }
+
+  &.ic-24dp {
+    height: 24px;
+    width: 24px;
+  }
+
+  &.ic-file-img-xlarge {
+    background-position: 0 0;
+  }
+
+  &.ic-file-audio-xlarge {
+    background-position: -56px 0;
+  }
+
+  &.ic-file-video-xlarge {
+    background-position: -112px 0;
+  }
+
+  &.ic-file-other-xlarge {
+    background-position: -168px 0;
+  }
+
+  &.ic-file-txt-xlarge {
+    background-position: -224px 0;
+  }
+
+  &.ic-file-zip-xlarge {
+    background-position: -280px 0;
+  }
+
+  &.ic-file-pdf-xlarge {
+    background-position: -336px 0;
+  }
+
+  &.ic-file-ai-xlarge {
+    background-position: -392px 0;
+  }
+
+  &.ic-file-psd-xlarge {
+    background-position: -448px 0;
+  }
+
+  &.ic-file-word-xlarge {
+    background-position: -504px 0;
+  }
+
+  &.ic-file-xls-xlarge {
+    background-position: -560px 0;
+  }
+
+  &.ic-file-ppt-xlarge {
+    background-position: -616px 0;
+  }
+
+  &.ic-file-presentations-xlarge {
+    background-position: -672px 0;
+  }
+
+  &.ic-file-documents-xlarge {
+    background-position: -728px 0;
+  }
+
+  &.ic-file-any-xlarge {
+    background-position: -784px 0;
+  }
+
+  &.ic-file-img-large {
+    background-position: -840px 0;
+  }
+
+  &.ic-file-audio-large {
+    background-position: -888px 0;
+  }
+
+  &.ic-file-video-large {
+    background-position: -936px 0;
+  }
+
+  &.ic-file-other-large {
+    background-position: -984px 0;
+  }
+
+  &.ic-file-txt-large {
+    background-position: -1032px 0;
+  }
+
+  &.ic-file-zip-large {
+    background-position: -1080px 0;
+  }
+
+  &.ic-file-pdf-large {
+    background-position: -1128px 0;
+  }
+
+  &.ic-file-ai-large {
+    background-position: -1176px 0;
+  }
+
+  &.ic-file-psd-large {
+    background-position: -1224px 0;
+  }
+
+  &.ic-file-word-large {
+    background-position: -1272px 0;
+  }
+
+  &.ic-file-xls-large {
+    background-position: -1320px 0;
+  }
+
+  &.ic-file-ppt-large {
+    background-position: -1368px 0;
+  }
+
+  &.ic-file-presentations-large {
+    background-position: -1416px 0;
+  }
+
+  &.ic-file-documents-large {
+    background-position: -1464px 0;
+  }
+
+  &.ic-file-any-large {
+    background-position: -1512px 0;
+  }
+
+  &.ic-file-img-medium {
+    background-position: -1560px 0;
+  }
+
+  &.ic-file-audio-medium {
+    background-position: -1592px 0;
+  }
+
+  &.ic-file-video-medium {
+    background-position: -1624px 0;
+  }
+
+  &.ic-file-other-medium {
+    background-position: -1656px 0;
+  }
+
+  &.ic-file-txt-medium {
+    background-position: -1688px 0;
+  }
+
+  &.ic-file-zip-medium {
+    background-position: -1720px 0;
+  }
+
+  &.ic-file-pdf-medium {
+    background-position: -1752px 0;
+  }
+
+  &.ic-file-ai-medium {
+    background-position: -1784px 0;
+  }
+
+  &.ic-file-psd-medium {
+    background-position: -1816px 0;
+  }
+
+  &.ic-file-word-medium {
+    background-position: -1848px 0;
+  }
+
+  &.ic-file-xls-medium {
+    background-position: -1880px 0;
+  }
+
+  &.ic-file-ppt-medium {
+    background-position: -1912px 0;
+  }
+
+  &.ic-file-presentations-medium {
+    background-position: -1944px 0;
+  }
+
+  &.ic-file-documents-medium {
+    background-position: -1976px 0;
+  }
+
+  &.ic-file-any-medium {
+    background-position: -2008px 0;
+  }
+
+  &.ic-file-img-small {
+    background-position: -2040px 0;
+  }
+
+  &.ic-file-audio-small {
+    background-position: -2064px 0;
+  }
+
+  &.ic-file-video-small {
+    background-position: -2088px 0;
+  }
+
+  &.ic-file-other-small {
+    background-position: -2112px 0;
+  }
+
+  &.ic-file-txt-small {
+    background-position: -2136px 0;
+  }
+
+  &.ic-file-zip-small {
+    background-position: -2160px 0;
+  }
+
+  &.ic-file-pdf-small {
+    background-position: -2184px 0;
+  }
+
+  &.ic-file-ai-small {
+    background-position: -2208px 0;
+  }
+
+  &.ic-file-psd-small {
+    background-position: -2232px 0;
+  }
+
+  &.ic-file-word-small {
+    background-position: -2256px 0;
+  }
+
+  &.ic-file-xls-small {
+    background-position: -2280px 0;
+  }
+
+  &.ic-file-ppt-small {
+    background-position: -2304px 0;
+  }
+
+  &.ic-file-presentations-small {
+    background-position: -2328px 0;
+  }
+
+  &.ic-file-documents-small {
+    background-position: -2352px 0;
+  }
+
+  &.ic-file-any-small {
+    background-position: -2376px 0;
+  }
+}

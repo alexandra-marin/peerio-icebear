@@ -1,0 +1,123 @@
+$share-with-spacing: 84px;
+$list-header-height: 48px;
+
+.share-with-dialog {
+  max-height: 80vh;
+  min-height: 80vh;
+
+  .body {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    padding: 0;
+
+    .title {
+      margin: $margin-large $margin-large $margin-default;
+    }
+  }
+
+  .share-with-contents {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .user-search {
+    flex-shrink: 0;
+    width: calc(100% - 48px); // 2x $margin-large
+    margin: 0 $margin-large $margin-large;
+
+    .p-input {
+      height: 48px;
+      width: auto;
+      margin: 0 $margin-large;
+      border-radius: 24px;
+    }
+  }
+
+  .chat-list-container {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .p-list-heading {
+    z-index: 1;
+    height: $list-header-height;
+    width: 100%;
+    top: 0;
+    padding-left: $share-with-spacing;
+    color: $text-dark-default;
+    background-color: $background-hover-default;
+  }
+
+  .list-chats {
+    li {
+      display: flex;
+      align-items: center;
+      position: relative;
+      padding-left: $share-with-spacing;
+
+      .checkbox {
+        display: none;
+        position: absolute;
+        left: $margin-xl;
+      }
+
+      &:hover .checkbox {
+        display: flex;
+      }
+
+      .display-name {
+        margin-left: $margin-default;
+        color: $text-dark-default;
+      }
+
+      .username {
+        @extend %hint-error-label;
+        margin-left: $margin-small;
+        font-style: italic;
+      }
+    }
+  }
+
+  .list-channels {
+    padding: 8px 0;
+
+    .p-list-item {
+      min-height: 24px;
+    }
+  }
+
+  .list-contacts {
+    .selected .left .material-icons {
+      color: $peerio-blue;
+    }
+  }
+
+  .receipt-wrapper {
+    @extend %flex-row;
+    align-items: center;
+    height: 48px;
+    min-height: 48px;
+    padding: $padding-default 0;
+    margin-left: $margin-xl;
+    border-top: 1px solid $divider-dark;
+  }
+
+  .move-to-root-notif {
+    justify-content: flex-end;
+    padding-right: $padding-large;
+    background-color: $background-hover-default;
+
+    .material-icons {
+      margin-right: $margin-small;
+    }
+  }
+}
+
+// 'Share folder' styles: ShareWithMultipleDialog & ModifyShareDialog
+.share-with-dialog.share-folder {
+  .p-list li .username {
+    color: $text-dark-secondary;
+  }
+}

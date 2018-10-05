@@ -1,0 +1,141 @@
+.terms-of-use {
+  .ak-backup-reminder {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    z-index: 10;
+    width: 100%;
+    top: 0;
+    padding: $padding-default;
+    color: $text-light-default;
+    background-color: $darkteal;
+
+    .title {
+      display: flex;
+      align-items: center;
+
+      .material-icons {
+        margin-right: $margin-small;
+        color: $text-light-default;
+      }
+    }
+
+    .description {
+      padding-left: 32px; // img width + img margin-right
+
+      .p-button {
+        margin-left: $margin-tiny;
+        color: $text-light-default;
+      }
+    }
+  }
+
+  .left-container p .p-button {
+    text-decoration: none;
+  }
+
+  .terms-left {
+    margin-top: $margin-default;
+
+    .terms-entry {
+      display: flex;
+      align-items: center;
+      position: relative;
+      padding: $padding-default 0;
+
+      > * {
+        // Need this to make content appear over ::before box-with-shadow on selected entry
+        z-index: 1;
+      }
+
+      .question {
+        margin-left: $margin-small;
+        font-size: 16px;
+        font-weight: $font-weight-semibold;
+        color: $text-dark-secondary;
+      }
+
+      .right-arrow {
+        margin-left: auto;
+      }
+
+      /*
+        This is actually the arrow that appears by the right-container content.
+        Orienting it according to .terms-entry position is more reliable.
+      */
+      .left-arrow {
+        position: absolute;
+        left: 50%;
+        margin-left: calc(25vw - 16px);
+        color: $darkblue;
+        transform: scale(1, 2) rotateY(180deg);
+      }
+
+      &.selected {
+        &::before {
+          content: ' ';
+          position: absolute;
+          z-index: 0;
+          height: calc(100% + 20px);
+          width: calc(100% + 32px); // 2x margin-default
+          left: -$margin-default;
+          top: -10px;
+          box-shadow: $shadow-5;
+          background-color: $background-root;
+        }
+      }
+    }
+  }
+
+  .right-container {
+    @include onboarding-right-content-padding();
+    justify-content: flex-start;
+    overflow-y: auto;
+  }
+
+  .terms-right {
+    width: 100%;
+    font-size: 14px;
+    color: $text-light-default;
+
+    .terms-text {
+      display: none;
+
+      &.selected {
+        display: block;
+      }
+    }
+
+    h3 {
+      font-size: 18px;
+    }
+
+    .question {
+      -webkit-margin-after: 0;
+      font-size: 16px;
+      font-weight: $font-weight-semibold;
+    }
+
+    p {
+      margin-top: 0;
+    }
+  }
+}
+
+.cancel-signup {
+  .heading {
+    margin-bottom: $margin-default;
+  }
+
+  .subheading {
+    margin-top: $margin-default;
+    font-family: $font-serif;
+    font-size: 24px;
+    font-weight: $font-weight-semibold;
+    color: $text-dark-secondary;
+  }
+
+  p {
+    margin-top: 0;
+  }
+}

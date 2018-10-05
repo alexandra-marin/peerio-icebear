@@ -1,0 +1,94 @@
+// Login page
+.login {
+  @extend %flex-col;
+  @extend %flex-align-center;
+  flex: 0 0 auto;
+  justify-content: center;
+  width: 100vw;
+  color: $text-light-default;
+
+  a {
+    color: inherit;
+  }
+
+  .login-inputs-container {
+    width: 400px;
+    padding: $padding-default;
+    margin: $margin-large 0;
+    color: $text-dark-default;
+    background-color: $background-root;
+    border-radius: 4px;
+  }
+
+  .login-form {
+    padding: $padding-default;
+  }
+
+  .title {
+    margin-bottom: $margin-default;
+    font-weight: $font-weight-bold;
+  }
+
+  .password {
+    position: relative;
+    margin-top: $margin-default;
+
+    input {
+      padding-right: 48px;
+    }
+
+    .p-button {
+      position: absolute;
+      right: 6px;
+      top: 16px;
+    }
+  }
+
+  .login-button-container {
+    display: flex;
+    margin-top: $margin-large;
+
+    .p-button {
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+
+  .welcome-back {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: $padding-default;
+    font-size: 20px;
+    // TODO: make transition vars
+    transition: 250ms;
+    color: $text-dark-secondary;
+    background-color: $background-hover-default;
+    border-radius: 4px;
+
+    &:hover {
+      background: $background-neutral;
+    }
+
+    .overflow {
+      width: 100%;
+      padding: 0 $padding-large;
+      overflow: hidden;
+      text-align: center;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    strong {
+      font-weight: $font-weight-bold;
+      color: $text-dark-default;
+    }
+
+    .subtitle {
+      @extend %hint-error-label;
+      margin-top: $margin-small;
+    }
+  }
+}

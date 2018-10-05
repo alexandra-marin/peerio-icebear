@@ -1,0 +1,49 @@
+.files {
+  .files-header-container {
+    width: 100%;
+    padding: $padding-large $padding-large 0;
+  }
+
+  .files-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 80px;
+    width: 100%;
+
+    .breadcrumb {
+      margin-left: $margin-large;
+    }
+
+    .buttons-container {
+      display: flex;
+
+      &.bulk-buttons .p-button {
+        padding: 0 $padding-small;
+        margin: 0;
+      }
+    }
+
+    button {
+      margin-left: $margin-small;
+
+      &.new-folder {
+        margin-left: auto;
+      }
+    }
+  }
+
+  .search-results-header {
+    @extend %title;
+    margin-left: $margin-xl;
+    color: $text-dark-inactive;
+  }
+
+  // .search is also defined (unscoped) in its own component file; all props
+  // currently here are overrides.
+  .search {
+    height: 48px;
+    width: 100%;
+    border-radius: 24px;
+  }
+}

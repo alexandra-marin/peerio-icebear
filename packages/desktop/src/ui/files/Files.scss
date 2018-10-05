@@ -1,0 +1,90 @@
+$pending-files-banner-height: 100px;
+
+.files {
+  @extend %flex-col;
+  @extend %flex-align-center;
+  height: 100vh;
+  width: 100%;
+  min-width: 0;
+  background: $background-root;
+
+  .file-wrapper {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .waiting-3rd-party {
+    background-color: $black-03;
+  }
+
+  .removed-folder-notif {
+    display: flex;
+    align-items: center;
+
+    max-height: 48px;
+    min-height: 48px;
+
+    padding: 0 24px 0 48px;
+    margin-top: -1px;
+    overflow: hidden;
+
+    transition: max-height 250ms, min-height 250ms, border-top 250ms;
+    background-color: rgba(4, 11, 65, 0.15);
+    border-top: 4px solid $color-confirmation;
+
+    .p-button {
+      width: 24px;
+      margin-left: auto;
+    }
+
+    &.hide-in-progress {
+      max-height: 0;
+      min-height: 0;
+      border-top: 0;
+    }
+  }
+
+  .file-ui-subheader {
+    display: flex;
+    align-items: center;
+    position: relative;
+    height: 48px;
+    min-height: 48px;
+    padding: 0 24px 0 48px;
+    color: $text-dark-secondary;
+
+    .file-share-info {
+      font-weight: $font-weight-semibold;
+    }
+
+    .p-progress-bar {
+      position: absolute;
+      left: 0;
+      top: 100%;
+      padding: 0;
+      margin-top: -2px;
+    }
+
+    &.volume-in-progress {
+      background-color: $background-hover-accent;
+    }
+
+    &.converting-to-volume {
+      background-color: rgba($color-error, 0.05);
+    }
+  }
+
+  .drop-zone {
+    // duplicating flex styles of parent; needs update if the parent is updated!
+    // maybe just use `display: contents;` if it's shipped by the time this
+    // needs updating.
+    @extend %flex-col;
+    @extend %flex-grow-1;
+    @extend %flex-shrink-0;
+    flex: 1;
+  }
+
+  .drop-zone-droppable-hovered {
+    background-color: rgba($peerio-teal, 0.38);
+  }
+}

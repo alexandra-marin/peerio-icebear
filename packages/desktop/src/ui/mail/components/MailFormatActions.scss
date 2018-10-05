@@ -1,0 +1,56 @@
+.mail {
+  .mail-actions {
+    @extend %flex-row;
+    @extend %flex-align-center;
+    @extend %flex-shrink-0;
+    height: 48px;
+    background-color: $black-03;
+
+    .counter {
+      position: relative;
+
+      .attach-file {
+        margin-left: 10px;
+        margin-right: 10px;
+      }
+
+      .count {
+        position: absolute;
+        height: 24px;
+        width: 24px;
+        right: 6px;
+        top: -4px;
+        line-height: 20px;
+        font-size: 12px;
+        text-align: center;
+        color: $text-light-default;
+        background: $peerio-blue;
+        border: 2px white solid;
+        border-radius: 20px;
+      }
+    }
+  }
+
+  .mail-format {
+    @extend %flex-row;
+    @extend %flex-align-center;
+    @extend %flex-grow-1;
+    height: 48px;
+    padding: 0 10px;
+    border-left: 1px solid $divider-dark;
+    border-right: 1px solid $divider-dark;
+
+    .material-icons {
+      color: $icon-dark-inactive;
+
+      .active {
+        color: $peerio-blue;
+      }
+    }
+  }
+
+  .delete {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+}

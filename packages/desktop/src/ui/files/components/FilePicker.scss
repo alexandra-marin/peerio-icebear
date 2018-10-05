@@ -1,0 +1,57 @@
+.file-picker {
+  // Override default padding so that file list can be full-width
+  .body {
+    padding: 0;
+
+    .title,
+    .p-progress-bar {
+      padding: $padding-large;
+      margin: 0;
+    }
+  }
+
+  .file-picker-body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .search {
+    flex-grow: 1;
+    height: 48px;
+    width: auto;
+    margin: 0 $margin-large;
+    border-radius: 24px;
+
+    input {
+      font-size: 12px;
+    }
+  }
+
+  .breadcrumb-container {
+    margin: $margin-large;
+  }
+
+  .breadcrumb * {
+    font-size: 16px !important;
+  }
+
+  .search-results-header {
+    margin-left: $margin-default;
+    margin-top: $margin-default;
+    font-size: 16px;
+    color: $text-dark-inactive;
+  }
+
+  // overriding File table defaults
+  .file-table-wrapper {
+    height: 55vh;
+
+    .file-table-body {
+      background-color: transparent;
+    }
+
+    .row-container {
+      padding-left: $padding-large;
+    }
+  }
+}

@@ -1,0 +1,95 @@
+.message-view {
+  .progress-wrapper {
+    @extend %flex-row;
+    @extend %flex-align-center;
+    @extend %flex-justify-center;
+    width: 100%;
+    min-height: 50px;
+  }
+
+  .messages-start {
+    width: 100%;
+    padding: 0 24px;
+    margin-top: auto;
+    margin-bottom: $margin-small;
+
+    .avatars {
+      @extend %flex-row;
+      @extend %flex-wrap;
+      margin-top: 64px;
+      margin-bottom: $margin-small;
+
+      .p-avatar {
+        margin: 0 $margin-small $margin-small 0;
+      }
+    }
+
+    .title {
+      margin-bottom: $margin-small;
+    }
+  }
+
+  .marker-wrapper {
+    @extend %flex-row;
+    @extend %flex-align-center;
+    @extend %flex-justify-center;
+    width: 100%;
+    margin: $margin-default 0;
+
+    .marker {
+      @extend %flex-grow-1;
+      height: 1px;
+      margin: $margin-default 0;
+      background: $divider-dark;
+    }
+
+    .content {
+      padding: 0 $padding-small;
+
+      .material-icons {
+        height: 8px;
+        width: 8px;
+        left: 16px;
+        font-size: 8px;
+        color: $color-error;
+      }
+    }
+  }
+
+  .marker-wrapper.new-messages {
+    margin: 0;
+
+    .marker {
+      background: rgba($color-error, 0.38);
+    }
+
+    .content {
+      padding-right: $padding-default;
+      font-size: 12px;
+      color: rgba($color-error, 0.7);
+    }
+  }
+
+  .messages-current {
+    @extend %flex-col;
+    @extend %flex-align-start;
+    flex: 1 1 auto;
+    padding-bottom: 24px;
+    overflow-x: hidden;
+
+    .messages-progress-bar {
+      align-self: center;
+      margin-top: auto;
+      margin-bottom: auto;
+    }
+  }
+}
+
+.messages-inline-progress-bar {
+  align-self: center;
+  width: 35px;
+}
+
+.patient-room .messages-current {
+  background-color: $background-chat;
+}

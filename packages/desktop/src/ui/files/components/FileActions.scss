@@ -1,0 +1,21 @@
+.files {
+  .processing-file {
+    position: absolute;
+    z-index: 10;
+    height: 48px;
+    width: 100%;
+    padding: $padding-default;
+    margin: 0;
+    opacity: 0.5;
+  }
+}
+
+.limited-actions-dialog {
+  .text {
+    color: $text-dark-secondary;
+
+    a {
+      text-decoration: none;
+    }
+  }
+}

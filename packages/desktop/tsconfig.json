@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "jsx": "react",
+    "allowJs": true,
+    "baseUrl": "./src",
+    "target": "esnext",
+    "noImplicitThis": true,
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitAny": false, // TODO: enable (default enabled under `strict`, so just remove this line)
+    "strictNullChecks": false, // TODO: enable (default enabled under `strict`, so just remove this line)
+    "paths": {
+      // path mappings are mirrored in the jest config in package.json. if you
+      // change them here, update them there as well!
+      "~/*": ["./*"],
+      // Since desktop app uses self-compiled sdk from node_modules/peerio-icebear/dist
+      // and main file of the sdk is /dist/index.js,
+      // we give a hint to typescript where to look for sources.
+      "peerio-icebear": ["../node_modules/peerio-icebear/src"]
+    }
+  },
+  "include": ["src/**/*", "test/**/*"],
+  "exclude": ["src/static/**/*"]
+}

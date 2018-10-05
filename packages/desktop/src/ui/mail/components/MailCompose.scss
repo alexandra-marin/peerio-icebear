@@ -1,0 +1,87 @@
+.mail {
+  .compose-container {
+    @extend %flex-row;
+    @extend %flex-grow-1;
+  }
+
+  .compose-view {
+    @extend %flex-grow-1;
+    @extend %flex-shrink-1;
+    @extend %flex-col;
+    height: 100%;
+    width: calc(100vw - 574px);
+
+    .compose-meta {
+      @extend %flex-row;
+      @extend %flex-shrink-0;
+      padding-top: $padding-small;
+
+      .meta-labels {
+        @extend .dark-label;
+        @extend %flex-col;
+        @extend %flex-justify-between;
+        line-height: 48px;
+      }
+
+      .attached-files {
+        @extend %flex-shrink-0;
+        margin-left: auto;
+        font-weight: $font-weight-semibold;
+      }
+    }
+
+    .meta-inputs-container {
+      @extend %flex-grow-1;
+    }
+
+    .meta-input {
+      @extend %flex-row;
+      @extend %flex-align-start;
+      @extend %flex-shrink-0;
+      min-height: 48px;
+      padding-left: $padding-default;
+      padding-right: $padding-small;
+
+      &:last-of-type {
+        border-bottom: 1px solid $divider-dark;
+        border-top: 1px solid $divider-dark;
+      }
+
+      .chip-label {
+        max-width: 100%;
+      }
+    }
+
+    .inline-files {
+      @extend %flex-align-center;
+      @extend %flex-row;
+      @extend %flex-shrink-0;
+      height: 48px;
+      overflow: hidden;
+      overflow-x: auto;
+
+      .shared-file {
+        margin-right: $margin-small;
+      }
+    }
+
+    .ql-editor.ql-blank::before {
+      left: auto;
+      right: auto;
+    }
+  }
+
+  .mail-content {
+    flex: 1;
+    overflow-y: hidden;
+    color: $text-dark-default;
+
+    .chip-wrapper {
+      margin: $margin-tiny 0 0 $margin-default;
+    }
+
+    .ql-editor {
+      padding: 32px 56px;
+    }
+  }
+}

@@ -1,0 +1,82 @@
+.display-1 {
+  @extend %display-1;
+}
+
+.display-2 {
+  @extend %display-2;
+  color: $peerio-blue;
+}
+
+.display-3 {
+  @extend %display-3;
+}
+
+.headline {
+  @extend %headline;
+}
+
+.title {
+  @extend %title;
+}
+
+.list-title {
+  @extend %list-title;
+}
+
+.dark-label {
+  @extend %hint-error-label;
+  color: $text-dark-hint;
+}
+
+.text-brand-primary {
+  color: $peerio-blue;
+}
+
+.text-right {
+  text-align: right !important;
+}
+
+.semibold {
+  font-weight: $font-weight-semibold;
+}
+
+.bold {
+  font-weight: $font-weight-bold;
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+.monospace,
+%monospace {
+  font-family: 'Fira Mono', monospace;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.passphrase {
+  user-select: text;
+  line-height: 1;
+  font-size: 24px;
+  font-weight: $font-weight-bold;
+}
+
+// New typography styles below!
+// TODO: consolidate old classes/styles into these rules
+.heading {
+  line-height: 48px;
+  font-family: $font-serif;
+  font-size: 36px;
+  font-weight: $font-weight-semibold;
+  color: $darkblue;
+}
+
+.guide-text {
+  margin-bottom: $margin-large;
+  line-height: 25px;
+  font-size: 18px;
+  color: $text-dark-secondary;
+}

@@ -1,0 +1,40 @@
+.mail.zero-mail {
+  @extend %flex-align-center;
+  @extend %flex-justify-center;
+
+  .container {
+    @extend %flex-row;
+  }
+
+  .spacer {
+    @extend %flex-col;
+    @extend %flex-grow-1;
+  }
+
+  .content {
+    @extend %flex-col;
+    @extend %flex-grow-0;
+    @extend %flex-shrink-0;
+  }
+
+  .display-3 {
+    @extend %flex-row;
+  }
+
+  .text {
+    @extend %flex-row;
+    @extend %flex-align-start;
+    width: 100%;
+
+    .heading {
+      margin-bottom: 32px;
+      line-height: 1.4;
+    }
+  }
+
+  img {
+    max-width: 280px;
+    min-width: 40%;
+    margin-left: auto;
+  }
+}

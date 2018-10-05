@@ -1,0 +1,39 @@
+.message-sidebar {
+  @extend %flex-col;
+  @extend %flex-shrink-0;
+  position: relative;
+  height: calc(100vh - 80px);
+  width: 272px;
+  overflow: hidden;
+  background: $background-hover-default;
+  border-left: 1px solid $divider-dark;
+
+  .header {
+    margin-bottom: 15px;
+    background-color: $background-hover-default;
+  }
+
+  .title {
+    @extend %flex-row;
+    align-items: center;
+    justify-content: space-between;
+    overflow: hidden;
+
+    .p-button {
+      margin-right: $margin-default;
+    }
+  }
+
+  .p-list-heading {
+    @extend %flex-shrink-1;
+    height: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .receipts {
+    height: 100%;
+    margin-top: 10px;
+    overflow: scroll;
+  }
+}

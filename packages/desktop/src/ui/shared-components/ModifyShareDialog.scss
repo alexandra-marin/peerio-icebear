@@ -1,0 +1,51 @@
+/*
+  This dialog uses the same basic styles as ShareWithDialog.
+  The rules in this file are overrides specific to ModifyShareDialog.
+*/
+
+.share-with-dialog.modify-shared-with {
+  $smaller-padding: 56px;
+
+  .p-list-heading,
+  .list-chats li {
+    padding-left: $smaller-padding;
+  }
+
+  .list-chats {
+    padding: 0 $padding-default;
+
+    li {
+      align-items: flex-start;
+    }
+  }
+}
+
+// ModifyShareListItem component
+.modify-share-list-item {
+  .content {
+    padding-top: 6px;
+  }
+
+  .right a {
+    text-decoration: none;
+    text-transform: lowercase;
+    color: $color-error;
+  }
+
+  &:hover {
+    background-color: inherit;
+  }
+
+  // After "minus" button is clicked
+  &.expanded {
+    background-color: $black-06;
+  }
+
+  .remove-user-warning {
+    padding: $padding-default;
+    margin: $margin-tiny 0;
+    white-space: normal;
+    color: $text-dark-secondary;
+    border-left: 1px solid $divider-dark;
+  }
+}

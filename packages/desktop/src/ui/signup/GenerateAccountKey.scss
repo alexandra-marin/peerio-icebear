@@ -1,0 +1,225 @@
+.generate-account-key {
+  .main-container {
+    display: flex;
+    flex-direction: column;
+    max-width: 416px;
+  }
+
+  .guide-text {
+    margin-bottom: $margin-default;
+  }
+
+  .ak-container {
+    display: flex;
+    align-items: center;
+
+    .ak-content {
+      @extend %monospace;
+      flex-grow: 1;
+      -webkit-user-select: auto;
+      padding: $padding-small;
+      font-size: 12px;
+      font-weight: $font-weight-semibold;
+      text-align: center;
+      letter-spacing: 6%;
+      color: $color-error;
+      border: 2px dotted #979797;
+      border-radius: 20px;
+    }
+
+    .loading-bar {
+      display: inline-block;
+      height: 12px;
+      width: 11.5%;
+      max-height: 12px;
+      margin: 5px 0.5% 0;
+      background-color: #c5c5c5;
+      border-radius: 4px;
+
+      @for $i from 0 through 7 {
+        &.bar-#{$i} {
+          animation: pulsing-grey 1300ms linear #{$i * 200}ms infinite,
+            to-teal 500ms ease #{200 * 8 + $i * 1300}ms forwards;
+        }
+      }
+
+      @keyframes pulsing-grey {
+        0% {
+          background-color: #c5c5c5;
+        }
+
+        15% {
+          background-color: #e2e2e2;
+        }
+
+        77% {
+          background-color: #c5c5c5;
+        }
+      }
+
+      @keyframes to-teal {
+        0% {
+          background-color: #c5c5c5;
+        }
+
+        100% {
+          background-color: $peerio-teal;
+        }
+      }
+    }
+  }
+
+  .ak-preview {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-top: $margin-default;
+    overflow: hidden;
+    background-color: #dbe8f9;
+    background-image: url('./static/img/illustration-ak-bg-pattern.svg');
+    background-size: 200%;
+    border: 1px solid $black-38;
+    border-radius: 16px;
+
+    .preview-content {
+      pointer-events: none;
+      padding: $padding-default $padding-large;
+      margin: 0 40px;
+      overflow: hidden;
+      text-align: center;
+      color: $text-light-default;
+      background-color: $darkblue;
+
+      .input-container:first-of-type {
+        margin-bottom: $margin-default;
+      }
+
+      .input {
+        width: 100%;
+        padding: $padding-small;
+        margin-top: $margin-tiny;
+        font-family: monospace;
+        font-size: 10px;
+        color: $text-dark-default;
+        background-color: $background-root;
+        border-radius: 4px;
+      }
+    }
+
+    .ui-bar {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: $padding-small;
+      box-shadow: 0 -4px 6px -3px $black-38;
+      background-color: rgba($background-root, 0.95);
+
+      .p-button {
+        margin-left: auto;
+      }
+    }
+  }
+
+  .skip-backup {
+    flex-shrink: 0;
+    margin: $margin-default 0 $margin-default auto;
+  }
+
+  // akDisplay() puts each half of AK in a <div>, to force the line break at small screen width
+  .ak-half {
+    display: inline-block;
+    cursor: text;
+    -webkit-user-select: auto;
+    padding-top: 2px;
+  }
+
+  // Mocked up login screen on the right side
+  .mock-login {
+    $mock-login-padding-right: 80px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 40px 0;
+
+    .head-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      padding-right: $mock-login-padding-right;
+      padding-bottom: $padding-large;
+
+      img {
+        height: 64px;
+        width: 64px;
+      }
+
+      .mock-line {
+        flex-shrink: 0;
+        margin: $margin-small 0;
+      }
+    }
+
+    .mock-input-container {
+      width: 100%;
+      padding: $padding-default;
+      padding-right: $mock-login-padding-right;
+      text-transform: lowercase;
+
+      &.highlight {
+        position: relative;
+
+        .material-icons {
+          position: absolute;
+          right: $margin-default;
+          top: 50%;
+          margin-top: -24px;
+          font-size: 48px;
+          color: $color-confirmation;
+        }
+
+        // to make mock-line blend in with highlighted background
+        .label {
+          border-color: #f2f3f5; // $background-hover-default as hex
+        }
+      }
+    }
+
+    .buttons-container {
+      padding-right: $mock-login-padding-right;
+
+      .p-button {
+        height: 44px;
+        width: 112px;
+        opacity: 0.7;
+        border-radius: 30px;
+      }
+    }
+
+    // stylelint-disable-next-line
+    @media all and (max-width: $break-width-default),
+      all and (max-height: $break-height-default) {
+      .head-container {
+        img {
+          height: 48px;
+          width: 48px;
+        }
+      }
+
+      .buttons-container {
+        .p-button {
+          height: 28px;
+          width: 70px;
+        }
+      }
+    }
+  }
+
+  // Text fade-in animations
+  @for $i from 0 through 2 {
+    .fade-#{$i} {
+      @include fade-slide-in($i * 100);
+    }
+  }
+}

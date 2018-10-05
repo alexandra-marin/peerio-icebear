@@ -1,0 +1,46 @@
+.mail {
+  .mail-item {
+    @extend %flex-row;
+    @extend %hint-error-label;
+    cursor: pointer;
+    height: 80px;
+    padding: $padding-small;
+    background-color: $white-50;
+    border-bottom: 1px solid $divider-dark;
+
+    .mail-item-content {
+      @extend %flex-col;
+      @extend %flex-grow-1;
+      @extend %flex-justify-between;
+    }
+
+    .subject-container {
+      @extend %flex-row;
+
+      .item-subject {
+        margin-right: auto;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+
+    .firstline-container {
+      @extend %flex-row;
+      @extend %flex-align-center;
+
+      .item-firstline {
+        margin-right: auto;
+      }
+    }
+
+    &.active {
+      color: $text-light-default;
+      background-color: $peerio-blue;
+    }
+
+    &:hover:not(.active) {
+      background-color: $white;
+    }
+  }
+}

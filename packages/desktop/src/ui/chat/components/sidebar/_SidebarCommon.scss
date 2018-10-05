@@ -1,0 +1,110 @@
+.chat-sidebar {
+  @extend %flex-col;
+  @extend %flex-shrink-0;
+  height: calc(100vh - 80px);
+  // transition: width 300ms $transition-easing-ease-in;
+  width: 0;
+  overflow: hidden;
+  background: $background-hover-default;
+
+  .title {
+    height: 48px;
+    margin: $margin-tiny $margin-default 0;
+    line-height: 48px;
+  }
+
+  .purpose-container {
+    position: relative;
+    padding-left: $padding-default;
+    padding-top: 9px;
+    padding-bottom: 9px;
+    border-bottom: 1px solid $divider-dark;
+  }
+
+  .title-editor > input,
+  .title-editor > textarea,
+  .purpose-editor > input,
+  .purpose-editor > textarea {
+    @extend %selectable;
+  }
+
+  // There doesn't seem to be a way to assign a classname to the React-Toolbox
+  // Input component's inner textarea, so we grab it by element name
+  .purpose-editor > textarea {
+    // With the 'multiline' attribute set, the Input component is resizable by
+    // default -- on both axes -- with no option to disable it.
+    // the input automatically sizes to the content and resizing on the x-axis
+    // breaks our page layout, so let's just disable it.
+    resize: none;
+    position: relative;
+  }
+
+  .purpose-label,
+  .purpose-label-big {
+    pointer-events: none;
+    color: $text-dark-hint;
+  }
+
+  .purpose-label {
+    position: absolute;
+    top: 8px;
+    font-size: 12px;
+  }
+
+  .purpose-label-big {
+    padding: 12px 0 7px;
+  }
+
+  .purpose-text {
+    @extend %selectable;
+    padding-right: $padding-default;
+    padding-top: 17px;
+    padding-bottom: 5px;
+    word-wrap: break-word;
+  }
+
+  .p-input {
+    height: auto;
+    padding: 0 $padding-default $padding-small;
+    border-bottom: 1px solid $divider-dark;
+
+    &.purpose-editor {
+      padding-bottom: 0;
+    }
+
+    input,
+    textarea {
+      min-height: 0;
+      padding-right: $padding-default;
+      background-color: transparent;
+      border: 0;
+    }
+
+    textarea {
+      padding-top: 0;
+      margin-top: 28px;
+      line-height: 1.45em;
+    }
+  }
+
+  &.open {
+    border-left: 1px solid $divider-dark;
+  }
+
+  &.open,
+  .p-list-item {
+    width: 272px;
+  }
+
+  .tag {
+    display: inline-block;
+    height: 18px;
+    padding: 0 4px 2px;
+    margin-left: $margin-small;
+    line-height: 18px;
+    font-size: 11px;
+    color: $text-dark-secondary;
+    background-color: $background-neutral;
+    border-radius: 4px;
+  }
+}

@@ -1,0 +1,18 @@
+.loading-screen {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: $background-root;
+
+  .random-messages {
+    display: flex;
+    flex-shrink: 1;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+
+    .headline {
+      margin: 160px 48px 0;
+    }
+  }
+}

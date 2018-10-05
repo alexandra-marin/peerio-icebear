@@ -1,0 +1,54 @@
+/*
+  Most FolderLine styles are shared with FileLine and are placed in files/_FileFolderLineShared.scss
+  This file is just for FolderLine-specific styles, such as folder sharing UI
+*/
+
+.folder-row-container {
+  position: relative;
+
+  &.folder-row-droppable-hovered {
+    background-color: rgba($peerio-teal, 0.38);
+  }
+
+  &.share-in-progress {
+    .percent-progress {
+      visibility: visible;
+      color: $text-dark-secondary;
+    }
+
+    .file-owner {
+      font-style: italic;
+      color: $text-dark-secondary;
+    }
+
+    .sub-row {
+      display: none;
+
+      .file-icon {
+        position: relative;
+        padding-left: $padding-default;
+
+        &::after {
+          content: ' ';
+          position: absolute;
+          height: 100%;
+          width: 1px;
+          left: 0;
+          top: 0;
+          // If we want to force 40px height for this line thing
+          // top: 50%;
+          // margin-top: -20px;
+          background-color: $text-dark-secondary;
+        }
+      }
+
+      .file-name {
+        padding-left: $padding-default;
+      }
+    }
+
+    &:hover .sub-row {
+      display: flex;
+    }
+  }
+}

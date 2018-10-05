@@ -1,0 +1,101 @@
+$max-signup-input-width: 400px;
+
+.signup {
+  // All signup related views are inside this container
+  height: 100vh;
+  width: 100vw;
+  background-color: $background-root;
+
+  // Each view is wrapped in its own container as well
+  > div {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  // Simple rules for left/right content split
+  .left-container,
+  .right-container {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    width: 50%;
+  }
+
+  // Left content container positioning requires flex on parent container
+  .left-content-container {
+    @include onboarding-content-sizing();
+  }
+
+  //// GENERAL RULES
+  //// for common components through Signup process
+
+  // Max width on validated inputs
+  .validated-input {
+    max-width: $max-signup-input-width;
+    margin-bottom: $margin-large;
+  }
+
+  // affirmative/negative buttons in .left-container content
+  .buttons-container {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    margin-top: $margin-large;
+
+    .p-button + .p-button {
+      margin-left: $margin-small;
+    }
+  }
+
+  // Right side (mock app UI)
+  .right-container {
+    align-items: flex-end;
+    justify-content: center;
+    padding: 148px 0 80px 112px;
+    background-color: $darkblue;
+
+    @media all and (max-width: $break-width-default),
+      all and (max-height: $break-height-default) {
+      // stylelint-disable-line
+      padding: 148px 0 148px 80px;
+    }
+  }
+
+  .mock-app-ui {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    position: relative;
+    pointer-events: none;
+    width: 100%;
+    padding: $padding-large 0 $padding-large $padding-large;
+    overflow: hidden;
+    background-color: $background-root;
+
+    .top-lines {
+      display: flex;
+      flex-shrink: 0;
+      width: 40%;
+
+      .mock-line {
+        height: 24px;
+        margin-right: 2px;
+      }
+
+      @media all and (max-width: $break-width-default),
+        all and (max-height: $break-height-default) {
+        display: none;
+      }
+    }
+  }
+
+  // TODO: revisit this, will these become default <p> styles?
+  p {
+    -webkit-margin-before: 0;
+    -webkit-margin-after: 0;
+    margin-top: $margin-large;
+    line-height: 22px;
+    font-size: 16px;
+  }
+}

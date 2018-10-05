@@ -1,0 +1,36 @@
+.files {
+  .file-loading {
+    display: flex;
+    // TODO: add pulse to imply activity.
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    height: 32px;
+    width: 32px;
+    margin: 0 -7px;
+    transition: 150ms;
+    background-color: $background-root;
+    border: 2px solid $color-confirmation;
+    border-radius: 20px;
+
+    > span:last-child {
+      display: none;
+    }
+
+    &:hover {
+      border-color: $color-error;
+
+      > span:last-child {
+        display: initial;
+      }
+
+      > span:first-child {
+        display: none;
+      }
+
+      .material-icons {
+        color: $color-error;
+      }
+    }
+  }
+}

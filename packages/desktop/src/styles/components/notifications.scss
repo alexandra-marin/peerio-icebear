@@ -1,0 +1,25 @@
+.notification {
+  height: 22px;
+  min-width: 28px;
+  padding: 0 $padding-tiny;
+  line-height: 22px;
+  font-size: 14px;
+  font-weight: $font-weight-semibold;
+  text-align: center;
+  color: $text-unread-color;
+  background-color: $peerio-teal;
+  border-radius: 24px;
+}
+
+.small-notification {
+  height: 16px;
+  width: 16px;
+  margin: 0;
+  line-height: 16px;
+  font-size: 12px;
+  font-weight: $font-weight-bold;
+  text-align: center;
+  color: $text-light-default;
+  background-color: $black-38;
+  border-radius: 2px;
+}

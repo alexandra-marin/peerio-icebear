@@ -1,0 +1,30 @@
+.search {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  height: 36px;
+  width: 256px;
+  padding: 0 $padding-default;
+  background: $background-root;
+  border: 1px solid $input-border;
+  border-radius: 8px;
+
+  .p-input {
+    padding-right: $padding-small;
+
+    .hint-or-error {
+      display: none;
+    }
+  }
+
+  input {
+    height: 36px;
+    padding: 0 0 0 $padding-small;
+    line-height: 36px;
+    border-width: 0;
+  }
+
+  button {
+    line-height: 34px; // takes into account the borders.
+  }
+}

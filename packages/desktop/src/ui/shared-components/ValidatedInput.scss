@@ -1,0 +1,56 @@
+.validated-input {
+  position: relative;
+
+  // TODO: consolidate with regular Input .error element
+  .helper-text {
+    @extend %hint-error-label;
+    position: absolute;
+    width: 100%;
+    top: 100%;
+    color: $text-dark-inactive;
+    opacity: 1;
+  }
+
+  &.dark {
+    .p-input {
+      input {
+        background-color: $input-inactive;
+        border-width: 0;
+
+        &:hover {
+          background: $white;
+        }
+
+        &:focus {
+          background: $white;
+        }
+      }
+
+      &.focused {
+        .label {
+          color: $text-dark-hint;
+        }
+      }
+
+      &.has-error {
+        input {
+          background-color: $background-root;
+          border-bottom: 4px solid $color-error;
+        }
+
+        .error {
+          margin-top: $margin-tiny;
+          color: $text-light-default;
+        }
+
+        .label {
+          color: $color-error;
+        }
+      }
+    }
+  }
+}
+
+.signup .signup-form .validated-input {
+  width: 375px;
+}

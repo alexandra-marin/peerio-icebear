@@ -1,0 +1,57 @@
+.urlpreview {
+  width: $urlpreview-width;
+  max-width: 100%;
+  margin-left: $margin-default;
+  margin-top: $margin-default;
+
+  .url-content {
+    $image-height: 400px;
+
+    .url-title a {
+      text-decoration: none;
+    }
+
+    .url-info {
+      font-size: 12px;
+      color: $text-dark-inactive;
+    }
+
+    .image-over-limit-warning {
+      font-style: italic;
+      font-weight: $font-weight-regular;
+    }
+
+    button.display-this-image {
+      cursor: pointer;
+      padding-left: 1ex;
+      font-style: italic;
+      font-weight: $font-weight-regular;
+      text-align: left;
+      text-transform: none;
+      color: $peerio-blue;
+      background: none;
+      border: 0;
+
+      &:focus {
+        outline: 0;
+      }
+    }
+
+    .url-image {
+      display: flex;
+      align-items: flex-start;
+      height: 100%;
+      width: 100%;
+      max-height: $image-height;
+      overflow: hidden;
+
+      img {
+        height: auto;
+        width: auto;
+        max-height: $image-height;
+        max-width: 100%;
+        border-radius: 2px;
+      }
+    }
+  }
+}

@@ -1,0 +1,145 @@
+%notify {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  height: 10px;
+  width: 10px;
+  right: 0;
+  background: $color-error;
+  border-radius: 10px;
+}
+
+.poweredBy {
+  display: block;
+  width: 25%;
+}
+
+.logo {
+  width: 150px;
+  margin-bottom: $margin-large;
+}
+
+%reverse-icon {
+  text-align: right;
+  transform: rotateY(180deg);
+}
+
+// OVERRIDE USER AGENT STYLESHEET
+ul {
+  -webkit-margin-before: 0;
+  -webkit-margin-after: 0;
+  -webkit-padding-start: 0;
+  margin: 0;
+}
+
+// HIDE STUFF
+// doesn't affect layout.
+.hide {
+  visibility: hidden;
+}
+
+// affects layout.
+.banish {
+  display: none !important;
+}
+
+.block {
+  display: block;
+}
+
+.blur {
+  filter: blur(5px);
+}
+
+@keyframes pulse-scale {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+// All items are not selectable by default. Use this class to make items selectable.
+.selectable,
+%selectable {
+  cursor: text;
+  user-select: auto;
+
+  // Children of selectable content may still be clickable, so need to override.
+  button,
+  a,
+  .clickable {
+    cursor: pointer;
+  }
+}
+
+// Make things scrollable
+.scrollable {
+  overflow-y: auto;
+}
+
+// BUTTONS
+.clickable {
+  cursor: pointer;
+}
+
+a.clickable {
+  text-decoration: underline;
+}
+
+// INPUTS
+// User search input (search icon, round edges)
+// TODO: use this class in UserPicker
+.user-search {
+  @extend %flex-align-center;
+  display: flex;
+  width: 100%;
+  padding: 0 $padding-small 0 $padding-default;
+  overflow: hidden;
+  border: 1px solid $input-border;
+  border-radius: 24px;
+
+  .chip-wrapper {
+    padding: 0 8px;
+  }
+
+  .p-input input {
+    padding: 0;
+    font-style: italic;
+    border: 0;
+  }
+}
+
+// LAYOUT MIXINS
+$break-width-default: 1280px;
+$break-height-default: 900px;
+
+@mixin onboarding-content-sizing() {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 500px;
+  padding-top: 272px;
+  margin-left: auto;
+  margin-right: auto;
+
+  @media all and (max-width: $break-width-default),
+    all and (max-height: $break-height-default) {
+    width: 344px;
+    padding-top: 128px;
+  }
+}
+
+@mixin onboarding-right-content-padding() {
+  padding-right: 168px;
+  padding-top: 272px;
+
+  @media all and (max-width: $break-width-default),
+    all and (max-height: $break-height-default) {
+    padding-right: 80px;
+    padding-top: 128px;
+  }
+}

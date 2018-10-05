@@ -1,0 +1,22 @@
+.message-view {
+  .formatting-button {
+    padding: 0 8px;
+    margin: 2px;
+    color: $black-54;
+    border-radius: 4px;
+
+    &.formatting-button-active {
+      background-color: $black-12;
+    }
+  }
+
+  .formatting-button-strong {
+    font-weight: $font-weight-semibold;
+  }
+  .formatting-button-em {
+    font-style: italic;
+  }
+  .formatting-button-strike {
+    text-decoration: line-through;
+  }
+}

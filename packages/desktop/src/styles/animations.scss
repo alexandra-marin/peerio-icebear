@@ -1,0 +1,17 @@
+@mixin fade-slide-in($delay) {
+  padding-top: 10px;
+  animation: fade-slide-in-animation 200ms linear #{$delay}ms forwards;
+  opacity: 0;
+
+  @keyframes fade-slide-in-animation {
+    0% {
+      padding-top: 10px;
+      opacity: 0;
+    }
+
+    100% {
+      padding-top: 0;
+      opacity: 1;
+    }
+  }
+}

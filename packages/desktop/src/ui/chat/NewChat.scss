@@ -1,0 +1,16 @@
+.create-new-chat.new-dm {
+  position: relative;
+
+  .progress-overlay {
+    left: 0;
+  }
+
+  .user-picker-container {
+    height: auto;
+    width: 100%;
+  }
+
+  .p-list {
+    padding-left: $userpicker-margin-large;
+  }
+}

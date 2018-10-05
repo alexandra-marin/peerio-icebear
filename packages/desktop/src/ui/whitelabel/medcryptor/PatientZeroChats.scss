@@ -1,0 +1,50 @@
+.patient-zero-chats {
+  flex-grow: 1;
+
+  .patient-name-header {
+    @extend %headline;
+    display: flex;
+    align-items: center;
+    height: 80px;
+    padding: 0 56px;
+    border-bottom: 1px solid $divider-dark;
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    margin: 72px 56px;
+
+    section {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 72px;
+
+      .title {
+        font-size: 34px;
+        color: $peerio-blue;
+      }
+
+      .headline {
+        margin: $margin-default 0;
+        color: $text-dark-secondary;
+      }
+
+      .description {
+        line-height: 27px;
+
+        .plus-icon-container {
+          display: inline-flex;
+          position: relative;
+          margin-bottom: -$margin-tiny;
+          vertical-align: baseline;
+
+          .plus-icon {
+            margin: 0 $margin-tiny;
+            color: $peerio-blue;
+          }
+        }
+      }
+    }
+  }
+}

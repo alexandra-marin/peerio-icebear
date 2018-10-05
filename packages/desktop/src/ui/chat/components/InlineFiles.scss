@@ -1,0 +1,296 @@
+.inline-files-container {
+  .optional-message {
+    margin-top: $margin-tiny;
+  }
+
+  .inline-files {
+    position: relative;
+    min-width: 180px;
+    margin-left: $margin-default;
+    font-weight: $font-weight-bold;
+    transition: 250ms;
+    color: $text-dark-inactive;
+    background: $white;
+    border: 1px solid $divider-dark;
+    border-radius: 2px;
+
+    .inline-files-topbar {
+      position: relative;
+      padding: 0 $padding-small 0 $padding-default;
+
+      .p-progress-bar {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+      }
+    }
+
+    .buttons-container {
+      @extend %flex-row;
+      @extend %flex-justify-end;
+
+      .notnow {
+        color: $text-dark-inactive;
+      }
+
+      .save {
+        color: $peerio-blue;
+      }
+    }
+  }
+
+  .shared-file,
+  .invalid-file,
+  .unknown-file {
+    @extend %flex-col;
+    @extend %flex-justify-center;
+    height: 48px;
+  }
+
+  .shared-file {
+    .container {
+      @extend %flex-row;
+      @extend %flex-align-center;
+      @extend %flex-justify-between;
+    }
+
+    .material-icons {
+      padding: 0;
+      margin: 0;
+      vertical-align: middle;
+    }
+
+    button {
+      min-width: 0;
+      padding: 0 $padding-tiny;
+      margin: 0 $margin-tiny;
+    }
+
+    .file-icon {
+      width: 24px;
+      margin-right: $margin-small;
+    }
+
+    .file-name-container {
+      display: flex;
+      align-items: center;
+
+      // we add a min-width because this container is itself in a flex
+      // container, and we want this to shrink (truncating the filename).
+      min-width: 50px;
+      margin-right: auto;
+    }
+
+    .file-name {
+      max-width: 100%;
+      margin-right: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .unknown-file {
+    cursor: auto;
+    margin-left: $margin-default;
+    color: $text-dark-hint;
+  }
+
+  .p-progress-bar {
+    &.unknown-file-progress-bar {
+      position: relative;
+      width: 100%;
+      left: auto;
+      margin: 0 $margin-default;
+    }
+
+    &.determinate {
+      position: absolute;
+      width: auto;
+      left: 24px;
+      right: 0;
+      bottom: 0;
+    }
+  }
+
+  .invalid-file {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    margin-left: $margin-default;
+    color: $color-error;
+
+    .material-icons {
+      margin-right: $margin-tiny;
+      color: $color-error;
+    }
+  }
+
+  .inline-files-expanded {
+    @extend %flex-col;
+    @extend %flex-justify-center;
+    align-items: flex-start;
+    height: 92px;
+    padding: $padding-default;
+    border-top: 1px solid $divider-dark;
+
+    &.display-image {
+      height: 232px;
+    }
+
+    button.display-this-image {
+      cursor: pointer;
+      height: 100%;
+      width: 100%;
+      padding-left: 32px; // TODO switch to $padding-xl after merge
+      font-style: italic;
+      font-weight: $font-weight-regular;
+      text-align: left;
+      text-transform: none;
+      color: $peerio-blue;
+      background: none;
+      border: 0;
+
+      &:focus {
+        outline: 0;
+      }
+    }
+
+    .inline-files-dropdown {
+      display: flex;
+      align-items: flex-start;
+      height: 100%;
+      width: 100%;
+
+      .image-over-limit-warning {
+        padding-left: 32px; // TODO switch to $padding-xl after merge
+        margin: auto 0;
+
+        .text {
+          font-style: italic;
+          font-weight: $font-weight-regular;
+        }
+
+        button.display-over-limit-image {
+          display: inline;
+          width: auto;
+          padding: 0;
+          padding-right: 4px; // to account for italic font
+          line-height: 1.3em;
+        }
+      }
+
+      img {
+        cursor: pointer;
+        height: auto;
+        width: auto;
+        max-height: 100%;
+        max-width: 100%;
+        border-radius: 2px;
+
+        &:not(:last-child) {
+          margin-right: $margin-small;
+        }
+      }
+    }
+  }
+}
+
+.image-popup {
+  height: auto;
+  width: auto;
+  min-height: 240px; // arbitrary min-height to show enough of image above toolbar
+  min-width: 240px; // arbitrary min-width to show filename and buttons
+
+  .body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 0;
+  }
+
+  img {
+    flex-shrink: 0;
+    height: auto;
+    width: auto;
+    max-height: 96vh; // <Dialog> max dimensions
+    max-width: 96vw;
+  }
+
+  .p-button {
+    &:hover {
+      .material-icons {
+        color: $peerio-blue;
+      }
+    }
+
+    .material-icons {
+      color: $text-dark-hint;
+    }
+  }
+
+  .button-close,
+  .info-bar {
+    transition: opacity 250ms;
+    opacity: 0;
+  }
+
+  &:hover {
+    .button-close,
+    .info-bar {
+      opacity: 1;
+    }
+  }
+
+  .button-close {
+    position: absolute;
+    right: $margin-default;
+    top: $margin-default;
+    background-color: $white;
+    border-radius: 4px;
+
+    &:hover {
+      background-color: $white;
+    }
+  }
+
+  .info-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: absolute;
+    height: 64px;
+    width: 100%;
+    bottom: 0;
+    padding: 0 $padding-xl;
+    background-color: $white;
+
+    .left {
+      max-width: calc(100% - 120px); // $margin-default*2 + 24px*3
+    }
+
+    .file-name {
+      @extend %title;
+      overflow: hidden;
+      font-weight: normal;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: $black;
+    }
+
+    .file-size {
+      @extend %hint-error-label;
+    }
+
+    .right {
+      display: flex;
+      align-items: center;
+
+      button:not(:first-child) {
+        margin-left: $margin-default;
+      }
+    }
+  }
+}

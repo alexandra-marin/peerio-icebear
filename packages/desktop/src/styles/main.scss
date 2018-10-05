@@ -1,0 +1,152 @@
+// NOTE: import paths for CSS and SASS are different:
+//
+//   ../node_modules for CSS
+//   ../../node_modules for SASS
+//
+// because the former are resolved at runtime inside Electron app,
+// while the latter are resolved at compile time.
+
+// Libraries
+@import '../node_modules/normalize.css/normalize.css';
+@import '../node_modules/material-design-icons/iconfont/material-icons.css';
+@import '../node_modules/croppie/croppie.css';
+@import './static/emoji/sprites/emojione.css';
+
+// Brand/identity
+@import '../../node_modules/peer-ui/src/scss/_branding';
+@import './font';
+@import './whitelabel'; // variable overrides for whitelabel releases
+
+// Variables
+@import '../../node_modules/peer-ui/src/scss/_colors';
+@import './vars/_colors-white-label'; // variable overrides for whitelabel releases
+@import '../../node_modules/peer-ui/src/scss/_grid';
+@import '../../node_modules/peer-ui/src/scss/_layout';
+@import '../../node_modules/peer-ui/src/scss/_shadows';
+@import '../../node_modules/peer-ui/src/scss/_transitions';
+@import '../../node_modules/peer-ui/src/scss/_typography';
+
+// PeerUI components
+@import '../../node_modules/peer-ui/src/components/_all';
+
+// General reused styles, classes, etc.
+@import './misc';
+@import './typography';
+@import './animations';
+
+// Components that get reused between views
+@import './components/grid';
+@import './components/chip-wrapper';
+@import './components/notifications';
+@import './components/list';
+
+// Meta views
+@import '../ui/AppNav';
+@import '../ui/AppNavButton';
+@import '../ui/Loading';
+@import '../ui/Onboarding';
+@import '../ui/Root';
+@import '../ui/Welcome';
+
+// View-specific styles;
+@import '../ui/shared-components/_all';
+@import '../ui/contact/_all';
+@import '../ui/chat/_all';
+@import '../ui/emoji/_all';
+@import '../ui/files/_all';
+@import '../ui/login/_all';
+@import '../ui/mail/_all';
+@import '../ui/settings/_all';
+@import '../ui/signup/_all';
+@import '../ui/updater/_all';
+
+// Whitelabel component styles
+@import '../ui/whitelabel/_all';
+
+html {
+  cursor: default;
+  user-select: none;
+
+  box-sizing: border-box;
+  overflow: hidden;
+  font-family: $font-stack;
+  font-size: 10px;
+}
+
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: $font-stack;
+}
+
+a {
+  color: $peerio-blue;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+body {
+  background-color: $start-screen-bg;
+}
+
+body,
+#root,
+.app-root {
+  height: 100vh;
+  width: 100vw;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  font: 14px/1.45 $font-stack;
+  color: $text-dark-default;
+}
+
+.app-root {
+  @extend %flex-row;
+}
+
+textarea,
+section {
+  outline: 0;
+}
+
+.global-update-progress {
+  background: white;
+
+  .p-progress-bar {
+    position: relative;
+    height: 2px;
+  }
+}
+
+.platform-linux {
+  ::-webkit-scrollbar {
+    height: 12px;
+    width: 12px;
+  }
+
+  ::-webkit-scrollbar-button {
+    height: 0;
+    width: 0;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 50px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: $white-50;
+    border-radius: 50px;
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}

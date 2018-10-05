@@ -1,0 +1,13 @@
+.avatar-editor-container {
+  @extend %flex-row;
+  @extend %flex-align-center;
+  @extend %flex-justify-between;
+
+  .buttons-container {
+    width: 100%;
+
+    .rotate-button {
+      zoom: 1.6;
+    }
+  }
+}

@@ -1,0 +1,16 @@
+.migration-dialog {
+  .update-in-progress {
+    .p-progress-bar .progress-bar {
+      height: 8px;
+    }
+
+    .percent {
+      text-align: right;
+    }
+
+    p {
+      margin-bottom: 0;
+      text-align: center;
+    }
+  }
+}

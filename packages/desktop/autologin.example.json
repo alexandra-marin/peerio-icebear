@@ -1,0 +1,7 @@
+{
+  "username": "mytestuser",
+  "passphrase": "123",
+  "signupPassphraseOverride": "123",
+  "autologin": true,
+  "navigateTo": "/app/settings/security"
+}

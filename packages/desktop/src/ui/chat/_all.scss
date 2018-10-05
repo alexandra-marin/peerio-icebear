@@ -1,0 +1,231 @@
+// view wrapper
+.messages {
+  @extend %flex-row;
+  width: 100%;
+  background: $background-root;
+}
+
+// reused components
+.create-new-chat {
+  @extend %flex-col;
+  @extend %flex-grow-1;
+  @extend %flex-align-center;
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  background: white;
+
+  .message-search-wrapper {
+    @extend %flex-align-center;
+    @extend %flex-shrink-0;
+    width: 100%;
+    margin-bottom: $margin-xl;
+
+    .message-search-inner {
+      display: flex;
+      align-items: center;
+    }
+
+    .title-to {
+      @extend %title;
+      margin-right: $margin-large;
+      font-weight: $font-weight-regular;
+    }
+  }
+
+  .new-chat-search {
+    @extend %flex-align-center;
+    display: flex;
+    width: 100%;
+    padding: 0 $padding-small 0 $padding-default;
+    overflow: hidden;
+    border: 1px solid $input-border;
+    border-radius: 24px;
+
+    + .new-chat-search {
+      margin-top: 32px;
+    }
+
+    + .user-picker {
+      padding-top: 0;
+      margin-top: 32px;
+    }
+
+    .chip-wrapper {
+      min-height: 46px;
+      padding: 0 $padding-small;
+    }
+
+    .p-input {
+      flex-grow: 1;
+      width: inherit;
+      max-width: 100%;
+      padding: 0;
+      margin: 0;
+
+      input {
+        height: 40px;
+        padding: 0;
+        border-width: 0;
+      }
+
+      .hint-or-error {
+        display: none;
+      }
+    }
+  }
+
+  .helper-text {
+    @extend %hint-error-label;
+    margin-left: $margin-default;
+    margin-top: $margin-tiny;
+    color: $text-dark-hint;
+  }
+
+  .p-list {
+    @extend %flex-col;
+    overflow: hidden;
+
+    .user-list {
+      cursor: pointer;
+    }
+  }
+
+  .p-list-heading {
+    @extend %flex-shrink-0;
+    cursor: default;
+    margin-top: $margin-default;
+  }
+}
+
+.message-toolbar {
+  @extend %flex-justify-between;
+  display: flex;
+  flex: 0 0 80px;
+  align-items: center;
+  padding: 0 $padding-default 0 24px;
+  border-bottom: 1px solid $divider-dark;
+
+  .message-toolbar-inner {
+    @extend %flex-col;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .title {
+    @extend %flex-row;
+    height: 24px;
+    margin: $margin-default $margin-default $margin-tiny 0;
+    overflow: hidden;
+    font-size: 20px;
+    font-weight: $font-weight-bold;
+    color: $text-dark-default;
+
+    .name-editor {
+      height: 24px;
+      width: 260px;
+      padding: 0;
+      margin: 0;
+
+      input {
+        height: 24px;
+        width: 100%;
+        padding: $padding-tiny $padding-small;
+        margin: 0;
+        line-height: 20px;
+        font-size: 14px;
+        font-weight: $font-weight-bold;
+        color: $text-dark-inactive;
+        border: 1px solid rgba($peerio-blue, 0.54);
+        border-radius: 4px;
+      }
+    }
+
+    .name-editor-inner {
+      max-width: 100%;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .title-content {
+      height: 24px;
+      line-height: 20px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    // styling for edit icon in title bar thing.
+    .material-icons {
+      display: none;
+      position: absolute; // FIXME: rewrite to remove absolute positioning - Paul
+      left: 2px;
+      font-size: 18px;
+      color: $black-38;
+    }
+
+    &:hover {
+      .material-icons {
+        display: block;
+      }
+    }
+  }
+
+  .meta-nav {
+    @extend %flex-row;
+    @extend %flex-align-center;
+    height: 20px;
+
+    .material-icons {
+      font-size: 16px;
+    }
+
+    .pin-toggle {
+      display: flex;
+      align-items: center;
+    }
+
+    .member-count {
+      @extend %flex-row;
+      @extend %flex-align-center;
+      height: 20px;
+      margin-left: -12px;
+
+      .material-icons {
+        padding: $padding-small;
+      }
+    }
+  }
+
+  .message-toolbar-inner-right {
+    min-width: 72px; // 2x icon width 36px
+  }
+
+  .search {
+    margin-right: 12px;
+  }
+}
+
+@import './Chat';
+@import './NewChannel';
+@import './NewChat';
+@import './components/_ChatComponentsCommon';
+@import './components/ChannelInvite';
+@import './components/ChannelUpgradeOffer';
+@import './components/ChatList';
+@import './components/ChatNameEditor';
+@import './components/FormattingButton';
+@import './components/FormattingToolbar';
+@import './components/IdentityVerificationNotice';
+@import './components/InlineFiles';
+@import './components/Message';
+@import './components/MessageInput';
+@import './components/MessageInputProseMirror';
+@import './components/MessageInputSuggestions';
+@import './components/MessageList';
+@import './components/PendingDM';
+@import './components/ShareToChatProgress';
+@import './components/UrlPreview';
+@import './components/UrlPreviewConsent';
+@import './components/sidebar/_all';
+@import './components/ZeroChats';

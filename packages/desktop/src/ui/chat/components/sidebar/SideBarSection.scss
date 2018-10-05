@@ -1,0 +1,40 @@
+.sidebar-section {
+  @extend %flex-shrink-0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-bottom: 1px solid $divider-dark;
+  // overflow-y: auto;
+
+  .section-title {
+    margin-right: auto;
+  }
+
+  // collaspabled list styling
+  .p-list-heading {
+    @extend %flex-row;
+    @extend %flex-align-center;
+
+    .material-icons {
+      margin-left: auto;
+      margin-right: $margin-small;
+    }
+  }
+
+  .section-content {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  &.closed {
+    flex-shrink: 0;
+    height: 48px;
+    overflow: hidden;
+  }
+
+  &.open {
+    flex-shrink: 1;
+  }
+}

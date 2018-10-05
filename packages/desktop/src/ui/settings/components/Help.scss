@@ -1,0 +1,7 @@
+.help-container {
+  .text {
+    @extend %flex-row;
+    @extend %flex-align-center;
+    margin: $margin-default 0;
+  }
+}

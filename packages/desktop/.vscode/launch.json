@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "chrome",
+      "request": "attach",
+      "name": "Attach to Electron main window renderer process",
+      "url": "${workspaceRoot}/build/index.html",
+      "skipFiles": ["**/node_modules/*"],
+      "webRoot": "${workspaceRoot}",
+      "port": 9222
+    }
+  ]
+}

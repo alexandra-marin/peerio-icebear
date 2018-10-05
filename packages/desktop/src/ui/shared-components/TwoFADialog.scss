@@ -1,0 +1,15 @@
+.twofa-dialog {
+  .body {
+    padding-bottom: 0;
+  }
+
+  .totp-input {
+    display: inline-block;
+    width: 130px;
+    margin: $margin-large 0 $margin-xxl;
+
+    input {
+      text-align: center;
+    }
+  }
+}

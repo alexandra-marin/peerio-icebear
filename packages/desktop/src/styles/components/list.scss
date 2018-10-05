@@ -1,0 +1,48 @@
+// This is shared between ChatList and ContactList.
+// TODO: either separate styles into those two sheets, or refactor into shared component.
+
+.list {
+  @extend %flex-col;
+  background: $background-root;
+
+  .plus-icon-container {
+    height: 48px;
+    padding: 0 $padding-default;
+
+    .label {
+      padding-top: $padding-tiny;
+      margin-top: -$margin-tiny;
+      border-top: 1px solid $divider-accent;
+    }
+
+    .plus-icon {
+      margin-left: auto;
+    }
+  }
+}
+
+// left sidebar for navigation inside of a feature. Chat list/ Contact list/ maybe file list eventually. - paul
+.feature-navigation-list {
+  @extend %flex-col;
+  @extend %flex-shrink-0;
+  position: relative;
+  height: 100vh;
+  width: $width-list;
+
+  .list {
+    height: 100%;
+    padding-top: 12px; // padding is 20px this + the 8px from rtb list padding.
+    overflow: auto;
+    color: $text-light-inactive;
+    background-color: $background-list;
+
+    .p-list-item:hover {
+      background-color: $hover-bg;
+    }
+  }
+
+  .p-progress-bar {
+    position: absolute;
+    width: 100vw;
+  }
+}

@@ -1,0 +1,75 @@
+.message-view {
+  .message-input-wrapper {
+    position: relative;
+  }
+
+  .message-input {
+    @extend %flex-row;
+    @extend %flex-align-center;
+    //flex-grow: 1; FIXME: only grow when textarea grows.
+    flex-shrink: 0;
+    position: relative;
+    padding: 0 $padding-small 0 26px;
+    margin-top: auto;
+    background-color: $background-root;
+    border-top: 1px solid $divider-dark;
+
+    .thumbs-up {
+      color: $color-affirmative;
+    }
+  }
+
+  .jump-to-bottom {
+    position: absolute;
+    left: 50%;
+    bottom: 100%;
+    margin-left: -32px; // half of button width
+    margin-bottom: $margin-default;
+    transition: margin-bottom 250ms $transition-easing-ease-in;
+
+    .p-button {
+      width: 64px;
+      color: $peerio-blue;
+      opacity: 0.95;
+      box-shadow: 0 9px 46px 0 $black-12;
+      background-color: $background-root;
+      border: 1px solid $black-12;
+      border-radius: 18px;
+
+      &:hover {
+        color: $white;
+        background-color: $peerio-blue;
+      }
+    }
+
+    // TODO: consolidate 'badge' styles
+    .unread-badge {
+      position: absolute;
+      right: -$padding-small;
+      top: -$padding-small;
+      padding: 0 $padding-small;
+      font-weight: $font-weight-semibold;
+      background-color: $peerio-teal;
+      border: 1px solid $background-root;
+      border-radius: 14px;
+    }
+
+    &.snackbar-visible {
+      margin-bottom: 56px; // snackbar height + margin-default
+    }
+
+    &.share-in-progress {
+      padding-bottom: 48px; // add height of share-to-chat bar
+    }
+  }
+
+  // RANDOM MESSAGES
+  .backdrop {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.58);
+  }
+}

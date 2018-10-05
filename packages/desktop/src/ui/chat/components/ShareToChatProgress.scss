@@ -1,0 +1,42 @@
+.share-to-chat-progress {
+  display: flex;
+  align-items: center;
+  position: relative;
+  height: 48px;
+  min-height: 48px;
+  padding: 0 $padding-large 0 $padding-xl;
+  color: $text-dark-secondary;
+
+  box-shadow: 0 -2px 5px -2px rgba(0, 0, 0, 0.25);
+
+  > * {
+    display: flex;
+    align-items: center;
+  }
+
+  .info {
+    width: 100%;
+
+    .text {
+      margin-left: $margin-default;
+
+      .items-left {
+        font-style: italic;
+      }
+    }
+  }
+
+  .percent-progress {
+    margin-left: auto;
+
+    .right-icon {
+      margin-left: $margin-default;
+    }
+  }
+
+  .p-progress-bar {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+  }
+}

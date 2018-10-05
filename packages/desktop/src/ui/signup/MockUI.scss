@@ -1,0 +1,278 @@
+// "Highlight" effect where UI element sorta pops out of the screen with grey bg and shadow
+@mixin highlight() {
+  box-shadow: 0 4px 8px 0 $black-12;
+  background-color: $background-hover-default;
+  border-radius: 8px;
+}
+
+.highlight {
+  @include highlight();
+}
+
+// Colour circle for mock avatar
+.mock-circle {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  height: 72px;
+  width: 72px;
+  border-radius: 100%;
+
+  &.blue {
+    background-color: #b3d1ff;
+  }
+
+  &.purple {
+    background-color: #c3cafd;
+  }
+
+  &.yellow {
+    background-color: #feeeb3;
+  }
+
+  &.greyblue {
+    background-color: #b3cad2;
+  }
+
+  // stylelint-disable-next-line
+  @media all and (max-width: $break-width-default),
+    all and (max-height: $break-height-default) {
+    height: 36px;
+    width: 36px;
+  }
+}
+
+// Line with rounded edge representing text
+.mock-line {
+  height: 16px;
+  border-radius: 4px;
+
+  // stylelint-disable-next-line
+  &.light {
+    background-color: $black-06;
+  }
+
+  &.dark {
+    background-color: $black-12;
+  }
+
+  &.verydark {
+    background-color: $black-54;
+  }
+
+  @for $i from 1 through 6 {
+    &.width-#{$i} {
+      width: percentage($i / 6);
+    }
+  }
+
+  @media all and (max-width: $break-width-default),
+    all and (max-height: $break-height-default) {
+    height: 8px;
+  }
+}
+
+// Mock message with avatar and a few lines of text
+.mock-chat-entry {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  padding: $padding-default 80px $padding-default $padding-large;
+  transition: background-color 350ms;
+
+  .mock-circle {
+    margin-right: $margin-large;
+    font-size: 36px;
+  }
+
+  .text {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    color: $darkblue;
+
+    .chat-heading {
+      font-size: 18px;
+      font-weight: $font-weight-semibold;
+
+      .username {
+        font-style: italic;
+        color: $text-dark-secondary;
+      }
+    }
+
+    .body {
+      margin-top: $margin-small;
+      font-size: 18px;
+
+      .mock-line:not(:first-of-type) {
+        margin-top: $margin-tiny;
+      }
+
+      .username-highlight {
+        font-weight: $font-weight-bold;
+        background-color: $peerio-teal;
+      }
+    }
+  }
+
+  &.popout {
+    @include highlight();
+    padding-top: $padding-large;
+    padding-bottom: $padding-large;
+
+    .mock-circle {
+      height: 80px;
+      width: 80px;
+    }
+
+    .text {
+      color: $text-dark-default;
+
+      .chat-heading {
+        font-size: 21px;
+      }
+
+      .body {
+        color: $text-dark-secondary;
+      }
+    }
+  }
+
+  @media all and (max-width: $break-width-default),
+    all and (max-height: $break-height-default) {
+    padding: $padding-default 44px $padding-default $padding-default;
+
+    .mock-circle {
+      font-size: 24px;
+    }
+
+    .text {
+      .chat-heading {
+        font-size: 12px;
+      }
+
+      .body {
+        margin-top: 6px;
+        font-size: 12px;
+
+        .mock-line:not(:first-of-type) {
+          margin-top: 3px;
+        }
+      }
+    }
+
+    &.popout {
+      padding: $padding-default;
+
+      .mock-circle {
+        height: 40px;
+        width: 40px;
+      }
+
+      .text {
+        .chat-heading {
+          font-size: 16px;
+        }
+
+        .body {
+          font-size: 12px;
+        }
+      }
+    }
+  }
+}
+
+.mock-message-input {
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  margin-left: $margin-large;
+  background-color: $background-root;
+  border-top: 2px solid $black-12;
+
+  .material-icons {
+    padding: $padding-default 0 $padding-large;
+    font-size: 44px;
+    color: $black-12;
+  }
+
+  // stylelint-disable-next-line
+  @media all and (max-width: $break-width-default),
+    all and (max-height: $break-height-default) {
+    margin-left: $margin-default;
+
+    .material-icons {
+      font-size: 22px;
+    }
+  }
+}
+
+.mock-search-bar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  height: 72px;
+  border: 1px solid $black-12;
+  border-bottom-left-radius: 36px;
+  border-right: 0;
+  border-top-left-radius: 36px;
+
+  .material-icons {
+    margin-left: $margin-default;
+    font-size: 24px;
+    color: $black-12;
+  }
+
+  span {
+    margin-left: $margin-default;
+    font-size: 18px;
+  }
+
+  // stylelint-disable-next-line
+  @media all and (max-width: $break-width-default),
+    all and (max-height: $break-height-default) {
+    height: 40px;
+  }
+}
+
+.mock-text-input {
+  display: flex;
+  position: relative;
+  padding: $padding-default $padding-large;
+  font-size: 18px;
+  border: 2px solid $black-38;
+  border-radius: 4px;
+
+  &.active {
+    border-color: $peerio-blue;
+  }
+
+  .label {
+    position: absolute;
+    height: 12px;
+    width: 80px;
+    top: -7px;
+    background-color: #c4c4c4;
+    border: 2px solid $background-root;
+  }
+
+  .text {
+    overflow: hidden;
+    text-overflow: hidden;
+    white-space: nowrap;
+    color: $text-dark-default;
+
+    &.placeholder {
+      color: $text-dark-hint;
+    }
+  }
+
+  // stylelint-disable-next-line
+  @media all and (max-width: $break-width-default),
+    all and (max-height: $break-height-default) {
+    padding: $padding-small;
+    font-size: 16px;
+  }
+}

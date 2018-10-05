@@ -1,0 +1,41 @@
+$suggests-max-height: 200px;
+
+.message-view {
+  .suggests-wrapper {
+    position: absolute;
+    max-height: $suggests-max-height;
+    left: 20px;
+    right: 20px;
+    bottom: 100%;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    box-shadow: 0 4px 13px -6px;
+    background-color: #fafafa;
+    border: 1px solid #eee;
+    border-bottom: none;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+
+    .suggests {
+      left: 0;
+      right: 0;
+      top: 10px;
+      bottom: 10px;
+    }
+
+    .suggest-item {
+      cursor: pointer;
+      padding: 3px 10px;
+
+      .p-avatar {
+        display: inline-block;
+        margin-right: $margin-small;
+      }
+    }
+
+    .selected {
+      color: white;
+      background-color: $peerio-blue;
+    }
+  }
+}

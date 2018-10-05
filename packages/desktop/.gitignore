@@ -1,0 +1,10 @@
+build
+dist
+.DS_Store
+/.idea
+/autologin.json
+npm-debug.log.*
+npm-debug.log
+.opt-in
+.app.package.json.md5
+.package.json.md5

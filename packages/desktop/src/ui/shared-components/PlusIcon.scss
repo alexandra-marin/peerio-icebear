@@ -1,0 +1,64 @@
+.plus-icon-container {
+  display: flex;
+  align-items: center;
+
+  .label {
+    font-size: 16px; // 18px in Figma - Paul
+    font-weight: $font-weight-semibold;
+    color: $text-light-inactive;
+  }
+
+  .plus-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    position: relative;
+    height: 24px;
+    width: 24px;
+    margin-left: $margin-default;
+
+    font-size: 24px;
+    font-weight: $font-weight-semibold;
+    border: 2px solid;
+    border-radius: 4px;
+  }
+
+  &.clickable:hover {
+    .label {
+      color: $text-header;
+    }
+
+    .plus-icon {
+      color: $color-affirmative;
+    }
+  }
+
+  // Beacon on plus icon itself
+  .beacon-container {
+    margin-left: auto;
+    color: inherit;
+  }
+}
+
+.beacon-chat {
+  .circle-content {
+    color: $text-light-inactive;
+    background-color: $darkblue;
+
+    .plus-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      position: relative;
+      height: 24px;
+      width: 24px;
+
+      font-size: 24px;
+      font-weight: $font-weight-semibold;
+      border: 2px solid;
+      border-radius: 4px;
+    }
+  }
+}

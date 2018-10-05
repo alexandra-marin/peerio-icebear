@@ -1,0 +1,64 @@
+.contacts {
+  @extend %flex-row;
+  width: 100%;
+  background: $background-root;
+
+  .feature-navigation-list .p-list-item {
+    .material-icons,
+    &:hover .material-icons {
+      color: $text-light-inactive;
+    }
+
+    &.active .material-icons {
+      color: $text-light-default;
+    }
+  }
+
+  .contacts-view {
+    @extend %flex-col;
+    @extend %flex-grow-1;
+    @extend %flex-shrink-1;
+    position: relative;
+    width: 100%;
+  }
+
+  .toolbar {
+    @extend %flex-row;
+    @extend %flex-shrink-0;
+    @extend %flex-align-center;
+    height: 80px;
+    border-bottom: 1px solid $divider-dark;
+
+    .material-icons {
+      margin-left: 32px;
+      font-size: 48px;
+    }
+
+    .p-input {
+      margin-left: $margin-small;
+
+      input {
+        padding: 0;
+        border: 0;
+      }
+
+      .hint-or-error {
+        display: none;
+      }
+    }
+  }
+
+  .list-sort {
+    @extend %flex-row;
+    @extend %flex-shrink-0;
+    @extend %flex-align-center;
+    height: 48px;
+    width: 100%;
+    padding-left: 32px;
+    background: $black-06;
+
+    .p-dropdown .inputs-container {
+      width: 240px;
+    }
+  }
+}

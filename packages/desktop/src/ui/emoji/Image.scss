@@ -1,0 +1,50 @@
+/*
+  Using emojis as plain images in the app is super annoying because the emoji images come from spritesheets with hundreds of sprites. So, for example, when you want to have a 48px emoji image, you need to:
+    1. find the 32px emoji spritesheet it belongs to
+    2. calculate 1.5x the background size for that emoji category from the emojione stylesheet
+    3. calculate 1.5x the background position for that specific emoji ID from the emojione stylesheet
+
+  The EmojiPicker component is intended to make this easier, but it would be very boring and time consuming to do these calculations for every single emoji that exists, and not useful because we are not going to come close to using them all. Instead, we'll add to it as we go.
+
+  To add a new emoji to EmojiImage, you'll need to find the exact ID and category of the emoji.(The emoji.js helper has an object called emojiByCanonicalShortname which is used by the EmojiImage component itself to find the ID and category and apply them as classes; alternatively you can search the emoji name in Wikimedia Commons.) Then make the calculations described above and add them to the styles below.
+*/
+
+.emoji-image {
+  &.large {
+    // 1.5x size
+    height: 48px;
+    width: 48px;
+
+    &.emojione-32-diversity {
+      background-size: 1632px 1632px;
+
+      // :v: (peace hand sign)
+      &._270c-1f3fc {
+        background-position: 0 -1584px;
+      }
+    }
+
+    &.emojione-32-objects {
+      background-size: 691.5px 642px;
+
+      // :tada:
+      &._1f389 {
+        background-position: -99px 0;
+      }
+    }
+
+    &.emojione-32-people {
+      background-size: 939px 939px;
+
+      // :v: (peace hand sign)
+      &._270c {
+        background-position: -792px -891px;
+      }
+
+      // :relieved:
+      &._1f60c {
+        background-position: -445.5px -643.5px;
+      }
+    }
+  }
+}

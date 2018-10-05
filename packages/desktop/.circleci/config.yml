@@ -1,0 +1,36 @@
+# Check https://circleci.com/docs/2.0/language-javascript/ for more details
+
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node:9.8
+    working_directory: ~/repo
+    steps:
+      - checkout
+      #
+      # - run:
+      #     name: "Update npm"
+      #     command: |
+      #       npm install npm@latest
+      #       sudo rm -rf /usr/local/lib/node_modules/npm
+      #       sudo mv node_modules/npm /usr/local/lib/node_modules/npm
+      #       sudo chown -R 500:500 /usr/local/lib/node_modules/npm
+      - run:
+          name: "Checking Versions"
+          command: |
+            node --version
+            npm --version
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}-
+      - run:
+          name: install-dependencies
+          command: npm install
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - ./node_modules
+      - run:
+          name: eslint and stylelint
+          command: npm run verify
+      - run: npm test

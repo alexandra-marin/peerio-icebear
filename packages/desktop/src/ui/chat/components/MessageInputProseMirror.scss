@@ -1,0 +1,95 @@
+.message-editor-container-anotherwrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-end;
+  height: 100%;
+  width: 100%;
+}
+
+.message-editor-container-prosemirror {
+  // flex to align the lone inner content div to bottom
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+
+  position: relative;
+
+  max-height: 112px;
+  min-height: 40px; // 64px - 24px for formatting toolbar below
+  padding: $padding-small 0 0; // normally $padding-small on top and bottom, omitted when formatting toolbar is present
+  margin: 0 0 0 18px;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.ProseMirror {
+  @extend %chat-message;
+  height: 100%;
+  max-height: 96px;
+  padding: 0;
+  box-sizing: border-box;
+  line-height: 1.45;
+  overflow-y: auto;
+  text-align: left;
+  word-wrap: break-word;
+  tab-size: 4;
+  white-space: pre-wrap;
+  outline: none;
+
+  &.ProseMirror-empty::before {
+    content: attr(data-placeholder);
+    position: absolute;
+    pointer-events: none;
+    width: 100%;
+    left: 0;
+    right: auto;
+    overflow: hidden;
+    font-style: italic;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  img.emojione {
+    // Generally we want emoji to have a margin, but in the input box it can
+    // cause them to become clipped.
+    margin: unset;
+
+    // Disable the hover zoom effect for emoji inside the input box.
+    transition: unset;
+    &:hover {
+      transform: unset;
+    }
+  }
+
+  // A reset from Quill core -- TODO verify if this is actually the behaviour we want
+  p,
+  ol,
+  ul,
+  pre,
+  blockquote,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    padding: 0;
+    margin: 0;
+  }
+}
+
+.ProseMirror-hideselection *::selection {
+  background: transparent;
+}
+
+.ProseMirror-selectednode {
+  box-shadow: inset 0 0 0 100px $peerio-blue;
+}
+
+.ProseMirror-focused {
+  outline: none;
+  border: none;
+}

@@ -1,0 +1,29 @@
+.auto-sign-in {
+  height: 100vh;
+  color: $text-light-default;
+
+  .content {
+    @extend %flex-align-center;
+    @extend %flex-col;
+  }
+
+  .display-1 {
+    margin: 48px 0;
+  }
+
+  .options {
+    @extend %flex-row;
+    @extend %flex-justify-between;
+    margin-top: 48px;
+
+    .option {
+      @extend %flex-col;
+      @extend %flex-align-center;
+      width: 208px;
+
+      & + .option {
+        margin-left: 48px;
+      }
+    }
+  }
+}

@@ -1,0 +1,53 @@
+.app-nav {
+  .menu-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+    margin-top: $margin-large;
+    color: $icon-light-active;
+
+    .look-at-me {
+      @extend %hint-error-label;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      height: 16px;
+      width: 16px;
+      right: 12px;
+      top: 12px;
+      background: $look-at-me;
+      border: 2px solid $darkteal;
+      border-radius: 8px;
+    }
+
+    &.active .look-at-me {
+      border-color: $darkblue;
+    }
+
+    .p-button {
+      height: 48px;
+      width: 48px;
+      transition: color 150ms; // TODO transition variables
+      color: $icon-light-inactive;
+    }
+
+    &[disabled] {
+      pointer-events: none;
+
+      .p-button {
+        color: $text-light-disabled;
+      }
+    }
+
+    &.active,
+    &:hover {
+      .p-button {
+        color: $icon-light-active;
+      }
+    }
+  }
+}

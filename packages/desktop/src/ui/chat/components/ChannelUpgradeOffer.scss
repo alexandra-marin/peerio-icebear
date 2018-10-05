@@ -1,0 +1,11 @@
+.upgrade-rooms {
+  display: flex;
+  align-items: center;
+  height: 48px;
+  padding: 0 $padding-default;
+  background-color: rgba($darkteal, 0.15);
+
+  .p-button {
+    margin-left: auto;
+  }
+}

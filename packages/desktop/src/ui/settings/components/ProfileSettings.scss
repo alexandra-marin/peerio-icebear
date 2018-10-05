@@ -1,0 +1,175 @@
+.settings {
+  .settings-avatar-editor {
+    @extend %flex-row;
+  }
+
+  .settings-container-profile {
+    @extend %flex-row;
+    margin-top: 20px;
+
+    .label-email {
+      height: 24px;
+      padding-left: 12px;
+      margin-bottom: -8px;
+      line-height: 48px;
+    }
+
+    .email-row {
+      margin-top: $margin-small;
+
+      .right {
+        margin-left: auto;
+      }
+
+      .legend {
+        @extend %hint-error-label;
+      }
+
+      &.unconfirmed {
+        .legend {
+          color: $color-error;
+        }
+      }
+    }
+
+    .input-row {
+      display: flex;
+
+      .p-input:first-of-type {
+        margin-right: 1px;
+      }
+
+      .helper-text {
+        @extend %hint-error-label;
+      }
+    }
+
+    .peerio-id-container {
+      margin-top: 40px;
+
+      .list-title {
+        margin-bottom: 8px;
+      }
+    }
+
+    .avatar-card {
+      @extend %flex-col;
+      @extend %flex-shrink-0;
+      position: relative;
+      height: 224px;
+      width: 224px;
+      margin-left: 64px;
+      overflow: hidden;
+      background-size: 100%;
+      border-radius: 8px;
+
+      .p-avatar::before,
+      .p-avatar::after {
+        content: ' ';
+        position: absolute;
+        height: 48px;
+        width: 100%;
+        left: 0;
+      }
+
+      .p-avatar::before {
+        top: 0;
+        background-image: linear-gradient(
+          to bottom,
+          rgba(0, 0, 0, 0.3),
+          rgba(0, 0, 0, 0)
+        );
+      }
+
+      .p-avatar::after {
+        bottom: 0;
+        background-image: linear-gradient(
+          to top,
+          rgba(0, 0, 0, 0.3),
+          rgba(0, 0, 0, 0)
+        );
+      }
+
+      &-user {
+        @extend %flex-col;
+        @extend %flex-shrink-0;
+        @extend %flex-align-start;
+        height: 64px;
+        color: $text-light-default;
+      }
+
+      &-display-name {
+        margin: $margin-default 0 0 $margin-default;
+        font-weight: $font-weight-bold;
+      }
+
+      &-username {
+        margin: 0 0 0 $margin-default;
+      }
+
+      &-initial {
+        @extend %flex-row;
+        @extend %flex-align-center;
+        @extend %flex-justify-center;
+        @extend %flex-grow-1;
+        font-size: 112px;
+        color: $text-light-default;
+      }
+
+      .card-header,
+      .card-footer {
+        position: absolute;
+        z-index: 1;
+      }
+
+      .card-header {
+        left: 0;
+        top: 0;
+        padding-left: $padding-default;
+        padding-top: $padding-default;
+        color: $text-light-default;
+
+        .full-name {
+          font-weight: $font-weight-semibold;
+        }
+
+        .username {
+          @extend %hint-error-label;
+        }
+      }
+
+      .card-footer {
+        right: 0;
+        bottom: 0;
+        padding-right: $padding-small;
+        padding-bottom: $padding-small;
+
+        .p-button {
+          color: $icon-light-inactive;
+        }
+
+        .p-button:hover {
+          color: $icon-light-active;
+          background-color: $white-12;
+        }
+      }
+
+      .save-progress-overlay {
+        @extend %flex-row;
+        @extend %flex-justify-center;
+        @extend %flex-align-center;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.65);
+      }
+    }
+  }
+
+  .addemail-container {
+    @extend %flex-row;
+    align-items: center;
+  }
+}

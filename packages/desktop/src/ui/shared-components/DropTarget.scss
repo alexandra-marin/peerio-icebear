@@ -1,0 +1,32 @@
+.global-drop-target {
+  @extend %flex-col;
+  @extend %flex-align-center;
+  @extend %flex-justify-center;
+  position: fixed;
+  z-index: 99;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  color: $text-light-default;
+  background-color: $background-overlay;
+
+  .drop-content {
+    @extend %flex-row;
+    @extend %flex-align-center;
+    animation: pulse-scale;
+    animation-duration: 1000ms;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+
+    .display-2 {
+      color: $text-light-default;
+    }
+  }
+
+  .material-icons {
+    @extend %display-4;
+    margin-right: $margin-default;
+    color: $text-light-default;
+  }
+}

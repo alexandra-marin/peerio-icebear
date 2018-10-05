@@ -1,0 +1,70 @@
+// message content, input, toolbar
+.message-view {
+  @extend %flex-col;
+  @extend %flex-grow-1;
+  @extend %flex-shrink-1;
+  position: relative;
+  // FIXME remove calc?
+  width: calc(100vw - 336px);
+
+  .message-toolbar {
+  }
+
+  .messages-and-sidebar-container {
+    @extend %flex-row;
+    @extend %flex-grow-1;
+
+    // UserPicker that appears when adding member to room
+    .create-new-chat {
+      @extend %flex-col;
+      @extend %flex-grow-1;
+      position: relative;
+      height: calc(100vh - 80px);
+      padding: 0 20px;
+
+      .chat-creation-header,
+      .message-search-wrapper {
+        padding-left: $padding-default;
+      }
+
+      .user-search-error-container {
+        margin-left: 0;
+      }
+    }
+
+    .messages-container {
+      @extend %flex-col;
+      @extend %flex-grow-1;
+      position: relative;
+      max-width: 100%;
+      min-width: 0;
+    }
+  }
+
+  // both for text input and chat content
+  img.emojione {
+    display: inline-block;
+    -webkit-user-select: initial;
+    height: 3ex;
+    min-height: 20px;
+    min-width: 20px;
+    margin: -0.2ex 0.15em 0.2ex;
+    vertical-align: middle;
+    transition: transform 50ms ease;
+    //  width: auto;
+
+    &:hover {
+      transform: scale(1.4);
+    }
+  }
+}
+
+// message navigation
+.list {
+  // shown when when loading chats in the chat list.
+  .p-progress-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+}

@@ -1,0 +1,107 @@
+.channel-invite {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0 $padding-xl;
+
+  .invite-content,
+  .upgrade-prompt,
+  .participants,
+  .participant-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .invite-content {
+    margin-top: 256px;
+
+    .text {
+      @extend %headline;
+      line-height: 33px;
+      text-align: center;
+
+      .channel-name {
+        font-weight: $font-weight-semibold;
+        white-space: nowrap;
+      }
+    }
+
+    .buttons {
+      margin-top: $margin-large;
+
+      .p-button {
+        margin: 0 $margin-default;
+      }
+    }
+
+    .p-button.secondary {
+      border: 0;
+    }
+
+    .upgrade-prompt {
+      width: 100%;
+
+      .upgrade-content {
+        display: flex;
+        align-items: center;
+        width: 75%;
+        max-width: 800px;
+        padding: $padding-default;
+        margin: $margin-default 0;
+        background-color: rgba(50, 206, 195, 0.2);
+        border: 2px solid rgba(50, 206, 195, 0.54);
+
+        .upgrade-text {
+          margin-right: 10%;
+        }
+      }
+    }
+  }
+
+  .participants {
+    padding-top: $padding-xl;
+    margin: auto 0;
+
+    .p-divider {
+      width: 50%;
+      max-width: 600px;
+    }
+
+    .participant-list {
+      margin-top: $margin-default;
+
+      .hosted-by,
+      .already-in-room {
+        color: $text-dark-secondary;
+      }
+
+      .room-name {
+        font-weight: $font-weight-semibold;
+        color: $text-dark-secondary;
+      }
+
+      .avatars {
+        display: flex;
+        margin-top: $margin-small;
+
+        .p-avatar + div {
+          margin-left: 8px;
+        }
+
+        .more-participants {
+          @extend %hint-error-label;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 40px;
+          width: 40px;
+          font-weight: $font-weight-semibold;
+          color: $text-light-default;
+          background-color: $icon-dark-active;
+          border-radius: 100%;
+        }
+      }
+    }
+  }
+}

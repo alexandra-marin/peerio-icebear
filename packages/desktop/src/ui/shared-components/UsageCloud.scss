@@ -1,0 +1,26 @@
+.usage-cloud {
+  @extend %flex-col;
+  @extend %hint-error-label;
+  position: relative;
+  margin: auto 0 32px;
+  text-align: center;
+  color: $icon-light-inactive;
+
+  .p-button {
+    color: $icon-light-active;
+
+    &.cloud-in-progress {
+      position: absolute;
+      pointer-events: none;
+    }
+
+    &:focus {
+      color: $icon-light-active;
+    }
+
+    &:hover,
+    &:hover + .p-button {
+      color: $color-affirmative;
+    }
+  }
+}

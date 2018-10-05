@@ -1,0 +1,178 @@
+// The input box styles and the rendered message styles should be identical unless explicitly overridden.
+%chat-message {
+  $paragraph-line-height: 1.4;
+
+  // Remember to mark entities as selectable if they get added to the schema!
+
+  // Nodes:
+  p,          // paragraph
+  a,          // link
+  .mention,   // mention
+  .emojione,  // emoji
+  // Marks:
+  em,         // em
+  s,          // strike
+  strong {
+    // strong
+    @extend %selectable;
+  }
+
+  // Not in the chat schema, but error messages use them and we want those to be
+  // selectable too
+  ul,
+  li {
+    @extend %selectable;
+  }
+
+  /////////////////////////
+  // Listed in the same order as the chat-schema:
+
+  p {
+    flex-grow: 1;
+    max-width: calc(100% - 100px);
+    min-width: 96px;
+    margin: 0 0 0 $margin-default;
+    line-height: $paragraph-line-height;
+    word-break: break-word;
+    white-space: pre-wrap;
+
+    + p {
+      margin-top: 1em * $paragraph-line-height;
+    }
+  }
+
+  // Note that links can't be created directly inside the message input -- we
+  // only see them in the message list.
+  a {
+    cursor: pointer !important;
+    word-break: break-word;
+    color: $peerio-blue;
+  }
+
+  .mention {
+    cursor: pointer;
+    font-weight: $font-weight-semibold;
+    transition: background-color 50ms;
+    color: $text-dark-default;
+    background-color: rgba($peerio-blue, 0.45);
+    border-radius: 3px;
+
+    &:hover {
+      background-color: rgba($peerio-blue, 0.15);
+    }
+
+    &.self {
+      background-color: $peerio-teal;
+
+      &:hover {
+        background-color: rgba($peerio-teal, 0.15);
+      }
+    }
+  }
+
+  strong {
+    font-weight: $font-weight-semibold;
+  }
+
+  // TODO: code blocks and blockquotes not yet implemented.
+  // .pre {
+  //   padding: $padding-tiny 6px;
+  //   margin-right: $margin-tiny;
+  //   font-family: monospace;
+  //   background-color: $black-03;
+  //   border-radius: 4px;
+  // }
+  // blockquote {
+  //   padding-left: 1em;
+  //   margin-left: 0;
+  //   margin-right: 0;
+  //   border-left: 3px solid #eee;
+  // }
+}
+
+// UrlPreviewConsent and InlineFiles both have consent dialogs which are identical despite being in different components
+$urlpreview-width: 480px;
+
+.first-time {
+  max-width: 496px; // $urlpreview-width + 16px
+  padding: $padding-default 0;
+  margin-left: $margin-default;
+
+  .warning-body,
+  .url-content {
+    padding-left: $padding-default;
+    border-left: 1px solid $divider-dark;
+  }
+
+  .warning-header {
+    @extend %title;
+    @extend %flex-row;
+    @extend %flex-align-center;
+
+    padding-right: $padding-default;
+    margin: $margin-default 0;
+
+    .text {
+      margin-left: $margin-small;
+    }
+  }
+
+  .warning-body {
+    // half of icon width
+    padding-left: 12px;
+    margin-left: 12px;
+
+    p.text {
+      max-width: 100%; // override of a general <p> style in MessageList
+      padding-right: $padding-default;
+      margin: 0;
+      margin-left: $margin-small;
+    }
+
+    .p-radio {
+      padding-right: $padding-default;
+      margin-left: $margin-default;
+      margin-bottom: $margin-default;
+    }
+  }
+
+  .buttons-container {
+    @extend %flex-row;
+    @extend %flex-justify-end;
+
+    margin-bottom: $margin-default;
+
+    .p-button:last-child {
+      margin-left: $margin-small;
+    }
+  }
+}
+
+.update-settings {
+  @extend %hint-error-label;
+  display: flex;
+
+  align-content: center;
+  margin-left: $margin-default;
+  margin-top: $margin-small;
+  font-style: italic;
+
+  &.nomargin {
+    margin-left: 0;
+  }
+
+  .material-icons {
+    font-size: 16px;
+    color: $color-confirmation;
+  }
+
+  .text {
+    margin-left: $margin-small;
+    color: $text-dark-inactive;
+
+    a {
+      text-decoration: underline;
+      color: $text-dark-inactive;
+    }
+  }
+}

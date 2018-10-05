@@ -1,0 +1,59 @@
+.new-user-page {
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+  background-color: $background-root;
+
+  &::before {
+    content: ' ';
+    position: absolute;
+    pointer-events: none;
+    height: 80%;
+    width: 80%;
+    right: 0;
+    bottom: 0;
+    background-image: url('./static/img/illustration-newuser.svg');
+    background-position: bottom right;
+    background-repeat: no-repeat;
+    background-size: contain;
+  }
+
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80px;
+    width: 100%;
+    background-color: $darkblue;
+
+    img {
+      height: 32px;
+    }
+  }
+
+  .heading {
+    font-size: 48px;
+  }
+
+  .buttons-container {
+    display: flex;
+    flex-direction: column;
+
+    .p-button {
+      width: 164px;
+      margin-bottom: $margin-default;
+    }
+  }
+
+  .content-parent {
+    display: flex;
+    max-width: 40vw;
+    min-width: 440px;
+    margin-left: 80px;
+  }
+
+  .content {
+    @include onboarding-content-sizing();
+    min-width: 440px;
+  }
+}

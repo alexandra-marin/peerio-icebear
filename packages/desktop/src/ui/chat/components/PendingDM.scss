@@ -1,0 +1,70 @@
+.pending-dm {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: $padding-large;
+  text-align: center;
+
+  .button-container {
+    margin-top: $margin-default;
+
+    .p-button {
+      margin: 0 $margin-default;
+    }
+  }
+
+  &.dismissed {
+    .plus-icon-container {
+      display: inline-flex;
+      margin: 0 $margin-tiny;
+
+      .plus-icon {
+        margin: 0;
+      }
+    }
+  }
+}
+
+.pending-dm-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: $padding-large;
+  text-align: center;
+
+  .main-text {
+    @extend %headline;
+    margin-top: $margin-tiny;
+  }
+
+  .invite-type {
+    @extend %subtitle;
+    margin-top: $margin-small;
+    font-weight: $font-weight-semibold;
+    color: $text-dark-secondary;
+  }
+
+  .user-profile-container {
+    margin-top: $margin-large;
+    text-align: center;
+
+    .p-avatar {
+      display: inline-block;
+    }
+
+    .username {
+      margin-top: $margin-tiny;
+      color: $text-dark-secondary;
+    }
+  }
+
+  .identity-verification-notice {
+    margin-top: $margin-default;
+    font-style: italic;
+  }
+}

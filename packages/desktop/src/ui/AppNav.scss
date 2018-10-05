@@ -1,0 +1,154 @@
+.app-nav {
+  @extend %flex-col;
+  @extend %flex-shrink-0;
+  align-items: center;
+  z-index: 2;
+  height: 100vh;
+  width: $app-nav-width;
+  background-color: $darkteal;
+
+  .app-menu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+
+    .menu-item {
+      height: 64px;
+      width: 64px;
+
+      &.active {
+        background-color: $darkblue;
+      }
+    }
+  }
+
+  .avatar-menu-wrapper {
+    @extend %flex-row;
+    @extend %flex-align-center;
+    @extend %flex-justify-center;
+    @extend %flex-shrink-0;
+    position: relative;
+    height: 80px;
+    width: 80px;
+
+    .avatar-notify::before {
+      @extend %notify;
+      right: 20px !important;
+      top: 20px !important;
+    }
+
+    .p-button:hover {
+      background-color: transparent;
+    }
+
+    li {
+      min-width: 248px;
+
+      &.avatar-notify::before {
+        right: 200px;
+      }
+    }
+  }
+}
+
+.p-menu-content.app-nav-menu {
+  // Tricky rules to make last menu item appear to be full height (no padding)
+  padding-bottom: 0; // was 8px;
+
+  .p-divider:last-of-type {
+    margin-bottom: 0; // was 8px;
+  }
+
+  .p-menu-item:last-of-type {
+    padding-top: $padding-default; // $padding-small + 8px = $padding-default
+    padding-bottom: $padding-default;
+  }
+
+  // Individual menu item hover/selected colours
+  &.color-icons .p-menu-item,
+  .p-menu-item:hover,
+  .p-menu-item.selected {
+    &.security .material-icons {
+      color: $yellow;
+    }
+    &.account .material-icons {
+      color: $peerio-purple;
+    }
+    &.about .material-icons {
+      color: $peerio-teal;
+    }
+    &.help .material-icons {
+      color: $peerio-violet;
+    }
+    &.upgrade .material-icons {
+      color: $darkblue;
+    }
+    &.signout .material-icons {
+      color: $red;
+    }
+
+    &.profile,
+    &.preferences {
+      .p-custom-icon {
+        img.default {
+          display: none;
+        }
+        img.hover {
+          display: inline-block;
+        }
+      }
+    }
+  }
+
+  .p-menu-item {
+    &.selected {
+      &.profile {
+        background-color: rgba($peerio-blue, 0.05);
+      }
+      &.security {
+        background-color: rgba($yellow, 0.05);
+      }
+      &.preferences {
+        background-color: rgba($darkteal, 0.05);
+      }
+      &.account {
+        background-color: rgba($peerio-purple, 0.05);
+      }
+      &.about {
+        background-color: rgba($peerio-teal, 0.05);
+      }
+      &.help {
+        background-color: rgba($peerio-violet, 0.05);
+      }
+      &.upgrade {
+        background-color: rgba($peerio-blue, 0.05);
+      }
+      &.signout {
+        background-color: rgba($red, 0.05);
+      }
+    }
+  }
+}
+
+// 'contact' beacon gets portaled out of parent tree, so style it here
+.appnav-beacon {
+  margin-top: $margin-large;
+
+  .circle .circle-content {
+    background-color: $darkteal;
+
+    .menu-item {
+      margin-top: 0;
+
+      .material-icons {
+        color: $icon-light-inactive;
+      }
+
+      &:hover .material-icons {
+        color: $icon-light-active;
+      }
+    }
+  }
+}

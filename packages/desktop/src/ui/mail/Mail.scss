@@ -1,0 +1,54 @@
+.mail {
+  @extend %flex-row;
+  position: relative;
+  width: 100%;
+  color: $text-dark-inactive;
+  background-color: $white;
+
+  // MAIL ITEM LIST
+  &-list-wrapper {
+    @extend %flex-grow-0;
+    @extend %flex-shrink-0;
+    @extend %flex-col;
+    height: 100%;
+    width: $width-mail-list;
+    background-color: $background-selected;
+    border-right: 1px solid $divider-dark;
+  }
+
+  &-list {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  &-sorting {
+    @extend %flex-row;
+    @extend %flex-align-center;
+    @extend %flex-shrink-0;
+    height: 48px;
+    padding-left: $padding-small;
+    margin-top: $margin-small;
+    border-bottom: 1px solid $divider-dark;
+  }
+
+  .mail-sidebar {
+    @extend %flex-grow-0;
+    @extend %flex-shrink-0;
+    @extend %flex-col;
+    height: 100%;
+    width: $width-mail-sidebar;
+    padding: $padding-large $padding-default $padding-default;
+    border-left: 1px solid $divider-dark;
+
+    .mail-link {
+      @extend %flex-row;
+      @extend %flex-align-center;
+      white-space: nowrap;
+
+      a {
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+}

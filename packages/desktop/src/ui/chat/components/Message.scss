@@ -1,0 +1,238 @@
+.message-content-wrapper {
+  // stylelint-disable-next-line
+  @extend %flex-col;
+  @extend %flex-shrink-0;
+  $error-bg: rgba($color-error, 0.03);
+  position: relative;
+  padding: $padding-tiny 24px;
+  margin: 12px 0 0;
+
+  &:not(.invalid-sign) {
+    width: 100%;
+  }
+
+  &:hover,
+  &.selected {
+    background-color: $background-hover-default;
+  }
+
+  .message-content-wrapper-inner {
+    @extend %flex-row;
+  }
+
+  .marker-wrapper {
+    margin-left: -$margin-tiny;
+  }
+
+  &.light {
+    margin-top: 0;
+
+    .timestamp {
+      @extend %flex-shrink-0;
+      @extend %hint-error-label;
+      width: 40px;
+      padding-top: 2px; // To align the timestamp with the first row of text.
+      overflow: hidden;
+      text-align: right;
+      white-space: nowrap;
+      color: rgba($text-dark-hint, 0);
+    }
+
+    &:hover {
+      .timestamp {
+        color: $text-dark-hint;
+      }
+    }
+  }
+
+  &.send-error {
+    background-color: $error-bg;
+
+    .message-body {
+      color: $text-dark-hint;
+    }
+  }
+
+  &.invalid-sign {
+    min-width: 320px;
+    padding: $padding-tiny 0 0 $padding-tiny;
+    margin: 0 32px 0 28px;
+    overflow: hidden;
+    background-color: $error-bg;
+    border-radius: 18px;
+
+    .warning-icon {
+      @extend %flex-shrink-0;
+      width: 24px;
+      margin: 0 12px 0 auto;
+      color: $color-error;
+
+      + .receipt-wrapper {
+        @extend %flex-align-center;
+        margin-left: 0;
+      }
+    }
+  }
+
+  &.render-error {
+    min-width: 320px;
+    padding: $padding-small $padding-tiny;
+    margin: 0 0 12px;
+    background-color: $error-bg;
+  }
+
+  .message-content {
+    @extend %chat-message;
+    @extend %flex-col;
+    flex-grow: 1;
+    min-width: 0;
+
+    .meta-data {
+      @extend %flex-row;
+      align-items: center;
+      margin-bottom: $margin-tiny;
+
+      .timestamp {
+        @extend %hint-error-label;
+        color: $text-dark-inactive;
+      }
+
+      .user {
+        margin: 0 $padding-small 0 $padding-default;
+        font-weight: $font-weight-bold;
+
+        .username {
+          font-style: italic;
+          font-weight: $font-weight-regular;
+          color: $text-dark-inactive;
+        }
+      }
+    }
+
+    .system-message {
+      font-style: italic;
+      color: $text-dark-inactive;
+    }
+
+    .video-system-message {
+      font-style: normal;
+      color: $text-dark-hint;
+    }
+
+    .video-icon {
+      padding-right: 5px;
+      vertical-align: middle;
+    }
+  }
+
+  .inline-image {
+    object-fit: contain;
+    max-height: 500px;
+    max-width: 100%;
+    margin: $margin-small auto $margin-small $margin-default;
+  }
+
+  .send-error-options {
+    display: flex;
+    align-items: center;
+    margin: $margin-tiny $margin-default;
+    font-size: 12px;
+    color: $text-dark-hint;
+
+    .material-icons {
+      color: $color-error;
+    }
+
+    .p-button {
+      width: 24px;
+      color: $color-error;
+    }
+
+    .send-error-text {
+      width: 120px;
+      margin-left: $margin-small;
+    }
+
+    a {
+      margin-left: $margin-small;
+      font-style: italic;
+
+      &.disabled {
+        cursor: default;
+        pointer-events: none;
+        color: $icon-dark-inactive;
+      }
+
+      &:last-of-type {
+        color: $text-dark-secondary;
+      }
+    }
+
+    &.send-in-progress {
+      .material-icons {
+        animation-duration: 1s;
+        animation-iteration-count: infinite;
+        animation-name: spin;
+        animation-timing-function: linear;
+        color: $text-dark-secondary;
+      }
+
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    }
+  }
+
+  .receipt-wrapper {
+    @extend %flex-row;
+    @extend %flex-align-end;
+    @extend %flex-justify-end;
+    width: 82px;
+    min-width: 82px;
+    margin-left: auto;
+  }
+
+  .invalid-sign-warning {
+    @extend %flex-row;
+    @extend %hint-error-label;
+    @extend %flex-align-center;
+    height: 52px;
+    padding: 0 $padding-small 0 $padding-default;
+    margin-left: -8px;
+    margin-top: 24px;
+    color: $text-dark-hint;
+    background-color: $black-06;
+    border-radius: 2px;
+
+    .material-icons {
+      width: 24px;
+      margin-right: $margin-small;
+    }
+
+    .content {
+      margin-right: auto;
+    }
+  }
+
+  .plus-receipts {
+    cursor: pointer;
+    padding: 0 8px 0 22px;
+    margin-left: -14px;
+    line-height: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    transition: background-color 100ms linear;
+    color: $text-light-default;
+    background: $darkblue;
+    border-radius: 20px;
+
+    &:hover {
+      background: $peerio-blue;
+    }
+  }
+}

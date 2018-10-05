@@ -1,0 +1,20 @@
+.mail {
+  .mail-sidebar {
+    .sent-info {
+      .read-recipt,
+      .expire-info {
+        @extend %flex-col;
+        margin: 24px 0;
+
+        .content {
+          @extend %flex-col;
+        }
+
+        .mail-revoke {
+          margin-left: auto;
+          margin-top: 8px;
+        }
+      }
+    }
+  }
+}

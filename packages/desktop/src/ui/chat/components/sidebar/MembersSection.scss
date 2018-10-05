@@ -1,0 +1,27 @@
+.member-list {
+  flex-shrink: 1;
+  overflow-x: hidden;
+
+  &.with-admin-controls {
+    padding-top: 64px;
+  }
+
+  .user-caption {
+    display: flex;
+    max-width: 100%;
+
+    .username {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+.action-list {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  top: 0;
+  background: $background-hover-default-solid;
+}

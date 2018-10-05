@@ -1,0 +1,30 @@
+.security-settings {
+  .account-key-toggle {
+    @extend %flex-row;
+    @extend %flex-align-center;
+
+    .save-button {
+      margin-left: 32px;
+    }
+  }
+
+  .twofa-container {
+    @extend %flex-row;
+  }
+
+  .totp-input {
+    background-color: #f7f7f7; // $black-03 without transparency
+
+    .label {
+      background-color: #f7f7f7;
+    }
+
+    input {
+      background-color: transparent;
+    }
+
+    &.totp-error {
+      border-bottom: 4px solid $color-error;
+    }
+  }
+}

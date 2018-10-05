@@ -1,0 +1,17 @@
+.inline-shared-folder-container {
+  &.unshared {
+    .file-name-container {
+      pointer-events: none;
+    }
+
+    .file-name {
+      font-style: italic;
+      font-weight: $font-weight-regular;
+      color: $text-dark-secondary;
+    }
+
+    .file-icon .material-icons {
+      color: $black-12;
+    }
+  }
+}

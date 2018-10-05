@@ -1,0 +1,12 @@
+$width-mail-sidebar: 270px;
+$width-mail-list: 224px; // TODO: create a list variable because it's used everywhere.
+$width-mail-compose: 80px + $width-mail-sidebar + $width-mail-sidebar;
+
+@import './Mail';
+@import './components/MailCompose';
+@import './components/MailFormatActions';
+@import './components/MailItem';
+@import './components/MailPassphrase';
+@import './components/MailSent';
+@import './components/MailSentSidebar';
+@import './components/ZeroMail';

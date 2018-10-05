@@ -1,0 +1,42 @@
+.mail {
+  .mail-sent-container {
+    @extend %flex-row;
+    @extend %flex-grow-1;
+  }
+
+  .compose-view {
+    .compose-meta.sent {
+      height: 112px;
+      padding: $padding-small $padding-default $padding-default 56px;
+      background-color: $black-03;
+      border-bottom: 1px solid $divider-dark;
+
+      .meta-container {
+        @extend %flex-row;
+        @extend %flex-align-center;
+        @extend %flex-justify-between;
+        height: 36px;
+      }
+
+      .subject {
+        overflow: hidden;
+        font-size: 16px;
+        font-weight: $font-weight-bold;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .to,
+      .date {
+        @extend %hint-error-label;
+        padding: $padding-small 0;
+      }
+    }
+  }
+
+  .mail-content.sent-content {
+    @extend %flex-col;
+    @extend %flex-grow-1;
+    padding: 32px 56px;
+  }
+}

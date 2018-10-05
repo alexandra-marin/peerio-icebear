@@ -1,0 +1,65 @@
+.contacts {
+  .contact-list {
+    @extend %flex-col;
+    padding-top: 8px;
+    overflow: auto;
+
+    .contact-list-section {
+      @extend %flex-row;
+      flex-shrink: 0;
+      padding: 24px 0 32px;
+      border-bottom: 1px solid $divider-dark;
+
+      .contact-list-section-marker {
+        @extend %flex-row;
+        @extend %flex-grow-1;
+        @extend %flex-justify-center;
+        max-width: 224px;
+        min-width: 120px;
+        padding-top: $padding-large;
+        font-size: 24px;
+        color: $peerio-teal;
+      }
+
+      .contact-list-section-content {
+        @extend %flex-col;
+        width: 600px;
+
+        // stylelint-disable-next-line
+        .p-list-item {
+          .content .caption {
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+
+          .side-content.left {
+            min-width: 40px;
+          }
+
+          .side-content.right {
+            min-width: 80px;
+          }
+        }
+
+        @media all and (max-width: 1052px) {
+          width: 448px;
+        }
+      }
+    }
+  }
+
+  .no-contact-found {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: $padding-xxl;
+    margin: 0 $margin-xxl;
+
+    .text {
+      margin: $margin-xl;
+      text-align: center;
+    }
+  }
+}

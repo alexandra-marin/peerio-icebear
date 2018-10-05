@@ -1,0 +1,43 @@
+.flex-row {
+  @extend %flex-row;
+}
+
+.flex-col {
+  @extend %flex-col;
+}
+
+.flex-align-center {
+  @extend %flex-align-center;
+}
+
+.flex-align-start {
+  @extend %flex-align-start;
+}
+
+.flex-justify-around {
+  @extend %flex-justify-around;
+}
+
+.flex-justify-between {
+  @extend %flex-justify-between;
+}
+
+.flex-justify-center {
+  @extend %flex-justify-center;
+}
+
+.flex-grow-1 {
+  @extend %flex-grow-1;
+}
+
+.flex-grow-0 {
+  @extend %flex-grow-0;
+}
+
+.flex-shrink-1 {
+  @extend %flex-shrink-1;
+}
+
+.flex-shrink-0 {
+  @extend %flex-shrink-0;
+}

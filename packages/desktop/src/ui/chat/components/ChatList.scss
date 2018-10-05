@@ -1,0 +1,113 @@
+.messages-list {
+  position: relative;
+
+  .room-item {
+    cursor: pointer;
+    height: 26px;
+    max-height: 26px;
+    min-height: 26px;
+
+    &.new-room-entry {
+      font-style: italic;
+    }
+  }
+
+  .badge-new {
+    padding: 1px $padding-small 2px;
+    font-size: 11px;
+    font-weight: $font-weight-semibold;
+    color: $text-badge-color;
+    background-color: $badge-bg-color;
+    border-radius: 5px;
+  }
+
+  .unread {
+    font-weight: $font-weight-semibold;
+    color: $text-light-default;
+  }
+
+  .dm-item {
+    max-height: 44px;
+    min-height: 44px;
+
+    .icon {
+      height: 32px;
+    }
+
+    &.pinned {
+      position: relative;
+
+      &::before {
+        content: ' ';
+        position: absolute;
+        z-index: 1;
+        height: 16px;
+        width: 16px;
+        left: 8px;
+        top: 0;
+        opacity: 0.7;
+        background-image: url('./static/custom-icons/pin-on-white.svg');
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: 100%;
+      }
+    }
+
+    .new-dm-avatar {
+      display: flex;
+      flex-direction: column;
+      font-size: 32px;
+      color: $white;
+    }
+  }
+
+  .unread-notification {
+    $width-unread-notif: 240px; // $width-list - 2*$margin-default
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    position: fixed;
+    z-index: 2;
+    height: 36px;
+    width: $width-unread-notif;
+    bottom: 0;
+    margin-left: $margin-small;
+
+    color: $peerio-blue;
+    background-color: $background-root;
+
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+
+    .material-icons {
+      margin-left: $margin-small;
+      color: $peerio-blue;
+    }
+
+    &.top {
+      top: 0;
+      bottom: auto;
+
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
+  }
+}
+
+// "Start a secure chat" beacon
+.chatlist-plusicon-beacon {
+  .circle-content {
+    background-color: $darkblue;
+
+    .plus-icon {
+      margin-left: 0;
+      color: $text-light-inactive;
+    }
+  }
+}

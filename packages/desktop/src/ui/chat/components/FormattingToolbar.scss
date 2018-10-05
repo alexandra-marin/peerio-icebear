@@ -1,0 +1,12 @@
+.message-view {
+  .formatting-toolbar {
+    display: flex;
+    justify-content: center;
+    transition: opacity 800ms;
+    opacity: 0;
+
+    &.formatting-toolbar-visible {
+      opacity: 1;
+    }
+  }
+}

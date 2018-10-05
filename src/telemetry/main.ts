@@ -96,7 +96,7 @@ export async function send(eventObj: EventObject): Promise<void> {
     }
 }
 
-export async function sendStored(): Promise<void> {
+async function sendStored(): Promise<void> {
     try {
         const baseProperties = await getBaseProperties();
         const events = eventStore;

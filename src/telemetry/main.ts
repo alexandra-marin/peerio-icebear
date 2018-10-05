@@ -74,12 +74,13 @@ function convertEventPropertyCase(event: EventObject): EventProperties {
 let eventStore: EventObject[] = [];
 
 export async function send(eventObj: EventObject): Promise<void> {
-    try {
-        if (!User.current) {
-            eventStore.push(eventObj);
-            return;
-        }
+    if (!User.current) {
+        eventStore.push(eventObj);
+        return;
+    }
+    if (User.current && !User.current.settings.dataCollection) return;
 
+    try {
         const baseProperties = await getBaseProperties();
         const eventProperties = convertEventPropertyCase(eventObj);
         eventObj.properties = { ...baseProperties, ...eventProperties };

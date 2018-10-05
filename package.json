@@ -1,4 +1,7 @@
 {
   "private": true,
-  "workspaces": ["packages/icebear"]
+  "workspaces": [
+    "packages/icebear",
+    "packages/desktop"
+  ]
 }

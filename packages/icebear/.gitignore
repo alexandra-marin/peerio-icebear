@@ -1,4 +1,6 @@
-node_modules/
+test-results
+dist
+tests/config/.chrome_dev_user
 npm-debug.log
 .idea
 .chrome_dev_user

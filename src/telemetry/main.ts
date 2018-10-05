@@ -1,9 +1,10 @@
 import { observable, autorun } from 'mobx';
+import fetch from 'cross-fetch';
+
 import { asPromise } from '../helpers/prombservable';
 import config from '../config';
 import TinyDb from '../db/tiny-db';
 import { getRandomGlobalShortIdHex, strToBytes, bytesToB64 } from '../crypto/util';
-import g from '../helpers/global-context';
 import serverSettings from '../models/server-settings';
 import { EventObject, EventProperties } from './types';
 import User from '../models/user/user';
@@ -88,7 +89,7 @@ export async function send(eventObj: EventObject): Promise<void> {
         const data = bytesToB64(strToBytes(JSON.stringify(eventObj)));
         const url = `${config.telemetry.baseUrl}?data=${data}`;
 
-        g.fetch(url, {
+        await fetch(url, {
             method: 'GET'
         });
     } catch (e) {
@@ -99,9 +100,8 @@ export async function send(eventObj: EventObject): Promise<void> {
 async function sendStored(): Promise<void> {
     try {
         const baseProperties = await getBaseProperties();
-        const events = eventStore;
 
-        events.forEach(ev => {
+        eventStore.forEach(ev => {
             const eventProperties = convertEventPropertyCase(ev);
             ev.properties = { ...baseProperties, ...eventProperties };
         });
@@ -110,11 +110,11 @@ async function sendStored(): Promise<void> {
         // We are guessing here. Currently assuming that "message" corresponds to an entire "event".
         // Increment can be adjusted as we learn more.
         const increment = 50;
-        for (let i = 0; i < events.length; i += increment) {
-            const chunk = events.slice(i, i + increment);
-            const data = g.btoa(JSON.stringify(chunk));
+        for (let i = 0; i < eventStore.length; i += increment) {
+            const chunk = eventStore.slice(i, i + increment);
+            const data = bytesToB64(strToBytes(JSON.stringify(chunk)));
 
-            g.fetch(config.telemetry.baseUrl, {
+            await fetch(config.telemetry.baseUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'

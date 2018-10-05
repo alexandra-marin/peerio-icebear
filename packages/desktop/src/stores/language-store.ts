@@ -5,11 +5,7 @@ import moment from 'moment';
 import { observable, action } from 'mobx';
 
 import { setLocale } from 'peerio-translator';
-import {
-    errors as icebearErrors,
-    TinyDb as db,
-    PhraseDictionary
-} from 'peerio-icebear';
+import { errors as icebearErrors, TinyDb as db, PhraseDictionary } from 'peerio-icebear';
 
 const electron = require('electron').remote || require('electron');
 const normalizeError = icebearErrors.normalize;
@@ -88,10 +84,8 @@ class LanguageStore {
     }
 
     buildDictionary() {
-        const txtPath = path.join(
-            electron.app.getAppPath(),
-            `/node_modules/peerio-copy/phrase/dict/${this.language}.txt`
-        );
+        const copyPath = path.dirname(require.resolve('peerio-copy'));
+        const txtPath = path.join(copyPath, `phrase/dict/${this.language}.txt`);
         const dict = fs.readFileSync(txtPath, 'utf8');
         PhraseDictionary.setDictionary(this.language, dict);
     }
@@ -99,12 +93,11 @@ class LanguageStore {
     @action.bound
     changeLanguage(code: string) {
         try {
+            const icebearPath = path.dirname(require.resolve('peerio-icebear'));
             const jsonPath = path.join(
-                electron.app.getAppPath(),
-                `/node_modules/peerio-icebear/src/copy/${code.replace(
-                    '-',
-                    '_'
-                )}.json`
+                icebearPath,
+                '..',
+                `src/copy/${code.replace('-', '_')}.json`
             );
             const translation = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
             setLocale(code, translation);
@@ -117,9 +110,7 @@ class LanguageStore {
             moment.locale(code);
             console.log(`Language changed to ${code}`);
         } catch (err) {
-            console.error(
-                `Failed switch language to: ${code} ${normalizeError(err)}`
-            );
+            console.error(`Failed switch language to: ${code} ${normalizeError(err)}`);
         }
     }
 

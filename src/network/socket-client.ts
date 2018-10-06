@@ -242,6 +242,7 @@ export default class SocketClient {
         });
 
         this.handleReconnectError = () => {
+            if (this.resetting) return;
             // HACK: backoff.duration() will increase attempt count, so we balance that
             this.socket.io.backoff.attempts--;
             this.reconnectTimer.countDown(this.socket.io.backoff.duration() / 1000);
@@ -491,6 +492,7 @@ export default class SocketClient {
      * Opens a new connection. (Or does nothing if already open)
      */
     open = () => {
+        if (this.resetting) return;
         this.socket.open();
     };
 
@@ -515,8 +517,8 @@ export default class SocketClient {
         setTimeout(this.close);
         const interval = setInterval(() => {
             if (this.state !== STATES.closed) return;
-            this.open();
             this.resetting = false;
+            this.socket.open();
             clearInterval(interval);
         }, 1000);
     };

@@ -386,20 +386,21 @@ export class ContactStore {
      * after this function returns contact.
      */
     getContact(usernameOrEmail: string, prefetchedData?): Contact {
+        const normalizedKeyword = Contact.normalizeSearchKeyword(usernameOrEmail);
         const existing =
-            this._contactMap[usernameOrEmail] ||
-            this._requestMap[usernameOrEmail] ||
-            this._cachedContacts[usernameOrEmail];
+            this._contactMap[normalizedKeyword] ||
+            this._requestMap[normalizedKeyword] ||
+            this._cachedContacts[normalizedKeyword];
         if (existing) return existing;
 
-        const c = new Contact(usernameOrEmail, prefetchedData);
+        const c = new Contact(normalizedKeyword, prefetchedData);
         // is deleted when contact is added to _contactMap only
         // see getContactAndSave
-        this._requestMap[usernameOrEmail] = c;
+        this._requestMap[normalizedKeyword] = c;
         when(
             () => !c.loading,
             () => {
-                delete this._requestMap[usernameOrEmail];
+                delete this._requestMap[normalizedKeyword];
                 if (c.notFound) return;
                 if (this._contactMap[c.username] || this._cachedContacts[c.username]) return;
                 this._cachedContacts[c.username] = c;

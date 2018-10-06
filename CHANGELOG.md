@@ -2,6 +2,94 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.25.6"></a>
+## [5.25.6](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.25.5...v5.25.6) (2018-10-05)
+
+
+
+<a name="5.25.5"></a>
+## [5.25.5](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.25.4...v5.25.5) (2018-10-05)
+
+
+
+<a name="5.25.4"></a>
+## [5.25.4](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.25.3...v5.25.4) (2018-09-28)
+
+
+### Bug Fixes
+
+* retry ([ca0118d](https://github.com/PeerioTechnologies/peerio-icebear/commit/ca0118d))
+* validator ([195e8bb](https://github.com/PeerioTechnologies/peerio-icebear/commit/195e8bb))
+
+
+
+<a name="5.25.3"></a>
+## [5.25.3](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.25.2...v5.25.3) (2018-09-27)
+
+
+### Bug Fixes
+
+* ignore socket.open if resetting ([1df1947](https://github.com/PeerioTechnologies/peerio-icebear/commit/1df1947))
+* reauth issue ([a677cc2](https://github.com/PeerioTechnologies/peerio-icebear/commit/a677cc2))
+* retry logic ([10c9af1](https://github.com/PeerioTechnologies/peerio-icebear/commit/10c9af1))
+
+
+
+<a name="5.25.2"></a>
+## [5.25.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.25.1...v5.25.2) (2018-09-24)
+
+
+### Bug Fixes
+
+* folder sorting ([b8714e0](https://github.com/PeerioTechnologies/peerio-icebear/commit/b8714e0))
+
+
+
+<a name="5.25.1"></a>
+## [5.25.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.25.0...v5.25.1) (2018-09-20)
+
+
+### Bug Fixes
+
+* File#deleteable ([cd55441](https://github.com/PeerioTechnologies/peerio-icebear/commit/cd55441))
+
+
+
+<a name="5.25.0"></a>
+# [5.25.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.24.7...v5.25.0) (2018-09-20)
+
+
+### Features
+
+* File#deleteable ([d944928](https://github.com/PeerioTechnologies/peerio-icebear/commit/d944928))
+
+
+
+<a name="5.24.7"></a>
+## [5.24.7](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.24.6...v5.24.7) (2018-09-20)
+
+
+
+<a name="5.24.6"></a>
+## [5.24.6](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.24.5...v5.24.6) (2018-09-19)
+
+
+### Bug Fixes
+
+* Sync contacts copy ([75eeb7a](https://github.com/PeerioTechnologies/peerio-icebear/commit/75eeb7a))
+
+
+
+<a name="5.24.5"></a>
+## [5.24.5](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.24.4...v5.24.5) (2018-09-19)
+
+
+### Bug Fixes
+
+* better username normalization and ignoring @ symbol at start ([b692cf4](https://github.com/PeerioTechnologies/peerio-icebear/commit/b692cf4))
+
+
+
 <a name="5.24.4"></a>
 ## [5.24.4](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.24.3...v5.24.4) (2018-09-18)
 

@@ -47,7 +47,7 @@ export default class Contact {
      * @param noAutoLoad - don't automatically call this.load() in constructor (needed for tests only)
      */
     constructor(username: string, prefetchedData?, noAutoLoad = false) {
-        this.username = username.toLowerCase();
+        this.username = Contact.normalizeSearchKeyword(username);
         if (getUser().username === this.username) this.isMe = true;
         this.usernameTag = `@${this.username}`;
         if (this.isMe) {
@@ -222,6 +222,14 @@ export default class Contact {
             Contact.smartRequestExecutor,
             Contact.lastTimerInterval
         );
+    }
+
+    static normalizeSearchKeyword(keyword: string): string {
+        let normalized = keyword.toLowerCase().trim();
+        if (normalized[0] === '@') {
+            normalized = normalized.substr(1);
+        }
+        return normalized;
     }
 
     static smartRequestExecutor() {

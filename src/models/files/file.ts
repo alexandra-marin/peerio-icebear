@@ -326,6 +326,11 @@ export default class File extends Keg<IFilePayload, IFileProps> {
         return !this.format;
     }
 
+    @computed
+    get deleteable() {
+        return !!this.db && (this.db.id === 'SELF' || this.fileOwner === getUser().username);
+    }
+
     get descriptorVersion() {
         return this.data.descriptorVersion;
     }

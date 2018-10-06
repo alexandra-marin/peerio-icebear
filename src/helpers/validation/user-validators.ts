@@ -104,7 +104,7 @@ function isValid(context: ValidationContext, name: string, subKey?: string) {
 }
 
 function isNonEmptyString(name: string) {
-    return Promise.resolve(name.length > 0);
+    return Promise.resolve(!!(name && name.length > 0));
 }
 
 function isValidLoginUsername(name: string) {

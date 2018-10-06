@@ -9,6 +9,11 @@ import serverSettings from '../models/server-settings';
 import { EventObject, EventProperties } from './types';
 import User from '../models/user/user';
 
+// Mixpanel accepts batch events but up to a maximum of 50 "messages". This term is not explained.
+// We are guessing here. Currently assuming that "message" corresponds to an entire "event".
+// Increment can be adjusted as we learn more.
+const MIXPANEL_BATCH_SIZE = 50;
+
 let userId: string;
 const userIdState = observable({
     locked: false
@@ -75,11 +80,11 @@ function convertEventPropertyCase(event: EventObject): EventProperties {
 let eventStore: EventObject[] = [];
 
 export async function send(eventObj: EventObject): Promise<void> {
-    if (!User.current) {
+    if (!User.current || !User.current.settings.loaded) {
         eventStore.push(eventObj);
         return;
     }
-    if (User.current && !User.current.settings.dataCollection) return;
+    if (!User.current.settings.dataCollection) return;
 
     try {
         const baseProperties = await getBaseProperties();
@@ -106,12 +111,8 @@ async function sendStored(): Promise<void> {
             ev.properties = { ...baseProperties, ...eventProperties };
         });
 
-        // Mixpanel accepts batch events but up to a maximum of 50 "messages". This term is not explained.
-        // We are guessing here. Currently assuming that "message" corresponds to an entire "event".
-        // Increment can be adjusted as we learn more.
-        const increment = 50;
-        for (let i = 0; i < eventStore.length; i += increment) {
-            const chunk = eventStore.slice(i, i + increment);
+        for (let i = 0; i < eventStore.length; i += MIXPANEL_BATCH_SIZE) {
+            const chunk = eventStore.slice(i, i + MIXPANEL_BATCH_SIZE);
             const data = bytesToB64(strToBytes(JSON.stringify(chunk)));
 
             await fetch(config.telemetry.baseUrl, {
@@ -130,10 +131,10 @@ async function sendStored(): Promise<void> {
 
 autorun(() => {
     if (
+        eventStore.length > 0 &&
         User.current &&
         User.current.settings.loaded &&
-        User.current.settings.dataCollection &&
-        eventStore.length > 0
+        User.current.settings.dataCollection
     ) {
         sendStored();
     }

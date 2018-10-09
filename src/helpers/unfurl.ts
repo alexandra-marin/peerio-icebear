@@ -19,7 +19,33 @@ export function getUrls(str: string): string[] {
     if (!str) return [];
     return str.match(urlRegex) || [];
 }
-export function getContentHeaders(url: string) {
+
+export const getContentHeaders = config.isMobile ? getContentHeadersXHR : getContentHeadersNode;
+
+let https; // Node module 'https', loaded when not on mobile.
+
+// XXX(dchest): only supports HTTPS.
+// Exported for unit testing, use getContentHeaders.
+export function getContentHeadersNode(url: string): Promise<HeaderDict> {
+    if (!https) https = require('https');
+    if (urlCache[url]) return Promise.resolve(urlCache[url]);
+    if (urlsInProgress[url]) return urlsInProgress[url];
+    const promise = new Promise<HeaderDict>((resolve, reject) => {
+        https
+            .get(url, response => {
+                const res = response.headers;
+                urlCache[url] = res;
+                response.resume();
+                resolve(res);
+            })
+            .on('error', reject);
+    }).finally(() => delete urlsInProgress[url]);
+    urlsInProgress[url] = promise;
+    return promise;
+}
+
+// Exported for unit testing, use getContentHeaders.
+export function getContentHeadersXHR(url: string): Promise<HeaderDict> {
     if (urlCache[url]) return Promise.resolve(urlCache[url]);
     if (urlsInProgress[url]) return urlsInProgress[url];
 

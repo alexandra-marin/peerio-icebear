@@ -1,4 +1,4 @@
-import { observable, action, when, IObservableArray } from 'mobx';
+import { observable, action, when, IObservableArray, runInAction } from 'mobx';
 import socket from '../../network/socket';
 import warnings from '../warnings';
 import { getChatStore } from '../../helpers/di-chat-store';
@@ -39,7 +39,7 @@ class ChatInviteStore {
         });
     }
     /**
-     * List of channel ids current user has been invited to.
+     * List of channel invites current user has received.
      */
     @observable.shallow received = [] as IObservableArray<ReceivedInvite>;
 
@@ -145,8 +145,9 @@ class ChatInviteStore {
     };
 
     updateInvites = () => {
-        return socket.send('/auth/kegs/channel/invites').then(
-            action(async (res: Array<RawReceivedInvite>) => {
+        return socket
+            .send('/auth/kegs/channel/invites')
+            .then(async (res: Array<RawReceivedInvite>) => {
                 const newReceivedInvites: ReceivedInvite[] = [];
                 for (const i of res) {
                     const chatHead = await this.getChatHead(i);
@@ -177,23 +178,24 @@ class ChatInviteStore {
                     Object.assign(inv, data);
                     newReceivedInvites.push(inv);
                 }
-                if (this.initialInvitesProcessed) {
-                    // Find new invites and notify about them.
-                    newReceivedInvites.forEach(invite => {
-                        for (let i = 0; i < this.received.length; i++) {
-                            if (this.received[i].kegDbId === invite.kegDbId) {
-                                return; // invite seen
+                runInAction(() => {
+                    if (this.initialInvitesProcessed) {
+                        // Find new invites and notify about them.
+                        newReceivedInvites.forEach(invite => {
+                            for (let i = 0; i < this.received.length; i++) {
+                                if (this.received[i].kegDbId === invite.kegDbId) {
+                                    return; // invite seen
+                                }
                             }
-                        }
-                        // invite not seen, notify.
-                        setTimeout(() => {
-                            getChatStore().onInvitedToChannel({ invite });
+                            // invite not seen, notify.
+                            setTimeout(() => {
+                                getChatStore().onInvitedToChannel({ invite });
+                            });
                         });
-                    });
-                }
-                this.received = observable.shallowArray(newReceivedInvites);
-            })
-        );
+                    }
+                    this.received.replace(newReceivedInvites);
+                });
+            });
     };
 
     updateLeftUsers = () => {

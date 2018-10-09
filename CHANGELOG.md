@@ -2,6 +2,36 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.25.8"></a>
+## [5.25.8](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.25.7...v5.25.8) (2018-10-06)
+
+
+### Bug Fixes
+
+* don't export sendStored ([180524f](https://github.com/PeerioTechnologies/peerio-icebear/commit/180524f))
+* make User.current observable ([6e8cbce](https://github.com/PeerioTechnologies/peerio-icebear/commit/6e8cbce))
+* observe User.current in telemetry main ([476ff01](https://github.com/PeerioTechnologies/peerio-icebear/commit/476ff01))
+* review ([151c0fe](https://github.com/PeerioTechnologies/peerio-icebear/commit/151c0fe))
+* sendStored export ([941a851](https://github.com/PeerioTechnologies/peerio-icebear/commit/941a851))
+* use cross-fetch so telemetry works universally... ([67683c7](https://github.com/PeerioTechnologies/peerio-icebear/commit/67683c7))
+
+
+
+<a name="5.25.7"></a>
+## [5.25.7](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.25.6...v5.25.7) (2018-10-06)
+
+
+
+<a name="5.25.6"></a>
+## [5.25.6](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.25.5...v5.25.6) (2018-10-05)
+
+
+
+<a name="5.25.5"></a>
+## [5.25.5](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.25.4...v5.25.5) (2018-10-05)
+
+
+
 <a name="5.25.4"></a>
 ## [5.25.4](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.25.3...v5.25.4) (2018-09-28)
 

@@ -153,7 +153,7 @@ export default new class {
          * Mixpanel base URL. base64 encoded tracking events get added to this.
          * @type {string}
          */
-        baseUrl: 'https://api.mixpanel.com/track/?data='
+        baseUrl: 'https://api.mixpanel.com/track/'
     };
 
     /**

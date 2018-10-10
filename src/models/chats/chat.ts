@@ -108,7 +108,7 @@ export default class Chat {
      */
     @observable.shallow limboMessages = [] as IObservableArray<Message>;
 
-    receipts: ObservableMap<ReadReceipt>;
+    receipts: ObservableMap<string, ReadReceipt>;
 
     // performance helper, to lookup messages by id and avoid duplicates
     _messageMap = {};

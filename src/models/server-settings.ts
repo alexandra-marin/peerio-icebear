@@ -14,7 +14,7 @@ class ServerSettings {
             connected => {
                 if (connected) this.loadSettings();
             },
-            true
+            { fireImmediately: true }
         );
     }
     /**

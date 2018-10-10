@@ -156,9 +156,8 @@ export default class User {
 
     /**
      * UI beacons
-     * @type {Map<beaconName: string, seen: bool>}
      */
-    @observable beacons = observable.shallowMap<boolean>();
+    @observable beacons = observable.shallowMap<string, boolean>();
     /**
 
     /**

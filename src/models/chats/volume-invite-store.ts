@@ -10,7 +10,7 @@ class VolumeInviteStore {
         });
     }
 
-    @observable left = observable.shallowMap<Array<{ username: string }>>();
+    @observable left = observable.shallowMap<string, Array<{ username: string }>>();
 
     updating = false;
     updateAgain = false;

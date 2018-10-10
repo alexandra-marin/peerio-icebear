@@ -1,4 +1,4 @@
-import { action, reaction, observable } from 'mobx';
+import { action, reaction, observable, keys } from 'mobx';
 import User from '../user/user';
 import tracker from '../update-tracker';
 import socket from '../../network/socket';
@@ -11,7 +11,7 @@ class ChatReceiptHandler {
     constructor(chat: Chat) {
         this.chat = chat;
         // receipts cache {username: ReadReceipt}
-        this.chat.receipts = observable.shallowMap<ReadReceipt>();
+        this.chat.receipts = observable.shallowMap<string, ReadReceipt>();
         tracker.subscribeToKegUpdates(chat.id, 'read_receipt', this.onDigestUpdate);
         this.onDigestUpdate();
         this._reactionsToDispose.push(
@@ -165,7 +165,7 @@ class ChatReceiptHandler {
     // todo: can be faster
     @action
     applyReceipts() {
-        const users = this.chat.receipts.keys();
+        const users = keys(this.chat.receipts);
 
         for (let i = 0; i < this.chat.messages.length; i++) {
             const msg = this.chat.messages[i];

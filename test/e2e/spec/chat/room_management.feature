@@ -73,6 +73,8 @@ Feature: Room management
         When  Cucumbot receives the invite
         And   Cucumbot rejects the invite
         Then  The invite sent is removed
+        # we need this to make sure contact is deleted from boot keg, previous step checks only invites
+        And   The Cucumbot is not a member of the room
         And   Cucumbot's invite is removed
         When  I invite Cucumbot to the room
         And   Cucumbot receives the invite

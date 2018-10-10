@@ -21,7 +21,7 @@ class FileUploader extends FileProcessor {
     ) {
         super(file, stream, nonceGenerator, 'upload');
         // amount of bytes to read and to send
-        this.file.progressMax = file.size;
+        this.file.progressMax = file.sizeWithOverhead;
         if (startFromChunk != null) {
             console.log(`Resuming upload. Starting with chunk ${startFromChunk}`);
             nonceGenerator.chunkId = startFromChunk;
@@ -135,7 +135,7 @@ class FileUploader extends FileProcessor {
                 this.chunksWaitingForResponse--;
                 // console.log(`chunk ${chunk.id} sent`);
                 if (this.stopped) return;
-                this.file.progress += chunk.buffer.length;
+                this.file.progress += chunk.buffer.byteLength;
                 this._tick();
             })
             .catch(this._error);

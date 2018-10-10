@@ -48,7 +48,9 @@ class ChatInviteStore {
      * key - kegDbId
      */
     @observable
-    sent = observable.shallowMap<string, Array<{ username: string; timestamp?: number }>>();
+    sent = observable.map<string, Array<{ username: string; timestamp?: number }>>(null, {
+        deep: false
+    });
 
     /**
      * List of users requested to leave channels. This is normally for internal icebear use.
@@ -56,13 +58,14 @@ class ChatInviteStore {
      * if current user is an admin of specific channel. Then icebear will remove an item from this list.
      * key - kegDbId
      */
-    @observable left = observable.shallowMap<string, Array<{ username: string }>>();
+    @observable left = observable.map<string, Array<{ username: string }>>(null, { deep: false });
 
     /**
      * List of users who rejected invites and are pending to be removed from boot keg.
      * key - kegDbId
      */
-    @observable rejected = observable.shallowMap<string, Array<{ username: string }>>();
+    @observable
+    rejected = observable.map<string, Array<{ username: string }>>(null, { deep: false });
 
     updating = false;
     updateAgain = false;

@@ -11,7 +11,7 @@ class ChatReceiptHandler {
     constructor(chat: Chat) {
         this.chat = chat;
         // receipts cache {username: ReadReceipt}
-        this.chat.receipts = observable.shallowMap<string, ReadReceipt>();
+        this.chat.receipts = observable.map<string, ReadReceipt>(null, { deep: false });
         tracker.subscribeToKegUpdates(chat.id, 'read_receipt', this.onDigestUpdate);
         this.onDigestUpdate();
         this._reactionsToDispose.push(
@@ -176,7 +176,7 @@ class ChatReceiptHandler {
                 if (+msg.id !== receipt.chatPosition) continue;
                 // receiptError is already calculated, signature error MIGHT already have been calculated
                 if (receipt.receiptError || receipt.signatureError) continue;
-                msg.receipts = msg.receipts || observable.shallowArray([]);
+                msg.receipts = msg.receipts || observable.array([], { deep: false });
                 msg.receipts.push({ username, receipt });
             }
         }

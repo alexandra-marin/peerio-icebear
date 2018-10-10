@@ -23,7 +23,7 @@ import {
 import AccountVersion from './account-version';
 import Settings from './settings';
 
-const currentUser = observable.shallowBox<User | null>(null);
+const currentUser = observable.box<User | null>(null, { deep: false });
 
 /**
  * Class represents application user, you have to create and instance and assign it to `User.current`
@@ -157,7 +157,7 @@ export default class User {
     /**
      * UI beacons
      */
-    @observable beacons = observable.shallowMap<string, boolean>();
+    @observable beacons = observable.map<string, boolean>(null, { deep: false });
     /**
 
     /**

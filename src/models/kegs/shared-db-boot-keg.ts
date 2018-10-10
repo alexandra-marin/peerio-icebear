@@ -314,10 +314,11 @@ class SharedDbBootKeg extends SyncedKeg<ISharedDbBootKegPayload, ISharedDbBootKe
         if (kegKeyObj) this.kegKey = kegKeyObj.key;
         this.kegKeyId = maxKeyId;
         // we extract participant list from the current key object
-        this.participants = observable.shallowArray(
+        this.participants = observable.array(
             Object.keys(data.encryptedKeys[maxKeyId].keys).map(username =>
                 getContactStore().getContactAndSave(username)
-            )
+            ),
+            { deep: false }
         );
     }
 

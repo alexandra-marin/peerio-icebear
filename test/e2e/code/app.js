@@ -173,7 +173,7 @@ export default class App {
         }
         // resetting mobx (to stop existing reactions)
         delete global.__mobxInstanceCount;
-        this.world.libs.mobx.extras.resetGlobalState();
+        this.world.libs.mobx._resetGlobalState();
 
         // deleting module references
         delete this.world.ice;

@@ -27,7 +27,7 @@ let https; // Node module 'https', loaded when not on mobile.
 // XXX(dchest): only supports HTTPS.
 // Exported for unit testing, use getContentHeaders.
 export function getContentHeadersNode(url: string): Promise<HeaderDict> {
-    if (!https) https = require('https');
+    if (!https) https = require('https'); // eslint-disable-line global-require
     if (urlCache[url]) return Promise.resolve(urlCache[url]);
     if (urlsInProgress[url]) return urlsInProgress[url];
     const promise = new Promise<HeaderDict>((resolve, reject) => {

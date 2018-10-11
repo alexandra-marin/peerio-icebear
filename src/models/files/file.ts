@@ -752,5 +752,16 @@ export default class File extends Keg<IFilePayload, IFileProps> {
         );
     }
 }
-Object.assign(File.prototype, uploadModule);
-Object.assign(File.prototype, downloadModule);
+
+function mixInProperly(proto, source) {
+    for (const key in source) {
+        Object.defineProperty(proto, key, {
+            value: source[key],
+            enumerable: false,
+            writable: true
+        });
+    }
+}
+
+mixInProperly(File.prototype, uploadModule);
+mixInProperly(File.prototype, downloadModule);

@@ -758,7 +758,7 @@ function mixInProperly(proto, source) {
         Object.defineProperty(proto, key, {
             value: source[key],
             enumerable: false,
-            writeable: true
+            writable: true
         });
     }
 }

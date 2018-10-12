@@ -1,7 +1,7 @@
 import Keg from './keg';
 import KegDb from './keg-db';
 
-import { observable, when } from 'mobx';
+import { observable, when, Lambda } from 'mobx';
 
 import * as util from '../../crypto/util';
 import { KeyPair, IBootKeg, IKegDb } from '../../defs/interfaces';
@@ -45,11 +45,11 @@ export default class BootKeg extends Keg<BootKegPayload> implements IBootKeg {
             // quick path
             return this.keys[keyId].key;
         }
-        let resolve;
+        let resolve: Lambda;
         const promise = new Promise(_resolve => {
             resolve = _resolve;
         });
-        const disposeReaction = when(() => this.keys[keyId], resolve);
+        const disposeReaction = when(() => !!this.keys[keyId], resolve);
         await promise.timeout(timeout).catch(() => {
             disposeReaction();
         });

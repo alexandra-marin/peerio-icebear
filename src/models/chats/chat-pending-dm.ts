@@ -29,7 +29,7 @@ class ChatPendingDM extends Chat {
 
     @computed
     get allParticipants() {
-        return observable.shallowArray([getContactStore().getContact(this.username)]);
+        return observable.array([getContactStore().getContact(this.username)], { deep: false });
     }
     @computed
     get otherParticipants() {

@@ -108,7 +108,7 @@ export default class Chat {
      */
     @observable.shallow limboMessages = [] as IObservableArray<Message>;
 
-    receipts: ObservableMap<ReadReceipt>;
+    receipts: ObservableMap<string, ReadReceipt>;
 
     // performance helper, to lookup messages by id and avoid duplicates
     _messageMap = {};
@@ -125,7 +125,8 @@ export default class Chat {
      */
     @computed
     get allParticipants(): IObservableArray<Contact> {
-        if (!this.db.boot || !this.db.boot.participants) return observable.shallowArray([]);
+        if (!this.db.boot || !this.db.boot.participants)
+            return observable.array([], { deep: false });
         return this.db.boot.participants.sort(this.compareContacts);
     }
 

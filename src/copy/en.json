@@ -307,6 +307,7 @@
   "title_chatNameRemoved": "Chat title removed",
   "title_chatPurposeRemoved": "Chat purpose removed",
   "title_today": "Today",
+  "title_yesterday": "Yesterday",
   "title_newMessages": "New messages",
   "error_messageSendFail": "Unable to send your message",
   "error_messageNotSent": "Message wasn't sent.",

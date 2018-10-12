@@ -1,7 +1,7 @@
 import * as cryptoUtil from '../../crypto/util';
 import * as publicCrypto from '../../crypto/public';
 import * as cryptoKeys from '../../crypto/keys';
-import { action, observable, when } from 'mobx';
+import { action, observable, when, Lambda } from 'mobx';
 import { getContactStore } from '../../helpers/di-contact-store';
 import SyncedKeg from '../kegs/synced-keg';
 import User from '../user/user';
@@ -203,7 +203,7 @@ class SharedDbBootKeg extends SyncedKeg<ISharedDbBootKegPayload, ISharedDbBootKe
             // quick path
             return this.keys[keyId].key;
         }
-        let resolve;
+        let resolve: Lambda;
         const promise = new Promise(_resolve => {
             resolve = _resolve;
         });
@@ -314,10 +314,11 @@ class SharedDbBootKeg extends SyncedKeg<ISharedDbBootKegPayload, ISharedDbBootKe
         if (kegKeyObj) this.kegKey = kegKeyObj.key;
         this.kegKeyId = maxKeyId;
         // we extract participant list from the current key object
-        this.participants = observable.shallowArray(
+        this.participants = observable.array(
             Object.keys(data.encryptedKeys[maxKeyId].keys).map(username =>
                 getContactStore().getContactAndSave(username)
-            )
+            ),
+            { deep: false }
         );
     }
 

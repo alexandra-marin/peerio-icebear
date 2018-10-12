@@ -1,3 +1,4 @@
+import relativeTimestamp from '../../helpers/time-formatting';
 import { serverErrorCodes, ServerErrorType } from '../../errors';
 import Keg from './../kegs/keg';
 import { observable, computed, action, IObservableArray } from 'mobx';
@@ -132,6 +133,15 @@ export default class File extends Keg<IFilePayload, IFileProps> {
     set uploadedAt(val) {
         this.data.uploadedAt = val;
     }
+
+    /**
+     * @type {number}
+     */
+    @computed
+    get uploadTimeFormatted() {
+        return relativeTimestamp(this.uploadedAt.valueOf());
+    }
+
     /**
      */
     get updatedAt() {
@@ -752,5 +762,16 @@ export default class File extends Keg<IFilePayload, IFileProps> {
         );
     }
 }
-Object.assign(File.prototype, uploadModule);
-Object.assign(File.prototype, downloadModule);
+
+function mixInProperly(proto, source) {
+    for (const key in source) {
+        Object.defineProperty(proto, key, {
+            value: source[key],
+            enumerable: false,
+            writable: true
+        });
+    }
+}
+
+mixInProperly(File.prototype, uploadModule);
+mixInProperly(File.prototype, downloadModule);

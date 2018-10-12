@@ -7,12 +7,12 @@ import { observable, IObservableArray, ObservableMap } from 'mobx';
  * @param keyProp - property of the items in the array that will be used as key for the map
  * @returns map object
  */
-export default function createMap<T>(
-    array: IObservableArray<T>,
+export default function createMap<TKey, TVal>(
+    array: IObservableArray<TVal>,
     keyProp: string
-): { map: { [key: string]: T }; observableMap: ObservableMap<T> } {
+): { map: { [key: string]: TVal }; observableMap: ObservableMap<TKey, TVal> } {
     const map = {};
-    const observableMap = observable.map<T>();
+    const observableMap = observable.map<TKey, TVal>();
 
     array.intercept(delta => {
         if (delta.type === 'splice') {

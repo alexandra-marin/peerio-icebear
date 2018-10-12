@@ -323,14 +323,15 @@ export default class Message extends Keg<MessagePayload, MessageProps> {
 
     serializeKegPayload() {
         this.format = this.latestFormat;
-        this.userMentions = observable.shallowArray(
+        this.userMentions = observable.array(
             this.text
                 ? _.uniq(
                       this.db.participants
                           .filter(u => this.text.match(u.mentionRegex))
                           .map(u => u.username)
                   )
-                : []
+                : [],
+            { deep: false }
         );
         const ret: MessagePayload = {
             text: this.text,

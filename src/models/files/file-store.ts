@@ -1,5 +1,5 @@
 import { serverErrorCodes } from '../../errors';
-import { observable, action, when, computed, ObservableMap } from 'mobx';
+import { observable, action, when, computed, ObservableMap, values } from 'mobx';
 import socket from '../../network/socket';
 import User from '../user/user';
 import File from './file';
@@ -44,7 +44,7 @@ export class FileStore extends FileStoreBase {
     }>;
     // currently gets updated by each chat.file-handler inside 'copyKegs()'
     // not very intuitive, but until we make a special file store for chats it works
-    chatFileMap = observable.map<ObservableMap<File>>();
+    chatFileMap = observable.map<string, ObservableMap<string, File>>();
 
     bulk: FileStoreBulk;
     migration: FileStoreMigration;
@@ -61,7 +61,7 @@ export class FileStore extends FileStoreBase {
         return (
             this.loaded &&
             getVolumeStore().loaded &&
-            FileStoreBase.instances.values().every(s => s.loaded)
+            values(FileStoreBase.instances).every(s => s.loaded)
         );
     }
 
@@ -108,7 +108,7 @@ export class FileStore extends FileStoreBase {
                             if (this.isMainStore) {
                                 await this.cacheDescriptor(d);
                             }
-                            for (const store of this.getFileStoreInstances().values()) {
+                            for (const store of values(this.getFileStoreInstances())) {
                                 await store.cacheDescriptor(d);
                             }
                         });
@@ -263,15 +263,15 @@ export class FileStore extends FileStoreBase {
         }
         // looking in volumes
         let found: File;
-        FileStoreBase.instances.values().every(store => {
+        values(FileStoreBase.instances).every(store => {
             found = store.getById(fileId);
             return !found;
         });
         if (found) return found;
 
         // looking in chats
-        this.chatFileMap.values().every(fileMap => {
-            fileMap.values().every(file => {
+        values(this.chatFileMap).every(fileMap => {
+            values(fileMap).every(file => {
                 if (file.id === fileId && file.loaded && !file.deleted && file.version > 1) {
                     found = file;
                     return false;
@@ -337,8 +337,7 @@ export class FileStore extends FileStoreBase {
         if (!fileMap) {
             return [];
         }
-        const ret = fileMap
-            .values()
+        const ret = values(fileMap)
             .filter(f => f.loaded && !f.deleted)
             .sort((f1, f2) => {
                 if (f1.kegCreatedAt > f2.kegCreatedAt) return -1;
@@ -353,7 +352,7 @@ export class FileStore extends FileStoreBase {
     /**
      * Returns file shared in specific chat. Loads it if needed.
      */
-    getByIdInChat(fileId: string, kegDbId: string) {
+    getByIdInChat(fileId: string, kegDbId: string): File {
         const fileMap = this.chatFileMap.get(kegDbId);
         if (!fileMap) {
             return this.loadChatFile(fileId, kegDbId);
@@ -399,7 +398,7 @@ export class FileStore extends FileStoreBase {
     setChatFile(kegDbId: string, file: File) {
         let fileMap = this.chatFileMap.get(kegDbId);
         if (!fileMap) {
-            fileMap = observable.map();
+            fileMap = observable.map<string, File>();
             this.chatFileMap.set(kegDbId, fileMap);
         }
         const existing = fileMap.get(file.fileId);

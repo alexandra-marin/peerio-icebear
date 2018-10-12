@@ -14,7 +14,7 @@ export default class Beacons extends SyncedKeg<IBeaconsPayload, {}> {
     user: User;
 
     serializeKegPayload(): IBeaconsPayload {
-        return this.user.beacons.toJS();
+        return this.user.beacons.toPOJO();
     }
 
     @action

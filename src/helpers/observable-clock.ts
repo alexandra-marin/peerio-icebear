@@ -1,4 +1,4 @@
-import { Atom } from 'mobx';
+import { createAtom, IAtom } from 'mobx';
 import config from '../config';
 
 /**
@@ -12,11 +12,11 @@ export default class Clock {
      * @param interval - clock update interval in seconds
      */
     constructor(interval: number) {
-        this._atom = new Atom('Clock', this._startTicking, this._stopTicking);
+        this._atom = createAtom('Clock', this._startTicking, this._stopTicking);
         this._interval = interval;
     }
 
-    _atom: Atom;
+    _atom: IAtom;
     _intervalHandle: any = null;
     _lastTickValue: number;
     _interval: number;

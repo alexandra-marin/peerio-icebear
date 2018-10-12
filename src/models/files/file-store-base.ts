@@ -26,7 +26,7 @@ class FileStoreBase {
     constructor(kegDb: IKegDb, root = null, id) {
         this.id = id; // something to identify this instance in runtime
         this._kegDb = kegDb;
-        const m = createMap<File>(this.files, 'fileId');
+        const m = createMap<string, File>(this.files, 'fileId');
         this.fileMap = m.map;
         this.fileMapObservable = m.observableMap;
         this.folderStore = new FileStoreFolders(this, root);
@@ -40,7 +40,7 @@ class FileStoreBase {
     id: string;
     _kegDb: IKegDb;
     fileMap: { [key: string]: File };
-    fileMapObservable: ObservableMap<File>;
+    fileMapObservable: ObservableMap<string, File>;
     folderStore: FileStoreFolders;
     isMainStore = false;
     // TODO: raw keg types
@@ -50,7 +50,7 @@ class FileStoreBase {
     onAfterUpdate?(dirty: boolean): void;
 
     // #region File store instances
-    static instances = observable.map<FileStoreBase>();
+    static instances = observable.map<string, FileStoreBase>();
     getFileStoreById(id) {
         if (id === 'main') return getFileStore();
         return FileStoreBase.instances.get(id);

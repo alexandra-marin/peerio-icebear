@@ -131,10 +131,10 @@ async function sendStored(): Promise<void> {
 
 autorun(() => {
     if (
-        eventStore.length > 0 &&
         User.current &&
         User.current.settings.loaded &&
-        User.current.settings.dataCollection
+        User.current.settings.dataCollection &&
+        eventStore.length > 0
     ) {
         sendStored();
     }

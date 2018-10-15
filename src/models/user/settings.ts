@@ -8,6 +8,7 @@ interface ISettingsPayload {
     messageNotifications: boolean;
     dataCollectionOptIn: boolean;
     subscribeToPromoEmails: boolean;
+    disableOnboardingEmails: boolean;
 }
 interface ISettingsProps {}
 
@@ -28,6 +29,7 @@ export default class Settings extends Keg<ISettingsPayload, ISettingsProps> {
     @observable messageNotifications = false;
     @observable dataCollection = false;
     @observable subscribeToPromoEmails = false;
+    @observable disableOnboardingEmails = false;
 
     @observable loaded = false;
 
@@ -37,7 +39,8 @@ export default class Settings extends Keg<ISettingsPayload, ISettingsProps> {
             contactRequestNotifications: this.contactRequestNotifications,
             messageNotifications: this.messageNotifications,
             dataCollectionOptIn: this.dataCollection,
-            subscribeToPromoEmails: this.subscribeToPromoEmails
+            subscribeToPromoEmails: this.subscribeToPromoEmails,
+            disableOnboardingEmails: this.disableOnboardingEmails
         };
     }
 
@@ -47,6 +50,7 @@ export default class Settings extends Keg<ISettingsPayload, ISettingsProps> {
         this.messageNotifications = data.messageNotifications;
         this.dataCollection = data.dataCollectionOptIn;
         this.subscribeToPromoEmails = data.subscribeToPromoEmails;
+        this.disableOnboardingEmails = data.disableOnboardingEmails;
         this.loaded = true;
     }
 }

@@ -209,11 +209,20 @@ export default class SocketClient {
             this.preauthenticated = false;
             this.authenticated = false;
             this.connected = false;
-            this.cancelAwaitingRequests();
-            // Reconnect?
-            if (this.mustReconnect) {
-                this.reconnect();
-            }
+
+            // timeout is needed because for some reason, if server sends a
+            // fatal error(user blacklisted for example) in response and
+            // immediately disconnects, socket io calls disconnect handler
+            // before passing error response to message handler. so request gets
+            // canceled with 'DisconnectedError' instead of error returned in
+            // the response.
+            setTimeout(() => {
+                this.cancelAwaitingRequests();
+                // Reconnect?
+                if (this.mustReconnect) {
+                    this.reconnect();
+                }
+            });
         });
 
         this.socket.on('pong', latency => {

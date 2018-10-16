@@ -6,7 +6,6 @@
 import io from 'socket.io-client/dist/socket.io';
 import { computed, observable } from 'mobx';
 import { ServerError, serverErrorCodes, DisconnectedError, NotAuthenticatedError } from '../errors';
-import Timer from '../helpers/observable-timer';
 import { getUser } from '../helpers/di-current-user';
 import TaskPacer from '../helpers/task-pacer';
 import config from '../config';
@@ -124,10 +123,6 @@ export default class SocketClient {
      * Observable. In case reconnection attempt failed, this property will reflect current attempt number.
      */
     @observable reconnectAttempt = 0;
-    /**
-     * Countdown to the next reconnect attempt.
-     */
-    reconnectTimer = new Timer();
     /**
      * Counter incremented with every request to be able to identify server responses.
      */
@@ -248,7 +243,6 @@ export default class SocketClient {
             console.log('Trying to reconnected.');
             this.open();
         }, this.reconnectTimeout);
-        this.reconnectTimer.countDown(this.reconnectTimeout / 1000);
     }
 
     private handleConnectError = () => {
@@ -504,21 +498,11 @@ export default class SocketClient {
     };
 
     /**
-     * Internal function to do what it says
-     */
-    resetReconnectTimer = () => {
-        if (this.connected) return;
-        this.reset();
-    };
-
-    /**
      * Closes connection and opens it again.
      */
     reset = () => {
         if (this.resetting) return;
         this.resetting = true;
-
-        this.reconnectTimer.stop();
 
         setTimeout(this.close);
         const interval = setInterval(() => {

@@ -16,6 +16,10 @@ interface ManagerExt extends SocketIOClient.Manager {
 }
 
 interface SocketExt extends SocketIOClient.Socket {
+    // We need access to these internals bcs socket.io thinks it can queue messages and send them right
+    // after reconnect. In our reality those messages are likely to need an authenticated connection.
+    sendBuffer: any[];
+    receiveBuffer: any[];
     io: ManagerExt;
     binary: (hasBinaryProps: boolean) => SocketExt;
 }
@@ -394,6 +398,11 @@ export default class SocketClient {
      * Rejects promises and clears all awaiting requests (in case of disconnect)
      */
     cancelAwaitingRequests() {
+        // Clear socket.io internal cache of requests.
+        this.socket.sendBuffer = [];
+        this.socket.receiveBuffer = [];
+
+        // Cancel our own requests.
         const err = new DisconnectedError();
         for (const id in this.awaitingRequests) {
             const req = this.awaitingRequests[id];

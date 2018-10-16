@@ -249,7 +249,7 @@ export default class SocketClient {
             `Scheduling reconnecting attempt ${this.reconnectAttempt} in ${this.reconnectTimeout}ms`
         );
         setTimeout(() => {
-            console.log('Trying to reconnected.');
+            console.log('Trying to reconnect.');
             this.open();
         }, this.reconnectTimeout);
     }

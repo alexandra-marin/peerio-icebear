@@ -58,6 +58,9 @@ class SyncedKeg<TPayload, TProps> extends Keg<TPayload, TProps> {
                 this.loaded = true;
                 return Promise.resolve();
             }
+            console.log(
+                `Loading synced keg ${this.id} ${this.collectionVersion} ${digest.maxUpdateId}`
+            );
             return this.reload();
         });
 

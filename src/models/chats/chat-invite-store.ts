@@ -9,6 +9,9 @@ import { getUser } from '../../helpers/di-current-user';
 import ChatHead from './chat-head';
 import SharedKegDb from '../../models/kegs/shared-keg-db';
 
+// @ts-ignore to support desktop declarations emit until monorepo
+import Bluebird from 'bluebird';
+
 interface RawReceivedInvite {
     chatHeadKeg: any; // TODO: raw keg types
     bootKeg: any;

@@ -10,6 +10,8 @@ import { t } from 'peerio-translator';
 import clientApp from '../client-app';
 import { getContactStore } from '../../helpers/di-contact-store';
 import ContactColors from './contact.colors';
+// @ts-ignore to support desktop declarations emit until monorepo
+import Bluebird from 'bluebird';
 
 const nullFingerprint = '00000-00000-00000-00000-00000-00000';
 

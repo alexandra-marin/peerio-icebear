@@ -12,7 +12,7 @@ import Contact from './contact';
 import { setContactStore } from '../../helpers/di-contact-store';
 import MyContacts from '../contacts/my-contacts';
 import Invites from '../contacts/invites';
-import { EventEmitter } from 'eventemitter3';
+import EventEmitter from 'eventemitter3';
 import warnings from '../warnings';
 import createMap from '../../helpers/dynamic-array-map';
 import { getFirstLetterUpperCase } from './../../helpers/string';

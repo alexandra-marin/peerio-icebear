@@ -172,9 +172,9 @@ export default class App {
             throw new Error('Failed to clear require cache');
         }
         // resetting mobx (to stop existing reactions)
-        delete global.__mobxInstanceCount;
         this.world.libs.mobx._resetGlobalState();
-
+        delete global.__mobxInstanceCount;
+        delete global.__mobxGlobals;
         // deleting module references
         delete this.world.ice;
         delete global.ice;

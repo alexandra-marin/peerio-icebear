@@ -78,6 +78,7 @@ export default {
     TERMS_TOP_DRAWER: 'Terms of Use Top Drawer',
     TEXT_INPUT: 'Text Input',
     TOGGLE_VISIBILITY: 'Toggle Visibility',
+    TOP_DRAWER: 'Top Drawer',
     TRUE: 'true',
     TXT: 'Txt',
     USERNAME: 'Username',

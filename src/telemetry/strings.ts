@@ -29,6 +29,7 @@ export default {
     CREATE_ACCOUNT: 'Create Account',
     DECLINE_TERMS: 'Decline Terms Of Use',
     DOWNLOAD: 'Download',
+    DOWNLOAD_CANCEL: 'Download Cancel',
     DOWNLOAD_CONFIRM: 'Download Confirm',
     DURATION: 'Duration',
     EMAIL: 'Email',

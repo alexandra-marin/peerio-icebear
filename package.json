@@ -32,10 +32,6 @@
     "prettier": "prettier '{src,test}/**/*.{js,ts}' --write",
     "opt-in-npm-install": "opt --in npm-install --exec \"node ./scripts/npm_install_if_changed.js\""
   },
-  "files": [
-    "src",
-    "test"
-  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/PeerioTechnologies/peerio-icebear.git"

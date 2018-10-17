@@ -8,6 +8,9 @@ import Contact from '../contacts/contact';
 import { observable, computed, IObservableArray } from 'mobx';
 import { IKegDb } from '../../defs/interfaces';
 
+// @ts-ignore to support desktop declarations emit until monorepo
+import Bluebird from 'bluebird';
+
 /**
  * Class for shared keg databases.
  * Model is not really created until boot keg is updated for the first time.

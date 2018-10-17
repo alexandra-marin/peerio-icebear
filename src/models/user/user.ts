@@ -23,6 +23,9 @@ import {
 import AccountVersion from './account-version';
 import Settings from './settings';
 
+// @ts-ignore to support desktop declarations emit until monorepo
+import Bluebird from 'bluebird';
+
 const currentUser = observable.box<User | null>(null, { deep: false });
 
 /**

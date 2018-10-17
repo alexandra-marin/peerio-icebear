@@ -33,6 +33,10 @@ import { ChatStore } from './chat-store';
 import Volume from '../volumes/volume';
 import File from '../files/file';
 import ReadReceipt from './read-receipt';
+
+// @ts-ignore to support desktop declarations emit until monorepo
+import Bluebird from 'bluebird';
+
 // to assign when sending a message and don't have an id yet
 let temporaryChatId = 0;
 function getTemporaryChatId() {

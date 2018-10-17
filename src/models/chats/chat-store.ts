@@ -14,7 +14,7 @@ import ChatStoreSpaces from './chat-store.spaces.js';
 import ChatStoreCache from './chat-store.cache.js';
 import socket from '../../network/socket';
 import tracker from '../update-tracker';
-import { EventEmitter } from 'eventemitter3';
+import EventEmitter from 'eventemitter3';
 import * as _ from 'lodash';
 import MyChats from '../chats/my-chats';
 import TinyDb from '../../db/tiny-db';

@@ -12,6 +12,8 @@ import TinyDb from '../../db/tiny-db';
 import { action } from 'mobx';
 import socket from '../../network/socket';
 import File from './file';
+// @ts-ignore to support desktop declarations emit until monorepo
+import Bluebird from 'bluebird';
 
 export function _getDlResumeParams(this: File, path) {
     return config.FileStream.getStat(path)

@@ -23,7 +23,10 @@ import {
 import AccountVersion from './account-version';
 import Settings from './settings';
 
-let currentUser: User;
+// @ts-ignore to support desktop declarations emit until monorepo
+import Bluebird from 'bluebird';
+
+const currentUser = observable.box<User | null>(null, { deep: false });
 
 /**
  * Class represents application user, you have to create and instance and assign it to `User.current`
@@ -156,9 +159,8 @@ export default class User {
 
     /**
      * UI beacons
-     * @type {Map<beaconName: string, seen: bool>}
      */
-    @observable beacons = observable.shallowMap<boolean>();
+    @observable beacons = observable.map<string, boolean>(null, { deep: false });
     /**
 
     /**
@@ -633,12 +635,12 @@ export default class User {
     /**
      * Currently authenticated user.
      */
-    static get current() {
-        return currentUser;
+    static get current(): User | null {
+        return currentUser.get();
     }
 
-    static set current(val) {
-        currentUser = val;
+    static set current(val: User | null) {
+        currentUser.set(val);
         currentUserHelper.setUser(val);
     }
 

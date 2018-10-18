@@ -1,4 +1,4 @@
-import { observable, action, when, IObservableArray } from 'mobx';
+import { observable, action, when, IObservableArray, runInAction } from 'mobx';
 import socket from '../../network/socket';
 import warnings from '../warnings';
 import { getChatStore } from '../../helpers/di-chat-store';
@@ -8,6 +8,9 @@ import User from '../user/user';
 import { getUser } from '../../helpers/di-current-user';
 import ChatHead from './chat-head';
 import SharedKegDb from '../../models/kegs/shared-keg-db';
+
+// @ts-ignore to support desktop declarations emit until monorepo
+import Bluebird from 'bluebird';
 
 interface RawReceivedInvite {
     chatHeadKeg: any; // TODO: raw keg types
@@ -39,7 +42,7 @@ class ChatInviteStore {
         });
     }
     /**
-     * List of channel ids current user has been invited to.
+     * List of channel invites current user has received.
      */
     @observable.shallow received = [] as IObservableArray<ReceivedInvite>;
 
@@ -47,7 +50,10 @@ class ChatInviteStore {
      * List of channel invites admins of current channel have sent.
      * key - kegDbId
      */
-    @observable sent = observable.shallowMap<Array<{ username: string; timestamp?: number }>>();
+    @observable
+    sent = observable.map<string, Array<{ username: string; timestamp?: number }>>(null, {
+        deep: false
+    });
 
     /**
      * List of users requested to leave channels. This is normally for internal icebear use.
@@ -55,13 +61,14 @@ class ChatInviteStore {
      * if current user is an admin of specific channel. Then icebear will remove an item from this list.
      * key - kegDbId
      */
-    @observable left = observable.shallowMap<Array<{ username: string }>>();
+    @observable left = observable.map<string, Array<{ username: string }>>(null, { deep: false });
 
     /**
      * List of users who rejected invites and are pending to be removed from boot keg.
      * key - kegDbId
      */
-    @observable rejected = observable.shallowMap<Array<{ username: string }>>();
+    @observable
+    rejected = observable.map<string, Array<{ username: string }>>(null, { deep: false });
 
     updating = false;
     updateAgain = false;
@@ -145,8 +152,9 @@ class ChatInviteStore {
     };
 
     updateInvites = () => {
-        return socket.send('/auth/kegs/channel/invites').then(
-            action(async (res: Array<RawReceivedInvite>) => {
+        return socket
+            .send('/auth/kegs/channel/invites')
+            .then(async (res: Array<RawReceivedInvite>) => {
                 const newReceivedInvites: ReceivedInvite[] = [];
                 for (const i of res) {
                     const chatHead = await this.getChatHead(i);
@@ -177,23 +185,24 @@ class ChatInviteStore {
                     Object.assign(inv, data);
                     newReceivedInvites.push(inv);
                 }
-                if (this.initialInvitesProcessed) {
-                    // Find new invites and notify about them.
-                    newReceivedInvites.forEach(invite => {
-                        for (let i = 0; i < this.received.length; i++) {
-                            if (this.received[i].kegDbId === invite.kegDbId) {
-                                return; // invite seen
+                runInAction(() => {
+                    if (this.initialInvitesProcessed) {
+                        // Find new invites and notify about them.
+                        newReceivedInvites.forEach(invite => {
+                            for (let i = 0; i < this.received.length; i++) {
+                                if (this.received[i].kegDbId === invite.kegDbId) {
+                                    return; // invite seen
+                                }
                             }
-                        }
-                        // invite not seen, notify.
-                        setTimeout(() => {
-                            getChatStore().onInvitedToChannel({ invite });
+                            // invite not seen, notify.
+                            setTimeout(() => {
+                                getChatStore().onInvitedToChannel({ invite });
+                            });
                         });
-                    });
-                }
-                this.received = observable.shallowArray(newReceivedInvites);
-            })
-        );
+                    }
+                    this.received.replace(newReceivedInvites);
+                });
+            });
     };
 
     updateLeftUsers = () => {

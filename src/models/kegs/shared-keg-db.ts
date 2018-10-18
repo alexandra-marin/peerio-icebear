@@ -8,6 +8,9 @@ import Contact from '../contacts/contact';
 import { observable, computed, IObservableArray } from 'mobx';
 import { IKegDb } from '../../defs/interfaces';
 
+// @ts-ignore to support desktop declarations emit until monorepo
+import Bluebird from 'bluebird';
+
 /**
  * Class for shared keg databases.
  * Model is not really created until boot keg is updated for the first time.
@@ -112,7 +115,7 @@ class SharedKegDb implements IKegDb {
      */
     @computed
     get participants(): IObservableArray<Contact> {
-        return (this.boot && this.boot.participants) || observable.shallowArray([]);
+        return (this.boot && this.boot.participants) || observable.array([], { deep: false });
     }
 
     /**
@@ -204,7 +207,9 @@ class SharedKegDb implements IKegDb {
                     // (rooms are all in new format from the start)
                     // Migrating boot keg
                     if (!boot.format) {
-                        boot.participants = observable.shallowArray(this._metaParticipants);
+                        boot.participants = observable.array(this._metaParticipants, {
+                            deep: false
+                        });
                         //     // prevent spamming server on bootkeg migration
                         //     return Promise.delay(Math.round(Math.random() * 3000 + 2000))
                         //         .then(() => Contact.ensureAllLoaded(boot.participants))

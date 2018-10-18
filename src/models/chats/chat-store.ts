@@ -3,7 +3,7 @@ import {
     action,
     computed,
     reaction,
-    autorunAsync,
+    autorun,
     isObservableArray,
     when,
     IObservableArray
@@ -14,7 +14,7 @@ import ChatStoreSpaces from './chat-store.spaces.js';
 import ChatStoreCache from './chat-store.cache.js';
 import socket from '../../network/socket';
 import tracker from '../update-tracker';
-import { EventEmitter } from 'eventemitter3';
+import EventEmitter from 'eventemitter3';
 import * as _ from 'lodash';
 import MyChats from '../chats/my-chats';
 import TinyDb from '../../db/tiny-db';
@@ -44,16 +44,25 @@ export class ChatStore {
             }
         );
 
-        autorunAsync(() => {
-            this.sortChats();
-        }, 500);
+        autorun(
+            () => {
+                this.sortChats();
+            },
+            { delay: 500 }
+        );
         socket.onceAuthenticated(async () => {
             this.unreadChatsAlwaysOnTop = !!(await TinyDb.user.getValue(
                 'pref_unreadChatsAlwaysOnTop'
             ));
-            autorunAsync(() => {
-                TinyDb.user.setValue('pref_unreadChatsAlwaysOnTop', this.unreadChatsAlwaysOnTop);
-            }, 2000);
+            autorun(
+                () => {
+                    TinyDb.user.setValue(
+                        'pref_unreadChatsAlwaysOnTop',
+                        this.unreadChatsAlwaysOnTop
+                    );
+                },
+                { delay: 2000 }
+            );
             await this.cache.open();
             this.loadAllChats();
         });
@@ -241,16 +250,16 @@ export class ChatStore {
                 if (b.unreadCount > 0 && a.unreadCount === 0) return 1;
             }
             // if both chats have unread message - then sort by update time
-            const amsg = a.mostRecentMessage;
-            const bmsg = b.mostRecentMessage;
-            if (!amsg) {
-                if (!bmsg) return 0;
+            const aMsg = a.mostRecentMessage;
+            const bMsg = b.mostRecentMessage;
+            if (!aMsg) {
+                if (!bMsg) return 0;
                 return 1;
-            } else if (!bmsg) {
+            } else if (!bMsg) {
                 return -1;
             }
-            if (amsg.timestamp > bmsg.timestamp) return -1;
-            if (amsg.timestamp < bmsg.timestamp) return 1;
+            if (aMsg.timestamp > bMsg.timestamp) return -1;
+            if (aMsg.timestamp < bMsg.timestamp) return 1;
             return 0;
         }
         // a is not fav, b is fav

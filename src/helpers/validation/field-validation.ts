@@ -132,6 +132,6 @@ export function addValidation(
             store[fValid] = valid;
             store[fieldValidationMessageText] = message;
         },
-        true
+        { fireImmediately: true }
     );
 }

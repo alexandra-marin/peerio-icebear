@@ -81,7 +81,7 @@ let eventStore: EventObject[] = [];
 
 export async function send(eventObj: EventObject): Promise<void> {
     const eventWithTime = eventObj;
-    eventWithTime.properties.eventTime = Date.now();
+    eventWithTime.properties.time = Date.now();
 
     if (!User.current || !User.current.settings.loaded) {
         eventStore.push(eventWithTime);

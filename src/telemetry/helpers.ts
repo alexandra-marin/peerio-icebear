@@ -3,7 +3,7 @@ const ERROR_MESSAGES = {
     error_usernameNotFound: 'Username Not Found',
     error_usernameNotAvailable: 'Name Already Exists',
     error_invalidEmail: 'Not Valid Email',
-    error_addressNotAvailable: 'Email Not Available',
+    error_addressTaken: 'Email Not Available',
     error_fieldRequired: 'Required',
     error_loginFailed: 'Sign-in Failed',
     error_invalidName: 'Not allowed',

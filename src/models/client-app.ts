@@ -93,7 +93,7 @@ export class ClientApp {
             type,
             submit: (code, trust) => {
                 this.active2FARequest = null;
-                submitCallback(code, trust);
+                return submitCallback(code, trust);
             },
             cancel: () => {
                 this.active2FARequest = null;

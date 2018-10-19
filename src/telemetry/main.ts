@@ -84,6 +84,7 @@ export async function send(eventObj: EventObject): Promise<void> {
     eventWithTime.properties.time = Date.now();
 
     if (!User.current || !User.current.settings.loaded) {
+        console.log(eventWithTime);
         eventStore.push(eventWithTime);
         return;
     }

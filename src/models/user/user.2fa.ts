@@ -116,7 +116,7 @@ export default function mixUser2faModule(this: User) {
     this._handle2faOnLogin = () => {
         return new Promise((resolve, reject) => {
             clientApp.create2FARequest('login', (code, trustDevice = false) => {
-                this._getDeviceId()
+                return this._getDeviceId()
                     .then(deviceId => {
                         // eslint-disable-next-line no-param-reassign
                         code = sanitizeCode(code);
@@ -135,7 +135,7 @@ export default function mixUser2faModule(this: User) {
                         });
                     })
                     .then(resolve)
-                    .catch(reject);
+                    .tapCatch(reject);
             });
         }) as Promise<void>;
     };
@@ -150,10 +150,10 @@ export default function mixUser2faModule(this: User) {
                     const req = {
                         [code.length === 6 ? 'TOTPCode' : 'backupCode']: code
                     };
-                    socket
+                    return socket
                         .send('/auth/2fa/verify', req)
                         .then(resolve)
-                        .catch(reject);
+                        .tapCatch(reject);
                 },
                 () => {
                     console.log('User cancelled protected 2fa operation:', type);

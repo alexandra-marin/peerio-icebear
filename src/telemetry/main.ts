@@ -80,22 +80,20 @@ function convertEventPropertyCase(event: EventObject): EventProperties {
 let eventStore: EventObject[] = [];
 
 export async function send(eventObj: EventObject): Promise<void> {
-    const eventWithTime = eventObj;
-    eventWithTime.properties.eventTime = Date.now();
+    eventObj.properties.eventTime = Date.now();
 
     if (!User.current || !User.current.settings.loaded) {
-        console.log(eventWithTime);
-        eventStore.push(eventWithTime);
+        eventStore.push(eventObj);
         return;
     }
     if (!User.current.settings.dataCollection) return;
 
     try {
         const baseProperties = await getBaseProperties();
-        const eventProperties = convertEventPropertyCase(eventWithTime);
-        eventWithTime.properties = { ...baseProperties, ...eventProperties };
+        const eventProperties = convertEventPropertyCase(eventObj);
+        eventObj.properties = { ...baseProperties, ...eventProperties };
 
-        const data = bytesToB64(strToBytes(JSON.stringify(eventWithTime)));
+        const data = bytesToB64(strToBytes(JSON.stringify(eventObj)));
         const url = `${config.telemetry.baseUrl}?data=${data}`;
 
         await fetch(url, {

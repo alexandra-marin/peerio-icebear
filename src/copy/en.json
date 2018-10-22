@@ -1014,5 +1014,8 @@
   "description_uploadFiles_beacon": "Upload your files to make secure cloud backups and to share with others.",
   "description_sync_beacon": "See who you already know on Peerio, sync your contacts.",
   "title_contacts_zeroState0": "Quickly and easily add your contacts",
-  "title_contacts_zeroState1": "Add your contacts to start chatting and sharing files securely."
+  "title_contacts_zeroState1": "Add your contacts to start chatting and sharing files securely.",
+  "title_insecureImagePreviewWarning": "Image is not displayed because the link is not secure (doesnʼt use https)",
+  "title_quit": "Quit Peerio",
+  "title_updateAndQuit": "Update & Quit Peerio"
 }

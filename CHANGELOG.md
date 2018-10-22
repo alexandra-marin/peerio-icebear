@@ -2,6 +2,59 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.27.1"></a>
+## [5.27.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.27.0...v5.27.1) (2018-10-19)
+
+
+
+<a name="5.27.0"></a>
+# [5.27.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.26.3...v5.27.0) (2018-10-19)
+
+
+### Features
+
+* 2fa callback returns promise ([0d6d2e1](https://github.com/PeerioTechnologies/peerio-icebear/commit/0d6d2e1))
+
+
+
+<a name="5.26.3"></a>
+## [5.26.3](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.26.2...v5.26.3) (2018-10-17)
+
+
+
+<a name="5.26.2"></a>
+## [5.26.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.26.1...v5.26.2) (2018-10-17)
+
+
+
+<a name="5.26.1"></a>
+## [5.26.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.26.0...v5.26.1) (2018-10-17)
+
+
+
+<a name="5.26.0"></a>
+# [5.26.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.25.8...v5.26.0) (2018-10-17)
+
+
+### Bug Fixes
+
+* **chat-invite-store:** async action ([6517a99](https://github.com/PeerioTechnologies/peerio-icebear/commit/6517a99))
+* cancel request and reconnect in setTimeout ([903510f](https://github.com/PeerioTechnologies/peerio-icebear/commit/903510f))
+* clear socket.io buffers ([1a03d7c](https://github.com/PeerioTechnologies/peerio-icebear/commit/1a03d7c))
+* imports ([1535440](https://github.com/PeerioTechnologies/peerio-icebear/commit/1535440))
+* make mixin not create enumerable properties on the prototype [ch14573] ([e4c8c03](https://github.com/PeerioTechnologies/peerio-icebear/commit/e4c8c03))
+* more deprecated mobx api ([94e8856](https://github.com/PeerioTechnologies/peerio-icebear/commit/94e8856))
+* tests ([00fea59](https://github.com/PeerioTechnologies/peerio-icebear/commit/00fea59))
+* tests should wait for user to be removed from boot keg ([ee72b4c](https://github.com/PeerioTechnologies/peerio-icebear/commit/ee72b4c))
+* upload progress ([40486ee](https://github.com/PeerioTechnologies/peerio-icebear/commit/40486ee))
+
+
+### Features
+
+* add disable onboarding emails flag to user settings ([9dbdfa6](https://github.com/PeerioTechnologies/peerio-icebear/commit/9dbdfa6))
+
+
+
 <a name="5.25.8"></a>
 ## [5.25.8](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.25.7...v5.25.8) (2018-10-06)
 

@@ -245,7 +245,6 @@ export default class SocketClient {
     }
 
     private reconnect() {
-        this.reconnectAttempt++;
         console.warn(
             `Scheduling reconnecting attempt ${this.reconnectAttempt} in ${this.reconnectTimeout}ms`
         );
@@ -253,6 +252,7 @@ export default class SocketClient {
             console.log('Trying to reconnect.');
             this.open();
         }, this.reconnectTimeout);
+        this.reconnectAttempt++;
     }
 
     private handleConnectError = () => {

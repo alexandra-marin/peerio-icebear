@@ -199,6 +199,7 @@ export default class SocketClient {
 
         this.socket.on('connect', () => {
             console.log('\ud83d\udc9a Socket connected.');
+            this.clearInternalBuffers();
             this.configureDebugLogger();
             this.reconnectAttempt = 0;
             this.connected = true;
@@ -217,6 +218,7 @@ export default class SocketClient {
             // canceled with 'DisconnectedError' instead of error returned in
             // the response.
             setTimeout(() => {
+                this.clearInternalBuffers();
                 this.cancelAwaitingRequests();
                 // Reconnect?
                 if (this.mustReconnect && reason !== 'io server disconnect') {
@@ -399,13 +401,17 @@ export default class SocketClient {
     }
 
     /**
-     * Rejects promises and clears all awaiting requests (in case of disconnect)
+     *  Clear socket.io internal cache of requests.
      */
-    cancelAwaitingRequests() {
-        // Clear socket.io internal cache of requests.
+    private clearInternalBuffers() {
         this.socket.sendBuffer = [];
         this.socket.receiveBuffer = [];
+    }
 
+    /**
+     * Rejects promises and clears all awaiting requests (in case of disconnect)
+     */
+    private cancelAwaitingRequests() {
         // Cancel our own requests.
         const err = new DisconnectedError();
         for (const id in this.awaitingRequests) {

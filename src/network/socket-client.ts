@@ -230,6 +230,7 @@ export default class SocketClient {
         });
 
         this.socket.on('connect_error', this.handleConnectError);
+        this.socket.on('connect_timeout', this.handleConnectError);
         this.socket.on('error', this.handleConnectError);
 
         this.socket.open();

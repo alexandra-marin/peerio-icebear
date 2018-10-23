@@ -204,7 +204,7 @@ export default class SocketClient {
             this.connected = true;
         });
 
-        this.socket.on('disconnect', () => {
+        this.socket.on('disconnect', reason => {
             console.log('\ud83d\udc94 Socket disconnected.');
             this.preauthenticated = false;
             this.authenticated = false;
@@ -219,7 +219,7 @@ export default class SocketClient {
             setTimeout(() => {
                 this.cancelAwaitingRequests();
                 // Reconnect?
-                if (this.mustReconnect) {
+                if (this.mustReconnect && reason !== 'io server disconnect') {
                     this.reconnect();
                 }
             });

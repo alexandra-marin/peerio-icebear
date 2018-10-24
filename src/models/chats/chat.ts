@@ -687,7 +687,7 @@ export default class Chat {
      * @param files - An array of file ids
      */
     @action
-    sendRichTextMessage(richText: {}, legacyText: string, files?: string[]) {
+    sendRichTextMessage(richText: unknown, legacyText: string, files?: string[]) {
         const m = new Message(this.db);
         m.files = files;
         m.richText = richText;

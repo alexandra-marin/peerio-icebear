@@ -1,4 +1,4 @@
-import { observable, action, reaction, computed, IObservableArray } from 'mobx';
+import { observable, action, reaction, computed, IObservableArray, ObservableMap } from 'mobx';
 import tracker from '../update-tracker';
 import FileFolder from './file-folder';
 import FileFoldersKeg from './file-folders-keg';
@@ -24,7 +24,7 @@ class FileStoreFolders {
                 if (deleted) this.currentFolder = this.root;
             }
         );
-        const map = createMap(this.folders, 'id');
+        const map = createMap<string, FileFolder>(this.folders, 'id');
         this.foldersMap = map.observableMap;
     }
 
@@ -34,12 +34,12 @@ class FileStoreFolders {
     // flat folders array, every other folder array is computed from this one
     @observable.shallow folders = [] as IObservableArray<FileFolder>;
     // will update automatically when folders array changes
-    @observable foldersMap;
+    @observable foldersMap: ObservableMap<string, FileFolder>;
 
     @observable loaded = false;
-    @observable keg = null;
+    @observable keg: FileFoldersKeg | null = null;
 
-    @observable currentFolder;
+    @observable currentFolder: FileFolder;
 
     getById(id) {
         if (id && id.startsWith('volume:') && this.root.isShared) {
@@ -59,7 +59,7 @@ class FileStoreFolders {
     }
 
     // saves folder structure to keg
-    save() {
+    save(): Promise<void> {
         return retryUntilSuccess(
             () =>
                 this.keg.save(

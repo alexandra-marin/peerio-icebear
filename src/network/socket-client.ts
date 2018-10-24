@@ -231,9 +231,18 @@ export default class SocketClient {
             this.latency = latency;
         });
 
-        this.socket.on('connect_error', this.handleConnectError);
-        this.socket.on('connect_timeout', this.handleConnectError);
-        this.socket.on('error', this.handleConnectError);
+        this.socket.on('connect_error', err => {
+            console.error('Connect error', err);
+            this.handleConnectError();
+        });
+        this.socket.on('connect_timeout', timeout => {
+            console.error('Connect timeout', timeout);
+            this.handleConnectError();
+        });
+        this.socket.on('error', err => {
+            console.error('Socket error', err);
+            this.handleConnectError();
+        });
 
         this.socket.open();
 

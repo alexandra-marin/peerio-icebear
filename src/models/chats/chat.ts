@@ -284,10 +284,9 @@ export default class Chat {
      * Observable, because `this.name` relies on it
      */
     @observable.ref chatHead: ChatHead;
-    _messageHandler = null;
-    _receiptHandler = null;
-    _fileHandler = null;
-    _headHandler = null;
+    _messageHandler: ChatMessageHandler | null = null;
+    _receiptHandler: ChatReceiptHandler | null = null;
+    _fileHandler: ChatFileHandler | null = null;
 
     _addMessageQueue = new TaskQueue(1, config.chat.decryptQueueThrottle || 0);
 
@@ -993,7 +992,7 @@ export default class Chat {
         if (!this.messages.length) return;
         if (!clientApp.isFocused || !clientApp.isInChatsView || !this.active) return;
 
-        this._receiptHandler.sendReceipt(+this.messages[this.messages.length - 1].id);
+        this._receiptHandler.sendReceipt(this.messages[this.messages.length - 1].id);
     }
 
     /**
@@ -1233,7 +1232,6 @@ export default class Chat {
             this._reactionsToDispose.forEach(d => d());
             if (this._messageHandler) this._messageHandler.dispose();
             if (this._receiptHandler) this._receiptHandler.dispose();
-            if (this._headHandler) this._headHandler.dispose();
         } catch (err) {
             console.error(err);
         }

@@ -80,7 +80,7 @@ function convertEventPropertyCase(event: EventObject): EventProperties {
 let eventStore: EventObject[] = [];
 
 export async function send(eventObj: EventObject): Promise<void> {
-    eventObj.properties.eventTime = Date.now();
+    eventObj.properties.time = Date.now();
 
     if (!User.current || !User.current.settings.loaded) {
         eventStore.push(eventObj);

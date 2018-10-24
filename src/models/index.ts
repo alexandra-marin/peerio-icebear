@@ -24,3 +24,6 @@ export { Quota };
 
 import Volume from './volumes/volume';
 export { Volume };
+
+import ReadReceipt from './chats/read-receipt';
+export { ReadReceipt };

@@ -524,6 +524,7 @@ export default class SocketClient {
         const interval = setInterval(() => {
             if (this.state !== STATES.closed) return;
             this.resetting = false;
+            this.mustReconnect = true;
             this.socket.open();
             clearInterval(interval);
         }, 1000);

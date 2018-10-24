@@ -40,7 +40,7 @@ export default {
 export { default as socket } from './network/socket';
 export { default as User } from './models/user/user';
 export { default as PhraseDictionary } from './models/phrase-dictionary';
-export { default as config } from './config';
+export { default as config, Config } from './config';
 export { default as contactStore } from './models/contacts/contact-store';
 export { default as tofuStore } from './models/contacts/tofu-store';
 export { default as chatStore } from './models/chats/chat-store';

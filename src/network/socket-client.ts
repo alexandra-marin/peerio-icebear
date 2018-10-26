@@ -199,12 +199,13 @@ export default class SocketClient {
 
         this.socket.on('connect', () => {
             console.log('\ud83d\udc9a Socket connected.');
+            this.clearInternalBuffers();
             this.configureDebugLogger();
             this.reconnectAttempt = 0;
             this.connected = true;
         });
 
-        this.socket.on('disconnect', () => {
+        this.socket.on('disconnect', reason => {
             console.log('\ud83d\udc94 Socket disconnected.');
             this.preauthenticated = false;
             this.authenticated = false;
@@ -217,9 +218,10 @@ export default class SocketClient {
             // canceled with 'DisconnectedError' instead of error returned in
             // the response.
             setTimeout(() => {
+                this.clearInternalBuffers();
                 this.cancelAwaitingRequests();
                 // Reconnect?
-                if (this.mustReconnect) {
+                if (this.mustReconnect && reason !== 'io server disconnect') {
                     this.reconnect();
                 }
             });
@@ -229,8 +231,18 @@ export default class SocketClient {
             this.latency = latency;
         });
 
-        this.socket.on('connect_error', this.handleConnectError);
-        this.socket.on('error', this.handleConnectError);
+        this.socket.on('connect_error', err => {
+            console.error('Connect error', err);
+            this.handleConnectError();
+        });
+        this.socket.on('connect_timeout', timeout => {
+            console.error('Connect timeout', timeout);
+            this.handleConnectError();
+        });
+        this.socket.on('error', err => {
+            console.error('Socket error', err);
+            this.handleConnectError();
+        });
 
         this.socket.open();
 
@@ -244,7 +256,6 @@ export default class SocketClient {
     }
 
     private reconnect() {
-        this.reconnectAttempt++;
         console.warn(
             `Scheduling reconnecting attempt ${this.reconnectAttempt} in ${this.reconnectTimeout}ms`
         );
@@ -252,6 +263,7 @@ export default class SocketClient {
             console.log('Trying to reconnect.');
             this.open();
         }, this.reconnectTimeout);
+        this.reconnectAttempt++;
     }
 
     private handleConnectError = () => {
@@ -398,13 +410,17 @@ export default class SocketClient {
     }
 
     /**
-     * Rejects promises and clears all awaiting requests (in case of disconnect)
+     *  Clear socket.io internal cache of requests.
      */
-    cancelAwaitingRequests() {
-        // Clear socket.io internal cache of requests.
+    private clearInternalBuffers() {
         this.socket.sendBuffer = [];
         this.socket.receiveBuffer = [];
+    }
 
+    /**
+     * Rejects promises and clears all awaiting requests (in case of disconnect)
+     */
+    private cancelAwaitingRequests() {
         // Cancel our own requests.
         const err = new DisconnectedError();
         for (const id in this.awaitingRequests) {
@@ -517,6 +533,7 @@ export default class SocketClient {
         const interval = setInterval(() => {
             if (this.state !== STATES.closed) return;
             this.resetting = false;
+            this.mustReconnect = true;
             this.socket.open();
             clearInterval(interval);
         }, 1000);

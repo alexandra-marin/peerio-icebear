@@ -92,6 +92,7 @@ export default {
     USERNAME: 'Username',
     VIA_SYNC: 'Via Sync',
     VIEW_LINK: 'View Link',
+    WELCOME_BACK: 'Welcome Back',
     WELCOME_SCREEN: 'Welcome Screen',
     WELCOME_BACK_SCREEN: 'Welcome Back Screen',
     WHERE_ACCOUNT_KEY: 'Where to find Account Key'

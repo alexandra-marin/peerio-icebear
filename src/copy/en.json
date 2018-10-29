@@ -780,7 +780,7 @@
   "title_confirmChannelDelete": "Are you sure you want to delete this Room?",
   "title_actionIrreversible": "This action is irreversible.",
   "title_confirmChannelLeave": "Are you sure you want to leave this Room?",
-  "title_confirmChannelLeaveDescription": "You will lose access to files you have received here and will need a new invitation to enter this room again.",
+  "title_confirmChannelLeaveDescription": "You will lose access to files you have received here and will need a new invitation to rejoin this.",
   "error_volumeLeave": "Unable to leave Shared Folder.",
   "error_channelLeave": "Unable to leave Room.",
   "error_channelDelete": "Unable to delete Room.",

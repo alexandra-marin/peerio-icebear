@@ -7,6 +7,7 @@ import { getUser } from '../../helpers/di-current-user';
 import * as cryptoUtil from '../../crypto/util';
 import FileStoreBase from './file-store-base';
 import File from './file';
+import Volume from '../volumes/volume';
 
 function isLegacyFilePredicate(f: File) {
     return !!(f && f.isLegacy);
@@ -56,7 +57,7 @@ export default class FileFolder {
     // to let systems know that this instance is no good anymore
     @observable isDeleted: boolean;
 
-    @observable convertingToVolume = false;
+    @observable convertingToVolume?: Volume = null;
 
     get root() {
         return this.store.folderStore.root;

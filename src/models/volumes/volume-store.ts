@@ -142,12 +142,12 @@ export class VolumeStore {
         if (folder.store.id !== 'main') throw new Error('Can only share local folders');
         return this.shareQueue.addTask(async () => {
             const newFolder = await this.createVolume(participants, folder.name);
-            folder.convertingToVolume = true;
-            newFolder.convertingFromFolder = true;
+            folder.convertingToVolume = newFolder;
+            newFolder.convertingFromFolder = folder;
             await newFolder.attach(folder, false, true);
             folder.progress = newFolder.progress = folder.progressMax = newFolder.progressMax = 0;
-            folder.convertingToVolume = false;
-            newFolder.convertingFromFolder = false;
+            folder.convertingToVolume = null;
+            newFolder.convertingFromFolder = null;
             return Promise.resolve();
         });
     }

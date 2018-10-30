@@ -359,7 +359,7 @@
   "title_convertingToShared": "Converting to shared folder",
   "title_convertingFolderNameToShared": "Converting {folderName} to shared folder",
   "title_filesInQueue": "Files in queue for sharing",
-  "title_filesLeftCount": "files left",
+  "title_filesLeftCount": "{count} files left",
   "title_sharingCount": "Sharing {count} files",
   "title_sharingFiles": "Sharing files",
   "title_sharingCountInFolder": "Sharing {count} files in {name}",

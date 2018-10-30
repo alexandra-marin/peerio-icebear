@@ -73,8 +73,8 @@ export default class User {
     loadProfile: () => void;
     loadQuota: () => void;
     loadBeacons: () => void;
-    saveProfile: () => Promise<void>;
-    saveBeacons: () => Promise<void>;
+    saveProfile: () => Bluebird<void>;
+    saveBeacons: () => Bluebird<void>;
     resendEmailConfirmation: (email: string) => Promise<void>;
     removeEmail: (email: string) => Promise<void>;
     addEmail: (email: string) => void;

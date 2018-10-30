@@ -34,6 +34,10 @@ export default class FileFolder {
         }
     }
 
+    static kegUpdatedComparer = function(f1: File, f2: File) {
+        return f2.kegUpdatedAt - f1.kegUpdatedAt;
+    };
+
     isShared: boolean;
     // TODO: this is for  compatibility with File, to be able to process them in the same list
     isLegacy = false;
@@ -157,7 +161,7 @@ export default class FileFolder {
 
     @computed
     get filesSortedByDate() {
-        return this.files.sort((f1, f2) => f2.uploadedAt.valueOf() - f1.uploadedAt.valueOf());
+        return this.files.sort(FileFolder.kegUpdatedComparer);
     }
 
     @computed

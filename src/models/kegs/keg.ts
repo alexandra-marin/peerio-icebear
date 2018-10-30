@@ -143,6 +143,10 @@ export default class Keg<TPayload, TProps extends {} = {}> {
     afterLoad?: () => void;
     onLoadedFromKeg?: (keg: unknown) => void;
 
+    // something to resolve consecutive saveToServer() calls,
+    // when they're too close, this.version doesn't manage to get updated by the time second saveToServer serializes
+    // and it leads to false optimistic concurrency errors
+    lastSavingVersion = 0;
     /**
      * Keg format version, client tracks kegs structure changes with this property
      */
@@ -287,7 +291,8 @@ export default class Keg<TPayload, TProps extends {} = {}> {
             console.error('Failed preparing keg to save.', err);
             return Promise.reject(err);
         }
-        lastVersion = this.version; // eslint-disable-line prefer-const
+        lastVersion = Math.max(this.lastSavingVersion, this.version); // eslint-disable-line prefer-const
+        this.lastSavingVersion = lastVersion + 1;
         return signingPromise
             .then(() =>
                 socket.send(

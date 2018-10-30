@@ -219,11 +219,14 @@ export default class Keg<TPayload, TProps extends {} = {}> {
         if (this.loading) {
             console.warn(`Keg ${this.id} ${this.type} is trying to save while already loading.`);
         }
-        if (this.saving) {
-            return asPromise(this, 'saving', false).then(() => this.saveToServer());
+        if (this.saving && !this.id) {
+            // this keg is in the process of obtaining an id, save will be inevitably called later
+            return asPromise(this, 'saving', false);
         }
         this.saving = true;
-        if (this.id) return this.internalSave().finally(this.resetSavingState);
+        if (this.id) {
+            return this.internalSave().finally(this.resetSavingState);
+        }
 
         return socket
             .send(

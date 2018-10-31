@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.27.6"></a>
+## [5.27.6](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.27.5...v5.27.6) (2018-10-31)
+
+
+### Bug Fixes
+
+* 2fa req returns promise ([63b6c79](https://github.com/PeerioTechnologies/peerio-icebear/commit/63b6c79))
+
+
+
 <a name="5.27.5"></a>
 ## [5.27.5](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.27.4...v5.27.5) (2018-10-26)
 

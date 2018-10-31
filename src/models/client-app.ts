@@ -84,7 +84,7 @@ export class ClientApp {
      */
     create2FARequest(
         type: 'login' | 'backupCodes' | 'disable',
-        submitCallback: (code: string, trust?: boolean) => void,
+        submitCallback: (code: string, trust?: boolean) => Promise<void>,
         cancelCallback?: () => void
     ) {
         // deliberately overwriting existing request

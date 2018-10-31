@@ -114,7 +114,7 @@ export default function mixUser2faModule(this: User) {
      * to perform 2fa.
      */
     this._handle2faOnLogin = () => {
-        return new Promise((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             clientApp.create2FARequest('login', (code, trustDevice = false) => {
                 return this._getDeviceId()
                     .then(deviceId => {
@@ -135,9 +135,9 @@ export default function mixUser2faModule(this: User) {
                         });
                     })
                     .then(resolve)
-                    .tapCatch(reject);
+                    .tapCatch(reject) as Promise<void>;
             });
-        }) as Promise<void>;
+        });
     };
 
     function verifyProtectedAction(type) {
@@ -153,7 +153,7 @@ export default function mixUser2faModule(this: User) {
                     return socket
                         .send('/auth/2fa/verify', req)
                         .then(resolve)
-                        .tapCatch(reject);
+                        .tapCatch(reject) as Promise<void>;
                 },
                 () => {
                     console.log('User cancelled protected 2fa operation:', type);

@@ -152,6 +152,8 @@ export default class Keg<TPayload, TProps extends {} = {}> {
      */
     @observable format = 0;
 
+    @observable hidden = false;
+
     /**
      * null when signature has not been verified yet (it's async) or it will never be because this keg is not supposed
      * to be signed.
@@ -306,7 +308,8 @@ export default class Keg<TPayload, TProps extends {} = {}> {
                             payload: this.plaintext ? payload : payload.buffer,
                             props,
                             version: lastVersion + 1,
-                            format: this.format
+                            format: this.format,
+                            hidden: this.hidden
                         }
                     },
                     true

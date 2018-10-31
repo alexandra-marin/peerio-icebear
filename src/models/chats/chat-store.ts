@@ -324,7 +324,7 @@ export class ChatStore {
         this.chats.push(c);
         c.added = true;
         // console.log('Added chat ', c.id);
-        if (this.myChats.hidden.includes(c.id)) c.unhide();
+        if (this.myChats.hiddenChats.includes(c.id)) c.unhide();
         c.loadMetadata()
             .then(() => c.loadMostRecentMessage())
             .then(() => this.pending.onChatAdded(c));
@@ -352,7 +352,7 @@ export class ChatStore {
         });
         setTimeout(() => {
             // hiding all hidden chats
-            this.myChats.hidden.forEach(id => {
+            this.myChats.hiddenChats.forEach(id => {
                 const chat = this.chatMap[id];
                 if (chat) chat.hide();
             });

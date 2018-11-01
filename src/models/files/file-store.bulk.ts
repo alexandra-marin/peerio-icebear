@@ -105,7 +105,7 @@ class FileStoreBulk {
     }
 
     @action.bound
-    moveOne(item: File | FileFolder, folder: FileFolder, bulk: boolean) {
+    moveOne(item: File | FileFolder, folder: FileFolder, bulk?: boolean) {
         item.selected = false;
         if (item.folderId === folder.id) return;
         if (item.isShared) return;
@@ -150,7 +150,7 @@ class FileStoreBulk {
 
     /** Download the given `item` to the destination `path`. */
     @action.bound
-    async downloadOne(item: File | FileFolder, path: string, suppressSnackbar: boolean) {
+    async downloadOne(item: File | FileFolder, path: string, suppressSnackbar?: boolean) {
         item.selected = false;
         // TODO: maybe run in parallel?
         if (item.isFolder === true) {

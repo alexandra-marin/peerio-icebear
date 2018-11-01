@@ -80,7 +80,7 @@ export interface InvitedContact {
  */
 export interface TwoFARequest {
     type: 'login' | 'backupCodes' | 'disable';
-    submit: (totpCode: string, trustThisDevice?: boolean) => void;
+    submit: (totpCode: string, trustThisDevice?: boolean) => Promise<void>;
     cancel: () => void;
 }
 

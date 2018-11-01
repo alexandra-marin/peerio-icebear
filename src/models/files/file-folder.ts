@@ -373,7 +373,7 @@ export default class FileFolder {
         return dst.store.folderStore.save().return(folderIdMap);
     }
     // creates new child folder
-    createFolder(name: string, id: string, skipSave = false) {
+    createFolder(name: string, id?: string, skipSave = false) {
         if (this.findFolderByName(name)) {
             warnings.addSevere('error_folderAlreadyExists');
             throw new Error('error_folderAlreadyExists');

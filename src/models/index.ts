@@ -19,8 +19,14 @@ export { Invites };
 import File from './files/file';
 export { File };
 
+import FileFolder from './files/file-folder';
+export { FileFolder };
+
 import Quota from './user/quota';
 export { Quota };
 
 import Volume from './volumes/volume';
 export { Volume };
+
+import ReadReceipt from './chats/read-receipt';
+export { ReadReceipt };

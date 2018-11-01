@@ -1,6 +1,6 @@
 {
   "name": "peerio-icebear",
-  "version": "5.27.4",
+  "version": "5.27.7",
   "description": "Peerio Icebear client library",
   "main": "dist/index.js",
   "scripts": {
@@ -55,7 +55,7 @@
     "mobx": "4.5.0",
     "moment": "2.22.2",
     "pdfform.js": "1.0.13",
-    "peerio-translator": "github:PeerioTechnologies/peerio-translator#v1.0.2",
+    "peerio-translator": "github:PeerioTechnologies/peerio-translator#v1.0.3",
     "rimraf": "2.6.2",
     "safe-json-stringify": "1.2.0",
     "scrypt-async": "2.0.1",

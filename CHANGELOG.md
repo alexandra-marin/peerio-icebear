@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.27.7"></a>
+## [5.27.7](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.27.6...v5.27.7) (2018-11-01)
+
+
+
+<a name="5.27.6"></a>
+## [5.27.6](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.27.5...v5.27.6) (2018-10-31)
+
+
+### Bug Fixes
+
+* 2fa req returns promise ([63b6c79](https://github.com/PeerioTechnologies/peerio-icebear/commit/63b6c79))
+
+
+
+<a name="5.27.5"></a>
+## [5.27.5](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.27.4...v5.27.5) (2018-10-26)
+
+
+### Bug Fixes
+
+* don't automatically reconnect if server initiated disconnection ([63629bd](https://github.com/PeerioTechnologies/peerio-icebear/commit/63629bd))
+* handle connect_timeout event ([d379c3d](https://github.com/PeerioTechnologies/peerio-icebear/commit/d379c3d))
+* mustReconnect when resetting socket ([c90ca33](https://github.com/PeerioTechnologies/peerio-icebear/commit/c90ca33))
+* respect MIN_RECONNECT_MS ([268bba9](https://github.com/PeerioTechnologies/peerio-icebear/commit/268bba9))
+
+
+
 <a name="5.27.4"></a>
 ## [5.27.4](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.27.3...v5.27.4) (2018-10-23)
 

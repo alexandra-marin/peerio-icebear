@@ -336,7 +336,7 @@ class SharedDbBootKeg extends SyncedKeg<ISharedDbBootKegPayload, ISharedDbBootKe
                 keys: {}
             };
             this.participants.forEach(c => {
-                if (c.isDeleted || c.notFound) return;
+                if (c.notFound) return;
                 if (c.loading) {
                     throw new Error(
                         `Can not save boot keg because participant Contact (${

@@ -1018,6 +1018,16 @@
   "title_uploadFiles_beacon": "Encrypt and upload files",
   "description_uploadFiles_beacon": "Upload your files to make secure cloud backups and to share with others.",
   "description_sync_beacon": "See who you already know on Peerio, sync your contacts.",
+  "title_shareInChat_beacon": "Share files directly in your chats",
+  "description_shareInChat_beacon_desktop": "Drag and drop directly or access your files here, right from your chat.",
+  "description_shareInChat_beacon_mobile": "Upload a new file or share a file you’ve already uploaded to Peerio here.",
+  "description_infoPanel_beacon_desktop": "Toggle your infopanel to quickly access all files shared in this chat.",
+  "description_infoPanel_beacon_mobile": "Tap to access your infopanel and quickly access all files shared in this chat.",
+  "description_pin_beacon": "You can pin the contacts you chat with the most to keep them at the top of your list.",
+  "description_receivedFile_beacon": "Files shared with you in direct messages appear here automatically.",
+  "description_moreFiles_beacon": "Discover what you can do with files, tap here to view all options.",
+  "title_folders_beacon": "Organize your files",
+  "description_folders_beacon": "Create folders and organize your file. Tip: You can create folders within folders.",
   "title_contacts_zeroState0": "Quickly and easily add your contacts",
   "title_contacts_zeroState1": "Add your contacts to start chatting and sharing files securely."
 }

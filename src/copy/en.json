@@ -755,8 +755,6 @@
   "title_userInAddressBook": "{firstName} ({email}) is in your address book",
   "title_invitedUserViaEmail": "You invited {firstName} via email ({email})",
   "button_joinRoom": "Join room",
-  "button_nay": "Nay, decline",
-  "button_aye": "Aye, accept",
   "title_roomInviteUpgradeNotice": "Hi there. Basic Peerio accounts have access to <b>3 free rooms</>. Upgrade your account to get more, or decline this invite.",
   "title_hostedBy": "Hosted by",
   "title_whoIsAlreadyIn": "Who is already in",

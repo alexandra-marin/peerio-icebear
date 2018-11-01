@@ -70,8 +70,7 @@ function convertEventPropertyCase(event: EventObject): EventProperties {
     const eventProperties: EventProperties = {};
 
     Object.keys(event.properties).forEach(itemInCamel => {
-        if (itemInCamel === 'time') return;
-        const item = camelToTitleCase(itemInCamel);
+        const item = itemInCamel === 'time' ? itemInCamel : camelToTitleCase(itemInCamel);
         eventProperties[item] = event.properties[itemInCamel];
     });
 

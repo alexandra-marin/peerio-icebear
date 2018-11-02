@@ -6,10 +6,6 @@
   "scripts": {
     "=== HOOKS ===": "",
     "postinstall": "[ `which opt` ] && opt --in npm-install --exec \"node ./scripts/store_package_json_hash.js\" || true",
-    "postcheckout": "npm run opt-in-npm-install",
-    "postmerge": "npm run opt-in-npm-install",
-    "precommit": "opt --in lint --exec \"npm run validate\"",
-    "commitmsg": "validate-commit-msg",
     "=== TESTS ===": "",
     "test-build": "rm -rf dist && ./node_modules/.bin/babel src --out-dir dist --source-maps --extensions \".js,.ts\"",
     "mocha": "mocha \"test/unit/**/*.test.{ts,js}\" --require test/unit/unit-global-setup --timeout 15000",
@@ -55,7 +51,7 @@
     "mobx": "4.5.0",
     "moment": "2.22.2",
     "pdfform.js": "1.0.13",
-    "peerio-translator": "github:PeerioTechnologies/peerio-translator#v1.0.3",
+    "peerio-translator": "2.0.3",
     "rimraf": "2.6.2",
     "safe-json-stringify": "1.2.0",
     "scrypt-async": "2.0.1",
@@ -80,6 +76,7 @@
     "@types/lodash": "4.14.117",
     "@types/mocha": "5.2.5",
     "@types/node": "10.12.0",
+    "@types/react": "16.4.18",
     "@types/safe-json-stringify": "1.0.1",
     "@types/socket.io-client": "1.4.32",
     "@types/url-regex": "4.1.0",
@@ -141,5 +138,13 @@
     "node": "8.x",
     "npm": "5.x"
   },
-  "nyc": {}
+  "nyc": {},
+  "husky": {
+    "hooks": {
+      "commit-msg": "validate-commit-msg",
+      "post-checkout": "npm run opt-in-npm-install",
+      "post-merge": "npm run opt-in-npm-install",
+      "pre-commit": "makedefs src/copy/en.json src/copy/defs.d.ts && git stage src/copy/defs.d.ts && opt --in lint --exec \"npm run validate\""
+    }
+  }
 }

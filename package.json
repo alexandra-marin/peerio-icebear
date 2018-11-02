@@ -51,7 +51,7 @@
     "mobx": "4.5.0",
     "moment": "2.22.2",
     "pdfform.js": "1.0.13",
-    "peerio-translator": "2.0.3",
+    "peerio-translator": "2.0.4",
     "rimraf": "2.6.2",
     "safe-json-stringify": "1.2.0",
     "scrypt-async": "2.0.1",

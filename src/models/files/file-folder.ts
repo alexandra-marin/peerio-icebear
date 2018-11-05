@@ -7,6 +7,7 @@ import { getUser } from '../../helpers/di-current-user';
 import * as cryptoUtil from '../../crypto/util';
 import FileStoreBase from './file-store-base';
 import File from './file';
+import Volume from '../volumes/volume';
 
 function isLegacyFilePredicate(f: File) {
     return !!(f && f.isLegacy);
@@ -33,6 +34,10 @@ export default class FileFolder {
         }
     }
 
+    static kegUpdatedComparer = function(f1: File, f2: File) {
+        return f2.kegUpdatedAt - f1.kegUpdatedAt;
+    };
+
     isShared: boolean;
     // TODO: this is for  compatibility with File, to be able to process them in the same list
     isLegacy = false;
@@ -56,7 +61,7 @@ export default class FileFolder {
     // to let systems know that this instance is no good anymore
     @observable isDeleted: boolean;
 
-    @observable convertingToVolume = false;
+    @observable convertingToVolume?: Volume = null;
 
     get root() {
         return this.store.folderStore.root;
@@ -156,7 +161,7 @@ export default class FileFolder {
 
     @computed
     get filesSortedByDate() {
-        return this.files.sort((f1, f2) => f2.uploadedAt.valueOf() - f1.uploadedAt.valueOf());
+        return this.files.sort(FileFolder.kegUpdatedComparer);
     }
 
     @computed

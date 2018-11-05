@@ -31,7 +31,7 @@ class FileStoreBase {
         this.fileMapObservable = m.observableMap;
         this.folderStore = new FileStoreFolders(this, root);
         if (id !== 'main') {
-            // FileStoreBase.instances.set(this.id, this as FileStoreBase<SharedKegDb>);
+            FileStoreBase.instances.set(this.id, this as FileStoreBase);
         } else {
             tracker.onceUpdated(this.onFileDigestUpdate);
         }
@@ -350,7 +350,7 @@ class FileStoreBase {
                 : this.fileMap[keg.props.fileId] || this.getByKegId(keg.kegId);
             if (keg.deleted || keg.hidden) {
                 // deleted keg that exists gets wiped from store and cache
-                if (existing) {
+                if (existing || fromCache) {
                     filesToRemove.push(existing);
                 }
                 this.cache.removeValue(keg.kegId);

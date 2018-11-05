@@ -143,10 +143,16 @@ export default class Keg<TPayload, TProps extends {} = {}> {
     afterLoad?: () => void;
     onLoadedFromKeg?: (keg: unknown) => void;
 
+    // something to resolve consecutive saveToServer() calls,
+    // when they're too close, this.version doesn't manage to get updated by the time second saveToServer serializes
+    // and it leads to false optimistic concurrency errors
+    lastSavingVersion = 0;
     /**
      * Keg format version, client tracks kegs structure changes with this property
      */
     @observable format = 0;
+
+    @observable hidden = false;
 
     /**
      * null when signature has not been verified yet (it's async) or it will never be because this keg is not supposed
@@ -219,11 +225,14 @@ export default class Keg<TPayload, TProps extends {} = {}> {
         if (this.loading) {
             console.warn(`Keg ${this.id} ${this.type} is trying to save while already loading.`);
         }
-        if (this.saving) {
-            return asPromise(this, 'saving', false).then(() => this.saveToServer());
+        if (this.saving && !this.id) {
+            // this keg is in the process of obtaining an id, save will be inevitably called later
+            return asPromise(this, 'saving', false);
         }
         this.saving = true;
-        if (this.id) return this.internalSave().finally(this.resetSavingState);
+        if (this.id) {
+            return this.internalSave().finally(this.resetSavingState);
+        }
 
         return socket
             .send(
@@ -284,7 +293,8 @@ export default class Keg<TPayload, TProps extends {} = {}> {
             console.error('Failed preparing keg to save.', err);
             return Promise.reject(err);
         }
-        lastVersion = this.version; // eslint-disable-line prefer-const
+        lastVersion = Math.max(this.lastSavingVersion, this.version); // eslint-disable-line prefer-const
+        this.lastSavingVersion = lastVersion + 1;
         return signingPromise
             .then(() =>
                 socket.send(
@@ -298,7 +308,8 @@ export default class Keg<TPayload, TProps extends {} = {}> {
                             payload: this.plaintext ? payload : payload.buffer,
                             props,
                             version: lastVersion + 1,
-                            format: this.format
+                            format: this.format,
+                            hidden: this.hidden
                         }
                     },
                     true

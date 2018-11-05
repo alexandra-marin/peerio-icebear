@@ -1025,5 +1025,8 @@
   "title_folders_beacon": "Organize your files",
   "description_folders_beacon": "Create folders and organize your file. Tip: You can create folders within folders.",
   "title_contacts_zeroState0": "Quickly and easily add your contacts",
-  "title_contacts_zeroState1": "Add your contacts to start chatting and sharing files securely."
+  "title_contacts_zeroState1": "Add your contacts to start chatting and sharing files securely.",
+  "title_insecureImagePreviewWarning": "Image is not displayed because the link is not secure (doesnʼt use https)",
+  "title_quit": "Quit Peerio",
+  "title_updateAndQuit": "Update & Quit Peerio"
 }

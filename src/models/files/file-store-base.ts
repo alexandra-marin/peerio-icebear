@@ -12,7 +12,6 @@ import config from '../../config';
 import FileFolder from './file-folder';
 import CacheEngineBase from '../../db/cache-engine-base';
 import { IKegDb } from '../../defs/interfaces';
-import { VolumeStore } from '../volumes/volume-store';
 
 const PAGE_SIZE = 100;
 function isFileSelected(file) {

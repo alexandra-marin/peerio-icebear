@@ -633,6 +633,8 @@
   "notification_roomInviteBody": "{name} has invited you to the room #{room}",
   "notification_inviteAcceptedTitle": "Invitation accepted",
   "notification_inviteAcceptedBody": "Your contact {firstName} (@{username}) has joined Peerio",
+  "notification_peerioInTrayTitle": "Peerio is still running",
+  "notification_peerioInTrayBody": "You will continue to receive messages and notifications. To quit, right-click on Peerio icon in taskbar notification area and select \"Quit Peerio\".",
   "title_contacts": "Contacts",
   "title_contactGroups": "Groups",
   "title_contactsAllowAccess": "Please allow accessing contacts",

@@ -62,6 +62,7 @@ export default class FileFolder {
     @observable isDeleted: boolean;
 
     @observable convertingToVolume?: Volume = null;
+    @observable convertingFromFolder?: FileFolder = null; // when this is Volume (which extends FileFolder)
 
     get root() {
         return this.store.folderStore.root;

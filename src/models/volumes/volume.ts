@@ -30,8 +30,6 @@ export default class Volume extends FileFolder {
     @observable loadingMeta = false;
     @observable metaLoaded = false;
 
-    @observable convertingFromFolder?: FileFolder = null;
-
     compareContacts = (c1: Contact, c2: Contact) => {
         return c1.fullNameAndUsername.localeCompare(c2.fullNameAndUsername);
     };

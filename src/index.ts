@@ -63,6 +63,7 @@ export { default as CacheEngineBase } from './db/cache-engine-base';
 export { default as saveAccountKeyBackup } from './helpers/pdf';
 
 export { t } from './copy/t';
+export { LocalizationStrings } from './copy/defs'
 
 import * as validation from './helpers/validation/field-validation';
 export { validation };

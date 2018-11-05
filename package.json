@@ -6,10 +6,6 @@
   "scripts": {
     "=== HOOKS ===": "",
     "postinstall": "[ `which opt` ] && opt --in npm-install --exec \"node ./scripts/store_package_json_hash.js\" || true",
-    "postcheckout": "npm run opt-in-npm-install",
-    "postmerge": "npm run opt-in-npm-install",
-    "precommit": "opt --in lint --exec \"npm run validate\"",
-    "commitmsg": "validate-commit-msg",
     "=== TESTS ===": "",
     "test-build": "rm -rf dist && ./node_modules/.bin/babel src --out-dir dist --source-maps --extensions \".js,.ts\"",
     "mocha": "mocha \"test/unit/**/*.test.{ts,js}\" --require test/unit/unit-global-setup --timeout 15000",
@@ -141,5 +137,13 @@
     "node": "8.x",
     "npm": "5.x"
   },
-  "nyc": {}
+  "nyc": {},
+  "husky": {
+    "hooks": {
+      "commit-msg": "validate-commit-msg",
+      "post-checkout": "npm run opt-in-npm-install",
+      "post-merge": "npm run opt-in-npm-install",
+      "pre-commit": "opt --in lint --exec \"npm run validate\""
+    }
+  }
 }

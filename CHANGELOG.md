@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.27.12"></a>
+## [5.27.12](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.27.11...v5.27.12) (2018-11-05)
+
+
+### Bug Fixes
+
+* move convertingFromFolder property up the chain ([2892a08](https://github.com/PeerioTechnologies/peerio-icebear/commit/2892a08))
+
+
+
 <a name="5.27.11"></a>
 ## [5.27.11](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.27.10...v5.27.11) (2018-11-05)
 

@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.27.10"></a>
+## [5.27.10](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.27.9...v5.27.10) (2018-11-05)
+
+
+### Bug Fixes
+
+* :facepalm: ([b1d785f](https://github.com/PeerioTechnologies/peerio-icebear/commit/b1d785f))
+* concurrent keg save issue ([4524af7](https://github.com/PeerioTechnologies/peerio-icebear/commit/4524af7))
+* folder sorting ([98fe2b8](https://github.com/PeerioTechnologies/peerio-icebear/commit/98fe2b8))
+* hidden keg property management ([d4b9327](https://github.com/PeerioTechnologies/peerio-icebear/commit/d4b9327))
+* lint ([8ff624e](https://github.com/PeerioTechnologies/peerio-icebear/commit/8ff624e))
+* make sure to remove hidden file kegs from cache ([ba73414](https://github.com/PeerioTechnologies/peerio-icebear/commit/ba73414))
+* prop name conflict ([18368c3](https://github.com/PeerioTechnologies/peerio-icebear/commit/18368c3))
+* sharing progress ([ee36f87](https://github.com/PeerioTechnologies/peerio-icebear/commit/ee36f87))
+* ts ([313e695](https://github.com/PeerioTechnologies/peerio-icebear/commit/313e695))
+
+
+
 <a name="5.27.9"></a>
 ## [5.27.9](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.27.8...v5.27.9) (2018-11-05)
 

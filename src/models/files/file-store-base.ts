@@ -12,6 +12,7 @@ import config from '../../config';
 import FileFolder from './file-folder';
 import CacheEngineBase from '../../db/cache-engine-base';
 import { IKegDb } from '../../defs/interfaces';
+import { VolumeStore } from '../volumes/volume-store';
 
 const PAGE_SIZE = 100;
 function isFileSelected(file) {
@@ -31,7 +32,7 @@ class FileStoreBase {
         this.fileMapObservable = m.observableMap;
         this.folderStore = new FileStoreFolders(this, root);
         if (id !== 'main') {
-            // FileStoreBase.instances.set(this.id, this as FileStoreBase<SharedKegDb>);
+            FileStoreBase.instances.set(this.id, this as FileStoreBase);
         } else {
             tracker.onceUpdated(this.onFileDigestUpdate);
         }

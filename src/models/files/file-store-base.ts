@@ -350,7 +350,7 @@ class FileStoreBase {
                 : this.fileMap[keg.props.fileId] || this.getByKegId(keg.kegId);
             if (keg.deleted || keg.hidden) {
                 // deleted keg that exists gets wiped from store and cache
-                if (existing) {
+                if (existing || fromCache) {
                     filesToRemove.push(existing);
                 }
                 this.cache.removeValue(keg.kegId);

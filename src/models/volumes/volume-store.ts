@@ -9,6 +9,9 @@ import dbListProvider from '../../helpers/keg-db-list-provider';
 import tracker from '../update-tracker';
 import TaskQueue from '../../helpers/task-queue';
 
+// for side effects
+import '../chats/volume-invite-store';
+
 export class VolumeStore {
     constructor() {
         tracker.onceUpdated(this.loadAllVolumes);

@@ -94,7 +94,7 @@ class FileStoreBase {
         let ret: File[] = this.files;
         if (this.isMainStore) {
             FileStoreBase.instances.forEach(store => {
-                ret = ret.concat(store.files);
+                ret = ret.concat(store.files.slice());
             });
         }
         return ret;
@@ -124,7 +124,7 @@ class FileStoreBase {
     @computed
     get filesAndFoldersSearchResult() {
         return (this.foldersSearchResult as Array<File | FileFolder>).concat(
-            this.filesSearchResult
+            this.filesSearchResult.slice()
         );
     }
 
@@ -155,7 +155,7 @@ class FileStoreBase {
 
     @computed
     get selectedFilesOrFolders(): (File | FileFolder)[] {
-        return (this.selectedFolders as (File | FileFolder)[]).concat(this.selectedFiles);
+        return (this.selectedFolders as (File | FileFolder)[]).concat(this.selectedFiles.slice());
     }
 
     // #endregion

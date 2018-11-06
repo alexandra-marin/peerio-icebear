@@ -172,7 +172,7 @@ export class ChatStore {
     get allRooms(): any[] {
         // continuation of the mess with concatenating very different things
         // probably better let UI do this, extracting interface or making union types seems like too much work for this
-        const allRooms = (chatInviteStore.received as any[]).concat(this.channels);
+        const allRooms = (chatInviteStore.received as any[]).concat(this.channels.slice());
         allRooms.sort((a, b) => {
             const first = a.name || a.channelName;
             const second = b.name || b.channelName;
@@ -468,7 +468,7 @@ export class ChatStore {
             const active = this.spaces.spacesList.find(
                 x => x.spaceId === this.spaces.activeSpaceId
             );
-            const chats = active.internalRooms.concat(active.patientRooms);
+            const chats = active.internalRooms.concat(active.patientRooms.slice());
             const chatId = chats.length ? chats[0].id : null;
             if (chatId) {
                 this.activate(chatId);

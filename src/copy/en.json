@@ -377,6 +377,7 @@
   "button_shareWithOthers": "Share with others",
   "button_unshare": "Unshare",
   "button_reshare": "Reshare",
+  "button_undo": "Undo",
   "title_folderNameUnshared": "{folderName} was unshared",
   "title_folderUnshared": "Folder was unshared",
   "button_unshareAll": "Unshare all",
@@ -1034,5 +1035,6 @@
   "title_contacts_zeroState1": "Add your contacts to start chatting and sharing files securely.",
   "title_insecureImagePreviewWarning": "Image is not displayed because the link is not secure (doesnʼt use https)",
   "title_quit": "Quit Peerio",
-  "title_updateAndQuit": "Update & Quit Peerio"
+  "title_updateAndQuit": "Update & Quit Peerio",
+  "title_removed": "removed"
 }

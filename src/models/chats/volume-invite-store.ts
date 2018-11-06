@@ -50,7 +50,10 @@ class VolumeInviteStore {
             return;
         }
         this.updateAgain = false;
-        if (!socket.authenticated) return;
+        if (!socket.authenticated) {
+            this.updating = false;
+            return;
+        }
         this.updating = true;
 
         this.updateLeftUsers()

@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.27.14"></a>
+## [5.27.14](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.27.13...v5.27.14) (2018-11-06)
+
+
+### Bug Fixes
+
+* safe concat ([4007083](https://github.com/PeerioTechnologies/peerio-icebear/commit/4007083))
+* volume invites ([f2717a8](https://github.com/PeerioTechnologies/peerio-icebear/commit/f2717a8))
+
+
+
 <a name="5.27.13"></a>
 ## [5.27.13](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.27.12...v5.27.13) (2018-11-06)
 

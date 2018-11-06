@@ -168,7 +168,7 @@ export default class FileFolder {
     @computed
     get filesAndFoldersDefaultSorting() {
         return (this.foldersSortedByName as Array<File | FileFolder>).concat(
-            this.filesSortedByDate
+            this.filesSortedByDate.slice()
         );
     }
 
@@ -206,7 +206,7 @@ export default class FileFolder {
     get allFiles(): File[] {
         let ret = this.files;
         this.folders.forEach(f => {
-            ret = ret.concat(f.allFiles);
+            ret = ret.concat(f.allFiles.slice());
         });
         return ret;
     }
@@ -215,7 +215,7 @@ export default class FileFolder {
     get allFolders(): FileFolder[] {
         let ret = this.folders;
         this.folders.forEach(f => {
-            ret = ret.concat(f.allFolders);
+            ret = ret.concat(f.allFolders.slice());
         });
         return ret;
     }

@@ -7,19 +7,18 @@
     "=== HOOKS ===": "",
     "postinstall": "[ `which opt` ] && opt --in npm-install --exec \"node ./scripts/store_package_json_hash.js\" || true",
     "=== TESTS ===": "",
+    "test": "run-s test:prettier test:ts test:eslint test:copy test:unit",
     "test-build": "rm -rf dist && ./node_modules/.bin/babel src --out-dir dist --source-maps --extensions \".js,.ts\"",
     "mocha": "mocha \"test/unit/**/*.test.{ts,js}\" --require test/unit/unit-global-setup --timeout 15000",
-    "test": "run-s test:ts test:unit test:e2e",
     "test:ts": "tsc --noEmit -p test/tsconfig.json",
     "test:unit": "nyc --reporter=text --reporter=html --report-dir=test-results/unit npm run mocha",
+    "test:eslint": "eslint '{src,test}/**/*.{js,ts}' --color --max-warnings 0",
+    "test:copy": "./scripts/lint-copy.sh",
+    "test:prettier": "prettier '{src,test}/**/*.{js,ts}' -l",
+    "=== LONG AND DEVTIME TESTS (Not for running in commit hooks) ===": "",
     "test:e2e": "./test/e2e/run.sh",
     "test:e2e:wip": "./test/e2e/run-wip.sh",
     "test:e2e:debug": "./test/e2e/debug.sh",
-    "=== VALIDATION ===": "",
-    "validate": "run-s -l validate:* test:ts",
-    "validate:eslint": "eslint '{src,test}/**/*.{js,ts}' --color --max-warnings 0",
-    "validate:lint-copy": "./scripts/lint-copy.sh",
-    "validate:prettier": "prettier '{src,test}/**/*.{js,ts}' -l",
     "=== BENCHMARKS ===": "",
     "bench": "node ./benchmarks/index",
     "=== RELEASE ===": "",
@@ -143,7 +142,7 @@
       "commit-msg": "validate-commit-msg",
       "post-checkout": "npm run opt-in-npm-install",
       "post-merge": "npm run opt-in-npm-install",
-      "pre-commit": "opt --in lint --exec \"npm run validate\""
+      "pre-commit": "opt --in lint --exec \"npm run test\""
     }
   }
 }

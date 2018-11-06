@@ -11,8 +11,7 @@ jobs:
     steps:
       - checkout
       - run: npm install
-      - run: npm run validate
-      - run: npm run test:unit
+      - run: npm run test
       - run: npm run test:e2e
       - store_artifacts:
           path: test-results
@@ -25,7 +24,7 @@ jobs:
     steps:
       - add_ssh_keys:
           fingerprints:
-            - "2e:53:61:1e:34:dd:22:fd:d6:2d:4f:2b:44:ef:56:28"
+            - '2e:53:61:1e:34:dd:22:fd:d6:2d:4f:2b:44:ef:56:28'
       - checkout
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
@@ -53,4 +52,3 @@ workflows:
                 - dev
                 - master
                 - /release-.*/
-

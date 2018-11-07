@@ -30,8 +30,6 @@ export default class Volume extends FileFolder {
     @observable loadingMeta = false;
     @observable metaLoaded = false;
 
-    @observable convertingFromFolder = false;
-
     compareContacts = (c1: Contact, c2: Contact) => {
         return c1.fullNameAndUsername.localeCompare(c2.fullNameAndUsername);
     };
@@ -115,32 +113,25 @@ export default class Volume extends FileFolder {
         return contacts.forEach(c => getChatStore().startChatAndShareVolume(c, this));
     }
 
-    async removeParticipant(participant: Contact | string) {
-        const contact =
-            typeof participant === 'string'
-                ? // we don't really care if it's loaded or not, we just need Contact instance
-                  contactStore.getContact(participant)
-                : participant;
-
+    async removeParticipants(participants: Contact[]) {
         const boot = this.db.boot;
-        const wasAdmin = boot.admins.includes(contact);
+        const admins = participants.filter(p => boot.admins.includes(p));
 
-        await contact.ensureLoaded().then(() => {
-            return boot.save(
-                () => {
-                    if (wasAdmin) boot.unassignRole(contact, 'admin');
-                    boot.removeParticipant(contact);
-                    boot.addKey();
-                    return true;
-                },
-                () => {
-                    boot.addParticipant(contact);
-                    boot.removeUnsavedKey();
-                    if (wasAdmin) boot.assignRole(contact, 'admin');
-                },
-                'error_removeParticipant'
-            );
-        });
+        await Contact.ensureAllLoaded(participants);
+        await boot.save(
+            () => {
+                admins.forEach(a => boot.unassignRole(a, 'admin'));
+                participants.forEach(p => boot.removeParticipant(p));
+                boot.addKey();
+                return true;
+            },
+            () => {
+                participants.forEach(p => boot.addParticipant(p));
+                boot.removeUnsavedKey();
+                admins.forEach(a => boot.assignRole(a, 'admin'));
+            },
+            'error_removeParticipant'
+        );
         warnings.add('title_removedFromVolume');
     }
 

@@ -2,6 +2,80 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.27.16"></a>
+## [5.27.16](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.27.15...v5.27.16) (2018-11-06)
+
+
+
+<a name="5.27.15"></a>
+## [5.27.15](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.27.14...v5.27.15) (2018-11-06)
+
+
+### Bug Fixes
+
+* copy ([5997de7](https://github.com/PeerioTechnologies/peerio-icebear/commit/5997de7))
+
+
+
+<a name="5.27.14"></a>
+## [5.27.14](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.27.13...v5.27.14) (2018-11-06)
+
+
+### Bug Fixes
+
+* safe concat ([4007083](https://github.com/PeerioTechnologies/peerio-icebear/commit/4007083))
+* volume invites ([f2717a8](https://github.com/PeerioTechnologies/peerio-icebear/commit/f2717a8))
+
+
+
+<a name="5.27.13"></a>
+## [5.27.13](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.27.12...v5.27.13) (2018-11-06)
+
+
+
+<a name="5.27.12"></a>
+## [5.27.12](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.27.11...v5.27.12) (2018-11-05)
+
+
+### Bug Fixes
+
+* move convertingFromFolder property up the chain ([2892a08](https://github.com/PeerioTechnologies/peerio-icebear/commit/2892a08))
+
+
+
+<a name="5.27.11"></a>
+## [5.27.11](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.27.10...v5.27.11) (2018-11-05)
+
+
+
+<a name="5.27.10"></a>
+## [5.27.10](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.27.9...v5.27.10) (2018-11-05)
+
+
+### Bug Fixes
+
+* :facepalm: ([b1d785f](https://github.com/PeerioTechnologies/peerio-icebear/commit/b1d785f))
+* concurrent keg save issue ([4524af7](https://github.com/PeerioTechnologies/peerio-icebear/commit/4524af7))
+* folder sorting ([98fe2b8](https://github.com/PeerioTechnologies/peerio-icebear/commit/98fe2b8))
+* hidden keg property management ([d4b9327](https://github.com/PeerioTechnologies/peerio-icebear/commit/d4b9327))
+* lint ([8ff624e](https://github.com/PeerioTechnologies/peerio-icebear/commit/8ff624e))
+* make sure to remove hidden file kegs from cache ([ba73414](https://github.com/PeerioTechnologies/peerio-icebear/commit/ba73414))
+* prop name conflict ([18368c3](https://github.com/PeerioTechnologies/peerio-icebear/commit/18368c3))
+* sharing progress ([ee36f87](https://github.com/PeerioTechnologies/peerio-icebear/commit/ee36f87))
+* ts ([313e695](https://github.com/PeerioTechnologies/peerio-icebear/commit/313e695))
+
+
+
+<a name="5.27.9"></a>
+## [5.27.9](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.27.8...v5.27.9) (2018-11-05)
+
+
+
+<a name="5.27.8"></a>
+## [5.27.8](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.27.7...v5.27.8) (2018-11-05)
+
+
+
 <a name="5.27.7"></a>
 ## [5.27.7](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.27.6...v5.27.7) (2018-11-01)
 

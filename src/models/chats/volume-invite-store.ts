@@ -1,7 +1,7 @@
 import { observable, action } from 'mobx';
 import socket from '../../network/socket';
 import { getVolumeStore } from '../../helpers/di-volume-store';
-
+import contactStore from '../contacts/contact-store';
 class VolumeInviteStore {
     constructor() {
         socket.onceStarted(() => {
@@ -32,9 +32,8 @@ class VolumeInviteStore {
                         .getVolumeWhenReady(kegDbId)
                         .then(volume => {
                             if (!volume.canIAdmin) return;
-                            Promise.map(leavers, (l: string) => volume.removeParticipant(l), {
-                                concurrency: 1
-                            });
+                            const contacts = contactStore.getContacts(leavers);
+                            volume.removeParticipants(contacts);
                         })
                         .catch(err => {
                             console.error(err);
@@ -50,7 +49,10 @@ class VolumeInviteStore {
             return;
         }
         this.updateAgain = false;
-        if (!socket.authenticated) return;
+        if (!socket.authenticated) {
+            this.updating = false;
+            return;
+        }
         this.updating = true;
 
         this.updateLeftUsers()

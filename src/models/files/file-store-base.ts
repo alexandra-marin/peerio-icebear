@@ -31,7 +31,7 @@ class FileStoreBase {
         this.fileMapObservable = m.observableMap;
         this.folderStore = new FileStoreFolders(this, root);
         if (id !== 'main') {
-            // FileStoreBase.instances.set(this.id, this as FileStoreBase<SharedKegDb>);
+            FileStoreBase.instances.set(this.id, this as FileStoreBase);
         } else {
             tracker.onceUpdated(this.onFileDigestUpdate);
         }
@@ -94,7 +94,7 @@ class FileStoreBase {
         let ret: File[] = this.files;
         if (this.isMainStore) {
             FileStoreBase.instances.forEach(store => {
-                ret = ret.concat(store.files);
+                ret = ret.concat(store.files.slice());
             });
         }
         return ret;
@@ -124,7 +124,7 @@ class FileStoreBase {
     @computed
     get filesAndFoldersSearchResult() {
         return (this.foldersSearchResult as Array<File | FileFolder>).concat(
-            this.filesSearchResult
+            this.filesSearchResult.slice()
         );
     }
 
@@ -155,7 +155,7 @@ class FileStoreBase {
 
     @computed
     get selectedFilesOrFolders(): (File | FileFolder)[] {
-        return (this.selectedFolders as (File | FileFolder)[]).concat(this.selectedFiles);
+        return (this.selectedFolders as (File | FileFolder)[]).concat(this.selectedFiles.slice());
     }
 
     // #endregion
@@ -350,7 +350,7 @@ class FileStoreBase {
                 : this.fileMap[keg.props.fileId] || this.getByKegId(keg.kegId);
             if (keg.deleted || keg.hidden) {
                 // deleted keg that exists gets wiped from store and cache
-                if (existing) {
+                if (existing || fromCache) {
                     filesToRemove.push(existing);
                 }
                 this.cache.removeValue(keg.kegId);

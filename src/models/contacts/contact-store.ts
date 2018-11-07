@@ -380,6 +380,10 @@ export class ContactStore {
         );
     }
 
+    getContacts(usernames: string[]) {
+        return usernames.map(u => this.getContact(u));
+    }
+
     /**
      * Returns Contact object ether from cache or server.
      * It is important to be aware about `loading` state of contact, it is not guaranteed it will be loaded

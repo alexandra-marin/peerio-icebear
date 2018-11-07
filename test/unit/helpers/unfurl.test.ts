@@ -1,20 +1,10 @@
-import { getContentHeaders, getContentHeadersNode, getContentHeadersXHR } from '~/helpers/unfurl';
+import fetchHeadersNode from '~/helpers/node-fetch-headers';
 
 const URL = 'https://www.peerio.com';
 
 describe('Unfurl', () => {
-    it('getContentHeaders', async () => {
-        const headers = await getContentHeaders(URL);
-        headers.should.have.property('content-type');
-    });
-
-    it('getContentHeadersNode', async () => {
-        const headers = await getContentHeadersNode(URL);
-        headers.should.have.property('content-type');
-    });
-
-    it('getContentHeadersXHR', async () => {
-        const headers = await getContentHeadersXHR(URL);
+    it('fetchHeadersNode', async () => {
+        const headers = await fetchHeadersNode(URL, 30000);
         headers.should.have.property('content-type');
     });
 });

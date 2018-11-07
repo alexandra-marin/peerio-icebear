@@ -2,6 +2,7 @@ import _sdkVersion from './__sdk';
 import FileStreamBase from './models/files/file-stream-base';
 import CacheEngineBase from './db/cache-engine-base';
 import { TinyDBStorageEngineConstructor } from './defs/tiny-db';
+import fetchHeaders from './helpers/xhr-fetch-headers';
 
 const SERVER_PLAN_PREMIUM_MONTHLY = 'icebear_premium_monthly';
 const SERVER_PLAN_PREMIUM_YEARLY = 'icebear_premium_yearly';
@@ -310,6 +311,11 @@ export default new class {
      * How long to wait for external server to respond when unfurling urls posted in messages.
      */
     unfurlTimeout = 30000;
+
+    /**
+     * Function used to fetch headers.
+     * By default, uses XHR. On Desktop, should be re-configured to use node-fetch-headers. */
+    unfurlFetchHeaders = fetchHeaders;
 
     /**
      * Maximum total size of cached images which we store before we start deleting the least recent ones

@@ -73,7 +73,6 @@ export default class File extends Keg<IFilePayload, IFileProps> {
         suppressSnackbar?: boolean
     ): Promise<void>;
 
-    hidden: boolean;
     store: FileStoreBase;
     latestFormat: number;
     descriptorKey: string;

@@ -83,7 +83,7 @@ class UploadConfig {
     maxResponseQueue = 2;
 }
 
-export default new class {
+export class Config {
     sdkVersion = _sdkVersion;
 
     isMobile = false;
@@ -146,13 +146,12 @@ export default new class {
      * If not set, deviceId is generated from a random value.
      *
      */
-    deviceUID: string = null;
-    arch: any;
+    deviceUID: string | null = null;
+    arch: string;
 
     telemetry = {
         /**
          * Mixpanel base URL. base64 encoded tracking events get added to this.
-         * @type {string}
          */
         baseUrl: 'https://api.mixpanel.com/track/'
     };
@@ -327,4 +326,6 @@ export default new class {
     assetPathResolver = fileName => {
         return `./src/assets/${fileName}`;
     };
-}();
+}
+
+export default new Config();

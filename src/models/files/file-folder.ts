@@ -7,6 +7,7 @@ import { getUser } from '../../helpers/di-current-user';
 import * as cryptoUtil from '../../crypto/util';
 import FileStoreBase from './file-store-base';
 import File from './file';
+import Volume from '../volumes/volume';
 
 function isLegacyFilePredicate(f: File) {
     return !!(f && f.isLegacy);
@@ -33,6 +34,10 @@ export default class FileFolder {
         }
     }
 
+    static kegUpdatedComparer = function(f1: File, f2: File) {
+        return f2.kegUpdatedAt - f1.kegUpdatedAt;
+    };
+
     isShared: boolean;
     // TODO: this is for  compatibility with File, to be able to process them in the same list
     isLegacy = false;
@@ -56,7 +61,8 @@ export default class FileFolder {
     // to let systems know that this instance is no good anymore
     @observable isDeleted: boolean;
 
-    @observable convertingToVolume = false;
+    @observable convertingToVolume?: Volume = null;
+    @observable convertingFromFolder?: FileFolder = null; // when this is Volume (which extends FileFolder)
 
     get root() {
         return this.store.folderStore.root;
@@ -156,13 +162,13 @@ export default class FileFolder {
 
     @computed
     get filesSortedByDate() {
-        return this.files.sort((f1, f2) => f2.uploadedAt.valueOf() - f1.uploadedAt.valueOf());
+        return this.files.sort(FileFolder.kegUpdatedComparer);
     }
 
     @computed
     get filesAndFoldersDefaultSorting() {
         return (this.foldersSortedByName as Array<File | FileFolder>).concat(
-            this.filesSortedByDate
+            this.filesSortedByDate.slice()
         );
     }
 
@@ -200,7 +206,7 @@ export default class FileFolder {
     get allFiles(): File[] {
         let ret = this.files;
         this.folders.forEach(f => {
-            ret = ret.concat(f.allFiles);
+            ret = ret.concat(f.allFiles.slice());
         });
         return ret;
     }
@@ -209,7 +215,7 @@ export default class FileFolder {
     get allFolders(): FileFolder[] {
         let ret = this.folders;
         this.folders.forEach(f => {
-            ret = ret.concat(f.allFolders);
+            ret = ret.concat(f.allFolders.slice());
         });
         return ret;
     }
@@ -373,7 +379,7 @@ export default class FileFolder {
         return dst.store.folderStore.save().return(folderIdMap);
     }
     // creates new child folder
-    createFolder(name: string, id: string, skipSave = false) {
+    createFolder(name: string, id?: string, skipSave = false) {
         if (this.findFolderByName(name)) {
             warnings.addSevere('error_folderAlreadyExists');
             throw new Error('error_folderAlreadyExists');

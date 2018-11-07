@@ -21,18 +21,18 @@ export default class MyChats extends SyncedKeg<MyChatsPayload, MyChatsProps> {
     /**
      * Hidden chat ids
      */
-    hidden: string[] = [];
+    hiddenChats: string[] = [];
 
     serializeKegPayload() {
         return {
             favorites: this.favorites,
-            hidden: this.hidden
+            hidden: this.hiddenChats
         };
     }
 
     deserializeKegPayload(payload) {
         this.favorites = payload.favorites;
-        this.hidden = payload.hidden;
+        this.hiddenChats = payload.hidden;
     }
 
     protected _add(array, value) {
@@ -75,7 +75,7 @@ export default class MyChats extends SyncedKeg<MyChatsPayload, MyChatsProps> {
      * @returns true - if added, false - if already had been in the list
      */
     addHidden(chatId: string) {
-        const ret = this._add(this.hidden, chatId);
+        const ret = this._add(this.hiddenChats, chatId);
         if (ret) {
             this.removeFavorite(chatId);
         }
@@ -87,6 +87,6 @@ export default class MyChats extends SyncedKeg<MyChatsPayload, MyChatsProps> {
      * @returns true - if removed, false - if couldn't find it in the hidden list
      */
     removeHidden(chatId: string) {
-        return this._remove(this.hidden, chatId);
+        return this._remove(this.hiddenChats, chatId);
     }
 }

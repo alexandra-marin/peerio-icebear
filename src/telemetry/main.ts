@@ -70,7 +70,7 @@ function convertEventPropertyCase(event: EventObject): EventProperties {
     const eventProperties: EventProperties = {};
 
     Object.keys(event.properties).forEach(itemInCamel => {
-        const item = camelToTitleCase(itemInCamel);
+        const item = itemInCamel === 'time' ? itemInCamel : camelToTitleCase(itemInCamel);
         eventProperties[item] = event.properties[itemInCamel];
     });
 
@@ -80,6 +80,8 @@ function convertEventPropertyCase(event: EventObject): EventProperties {
 let eventStore: EventObject[] = [];
 
 export async function send(eventObj: EventObject): Promise<void> {
+    eventObj.properties.time = Math.floor(Date.now() / 1000);
+
     if (!User.current || !User.current.settings.loaded) {
         eventStore.push(eventObj);
         return;

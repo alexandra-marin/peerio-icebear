@@ -9,6 +9,9 @@ import dbListProvider from '../../helpers/keg-db-list-provider';
 import tracker from '../update-tracker';
 import TaskQueue from '../../helpers/task-queue';
 
+// for side effects
+import '../chats/volume-invite-store';
+
 export class VolumeStore {
     constructor() {
         tracker.onceUpdated(this.loadAllVolumes);
@@ -142,12 +145,12 @@ export class VolumeStore {
         if (folder.store.id !== 'main') throw new Error('Can only share local folders');
         return this.shareQueue.addTask(async () => {
             const newFolder = await this.createVolume(participants, folder.name);
-            folder.convertingToVolume = true;
-            newFolder.convertingFromFolder = true;
+            folder.convertingToVolume = newFolder;
+            newFolder.convertingFromFolder = folder;
             await newFolder.attach(folder, false, true);
             folder.progress = newFolder.progress = folder.progressMax = newFolder.progressMax = 0;
-            folder.convertingToVolume = false;
-            newFolder.convertingFromFolder = false;
+            folder.convertingToVolume = null;
+            newFolder.convertingFromFolder = null;
             return Promise.resolve();
         });
     }

@@ -88,7 +88,11 @@ class SyncedKeg<TPayload, TProps> extends Keg<TPayload, TProps> {
      * freshly received data from server.
      * @param errorLocaleKey - optional error to show in snackbar
      */
-    save(dataChangeFn: () => boolean, dataRestoreFn?: () => void, errorLocaleKey?: string) {
+    save(
+        dataChangeFn: () => boolean,
+        dataRestoreFn?: () => void,
+        errorLocaleKey?: string
+    ): Promise<void> {
         return new Promise((resolve, reject) => {
             this._syncQueue.addTask(
                 () => {

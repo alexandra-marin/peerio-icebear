@@ -361,7 +361,7 @@ export interface LocalizationStrings {
   'title_convertingToShared': () => string;
   'title_convertingFolderNameToShared': (params: { 'folderName': string | number }) => string;
   'title_filesInQueue': () => string;
-  'title_filesLeftCount': () => string;
+  'title_filesLeftCount': (params: { 'count': string | number }) => string;
   'title_sharingCount': (params: { 'count': string | number }) => string;
   'title_sharingFiles': () => string;
   'title_sharingCountInFolder': (params: { 'count': string | number, 'name': string | number }) => string;
@@ -379,6 +379,7 @@ export interface LocalizationStrings {
   'button_shareWithOthers': () => string;
   'button_unshare': () => string;
   'button_reshare': () => string;
+  'button_undo': () => string;
   'title_folderNameUnshared': (params: { 'folderName': string | number }) => string;
   'title_folderUnshared': () => string;
   'button_unshareAll': () => string;
@@ -635,6 +636,8 @@ export interface LocalizationStrings {
   'notification_roomInviteBody': (params: { 'name': string | number, 'room': string | number }) => string;
   'notification_inviteAcceptedTitle': () => string;
   'notification_inviteAcceptedBody': (params: { 'firstName': string | number, 'username': string | number }) => string;
+  'notification_peerioInTrayTitle': () => string;
+  'notification_peerioInTrayBody': () => string;
   'title_contacts': () => string;
   'title_contactGroups': () => string;
   'title_contactsAllowAccess': () => string;
@@ -654,6 +657,7 @@ export interface LocalizationStrings {
   'button_removeFavourite': () => string;
   'button_addAContact': () => string;
   'title_addAContact': () => string;
+  'title_teamUp': () => string;
   'title_inviteToPeerio': () => string;
   'title_favoriteContacts': () => string;
   'title_invitedContacts': () => string;
@@ -746,6 +750,7 @@ export interface LocalizationStrings {
   'title_channelInvites': () => string;
   'title_viewChannelInvites': () => string;
   'title_roomInviteHeading': () => string;
+  'title_roomInviteTitle': (params: { 'roomName': string | number }) => React.ReactChild[];
   'title_goodNews': () => string;
   'title_dmInviteHeading': (params: { 'contactName': string | number }) => React.ReactChild[];
   'title_helloDmInvite': () => string;
@@ -754,11 +759,11 @@ export interface LocalizationStrings {
   'mcr_title_roomInviteHeading_patient': () => string;
   'title_userInAddressBook': (params: { 'firstName': string | number, 'email': string | number }) => string;
   'title_invitedUserViaEmail': (params: { 'firstName': string | number, 'email': string | number }) => string;
-  'button_nay': () => string;
-  'button_aye': () => string;
+  'button_joinRoom': () => string;
   'title_roomInviteUpgradeNotice': () => React.ReactChild[];
   'title_hostedBy': () => string;
   'title_whoIsAlreadyIn': () => string;
+  'title_whoIsInRoom': (params: { 'roomName': string | number }) => React.ReactChild[];
   'title_userOut': (params: { 'name': string | number }) => string;
   'title_new': () => string;
   'title_channelInviteRevoked': () => string;
@@ -780,6 +785,8 @@ export interface LocalizationStrings {
   'title_channelPurposePlaceholder': () => string;
   'title_channelRecentInvitations': () => string;
   'title_confirmChannelDelete': () => string;
+  'title_actionIrreversible': () => string;
+  'title_deleteChannelDescription': () => string;
   'title_confirmChannelLeave': () => string;
   'title_confirmChannelLeaveDescription': () => string;
   'error_volumeLeave': () => string;
@@ -802,10 +809,13 @@ export interface LocalizationStrings {
   'button_demoteAdmin': () => string;
   'title_2FA': () => string;
   'title_2FARequired': () => string;
+  'title_2FAInput': () => string;
   'title_2FADetail': () => string;
+  'title_2FAFailed': () => string;
   'title_2FADetailDesktop': () => string;
   'title_2FASecretKey': () => string;
   'dialog_enter2FA': () => string;
+  'title_2FAInputLabel': () => string;
   'title_2FAHelperText': () => string;
   'title_2FACode': () => string;
   'title_2FAEnabled': () => string;
@@ -823,6 +833,7 @@ export interface LocalizationStrings {
   'title_enterTOTPCodeFromApp': () => string;
   'title_authApps': () => string;
   'title_trustThisDevice': () => string;
+  'title_verifyDeviceTwoWeeks': () => string;
   'title_stopTrustingThisDevice': () => string;
   'title_authAppsDetails': () => React.ReactChild[];
   'title_2FAEnabledThanks': () => string;
@@ -1026,4 +1037,8 @@ export interface LocalizationStrings {
   'description_folders_beacon': () => string;
   'title_contacts_zeroState0': () => string;
   'title_contacts_zeroState1': () => string;
+  'title_insecureImagePreviewWarning': () => string;
+  'title_quit': () => string;
+  'title_updateAndQuit': () => string;
+  'title_removed': () => string;
 }

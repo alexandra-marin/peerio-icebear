@@ -747,7 +747,7 @@
   "title_channelDeleted": "Room deleted.",
   "title_channelInvites": "Room invites",
   "title_viewChannelInvites": "View Room Invites",
-  "title_roomInviteHeading": "Behold! You have been invited to join",
+  "title_roomInviteHeading": "You have been invited to join",
   "title_roomInviteTitle": "You have been invited to join <b>#{roomName}</>",
   "title_goodNews": "Good news!",
   "title_dmInviteHeading": "<b>{contactName}</> just joined Peerio.",

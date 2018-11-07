@@ -27,7 +27,7 @@ export async function getContentHeaders(url: string): Promise<HeaderDict> {
     if (urlCache[url]) return Promise.resolve(urlCache[url]);
     if (urlsInProgress[url]) return urlsInProgress[url];
 
-    const promise = config.unfurlFetchHeaders(url, config.unfurlTimeout);
+    const promise = config.unfurlHeadersFetcher()(url, config.unfurlTimeout);
 
     urlsInProgress[url] = promise;
 

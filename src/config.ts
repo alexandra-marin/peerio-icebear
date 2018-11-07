@@ -312,9 +312,9 @@ export class Config {
     unfurlTimeout = 30000;
 
     /**
-     * Function used to fetch headers.
+     * Function returning a function used to fetch headers.
      * By default, uses XHR. On Desktop, should be re-configured to use node-fetch-headers. */
-    unfurlFetchHeaders = fetchHeaders;
+    unfurlHeadersFetcher = () => fetchHeaders;
 
     /**
      * Maximum total size of cached images which we store before we start deleting the least recent ones

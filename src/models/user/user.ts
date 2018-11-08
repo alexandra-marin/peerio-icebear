@@ -79,7 +79,6 @@ export default class User {
     removeEmail: (email: string) => Promise<void>;
     addEmail: (email: string) => void;
     makeEmailPrimary: (email: string) => Promise<void>;
-    canSendGhost: () => boolean;
     saveAvatar: (blobs?: ArrayBuffer[]) => Promise<void>;
     deleteAvatar: () => void;
     setAccountKeyBackedUp: () => Promise<void>;

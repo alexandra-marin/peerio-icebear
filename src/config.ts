@@ -16,7 +16,6 @@ const SERVER_PLAN_PRO_YEARLY = 'icebear_pro_yearly';
  * Best to do it in your local config.js
  *
  * - socketServerUrl
- * - ghostFrontendUrl
  * - appVersion
  * - platform
  * - FileStream
@@ -100,13 +99,6 @@ export class Config {
      * **Client app is required to set this property before using Icebear SDK.**
      */
     socketServerUrl = 'wss://';
-
-    /**
-     * Ghost website url. (https://)
-     *
-     * **Client app is required to set this property before using Icebear SDK.**
-     */
-    // ghostFrontendUrl = 'https://';
 
     /**
      * Application name

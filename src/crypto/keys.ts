@@ -74,7 +74,7 @@ export function deriveAccountKeys(
 }
 
 /**
- * Derive keys for a ghost/ephemeral user.
+ * Derive keys for an ephemeral user.
  * @param salt e.g. ephemeral ID
  */
 export function deriveEphemeralKeys(salt: Uint8Array, passphrase: string): Promise<KeyPair> {

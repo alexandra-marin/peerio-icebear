@@ -177,17 +177,6 @@ export default function mixUserProfileModule(this: User) {
             }) as Promise<void>;
     };
 
-    // todo: move to quota keg, make computed
-    this.canSendGhost = function() {
-        const q = this.quota;
-        if (q && q.quotasLeft && q.quotasLeft.ghost) {
-            const qTotal = q.quotasLeft.ghost.find(i => i.period === 'monthly');
-            if (!qTotal) return true;
-            return qTotal.limit > 0;
-        }
-        return true;
-    };
-
     /**
      *  blobs - 2 elements, 0-large, 1-medium avatar. Omit parameter
      * or pass null to delete avatar

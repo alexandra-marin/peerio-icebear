@@ -59,11 +59,11 @@ describe('Crypto Keys module', function() {
         });
     });
 
-    describe('ghost/ephemeral keys', () => {
-        let ghostID: Uint8Array;
+    describe('ephemeral keys', () => {
+        let randomId: Uint8Array;
         let expected: KeyPair;
         before(() => {
-            ghostID = util.strToBytes('CvfX223vsFuVerNrGS1n1sz4AYfpERb8JbeBeWUYMqdo');
+            randomId = util.strToBytes('CvfX223vsFuVerNrGS1n1sz4AYfpERb8JbeBeWUYMqdo');
             passphrase = 'latch floats varied harper vast';
 
             expected = {
@@ -73,7 +73,7 @@ describe('Crypto Keys module', function() {
         });
 
         it('can be derived', () => {
-            return crypto.deriveEphemeralKeys(ghostID, passphrase).then(kp => {
+            return crypto.deriveEphemeralKeys(randomId, passphrase).then(kp => {
                 expect(kp.secretKey).to.deep.equal(expected.secretKey);
                 expect(kp.publicKey).to.deep.equal(expected.publicKey);
             });
@@ -83,7 +83,7 @@ describe('Crypto Keys module', function() {
             return (
                 crypto
                     // @ts-ignore intentional violation for testing
-                    .deriveEphemeralKeys('not the real ghost id heheheheh', passphrase)
+                    .deriveEphemeralKeys('i am a bad id', passphrase)
                     .then(kp => {
                         expect(kp.secretKey).not.to.deep.equal(expected.secretKey);
                         expect(kp.publicKey).not.to.deep.equal(expected.publicKey);
@@ -92,7 +92,7 @@ describe('Crypto Keys module', function() {
         });
 
         it('cannot be derived from a bad passphrase', () => {
-            return crypto.deriveEphemeralKeys(ghostID, 'blabla bla bla').then(kp => {
+            return crypto.deriveEphemeralKeys(randomId, 'blabla bla bla').then(kp => {
                 expect(kp.secretKey).not.to.deep.equal(expected.secretKey);
                 expect(kp.publicKey).not.to.deep.equal(expected.publicKey);
             });

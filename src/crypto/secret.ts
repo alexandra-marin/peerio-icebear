@@ -126,7 +126,7 @@ export function decrypt(
     containsLength?: boolean
 ): Uint8Array {
     let start = 0;
-    let end: number | undefined;
+    let end?: number;
     if (!nonce) {
         // eslint-disable-next-line no-param-reassign
         nonce = cipher.subarray(-NONCE_SIZE);

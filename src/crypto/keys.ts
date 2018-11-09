@@ -1,7 +1,7 @@
 /**
  * Peerio Crypto module for key handling.
  */
-import BLAKE2s from 'blake2s-js';
+import BLAKE2s, { ByteArray } from 'blake2s-js';
 import * as nacl from 'tweetnacl';
 import { scryptPromise } from './scrypt-proxy';
 import { bytesToHex, strToBytes, concatTypedArrays, getRandomBytes } from './util';
@@ -29,11 +29,9 @@ try {
  * @returns the hash
  */
 function prehashPass(value: string, personalization?: string): Uint8Array {
-    let blake2sOptions: { personalization: Uint8Array } | undefined;
-    if (personalization) {
-        blake2sOptions = { personalization: strToBytes(personalization) };
-    }
-    const prehashedPass = new BLAKE2s(32, blake2sOptions);
+    const prehashedPass = personalization
+        ? new BLAKE2s(32, { personalization: strToBytes(personalization) })
+        : new BLAKE2s(32);
     prehashedPass.update(strToBytes(value));
     return prehashedPass.digest();
 }
@@ -145,7 +143,7 @@ export function generateAuthSalt(): Uint8Array {
  * Hashes auth public key. Uses personalized hash.
  * @returns 32 bytes personalized hash
  */
-export function getAuthKeyHash(key): Uint8Array {
+export function getAuthKeyHash(key: ByteArray): Uint8Array {
     const hash = new BLAKE2s(32, {
         personalization: strToBytes('AuthCPK1')
     });

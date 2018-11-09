@@ -17,12 +17,11 @@ export function getHashObject(
     value: Uint8Array,
     personalizationString?: string
 ): BLAKE2s {
-    const blake2sOptions = personalizationString
-        ? {
+    const h = personalizationString
+        ? new BLAKE2s(length, {
               personalization: padding.padBytes(strToBytes(personalizationString), 8)
-          }
-        : undefined;
-    const h = new BLAKE2s(length, blake2sOptions);
+          })
+        : new BLAKE2s(length);
     h.update(value);
     return h;
 }

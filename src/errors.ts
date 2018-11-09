@@ -117,10 +117,11 @@ export const serverErrorCodes = {
     accountClosed: 488,
     responseValidationError: 501
 };
+
 // reverse map
-const serverErrorMap = {};
-Object.keys(serverErrorCodes).forEach(key => {
-    serverErrorMap[serverErrorCodes[key]] = key;
+const serverErrorMap: { [errorCode: number]: string } = {};
+Object.entries(serverErrorCodes).forEach(([key, value]) => {
+    serverErrorMap[value] = key;
 });
 
 export interface ServerErrorType extends Error {

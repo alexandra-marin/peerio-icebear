@@ -1,4 +1,4 @@
-import { t } from 'peerio-translator';
+import { t } from '../copy/t';
 import moment from 'moment';
 import Clock from './observable-clock';
 
@@ -28,7 +28,7 @@ export default function relativeTimestamp(time: number): string {
     } else if (timeFromNow > 2 * day) {
         return moment(time).format('dddd');
     } else if (timeFromNow > relativeTimeDisplayLimit) {
-        return t('title_yesterday') as string;
+        return t('title_yesterday');
     }
     return moment(time).fromNow();
 }

@@ -24,6 +24,7 @@
     "=== RELEASE ===": "",
     "release": "./scripts/release.sh",
     "=== UTILS ===": "",
+    "makedefs": "makedefs src/copy/en.json src/copy/defs.ts",
     "prettier": "prettier '{src,test}/**/*.{js,ts}' --write",
     "opt-in-npm-install": "opt --in npm-install --exec \"node ./scripts/npm_install_if_changed.js\""
   },
@@ -50,7 +51,7 @@
     "mobx": "4.5.2",
     "moment": "2.22.2",
     "pdfform.js": "1.0.13",
-    "peerio-translator": "github:PeerioTechnologies/peerio-translator#v1.0.3",
+    "peerio-translator": "2.0.4",
     "rimraf": "2.6.2",
     "safe-json-stringify": "1.2.0",
     "scrypt-async": "2.0.1",
@@ -75,6 +76,7 @@
     "@types/lodash": "4.14.118",
     "@types/mocha": "5.2.5",
     "@types/node": "10.12.2",
+    "@types/react": "16.4.18",
     "@types/safe-json-stringify": "1.0.1",
     "@types/socket.io-client": "1.4.32",
     "@types/url-regex": "4.1.0",
@@ -142,7 +144,7 @@
       "commit-msg": "validate-commit-msg",
       "post-checkout": "npm run opt-in-npm-install",
       "post-merge": "npm run opt-in-npm-install",
-      "pre-commit": "opt --in lint --exec \"npm run test\""
+      "pre-commit": "npm run makedefs && git stage src/copy/defs.ts && opt --in lint --exec \"npm run test\""
     }
   }
 }

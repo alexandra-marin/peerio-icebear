@@ -6,7 +6,7 @@ import Tofu from './tofu';
 import tofuStore from './tofu-store';
 import { getFirstLetterUpperCase } from './../../helpers/string';
 import serverSettings from '../server-settings';
-import { t } from 'peerio-translator';
+import { t } from '../../copy/t';
 import clientApp from '../client-app';
 import { getContactStore } from '../../helpers/di-contact-store';
 import ContactColors from './contact.colors';

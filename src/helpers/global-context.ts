@@ -1,4 +1,4 @@
-let g;
+let g: any;
 if (typeof window !== 'undefined') {
     g = window;
 } else if (typeof global !== 'undefined') {

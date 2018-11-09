@@ -14,7 +14,7 @@ import { InvalidArgumentError } from '../../errors';
  * @returns random bytes array of `num` size
  */
 // eslint-disable-next-line import/no-mutable-exports
-export let getRandomBytes: (num: number) => Uint8Array;
+export let getRandomBytes!: (num: number) => Uint8Array;
 
 // do we have crypto shim?
 if (globalContext.cryptoShim) {

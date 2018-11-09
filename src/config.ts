@@ -309,7 +309,7 @@ export class Config {
     /**
      * Given a file name returns correct path to any asset file in sdk 'src/assets/' folder
      */
-    assetPathResolver = fileName => {
+    assetPathResolver = (fileName: string): string => {
         return `./src/assets/${fileName}`;
     };
 }

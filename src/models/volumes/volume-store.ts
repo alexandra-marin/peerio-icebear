@@ -16,7 +16,9 @@ export class VolumeStore {
     constructor() {
         tracker.onceUpdated(this.loadAllVolumes);
         socket.onceStarted(() => {
-            socket.subscribe(socket.APP_EVENTS.volumeDeleted, this.processVolumeDeletedEvent);
+            socket.subscribe(socket.APP_EVENTS.volumeDeleted, data =>
+                this.processVolumeDeletedEvent(data.volumeId)
+            );
         });
     }
 
@@ -26,8 +28,8 @@ export class VolumeStore {
     @observable loading = false;
     @observable loaded = false;
 
-    processVolumeDeletedEvent = data => {
-        const volume = this.volumeMap[data.kegDbId];
+    processVolumeDeletedEvent = (kegDbId: string) => {
+        const volume = this.volumeMap[kegDbId];
         if (!volume) return;
         if (!volume.deletedByMyself) {
             warnings.addSevere('title_kickedFromVolume', '', {
@@ -75,7 +77,8 @@ export class VolumeStore {
         this.loading = true;
         await tracker.waitUntilUpdated();
         tracker.subscribeToKegDbAdded(this.addVolume);
-
+        dbListProvider.onVolumeAdded(this.addVolume);
+        dbListProvider.onDbRemoved(this.processVolumeDeletedEvent);
         const volumes = await dbListProvider.getVolumes();
         volumes.forEach(this.addVolume);
 

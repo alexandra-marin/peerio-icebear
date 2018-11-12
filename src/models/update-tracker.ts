@@ -1,6 +1,7 @@
 import socket from '../network/socket';
 import { observable, when, reaction } from 'mobx';
 import { asPromise } from '../helpers/prombservable';
+import dbListProvider from '../helpers/keg-db-list-provider';
 
 /**
  * Data update tracking module. This is an internal module that allows Icebear to get and report new data as it arrives
@@ -39,6 +40,7 @@ class UpdateTracker {
     }
 
     DESCRIPTOR_PATH = 'global:fileDescriptor:updated';
+    DBUPDATE_PATH = 'global:kegdbaccess:updated';
     /**
      * listeners to new keg db added event
      */
@@ -79,7 +81,8 @@ class UpdateTracker {
             knownUpdateId: string;
         };
     } = {
-        [this.DESCRIPTOR_PATH]: { maxUpdateId: '', knownUpdateId: '' }
+        [this.DESCRIPTOR_PATH]: { maxUpdateId: '', knownUpdateId: '' },
+        [this.DBUPDATE_PATH]: { maxUpdateId: '', knownUpdateId: '' }
     };
 
     get fileDescriptorDigest() {
@@ -216,6 +219,7 @@ class UpdateTracker {
             const d = this.globalDigest[kegDbId];
             if (!d) return; // unknown global digest type
             d.maxUpdateId = maxUpdateId;
+            if (kegDbId === this.DBUPDATE_PATH) dbListProvider.reload();
             if (isFromEvent) {
                 this.emitKegTypeUpdatedEvent(kegDbId, 'global');
             } else {

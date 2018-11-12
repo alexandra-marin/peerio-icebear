@@ -10,6 +10,7 @@ export default class MemoryStorage implements TinyDBStorageEngine {
 
     // should return null if value doesn't exist
     async getValue(key) {
+        // eslint-disable-next-line no-prototype-builtins
         return this.data.hasOwnProperty(key) ? this.data[key] : null;
     }
 

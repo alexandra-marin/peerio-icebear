@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.28.3"></a>
+## [5.28.3](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.28.1...v5.28.3) (2018-11-13)
+
+
+### Bug Fixes
+
+* db list events handling ([ed0cd31](https://github.com/PeerioTechnologies/peerio-icebear/commit/ed0cd31))
+
+
+
 <a name="5.28.2"></a>
 ## [5.28.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.27.17...v5.28.2) (2018-11-13)
 

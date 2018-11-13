@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 
 ### Bug Fixes
+
 * db list events handling ([022a5b8](https://github.com/PeerioTechnologies/peerio-icebear/commit/022a5b8))
 
 * stricter type in getauthhashkey ([f9a37b6](https://github.com/PeerioTechnologies/peerio-icebear/commit/f9a37b6))

@@ -1,12 +1,12 @@
 import MRUList from '~/helpers/mru-list';
 import TinyDb from '~/db/tiny-db';
-import StorageEngine from '~/models/storage/node-json-storage';
+import MemoryStorage from '~/models/storage/memory-storage';
 import config from '~/config';
 import { observable } from 'mobx';
 
 describe('MRU list helper should', () => {
     before(() => {
-        config.StorageEngine = StorageEngine;
+        config.StorageEngine = MemoryStorage;
         const key = new Uint8Array(32);
         key.fill(Math.random());
         TinyDb.openUser('test', key);

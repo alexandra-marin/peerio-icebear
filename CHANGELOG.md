@@ -2,6 +2,52 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.29.0"></a>
+# [5.29.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.28.2...v5.29.0) (2018-11-18)
+
+
+### Bug Fixes
+
+* db list events handling ([ed0cd31](https://github.com/PeerioTechnologies/peerio-icebear/commit/ed0cd31))
+
+
+
+<a name="5.28.1"></a>
+## [5.28.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.28.0...v5.28.1) (2018-11-09)
+
+
+### Bug Fixes
+
+* stricter type in getauthhashkey ([f9a37b6](https://github.com/PeerioTechnologies/peerio-icebear/commit/f9a37b6))
+
+
+
+<a name="5.28.0"></a>
+# [5.28.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.27.19...v5.28.0) (2018-11-09)
+
+
+
+<a name="5.27.19"></a>
+## [5.27.19](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.27.18...v5.27.19) (2018-11-09)
+
+
+
+<a name="5.27.18"></a>
+## [5.27.18](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.27.17...v5.27.18) (2018-11-08)
+
+
+### Bug Fixes
+
+* bump ([c1c68b2](https://github.com/PeerioTechnologies/peerio-icebear/commit/c1c68b2))
+
+
+### Features
+
+* export wrapped ([dd07f1e](https://github.com/PeerioTechnologies/peerio-icebear/commit/dd07f1e))
+* wrapped `t()` ([1e6eb3e](https://github.com/PeerioTechnologies/peerio-icebear/commit/1e6eb3e))
+
+
+
 <a name="5.28.2"></a>
 ## [5.28.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.27.17...v5.28.2) (2018-11-13)
 

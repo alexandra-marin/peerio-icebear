@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.30.0"></a>
+# [5.30.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.29.1...v5.30.0) (2018-11-19)
+
+
+### Features
+
+* canDelete on file-store.bulk ([5dd5ae4](https://github.com/PeerioTechnologies/peerio-icebear/commit/5dd5ae4))
+
+
+
 <a name="5.29.1"></a>
 ## [5.29.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.29.0...v5.29.1) (2018-11-19)
 

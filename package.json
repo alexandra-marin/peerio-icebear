@@ -25,6 +25,7 @@
     "release": "./scripts/release.sh",
     "=== UTILS ===": "",
     "makedefs": "makedefs src/copy/en.json src/copy/defs.ts",
+    "makepseudo": "makepseudo src/copy/en.json src/copy/pseudo.json",
     "prettier": "prettier '{src,test}/**/*.{js,ts}' --write",
     "opt-in-npm-install": "opt --in npm-install --exec \"node ./scripts/npm_install_if_changed.js\""
   },
@@ -51,7 +52,7 @@
     "mobx": "4.5.2",
     "moment": "2.22.2",
     "pdfform.js": "1.0.13",
-    "peerio-translator": "2.0.4",
+    "peerio-translator": "2.1.0",
     "rimraf": "2.6.2",
     "safe-json-stringify": "1.2.0",
     "scrypt-async": "2.0.1",
@@ -144,7 +145,7 @@
       "commit-msg": "validate-commit-msg",
       "post-checkout": "npm run opt-in-npm-install",
       "post-merge": "npm run opt-in-npm-install",
-      "pre-commit": "npm run makedefs && git stage src/copy/defs.ts && opt --in lint --exec \"npm run test\""
+      "pre-commit": "npm run makedefs && npm run makepseudo && git stage src/copy/defs.ts src/copy/pseudo.json && opt --in lint --exec \"npm run test\""
     }
   }
 }

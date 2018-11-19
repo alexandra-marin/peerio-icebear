@@ -20,7 +20,6 @@ import {
     AccountCreationChallenge,
     AuthData
 } from '../../defs/interfaces';
-import AccountVersion from './account-version';
 import Settings from './settings';
 
 // @ts-ignore to support desktop declarations emit until monorepo
@@ -66,7 +65,6 @@ export default class User {
     validatePasscode: (passcode: string) => Promise<string>;
     hasPasscode: () => Promise<boolean>;
     signout: (untrust?: boolean) => Promise<void>;
-    accountVersionKeg: AccountVersion;
     settings: Settings;
     loadSettings: () => void;
     saveSettings: (updateFunction: (settingsKeg: Settings) => void) => Promise<void>;

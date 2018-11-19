@@ -12,7 +12,6 @@ import TaskQueue from '../../helpers/task-queue';
 import { setFileStore } from '../../helpers/di-file-store';
 import { getChatStore } from '../../helpers/di-chat-store';
 import { getVolumeStore } from '../../helpers/di-volume-store';
-import FileStoreMigration from './file-store.migration';
 import FileStoreBase from './file-store-base';
 import FileStoreBulk from './file-store.bulk';
 import * as util from '../../util';
@@ -31,7 +30,6 @@ export class FileStore extends FileStoreBase {
     constructor() {
         super(null, null, 'main');
         this.bulk = new FileStoreBulk(this);
-        this.migration = new FileStoreMigration(this);
 
         when(() => this.allStoresLoaded, this.onFinishLoading);
     }
@@ -47,7 +45,6 @@ export class FileStore extends FileStoreBase {
     chatFileMap = observable.map<string, ObservableMap<string, File>>();
 
     bulk: FileStoreBulk;
-    migration: FileStoreMigration;
     // Human readable maximum auto-expandable inline image size limit
     inlineImageSizeLimitFormatted = util.formatBytes(config.chat.inlineImageSizeLimit);
     // Human readable maximum cutoff inline image size limit

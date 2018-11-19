@@ -8,8 +8,6 @@ import warnings from '../warnings';
 import socket from '../../network/socket';
 import validators from '../../helpers/validation/user-validators';
 import contactStore from '../contacts/contact-store';
-import AccountVersion from './account-version';
-import { getFileStore } from '../../helpers/di-file-store';
 import User from './user';
 import Beacons from './beacons';
 
@@ -20,17 +18,7 @@ export default function mixUserProfileModule(this: User) {
     const _profileKeg = new Profile(this);
     const _beaconsKeg = new Beacons(this);
     const _quotaKeg = new Quota(this);
-    this.accountVersionKeg = new AccountVersion(this);
     this.settings = new Settings(this);
-
-    when(
-        () => this.accountVersionKeg.loaded,
-        () => {
-            // already migrated?
-            if (this.accountVersionKeg.accountVersion === 1) return;
-            getFileStore().migration.migrateToAccountVersion1();
-        }
-    );
 
     this.loadSettings = () => {
         loadSimpleKeg(this.settings);

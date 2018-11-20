@@ -8,11 +8,7 @@ type DbListEventHandler = (kegDbId: string) => void;
  */
 class KegDbListProvider {
     constructor() {
-        socket.onAuthenticated(() => {
-            this.prevCachedList = this.cachedList;
-            this.cachedList = null;
-            this.cacheList();
-        });
+        socket.onAuthenticated(this.reload);
     }
 
     loadingPromise: Promise<void> = null;
@@ -21,6 +17,13 @@ class KegDbListProvider {
 
     dbAddedHandlers: DbListEventHandler[] = [];
     dbRemovedHandlers: DbListEventHandler[] = [];
+
+    reload = () => {
+        if (this.loadingPromise) return this.loadingPromise;
+        this.prevCachedList = this.cachedList;
+        this.cachedList = null;
+        return this.cacheList();
+    };
 
     async cacheList() {
         if (this.loadingPromise) return this.loadingPromise;
@@ -33,6 +36,7 @@ class KegDbListProvider {
 
         return this.loadingPromise;
     }
+
     compareChanges() {
         if (!this.cachedList || !this.prevCachedList) return;
         for (const id of this.cachedList) {
@@ -70,6 +74,12 @@ class KegDbListProvider {
 
     onDbRemoved(handler: DbListEventHandler) {
         this.dbRemovedHandlers.push(handler);
+    }
+
+    onVolumeAdded(handler: DbListEventHandler) {
+        this.onDbAdded(id => {
+            if (id.startsWith('volume:')) handler(id);
+        });
     }
 }
 

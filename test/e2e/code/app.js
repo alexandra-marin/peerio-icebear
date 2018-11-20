@@ -51,8 +51,8 @@ export default class App {
         const StorageEngine = require('~/models/storage/node-json-storage').default;
         const cfg = this.world.ice.config;
         // todo: make special test platform?
-        cfg.appVersion = '2.37.1';
-        cfg.clientVersion = '2.9.0';
+        cfg.appVersion = '200.0.0';
+        cfg.clientVersion = '200.0.0';
         cfg.platform = 'electron';
         cfg.whiteLabel.name = '';
         cfg.arch = os.arch();

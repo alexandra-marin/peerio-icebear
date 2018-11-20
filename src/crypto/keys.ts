@@ -29,11 +29,9 @@ try {
  * @returns the hash
  */
 function prehashPass(value: string, personalization?: string): Uint8Array {
-    let blake2sOptions: { personalization: Uint8Array } | undefined;
-    if (personalization) {
-        blake2sOptions = { personalization: strToBytes(personalization) };
-    }
-    const prehashedPass = new BLAKE2s(32, blake2sOptions);
+    const prehashedPass = personalization
+        ? new BLAKE2s(32, { personalization: strToBytes(personalization) })
+        : new BLAKE2s(32);
     prehashedPass.update(strToBytes(value));
     return prehashedPass.digest();
 }
@@ -74,7 +72,7 @@ export function deriveAccountKeys(
 }
 
 /**
- * Derive keys for a ghost/ephemeral user.
+ * Derive keys for an ephemeral user.
  * @param salt e.g. ephemeral ID
  */
 export function deriveEphemeralKeys(salt: Uint8Array, passphrase: string): Promise<KeyPair> {
@@ -145,10 +143,8 @@ export function generateAuthSalt(): Uint8Array {
  * Hashes auth public key. Uses personalized hash.
  * @returns 32 bytes personalized hash
  */
-export function getAuthKeyHash(key): Uint8Array {
-    const hash = new BLAKE2s(32, {
-        personalization: strToBytes('AuthCPK1')
-    });
+export function getAuthKeyHash(key: Uint8Array): Uint8Array {
+    const hash = new BLAKE2s(32, { personalization: strToBytes('AuthCPK1') });
     hash.update(key);
     return hash.digest();
 }

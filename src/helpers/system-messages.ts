@@ -6,7 +6,7 @@
  * module should be used instead.
  */
 
-import { t } from 'peerio-translator';
+import { t } from '../copy/t';
 import contactStore from '../models/contacts/contact-store';
 import Message from '../models/chats/message';
 

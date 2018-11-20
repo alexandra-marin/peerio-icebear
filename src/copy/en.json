@@ -831,7 +831,7 @@
   "title_enterTOTPCodeFromApp": "Input the 6 digit code from the app",
   "title_authApps": "Let's get you started",
   "title_trustThisDevice": "This is a trusted device",
-  "title_verifyDeviceTwoWeeks": "Verify this device for two weeks.",
+  "title_verifyDeviceTwoWeeks": "Verify this device for one month.",
   "title_stopTrustingThisDevice": "Stop trusting this device",
   "title_authAppsDetails": "To enable Two Step Verification use an authenticator app such as Google Authenticator for <a-googleAuthA>Android</> or <a-googleAuthI>iOS</> or <a-authy>Authy</> on your desktop or mobile device, and follow the steps on the screen.",
   "title_2FAEnabledThanks": "Thanks for adding another layer of security to your account.",

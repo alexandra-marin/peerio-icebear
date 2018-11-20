@@ -24,7 +24,7 @@ const textDecoder = HAS_TEXT_ENCODER ? new TextDecoder('utf-8') : null;
  */
 export function strToBytes(str: string): Uint8Array {
     if (HAS_TEXT_ENCODER) {
-        return textEncoder.encode(str);
+        return textEncoder!.encode(str);
     }
     // returning Buffer instance will break deep equality tests since Buffer modifies prototype
     return new Uint8Array(Buffer.from(str, 'utf-8').buffer);
@@ -38,7 +38,7 @@ export function strToBytes(str: string): Uint8Array {
  */
 export function bytesToStr(bytes: Uint8Array): string {
     if (HAS_TEXT_ENCODER) {
-        return textDecoder.decode(bytes);
+        return textDecoder!.decode(bytes);
     }
     return Buffer.from(bytes.buffer as ArrayBuffer, bytes.byteOffset, bytes.byteLength).toString(
         'utf-8'

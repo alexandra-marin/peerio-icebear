@@ -19,6 +19,7 @@ interface ExternalImage {
     length: number;
     isOverInlineSizeLimit: boolean;
     isOversizeCutoff: boolean;
+    isInsecure: boolean;
 }
 
 interface MessagePayload {
@@ -266,6 +267,20 @@ export default class Message extends Keg<MessagePayload, MessageProps> {
         urls = Array.from(new Set(urls)); // deduplicate
         for (let i = 0; i < urls.length; i++) {
             const url = urls[i];
+            if (!url.toLowerCase().startsWith('https://')) {
+                // Insecure URL, don't try to fetch it.
+                if (/\.(jpg|jpeg|gif|png|bmp)$/.test(url)) {
+                    // Probably an image, add it as insecure.
+                    this.externalImages.push({
+                        url,
+                        length: 0,
+                        isOverInlineSizeLimit: false,
+                        isOversizeCutoff: false,
+                        isInsecure: true
+                    });
+                }
+                continue;
+            }
             if (unfurl.urlCache[url]) {
                 this._processUrlHeaders(url, unfurl.urlCache[url]);
             } else {
@@ -319,7 +334,8 @@ export default class Message extends Keg<MessagePayload, MessageProps> {
             isOverInlineSizeLimit:
                 clientApp.uiUserPrefs.limitInlineImageSize &&
                 length > config.chat.inlineImageSizeLimit,
-            isOversizeCutoff: length > config.chat.inlineImageSizeLimitCutoff
+            isOversizeCutoff: length > config.chat.inlineImageSizeLimitCutoff,
+            isInsecure: false
         });
     }
 

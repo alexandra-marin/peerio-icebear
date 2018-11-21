@@ -314,7 +314,7 @@ export class Config {
          * If larger, will be truncated.
          * Note that it's the number of UTF-16 characters, not bytes (same for ASCII).
          */
-        maxHTMLContentLength: 4 * 1024 // 4K ought to be enought for anyone
+        maxHTMLContentLength: 64 * 1024 // 64K ought to be enough for anyone
     };
 
     /**

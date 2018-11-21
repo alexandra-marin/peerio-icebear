@@ -1,26 +1,17 @@
-import { observable, computed, when, IObservableArray } from 'mobx';
+import { observable, computed, IObservableArray } from 'mobx';
 import contactStore from './../contacts/contact-store';
 import User from './../user/user';
 import Keg from './../kegs/keg';
 import moment from 'moment';
 import _ from 'lodash';
 import { retryUntilSuccess } from '../../helpers/retry';
-import * as unfurl from '../../helpers/unfurl';
-import config from '../../config';
+import { ExternalImage, ExternalWebsite, ExternalContent } from '../../helpers/unfurl/types';
+import { getUrls, processUrl } from '../../helpers/unfurl/unfurl';
 import clientApp from '../client-app';
-import TaskQueue from '../../helpers/task-queue';
-import socket from '../../network/socket';
 import SharedKegDb from '../kegs/shared-keg-db';
 import Contact from '../contacts/contact';
 import ReadReceipt from './read-receipt';
-
-interface ExternalImage {
-    url: string;
-    length: number;
-    isOverInlineSizeLimit: boolean;
-    isOversizeCutoff: boolean;
-    isInsecure: boolean;
-}
+import config from '../../config';
 
 interface MessagePayload {
     text: string;
@@ -59,7 +50,6 @@ export default class Message extends Keg<MessagePayload, MessageProps> {
     richText: unknown;
     isMention: boolean;
 
-    static unfurlQueue = new TaskQueue(5);
     @observable sending = false;
     @observable sendError = false;
     /**
@@ -81,9 +71,14 @@ export default class Message extends Keg<MessagePayload, MessageProps> {
     @observable groupWithPrevious: boolean;
 
     /**
-     * External image urls mentioned in this chat and safe to render in agreement with all settings.
+     * External images mentioned in this chat and safe to render in agreement with all settings.
      */
     @observable.shallow externalImages = [] as IObservableArray<ExternalImage>;
+
+    /**
+     * External site mentioned in this chat and safe to render in agreement with all settings.
+     */
+    @observable.shallow externalWebsites = [] as IObservableArray<ExternalWebsite>;
 
     /**
      * Indicates if current message contains at least one url.
@@ -252,7 +247,7 @@ export default class Message extends Keg<MessagePayload, MessageProps> {
         const settings = clientApp.uiUserPrefs;
         // it's not nice to run regex on every message,
         // but we'll remove this with richText release
-        let urls = unfurl.getUrls(this.text);
+        let urls = getUrls(this.text);
         this.hasUrls = !!urls.length;
 
         if (!settings.externalContentEnabled) {
@@ -265,79 +260,21 @@ export default class Message extends Keg<MessagePayload, MessageProps> {
         }
 
         urls = Array.from(new Set(urls)); // deduplicate
-        for (let i = 0; i < urls.length; i++) {
-            const url = urls[i];
-            if (!url.toLowerCase().startsWith('https://')) {
-                // Insecure URL, don't try to fetch it.
-                if (/\.(jpg|jpeg|gif|png|bmp)$/.test(url)) {
-                    // Probably an image, add it as insecure.
-                    this.externalImages.push({
-                        url,
-                        length: 0,
-                        isOverInlineSizeLimit: false,
-                        isOversizeCutoff: false,
-                        isInsecure: true
-                    });
-                }
-                continue;
-            }
-            if (unfurl.urlCache[url]) {
-                this._processUrlHeaders(url, unfurl.urlCache[url]);
-            } else {
-                this._queueUnfurl(url);
-            }
+        if (urls.length > config.unfurl.maxLinks) urls = urls.slice(0, config.unfurl.maxLinks);
+        // Note: launching all promises at once, not awaiting sequentially.
+        urls.forEach(url => processUrl(url).then(this._processExternalContent));
+    }
+
+    protected _processExternalContent = (externalContent: ExternalContent) => {
+        if (!externalContent) return;
+        // TODO: remove this debug
+        console.log('externalContent=', externalContent);
+        if (externalContent.type == 'html') {
+            this.externalWebsites.push(externalContent);
+        } else if (externalContent.type == 'image') {
+            this.externalImages.push(externalContent);
         }
-    }
-
-    protected _queueUnfurl(url: string) {
-        Message.unfurlQueue.addTask(() => {
-            return unfurl
-                .getContentHeaders(url)
-                .catch(err => {
-                    console.error(err);
-                    // There's no reliable way to know if XMLHttpRequest has failed due to disconnection.
-                    // Also, socket.connected is usually updated with a little delay,
-                    // so we rely on this hacky way to postpone the connection check.
-                    // We wait for socket to disconnect and will assume our headers request failed
-                    // due to disconnection if socket disconnects within next few seconds.
-                    // False positives are possible but harmless.
-                    const dispose = when(
-                        () => !socket.connected,
-                        () => {
-                            const queue = Message.unfurlQueue;
-                            if (!queue.paused) {
-                                when(() => socket.connected, () => queue.resume());
-                                queue.pause();
-                            }
-                            this._queueUnfurl(url);
-                        }
-                    );
-                    setTimeout(dispose, 2000);
-                })
-                .then(headers => {
-                    if (headers) this._processUrlHeaders(url, headers);
-                });
-        });
-    }
-
-    protected _processUrlHeaders(url: string, headers) {
-        if (!headers || !headers['content-type']) return;
-
-        const type = headers['content-type'].split(';')[0];
-        const length = +(headers['content-length'] || 0); // careful, +undefined is NaN
-
-        if (!config.chat.allowedInlineContentTypes[type]) return;
-
-        this.externalImages.push({
-            url,
-            length,
-            isOverInlineSizeLimit:
-                clientApp.uiUserPrefs.limitInlineImageSize &&
-                length > config.chat.inlineImageSizeLimit,
-            isOversizeCutoff: length > config.chat.inlineImageSizeLimitCutoff,
-            isInsecure: false
-        });
-    }
+    };
 
     serializeKegPayload() {
         this.format = this.latestFormat;

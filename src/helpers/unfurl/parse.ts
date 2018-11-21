@@ -28,20 +28,19 @@ export function parseHTML(url: string, data: string): HTMLParseResult | null {
 
         // TODO: find charset.
         head.childNodes.forEach(node => {
-            const n = node;
             switch (node.nodeName) {
                 case 'title': {
                     if (res.title) break; // only use <title> tag if we didn't read it from opengraph.
-                    if (!n.childNodes) break;
-                    const titleNode = n.childNodes.find(n => n.nodeName === '#text') as any;
+                    if (!node.childNodes) break;
+                    const titleNode = node.childNodes.find(n => n.nodeName === '#text') as any;
                     if (titleNode && typeof titleNode.value === 'string')
                         res.title = titleNode.value.trim();
                     break;
                 }
                 case 'meta': {
-                    if (!n.attrs) break;
-                    const attrs = mapAttrs(n.attrs);
-                    if (attrs['name'] == 'description' && !res.description) {
+                    if (!node.attrs) break;
+                    const attrs = mapAttrs(node.attrs);
+                    if (attrs['name'] === 'description' && !res.description) {
                         res.description = attrs['content'];
                     }
                     switch (attrs['property']) {
@@ -57,15 +56,20 @@ export function parseHTML(url: string, data: string): HTMLParseResult | null {
                         case 'og:image':
                             res.imageURL = attrs['content'];
                             break;
+                        default:
+                            break;
                     }
                     break;
                 }
-                case 'link':
-                    if (!n.attrs) break;
-                    const attrs = mapAttrs(n.attrs);
+                case 'link': {
+                    if (!node.attrs) break;
+                    const attrs = mapAttrs(node.attrs);
                     if (attrs['rel'] === 'shortcut icon' || attrs['rel'] === 'icon') {
                         res.faviconURL = attrs['href'];
                     }
+                    break;
+                }
+                default:
                     break;
             }
         });
@@ -83,13 +87,13 @@ export function parseHTML(url: string, data: string): HTMLParseResult | null {
 
         // Validate URLs.
         try {
-            new URL(res.imageURL);
+            new URL(res.imageURL); // eslint-disable-line no-new
         } catch (err) {
             res.imageURL = undefined;
         }
 
         try {
-            new URL(res.faviconURL);
+            new URL(res.faviconURL); // eslint-disable-line no-new
         } catch (err) {
             res.faviconURL = undefined;
         }

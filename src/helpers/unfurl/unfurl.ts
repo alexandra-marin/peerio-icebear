@@ -7,14 +7,19 @@ import socket from '../../network/socket';
 import config from '../../config';
 import clientApp from '../../models/client-app';
 import TaskQueue from '../task-queue';
+import CacheEngineBase from '../../db/cache-engine-base';
 import { ExternalContent, ExternalWebsite, ExternalImage } from './types';
 import { parseHTML } from './parse';
-import CacheEngineBase from 'src/db/cache-engine-base';
 const urlRegex: RegExp = require('url-regex')();
 
 const urlsInProgress: { [url: string]: Promise<ExternalContent | null> } = {};
 const queue = new TaskQueue(5);
 let urlCache: CacheEngineBase<ExternalContent> | undefined;
+
+export const htmlContentTypes = {
+    'text/html': true,
+    'application/xhtml+xml': true
+};
 
 /**
  * Detects urls in a string and returns them.
@@ -39,8 +44,8 @@ export async function processUrl(url: string): Promise<ExternalContent | null> {
         await urlCache.open();
     }
 
-    let content = await urlCache.getValue(url);
-    if (content) return content;
+    const cached = await urlCache.getValue(url);
+    if (cached) return cached;
 
     return queue.addTask<ExternalContent | null>(async () => {
         try {
@@ -121,27 +126,26 @@ export async function getExternalContent(url: string): Promise<ExternalContent |
             if (!fetched.contentText) return null;
             const html = parseHTML(url, fetched.contentText);
             if (!html) return null;
-            let { siteName, title, description, imageURL, faviconURL } = html;
             const website: ExternalWebsite = {
                 type: 'html',
-                siteName,
                 url,
-                title,
-                description
+                siteName: html.siteName,
+                title: html.title,
+                description: html.description
             };
 
-            if (!faviconURL) {
+            if (!html.faviconURL) {
                 const u = new URL(url);
-                faviconURL = 'https://' + u.hostname + '/favicon.ico';
+                html.faviconURL = `https://${u.hostname}/favicon.ico`;
             }
 
-            const favicon = await getExternalContent(faviconURL);
+            const favicon = await getExternalContent(html.faviconURL);
             if (favicon && favicon.type === 'image') {
                 website.favicon = favicon;
             }
 
-            if (imageURL) {
-                const image = await getExternalContent(imageURL);
+            if (html.imageURL) {
+                const image = await getExternalContent(html.imageURL);
                 if (image && image.type === 'image') {
                     website.image = image;
                 }
@@ -158,11 +162,6 @@ export async function getExternalContent(url: string): Promise<ExternalContent |
         delete urlsInProgress[url];
     });
 }
-
-export const htmlContentTypes = {
-    'text/html': true,
-    'application/xhtml+xml': true
-};
 
 function fetchContent(url: string): Promise<FetchedContent | null> {
     return new Promise((resolve, reject) => {

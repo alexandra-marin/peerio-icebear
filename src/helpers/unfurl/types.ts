@@ -1,4 +1,11 @@
-export type ExternalContent = ExternalWebsite | ExternalImage;
+export type ExternalImage = {
+    type: 'image';
+    url: string;
+    length: number;
+    isOverInlineSizeLimit: boolean;
+    isOversizeCutoff: boolean;
+    isInsecure: boolean;
+};
 
 export type ExternalWebsite = {
     type: 'html';
@@ -10,11 +17,4 @@ export type ExternalWebsite = {
     image?: ExternalImage;
 };
 
-export type ExternalImage = {
-    type: 'image';
-    url: string;
-    length: number;
-    isOverInlineSizeLimit: boolean;
-    isOversizeCutoff: boolean;
-    isInsecure: boolean;
-};
+export type ExternalContent = ExternalWebsite | ExternalImage;

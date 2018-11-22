@@ -86,7 +86,10 @@ export async function processUrl(url: string): Promise<ExternalContent | null> {
     });
 }
 
-export async function getExternalContent(url: string, expectImage = false): Promise<ExternalContent | null> {
+export async function getExternalContent(
+    url: string,
+    expectImage = false
+): Promise<ExternalContent | null> {
     if (!url.toLowerCase().startsWith('https://')) {
         // Insecure URL, don't try to fetch it.
         if (/\.(jpg|jpeg|gif|png|bmp)$/.test(url)) {

@@ -88,13 +88,13 @@ export function parseHTML(url: string, data: string): HTMLParseResult | null {
 
         // Validate and resolve URLs.
         try {
-            res.imageURL = new URL(res.imageURL, url).href; // eslint-disable-line no-new
+            res.imageURL = new URL(res.imageURL, url).href;
         } catch (err) {
             res.imageURL = undefined;
         }
 
         try {
-            res.faviconURL = new URL(res.faviconURL, url).href; // eslint-disable-line no-new
+            res.faviconURL = new URL(res.faviconURL, url).href;
         } catch (err) {
             res.faviconURL = undefined;
         }

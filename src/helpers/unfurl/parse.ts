@@ -63,6 +63,7 @@ export function parseHTML(url: string, data: string): HTMLParseResult | null {
                 }
                 case 'link': {
                     if (!node.attrs) break;
+                    if (res.faviconURL) break; // first favicon is fine
                     const attrs = mapAttrs(node.attrs);
                     if (attrs['rel'] === 'shortcut icon' || attrs['rel'] === 'icon') {
                         res.faviconURL = attrs['href'];
@@ -85,15 +86,15 @@ export function parseHTML(url: string, data: string): HTMLParseResult | null {
             res.siteName = new URL(url).hostname.toLowerCase();
         }
 
-        // Validate URLs.
+        // Validate and resolve URLs.
         try {
-            new URL(res.imageURL); // eslint-disable-line no-new
+            res.imageURL = new URL(res.imageURL, url).href; // eslint-disable-line no-new
         } catch (err) {
             res.imageURL = undefined;
         }
 
         try {
-            new URL(res.faviconURL); // eslint-disable-line no-new
+            res.faviconURL = new URL(res.faviconURL, url).href; // eslint-disable-line no-new
         } catch (err) {
             res.faviconURL = undefined;
         }

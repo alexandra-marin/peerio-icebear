@@ -135,7 +135,6 @@ export async function getExternalContent(url: string, expectImage = false): Prom
                 title: html.title,
                 description: html.description
             };
-            console.log('Got website', website);
 
             if (!html.faviconURL) {
                 const u = new URL(url);
@@ -154,7 +153,6 @@ export async function getExternalContent(url: string, expectImage = false): Prom
                 }
             }
 
-            console.log('Returning website', website);
             return website;
         }
         return null;

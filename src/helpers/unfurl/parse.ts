@@ -76,7 +76,7 @@ export function parseHTML(url: string, data: string): HTMLParseResult | null {
         });
 
         // Validate and trim strings.
-        res.siteName = trimOrUndefined(res.title);
+        res.siteName = trimOrUndefined(res.siteName);
         res.title = trimOrUndefined(res.title);
         res.description = trimOrUndefined(res.description);
         res.imageURL = trimOrUndefined(res.imageURL);

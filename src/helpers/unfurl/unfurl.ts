@@ -86,7 +86,7 @@ export async function processUrl(url: string): Promise<ExternalContent | null> {
     });
 }
 
-export async function getExternalContent(url: string): Promise<ExternalContent | null> {
+export async function getExternalContent(url: string, expectImage = false): Promise<ExternalContent | null> {
     if (!url.toLowerCase().startsWith('https://')) {
         // Insecure URL, don't try to fetch it.
         if (/\.(jpg|jpeg|gif|png|bmp)$/.test(url)) {
@@ -122,6 +122,8 @@ export async function getExternalContent(url: string): Promise<ExternalContent |
             return image;
         }
 
+        if (expectImage) return null;
+
         if (htmlContentTypes[fetched.contentType]) {
             if (!fetched.contentText) return null;
             const html = parseHTML(url, fetched.contentText);
@@ -133,24 +135,26 @@ export async function getExternalContent(url: string): Promise<ExternalContent |
                 title: html.title,
                 description: html.description
             };
+            console.log('Got website', website);
 
             if (!html.faviconURL) {
                 const u = new URL(url);
                 html.faviconURL = `https://${u.hostname}/favicon.ico`;
             }
 
-            const favicon = await getExternalContent(html.faviconURL);
+            const favicon = await getExternalContent(html.faviconURL, true);
             if (favicon && favicon.type === 'image') {
                 website.favicon = favicon;
             }
 
             if (html.imageURL) {
-                const image = await getExternalContent(html.imageURL);
+                const image = await getExternalContent(html.imageURL, true);
                 if (image && image.type === 'image') {
                     website.image = image;
                 }
             }
 
+            console.log('Returning website', website);
             return website;
         }
         return null;

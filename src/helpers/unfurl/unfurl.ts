@@ -145,13 +145,13 @@ export async function getExternalContent(
             }
 
             const favicon = await getExternalContent(html.faviconURL, true);
-            if (favicon && favicon.type === 'image') {
+            if (favicon && favicon.type === 'image' && !favicon.isInsecure) {
                 website.favicon = favicon;
             }
 
             if (html.imageURL) {
                 const image = await getExternalContent(html.imageURL, true);
-                if (image && image.type === 'image') {
+                if (image && image.type === 'image' && !image.isInsecure) {
                     website.image = image;
                 }
             }

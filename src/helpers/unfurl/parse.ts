@@ -82,7 +82,7 @@ export function parseHTML(url: string, data: string): HTMLParseResult | null {
         res.imageURL = trimOrUndefined(res.imageURL);
         res.faviconURL = trimOrUndefined(res.faviconURL);
 
-        if (!res.siteName) {
+        if (!res.siteName || res.siteName === res.title) {
             res.siteName = new URL(url).hostname.toLowerCase();
         }
 

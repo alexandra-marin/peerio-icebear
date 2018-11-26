@@ -404,12 +404,10 @@ export class ChatStore {
         }
 
         // waiting for most chats to load but up to a reasonable time
-        await Promise.map(
-            this.chats,
-            chat =>
-                chat.isChannel
-                    ? asPromise(chat, 'headLoaded', true)
-                    : asPromise(chat, 'metaLoaded', true)
+        await Promise.map(this.chats, chat =>
+            chat.isChannel
+                ? asPromise(chat, 'headLoaded', true)
+                : asPromise(chat, 'metaLoaded', true)
         )
             .timeout(5000)
             .catch(() => {

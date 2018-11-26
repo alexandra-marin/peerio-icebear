@@ -5,6 +5,7 @@ export interface HTMLParseResult {
     title?: string;
     description?: string;
     imageURL?: string;
+    imageAlt?: string;
     faviconURL?: string;
 }
 
@@ -33,28 +34,52 @@ export function parseHTML(url: string, data: string): HTMLParseResult | null {
                     if (res.title) break; // only use <title> tag if we didn't read it from opengraph.
                     if (!node.childNodes) break;
                     const titleNode = node.childNodes.find(n => n.nodeName === '#text') as any;
-                    if (titleNode && typeof titleNode.value === 'string')
+                    if (titleNode && typeof titleNode.value === 'string') {
                         res.title = titleNode.value.trim();
+                    }
                     break;
                 }
                 case 'meta': {
                     if (!node.attrs) break;
                     const attrs = mapAttrs(node.attrs);
-                    if (attrs['name'] === 'description' && !res.description) {
-                        res.description = attrs['content'];
+                    const content = attrs['content'];
+                    switch (attrs['name']) {
+                        case 'description':
+                            if (!res.description) res.description = content; // prefer twitter or og description
+                            break;
+                        case 'twitter:title':
+                            if (content) res.title = content;
+                            break;
+                        case 'twitter:image:src':
+                            if (!res.imageURL) res.imageURL = content; // prefer og image
+                            break;
+                        case 'twitter:image:alt':
+                            if (!res.imageAlt) res.imageAlt = content;
+                            break;
+                        default:
+                            break;
                     }
                     switch (attrs['property']) {
                         case 'og:description':
-                            res.description = attrs['content'];
+                            if (content) res.description = content;
                             break;
                         case 'og:site_name':
-                            res.siteName = attrs['content'];
+                            if (content) res.siteName = content;
                             break;
                         case 'og:title':
-                            res.title = attrs['content'];
+                            if (content) res.title = content;
                             break;
                         case 'og:image':
-                            res.imageURL = attrs['content'];
+                            if (content) res.imageURL = content;
+                            break;
+                        case 'og:image:url':
+                            if (!res.imageURL) res.imageURL = content;
+                            break;
+                        case 'og:image:secure_url':
+                            if (content) res.imageURL = content;
+                            break;
+                        case 'og:image:alt':
+                            if (content) res.imageAlt = content;
                             break;
                         default:
                             break;
@@ -88,13 +113,13 @@ export function parseHTML(url: string, data: string): HTMLParseResult | null {
 
         // Validate and resolve URLs.
         try {
-            res.imageURL = new URL(res.imageURL, url).href;
+            if (res.imageURL) res.imageURL = new URL(res.imageURL, url).href;
         } catch (err) {
             res.imageURL = undefined;
         }
 
         try {
-            res.faviconURL = new URL(res.faviconURL, url).href;
+            if (res.faviconURL) res.faviconURL = new URL(res.faviconURL, url).href;
         } catch (err) {
             res.faviconURL = undefined;
         }

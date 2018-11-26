@@ -15,6 +15,7 @@ export type ExternalWebsite = {
     description?: string;
     favicon?: ExternalImage;
     image?: ExternalImage;
+    imageAlt?: string;
 };
 
 export type ExternalContent = ExternalWebsite | ExternalImage;

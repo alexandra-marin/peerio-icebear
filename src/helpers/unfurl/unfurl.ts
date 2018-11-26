@@ -153,6 +153,7 @@ export async function getExternalContent(
                 const image = await getExternalContent(html.imageURL, true);
                 if (image && image.type === 'image' && !image.isInsecure) {
                     website.image = image;
+                    website.imageAlt = html.imageAlt;
                 }
             }
 

@@ -23,11 +23,10 @@ export function parseHTML(url: string, data: string): HTMLParseResult | null {
         let html = doc.childNodes.find(n => n.nodeName === 'html');
         if (!html || !html.childNodes) html = doc; // some pages don't bother with <html> tags
         let head = html.childNodes.find(n => n.nodeName === 'head');
-        if (!head) head = html; // some pages don't even bother with <head>. XXX: should we require it?
+        if (!head) head = html; // some pages don't even bother with <head>
 
         if (!head.childNodes) return null;
 
-        // TODO: find charset.
         head.childNodes.forEach(node => {
             switch (node.nodeName) {
                 case 'title': {
@@ -124,7 +123,6 @@ export function parseHTML(url: string, data: string): HTMLParseResult | null {
             res.faviconURL = undefined;
         }
 
-        console.log(res); // XXX: debug logging
         return res;
     } catch (err) {
         console.error(`Failed to parse HTML from ${url}`, err);

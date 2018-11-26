@@ -267,8 +267,6 @@ export default class Message extends Keg<MessagePayload, MessageProps> {
 
     protected _processExternalContent = (externalContent: ExternalContent) => {
         if (!externalContent) return;
-        // TODO: remove this debug
-        console.log('externalContent=', externalContent);
         if (externalContent.type === 'html') {
             this.externalWebsites.push(externalContent);
         } else if (externalContent.type === 'image') {

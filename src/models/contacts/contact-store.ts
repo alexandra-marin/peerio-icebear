@@ -488,7 +488,7 @@ export class ContactStore {
      * @param token - search query string
      * @param list - optional list to search in, by default it will search in contact store
      */
-    filter(token: string, list?: Contact[], nosort = false) {
+    filter(token: string, list?: Contact[], nosort = false): Contact[] {
         // eslint-disable-next-line no-param-reassign
         token = token.toLocaleLowerCase();
         let removeUnavailable = false;

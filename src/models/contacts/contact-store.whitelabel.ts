@@ -7,14 +7,14 @@ import Contact from './contact';
 // Filter contacts in Peerio namespace
 // Should only return whiteLabel.name === 'peerio' contacts
 // regardless of context
-function peerioContactFilter(contact: Contact /* , context: string */) {
+function peerioContactFilter(contact: Contact /* , context: string */): boolean {
     return contact.appLabel === 'peerio';
 }
 
 // Filter contacts in medcryptor workspace
 // For desktop, various rules (MC only, Peerio only, or both) based on context
 // For mobile always returns all users
-function medcryptorContactFilter(contact: Contact, context: string) {
+function medcryptorContactFilter(contact: Contact, context: string): boolean {
     if (config.isMobile) return contact.appLabel === 'medcryptor';
     switch (context) {
         case 'newchat':
@@ -36,11 +36,11 @@ const filters = {
     medcryptor: medcryptorContactFilter
 };
 
-function getContactFilter() {
+function getContactFilter(): (contact: Contact, context?: string) => boolean {
     return filters[config.whiteLabel.name || 'peerio'];
 }
 
-class ContactStoreWhitelabel {
+export default class ContactStoreWhitelabel {
     constructor(store: ContactStore) {
         this.store = store;
     }
@@ -53,7 +53,7 @@ class ContactStoreWhitelabel {
     // For Peerio, all contexts including newchat currently return only Peerio contacts
     // For Medcryptor, newchat context returns all namespace contacts, default context
     // returns only medcryptor
-    getContact(usernameOrEmail: string, context: string) {
+    getContact(usernameOrEmail: string, context: string): Promise<Contact> {
         const c = this.store.getContact(usernameOrEmail);
         return new Promise(resolve => {
             // when our request is complete, check and apply filter
@@ -70,22 +70,20 @@ class ContactStoreWhitelabel {
         });
     }
 
-    filter(token: string, context: string) {
+    filter(token: string, context: string): Contact[] {
         const filter = getContactFilter();
         return this.store.filter(token).filter(c => filter(c, context));
     }
 
-    checkMCAdmin(username: string) {
+    checkMCAdmin(username: string): boolean {
         const c = this.store.getContact(username);
         if (!c || !c.mcrRoles) return null;
         return c.mcrRoles.some(x => x.includes('admin'));
     }
 
-    checkMCDoctor(username: string) {
+    checkMCDoctor(username: string): boolean {
         const c = this.store.getContact(username);
         if (!c || !c.mcrRoles) return null;
         return c.mcrRoles.includes('doctor');
     }
 }
-
-export default ContactStoreWhitelabel;

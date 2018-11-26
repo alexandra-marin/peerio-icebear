@@ -30,24 +30,24 @@ export function parseHTML(url: string, data: string): HTMLParseResult | null {
         head.childNodes.forEach(node => {
             switch (node.nodeName) {
                 case 'title': {
-                    if (res.title) break; // only use <title> tag if we didn't read it from opengraph.
-                    if (!node.childNodes) break;
+                    // only use <title> tag if we didn't read it from opengraph.
+                    if (res.title || !node.childNodes) break;
                     const titleNode = node.childNodes.find(n => n.nodeName === '#text') as any;
                     if (titleNode && typeof titleNode.value === 'string') {
-                        res.title = titleNode.value.trim();
+                        res.title = titleNode.value;
                     }
                     break;
                 }
                 case 'meta': {
                     if (!node.attrs) break;
-                    const attrs = mapAttrs(node.attrs);
-                    const content = attrs['content'];
-                    switch (attrs['name']) {
+                    const { name, property, content } = mapAttrs(node.attrs);
+                    if (!content) break;
+                    switch (name) {
                         case 'description':
                             if (!res.description) res.description = content; // prefer twitter or og description
                             break;
                         case 'twitter:title':
-                            if (content) res.title = content;
+                            res.title = content;
                             break;
                         case 'twitter:image:src':
                             if (!res.imageURL) res.imageURL = content; // prefer og image
@@ -58,27 +58,27 @@ export function parseHTML(url: string, data: string): HTMLParseResult | null {
                         default:
                             break;
                     }
-                    switch (attrs['property']) {
+                    switch (property) {
                         case 'og:description':
-                            if (content) res.description = content;
+                            res.description = content;
                             break;
                         case 'og:site_name':
-                            if (content) res.siteName = content;
+                            res.siteName = content;
                             break;
                         case 'og:title':
-                            if (content) res.title = content;
+                            res.title = content;
                             break;
                         case 'og:image':
-                            if (content) res.imageURL = content;
+                            res.imageURL = content;
                             break;
                         case 'og:image:url':
                             if (!res.imageURL) res.imageURL = content;
                             break;
                         case 'og:image:secure_url':
-                            if (content) res.imageURL = content;
+                            res.imageURL = content;
                             break;
                         case 'og:image:alt':
-                            if (content) res.imageAlt = content;
+                            res.imageAlt = content;
                             break;
                         default:
                             break;
@@ -86,11 +86,10 @@ export function parseHTML(url: string, data: string): HTMLParseResult | null {
                     break;
                 }
                 case 'link': {
-                    if (!node.attrs) break;
-                    if (res.faviconURL) break; // first favicon is fine
-                    const attrs = mapAttrs(node.attrs);
-                    if (attrs['rel'] === 'shortcut icon' || attrs['rel'] === 'icon') {
-                        res.faviconURL = attrs['href'];
+                    if (!node.attrs || res.faviconURL) break; // first favicon is fine
+                    const { rel, href } = mapAttrs(node.attrs);
+                    if (rel === 'shortcut icon' || rel === 'icon') {
+                        res.faviconURL = href;
                     }
                     break;
                 }

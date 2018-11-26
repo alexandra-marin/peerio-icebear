@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.31.0"></a>
+# [5.31.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.30.0...v5.31.0) (2018-11-20)
+
+
+### Bug Fixes
+
+* **unfurl:** use Node https.get to avoid prefetch ([4299d21](https://github.com/PeerioTechnologies/peerio-icebear/commit/4299d21))
+* make unfurl function configurable ([a99ea6c](https://github.com/PeerioTechnologies/peerio-icebear/commit/a99ea6c))
+* make unfurlHeaderFetcher dynamic ([b6e58c7](https://github.com/PeerioTechnologies/peerio-icebear/commit/b6e58c7))
+
+
+### Features
+
+* **unfurl:** fetch only HTTPS images ([24034ff](https://github.com/PeerioTechnologies/peerio-icebear/commit/24034ff))
+
+
+
+<a name="5.30.0"></a>
+# [5.30.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.29.1...v5.30.0) (2018-11-19)
+
+
+### Features
+
+* canDelete on file-store.bulk ([5dd5ae4](https://github.com/PeerioTechnologies/peerio-icebear/commit/5dd5ae4))
+
+
+
 <a name="5.29.1"></a>
 ## [5.29.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.29.0...v5.29.1) (2018-11-19)
 

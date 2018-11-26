@@ -32,12 +32,19 @@ class FileStoreBulk {
     get canMove() {
         return !getFileStore().selectedFilesOrFolders.some(f => f.isFolder && f.isShared);
     }
+
+    @computed
+    get canDelete() {
+        return !getFileStore().selectedFiles.some(f => !f.deleteable);
+    }
+
     @computed
     get canShare() {
         return !getFileStore().selectedFilesOrFolders.some(
             f => (f.isFolder && !f.canShare) || f.isLegacy
         );
     }
+
     @computed
     get hasLegacyObjectsSelected() {
         return getFileStore().selectedFilesOrFolders.some(

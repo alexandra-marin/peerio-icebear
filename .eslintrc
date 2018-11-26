@@ -26,7 +26,6 @@
         "typescript/class-name-casing": 2,
         "typescript/no-angle-bracket-type-assertion": 2,
         "typescript/no-array-constructor": 2,
-        "dot-notation": 0,
         "no-useless-return": 0
     }
 }

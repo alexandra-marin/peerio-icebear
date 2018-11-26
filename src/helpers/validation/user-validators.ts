@@ -28,10 +28,12 @@
  *  validator will be used.
  *
  */
+import IsEmail from 'isemail';
+
 import socket from '../../network/socket';
 import { getFirstLetter } from '../string';
 import config from '../../config';
-import IsEmail from 'isemail';
+import { LocalizationStrings } from '../../copy/defs';
 
 const VALIDATION_THROTTLING_PERIOD_MS = 400;
 const usernameRegex = /^\w{1,16}$/;
@@ -115,8 +117,18 @@ function isValidLoginUsername(name: string) {
     );
 }
 
-function areEqualValues(value, additionalArguments) {
-    if (additionalArguments.required !== false && (!value || value.length === 0)) {
+interface AdditionalArguments<T> {
+    equalsValue: T;
+    equalsErrorMessage: keyof LocalizationStrings;
+    /**
+     * Is the value non-nullable (or if it's a value with a `length` property,
+     * is it allowed to be empty?)
+     */
+    required?: boolean;
+}
+
+function areEqualValues<T>(value: T, additionalArguments: AdditionalArguments<T>) {
+    if (additionalArguments.required !== false && (!value || (value as any).length === 0)) {
         return Promise.resolve({
             result: false,
             message: 'error_fieldRequired'
@@ -129,7 +141,10 @@ function areEqualValues(value, additionalArguments) {
     });
 }
 
-function pair(action, message) {
+function pair<T extends any[]>(
+    action: (...args: T) => Promise<boolean>,
+    message: keyof LocalizationStrings
+) {
     return { action, message };
 }
 
@@ -148,7 +163,12 @@ const usernameExistence = pair(isValidLoginUsername, 'error_usernameNotFound');
 const stringExists = pair(isNonEmptyString, 'error_fieldRequired');
 const firstNameReserved = pair(isValidSignupFirstName, 'error_invalidName');
 const lastNameReserved = pair(isValidSignupLastName, 'error_invalidName');
-const valueEquality = pair(areEqualValues, 'error_mustMatch');
+
+// `areEqualValues` is the only validator that doesn't conform to the standard
+// validator signature, so to preserve its signature we form the object manually
+// instead of using the `pair` helper.
+const valueEquality = { action: areEqualValues, message: 'error_mustMatch' };
+
 const isValidMcrDoctorAhpra = isValid('medcryptor_doctor', 'ahpra');
 const isValidMcrAdminAhpra = isValid('medcryptor_admin', 'ahpra');
 const mcrDoctorAhpraAvailability = pair(isValidMcrDoctorAhpra, 'mcr_error_ahrpa');

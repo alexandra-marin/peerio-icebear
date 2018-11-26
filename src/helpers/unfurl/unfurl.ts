@@ -183,15 +183,14 @@ function fetchContent(url: string): Promise<FetchedContent | null> {
 
                 case 2 /* HEADERS_RECEIVED */: {
                     // Ensure we weren't redirected to insecure URL.
-                    if (!req.responseURL.toLowerCase().startsWith('https://')) {
+                    if (req.responseURL && !req.responseURL.toLowerCase().startsWith('https://')) {
                         resolved = true;
                         req.abort();
                         resolve(null);
                     }
-                    resp.contentType = parseContentType(req.getResponseHeader('content-type'));
-                    resp.contentLength = parseContentLength(
-                        req.getResponseHeader('content-length')
-                    );
+                    const headers = parseResponseHeaders(req.getAllResponseHeaders());
+                    resp.contentType = parseContentType(headers['content-type']);
+                    resp.contentLength = parseContentLength(headers['content-length']);
                     // Image? Don't fetch content.
                     if (resp.contentType && config.chat.allowedInlineImageTypes[resp.contentType]) {
                         resolved = true;
@@ -252,4 +251,26 @@ function parseContentType(headerValue: string | null): string {
 
 function parseContentLength(headerValue: string | null): number {
     return +(headerValue || 0); // careful, +undefined is NaN
+}
+
+// XXX: This method is used because react-native 0.55 doesn't have
+// a working xhr.getResponseHeader(). Fixed in 0.58.
+function parseResponseHeaders(headerStr: string): { [key: string]: string } {
+    const headers = {};
+    if (!headerStr) {
+        return headers;
+    }
+    const headerPairs = headerStr.split('\u000d\u000a');
+    for (let i = 0; i < headerPairs.length; i++) {
+        const headerPair = headerPairs[i];
+        // Can't use split() here because it does the wrong thing
+        // if  header value has ": " in it.
+        const index = headerPair.indexOf(': ');
+        if (index > 0) {
+            const key = headerPair.substring(0, index).toLowerCase();
+            const val = headerPair.substring(index + 2);
+            headers[key] = val;
+        }
+    }
+    return headers;
 }

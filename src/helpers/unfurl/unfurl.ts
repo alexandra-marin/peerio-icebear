@@ -108,6 +108,8 @@ export async function getExternalContent(
         }
     }
 
+    if (!goodUrl(url)) return null;
+
     if (urlsInProgress[url]) return urlsInProgress[url];
 
     const promise = fetchContent(url).then(async fetched => {
@@ -185,7 +187,7 @@ function fetchContent(url: string): Promise<FetchedContent | null> {
 
                 case 2 /* HEADERS_RECEIVED */: {
                     // Ensure we weren't redirected to insecure URL.
-                    if (req.responseURL && !req.responseURL.toLowerCase().startsWith('https://')) {
+                    if (req.status !== 200 || (req.responseURL && !goodUrl(req.responseURL))) {
                         resolved = true;
                         req.abort();
                         resolve(null);
@@ -284,4 +286,13 @@ function parseResponseHeaders(headerStr: string): { [key: string]: string } {
 function truncate(s: string | undefined, maxChars: number): string | undefined {
     if (typeof s === 'undefined') return undefined;
     return truncateWithEllipsis(s, maxChars);
+}
+
+function goodUrl(url: string): boolean {
+    const parsedUrl = urlParser.parse(url);
+    if (parsedUrl.protocol !== 'https:') return false;
+    // Don't try to fetch anything from URLs that don't
+    // have root domain after dot (e.g. is IP address, localhost, etc.)
+    if (!/\.[^\d]+$/.test(parsedUrl.hostname)) return false;
+    return true;
 }

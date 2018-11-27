@@ -217,13 +217,16 @@ export default class Keg<TPayload, TProps extends {} = {}> {
     /**
      * Saves keg to server, creates keg (reserves id) first if needed
      */
-    saveToServer() {
+    async saveToServer() {
         if (this.loading) {
             console.warn(`Keg ${this.id} ${this.type} is trying to save while already loading.`);
         }
-        if (this.saving && !this.id) {
-            // this keg is in the process of obtaining an id, save will be inevitably called later
-            return asPromise(this, 'saving', false);
+        if (this.saving) {
+            if (!this.id) {
+                // this keg is in the process of obtaining an id, save will be inevitably called later
+                return asPromise(this, 'saving', false);
+            }
+            await asPromise(this, 'saving', false);
         }
         this.saving = true;
         if (this.id) {
@@ -289,7 +292,7 @@ export default class Keg<TPayload, TProps extends {} = {}> {
             console.error('Failed preparing keg to save.', err);
             return Promise.reject(err);
         }
-        lastVersion =this.version; // eslint-disable-line prefer-const
+        lastVersion = this.version; // eslint-disable-line prefer-const
         return signingPromise
             .then(() =>
                 socket.send(

@@ -3,7 +3,7 @@
  */
 
 import { when } from 'mobx';
-import { resolve } from 'url';
+import * as urlParser from 'url';
 import socket from '../../network/socket';
 import config from '../../config';
 import clientApp from '../../models/client-app';
@@ -141,7 +141,7 @@ export async function getExternalContent(
             };
 
             if (!html.faviconURL) {
-                html.faviconURL = resolve(url, '/favicon.ico');
+                html.faviconURL = urlParser.resolve(url, '/favicon.ico');
             }
 
             const favicon = await getExternalContent(html.faviconURL, true);

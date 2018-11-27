@@ -282,7 +282,8 @@ export class Config {
             'image/gif': true,
             'image/pjpeg': true,
             'image/png': true,
-            'image/x-icon': true
+            'image/x-icon': true,
+            'image/vnd.microsoft.icon': true
         }
     };
 

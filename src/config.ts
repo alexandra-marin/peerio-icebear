@@ -2,7 +2,6 @@ import _sdkVersion from './__sdk';
 import FileStreamBase from './models/files/file-stream-base';
 import CacheEngineBase from './db/cache-engine-base';
 import { TinyDBStorageEngineConstructor } from './defs/tiny-db';
-import fetchHeaders from './helpers/xhr-fetch-headers';
 
 const SERVER_PLAN_PREMIUM_MONTHLY = 'icebear_premium_monthly';
 const SERVER_PLAN_PREMIUM_YEARLY = 'icebear_premium_yearly';
@@ -277,12 +276,14 @@ export class Config {
          * Image bigger than this is not downloaded inline even with manual "Display this image"
          */
         inlineImageSizeLimitCutoff: 30 * 1024 * 1024,
-        allowedInlineContentTypes: {
+        allowedInlineImageTypes: {
             'image/jpeg': true,
             'image/bmp': true,
             'image/gif': true,
             'image/pjpeg': true,
-            'image/png': true
+            'image/png': true,
+            'image/x-icon': true,
+            'image/vnd.microsoft.icon': true
         }
     };
 
@@ -298,15 +299,36 @@ export class Config {
         maxNameLength: 40
     };
 
-    /**
-     * How long to wait for external server to respond when unfurling urls posted in messages.
-     */
-    unfurlTimeout = 30000;
+    unfurl = {
+        /**
+         * Maximum number of links in message to unfurl.
+         */
+        maxLinks: 64,
 
-    /**
-     * Function returning a function used to fetch headers.
-     * By default, uses XHR. On Desktop, should be re-configured to use node-fetch-headers. */
-    unfurlHeadersFetcher = () => fetchHeaders;
+        /**
+         * How long to wait for external server to respond when unfurling urls posted in messages.
+         */
+        timeout: 30000,
+
+        /**
+         * Maximum HTML content length to fetch for parsing.
+         * If larger, will be truncated.
+         * Note that it's the number of UTF-16 characters, not bytes (same for ASCII).
+         */
+        maxHTMLContentLength: 64 * 1024, // 64K ought to be enough for anyone,
+
+        /** Maximum website name length. */
+        maxSiteNameLength: 256,
+
+        /** Maximum website title length. */
+        maxTitleLength: 256,
+
+        /** Maximum website description length */
+        maxDescriptionLength: 280,
+
+        /** Maximum image alt length */
+        maxImageAltLength: 512
+    };
 
     /**
      * Maximum total size of cached images which we store before we start deleting the least recent ones

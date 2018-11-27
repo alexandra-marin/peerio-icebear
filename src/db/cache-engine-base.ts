@@ -115,6 +115,7 @@ export default class CacheEngineBase<TValue> {
     @observable isOpen: boolean;
 
     async open() {
+        if (this.isOpen) return;
         // not the best design, if we invoke reset for meta db it's gonna lock,
         // but meta db is meta db, it's not a regular db, so it can have exceptions
         if (this.name !== META_DB_NAME) {

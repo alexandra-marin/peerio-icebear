@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.32.1"></a>
+## [5.32.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.32.0...v5.32.1) (2018-11-27)
+
+
+### Bug Fixes
+
+* don't try to fetch from IP or local domains; don't unfurl non-200 ([eaaadc0](https://github.com/PeerioTechnologies/peerio-icebear/commit/eaaadc0))
+* saving kegs in queue ([65e2e39](https://github.com/PeerioTechnologies/peerio-icebear/commit/65e2e39))
+
+
+### Reverts
+
+* lastSavingVersion in keg.js ([aaae314](https://github.com/PeerioTechnologies/peerio-icebear/commit/aaae314))
+
+
+
 <a name="5.32.0"></a>
 # [5.32.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.31.2...v5.32.0) (2018-11-27)
 

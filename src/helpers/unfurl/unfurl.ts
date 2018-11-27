@@ -11,6 +11,7 @@ import TaskQueue from '../task-queue';
 import CacheEngineBase from '../../db/cache-engine-base';
 import { ExternalContent, ExternalWebsite, ExternalImage } from './types';
 import { parseHTML } from './parse';
+import { truncateWithEllipsis } from '../string';
 const urlRegex: RegExp = require('url-regex')();
 
 const urlsInProgress: { [url: string]: Promise<ExternalContent | null> } = {};
@@ -281,14 +282,6 @@ function parseResponseHeaders(headerStr: string): { [key: string]: string } {
 }
 
 function truncate(s: string | undefined, maxChars: number): string | undefined {
-    /* eslint-disable no-param-reassign */
     if (typeof s === 'undefined') return undefined;
-    if (s.length <= maxChars) return s;
-    s = s.substring(0, maxChars - 1); // minus ellipsis that we'll add
-    // Already ends with ellipsis?
-    if (s.endsWith('…')) return s;
-    // Trim up to three periods at the end before adding ellipsis.
-    if (s.endsWith('..')) s = s.substring(0, s.length - 2);
-    if (s.endsWith('.')) s = s.substring(0, s.length - 1);
-    return `${s}…`;
+    return truncateWithEllipsis(s, maxChars);
 }

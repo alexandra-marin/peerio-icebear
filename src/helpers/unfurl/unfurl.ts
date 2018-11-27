@@ -153,7 +153,7 @@ export async function getExternalContent(
                 const image = await getExternalContent(html.imageURL, true);
                 if (image && image.type === 'image' && !image.isInsecure) {
                     website.image = image;
-                    website.imageAlt = html.imageAlt;
+                    website.imageAlt = truncate(html.imageAlt, config.unfurl.maxImageAltLength);
                 }
             }
 
@@ -282,8 +282,7 @@ function truncate(s: string | undefined, maxChars: number): string | undefined {
     s = s.substring(0, maxChars - 1); // minus ellipsis that we'll add
     // Already ends with ellipsis?
     if (s.endsWith('…')) return s;
-    // Trim up to three periods or ellipsis at the end before
-    // adding ellipsis.
+    // Trim up to three periods at the end before adding ellipsis.
     if (s.endsWith('..')) s = s.substring(0, s.length - 2);
     if (s.endsWith('.')) s = s.substring(0, s.length - 1);
     return `${s}…`;

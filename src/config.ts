@@ -323,7 +323,10 @@ export class Config {
         maxTitleLength: 256,
 
         /** Maximum website description length */
-        maxDescriptionLength: 280
+        maxDescriptionLength: 280,
+
+        /** Maximum image alt length */
+        maxImageAltLength: 512
     };
 
     /**

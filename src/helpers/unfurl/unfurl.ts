@@ -32,6 +32,7 @@ export function getUrls(str: string): string[] {
 }
 
 interface FetchedContent {
+    responseURL: string;
     contentType: string;
     contentLength: number;
     contentText?: string; // may be partial
@@ -130,7 +131,7 @@ export async function getExternalContent(
 
         if (htmlContentTypes[fetched.contentType]) {
             if (!fetched.contentText) return null;
-            const html = parseHTML(url, fetched.contentText);
+            const html = parseHTML(fetched.responseURL, fetched.contentText);
             if (!html) return null;
             const website: ExternalWebsite = {
                 type: 'html',
@@ -141,7 +142,7 @@ export async function getExternalContent(
             };
 
             if (!html.faviconURL) {
-                html.faviconURL = urlParser.resolve(url, '/favicon.ico');
+                html.faviconURL = urlParser.resolve(fetched.responseURL, '/favicon.ico');
             }
 
             const favicon = await getExternalContent(html.faviconURL, true);
@@ -188,6 +189,10 @@ function fetchContent(url: string): Promise<FetchedContent | null> {
                         req.abort();
                         resolve(null);
                     }
+                    // Remember response URL (which may be different from url if redirected)
+                    // for resolving URLs after parsing.
+                    resp.responseURL = req.responseURL || url;
+
                     const headers = parseResponseHeaders(req.getAllResponseHeaders());
                     resp.contentType = parseContentType(headers['content-type']);
                     resp.contentLength = parseContentLength(headers['content-length']);

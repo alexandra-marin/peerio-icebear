@@ -320,10 +320,10 @@ export class Config {
         maxSiteNameLength: 256,
 
         /** Maximum website title length. */
-        maxTitleLength: 1024,
+        maxTitleLength: 256,
 
         /** Maximum website description length */
-        maxDescriptionLength: 1024
+        maxDescriptionLength: 280
     };
 
     /**

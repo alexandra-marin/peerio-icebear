@@ -335,7 +335,7 @@ class ChatMessageHandler {
                         'Received page',
                         pagingUp ? 'UP' : 'DOWN',
                         (pagingUp && this.chat._cancelTopPageLoad) ||
-                            (!pagingUp && this.chat._cancelBottomPageLoad)
+                        (!pagingUp && this.chat._cancelBottomPageLoad)
                             ? 'and discarded'
                             : ''
                     );

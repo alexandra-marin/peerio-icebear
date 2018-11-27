@@ -93,8 +93,8 @@ export default class Volume extends FileFolder {
 
     async addParticipants(participants: (Contact | string)[]) {
         if (!participants || !participants.length) return Promise.resolve();
-        const contacts = participants.map(p =>
-            typeof p === 'string' ? contactStore.getContactAndSave(p) : p
+        const contacts = participants.map(
+            p => (typeof p === 'string' ? contactStore.getContactAndSave(p) : p)
         );
         await Contact.ensureAllLoaded(contacts);
 

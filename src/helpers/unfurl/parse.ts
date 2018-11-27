@@ -1,4 +1,5 @@
 import * as parse5 from 'parse5';
+import * as urlParser from 'url';
 
 export interface HTMLParseResult {
     siteName: string;
@@ -106,22 +107,11 @@ export function parseHTML(url: string, data: string): HTMLParseResult | null {
         res.faviconURL = trimOrUndefined(res.faviconURL);
 
         if (!res.siteName || res.siteName === res.title) {
-            res.siteName = new URL(url).hostname.toLowerCase();
+            res.siteName = urlParser.parse(url).hostname;
         }
 
-        // Validate and resolve URLs.
-        try {
-            if (res.imageURL) res.imageURL = new URL(res.imageURL, url).href;
-        } catch (err) {
-            res.imageURL = undefined;
-        }
-
-        try {
-            if (res.faviconURL) res.faviconURL = new URL(res.faviconURL, url).href;
-        } catch (err) {
-            res.faviconURL = undefined;
-        }
-
+        res.imageURL = resolveURL(url, res.imageURL);
+        res.faviconURL = resolveURL(url, res.faviconURL);
         return res;
     } catch (err) {
         console.error(`Failed to parse HTML from ${url}`, err);
@@ -140,4 +130,11 @@ function mapAttrs(arr: { name: string; value: string }[]): { [name: string]: str
         map[a.name] = a.value;
     });
     return map;
+}
+
+function resolveURL(baseURL: string, urlOrPath: string | undefined): string | undefined {
+    if (!urlOrPath) return undefined;
+    const resolvedURL = urlParser.parse(urlParser.resolve(baseURL, urlOrPath));
+    if (!resolvedURL.host || !resolvedURL.href) return undefined;
+    return resolvedURL.href;
 }

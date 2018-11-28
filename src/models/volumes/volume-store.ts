@@ -17,7 +17,7 @@ export class VolumeStore {
         tracker.onceUpdated(this.loadAllVolumes);
         socket.onceStarted(() => {
             socket.subscribe(socket.APP_EVENTS.volumeDeleted, data =>
-                this.processVolumeDeletedEvent(data.volumeId)
+                this.processVolumeDeletedEvent(data.kegDbId)
             );
         });
     }

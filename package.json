@@ -53,7 +53,7 @@
     "moment": "2.22.2",
     "parse5": "5.1.0",
     "pdfform.js": "1.0.13",
-    "peerio-translator": "2.1.0",
+    "peerio-translator": "2.1.1",
     "rimraf": "2.6.2",
     "safe-json-stringify": "1.2.0",
     "scrypt-async": "2.0.1",

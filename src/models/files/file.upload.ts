@@ -158,6 +158,7 @@ export function cancelUpload(this: File) {
     console.log('file.uploads.js: upload cancelled');
     this._saveUploadEndFact();
     this._resetUploadState();
+    this.store.files.remove(this);
     return this.remove();
 }
 

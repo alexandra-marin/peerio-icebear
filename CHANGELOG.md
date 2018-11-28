@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.32.6"></a>
+## [5.32.6](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.32.5...v5.32.6) (2018-11-28)
+
+
+### Bug Fixes
+
+* deleting volumes ([fe5d677](https://github.com/PeerioTechnologies/peerio-icebear/commit/fe5d677))
+
+
+
 <a name="5.32.5"></a>
 ## [5.32.5](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.32.4...v5.32.5) (2018-11-28)
 

@@ -1,4 +1,4 @@
-import { getFirstLetterUpperCase } from '~/helpers/string';
+import { getFirstLetterUpperCase, truncateWithEllipsis } from '~/helpers/string';
 
 describe('String helper should', () => {
     it('return empty string for no input', () => {
@@ -35,5 +35,9 @@ describe('String helper should', () => {
         const actual = getFirstLetterUpperCase(name);
 
         actual.should.equal(expected);
+    });
+
+    it('truncate with ellipsis', () => {
+        truncateWithEllipsis('😀😀😀😀😀😀😀', 6).should.equal('😀😀…');
     });
 });

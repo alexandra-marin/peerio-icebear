@@ -1,10 +1,14 @@
-import fetchHeadersNode from '~/helpers/node-fetch-headers';
-
-const URL = 'https://www.peerio.com';
+import * as fs from 'fs';
+import * as path from 'path';
+import { parseHTML } from '../../../src/helpers/unfurl/parse';
+import testData from './unfurl-data';
 
 describe('Unfurl', () => {
-    it('fetchHeadersNode', async () => {
-        const headers = await fetchHeadersNode(URL, 30000);
-        headers.should.have.property('content-type');
+    it('parseHTML', () => {
+        for (const data of testData) {
+            const page = fs.readFileSync(path.join(__dirname, 'unfurl-data', data.file)).toString();
+            const result = parseHTML(data.url, page);
+            result.should.deep.equal(data.result);
+        }
     });
 });

@@ -441,7 +441,9 @@ export class ChatStore {
 
         // TODO: remove when kegdb add/remove will make it's way to digest
         dbListProvider.onDbAdded(id => this.addChat(id));
-        dbListProvider.onDbRemoved(id => this.unloadChat(id));
+        dbListProvider.onDbRemoved(id => {
+            this.processChannelDeletedEvent({ kegDbId: id });
+        });
     }
 
     getSelflessParticipants(participants) {

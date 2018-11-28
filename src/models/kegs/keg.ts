@@ -143,10 +143,6 @@ export default class Keg<TPayload, TProps extends {} = {}> {
     afterLoad?: () => void;
     onLoadedFromKeg?: (keg: unknown) => void;
 
-    // something to resolve consecutive saveToServer() calls,
-    // when they're too close, this.version doesn't manage to get updated by the time second saveToServer serializes
-    // and it leads to false optimistic concurrency errors
-    lastSavingVersion = 0;
     /**
      * Keg format version, client tracks kegs structure changes with this property
      */
@@ -221,13 +217,16 @@ export default class Keg<TPayload, TProps extends {} = {}> {
     /**
      * Saves keg to server, creates keg (reserves id) first if needed
      */
-    saveToServer() {
+    async saveToServer() {
         if (this.loading) {
             console.warn(`Keg ${this.id} ${this.type} is trying to save while already loading.`);
         }
-        if (this.saving && !this.id) {
-            // this keg is in the process of obtaining an id, save will be inevitably called later
-            return asPromise(this, 'saving', false);
+        if (this.saving) {
+            if (!this.id) {
+                // this keg is in the process of obtaining an id, save will be inevitably called later
+                return asPromise(this, 'saving', false);
+            }
+            await asPromise(this, 'saving', false);
         }
         this.saving = true;
         if (this.id) {
@@ -257,7 +256,7 @@ export default class Keg<TPayload, TProps extends {} = {}> {
      * Updates existing server keg with new data.
      * This function assumes keg id exists so always use `saveToServer()` to be safe.
      */
-    protected internalSave(): Promise<void> {
+    protected async internalSave(): Promise<void> {
         let payload,
             props,
             lastVersion,
@@ -293,8 +292,7 @@ export default class Keg<TPayload, TProps extends {} = {}> {
             console.error('Failed preparing keg to save.', err);
             return Promise.reject(err);
         }
-        lastVersion = Math.max(this.lastSavingVersion, this.version); // eslint-disable-line prefer-const
-        this.lastSavingVersion = lastVersion + 1;
+        lastVersion = this.version; // eslint-disable-line prefer-const
         return signingPromise
             .then(() =>
                 socket.send(

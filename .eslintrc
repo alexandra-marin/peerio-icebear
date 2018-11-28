@@ -25,6 +25,7 @@
         "import/no-unresolved": 0,
         "typescript/class-name-casing": 2,
         "typescript/no-angle-bracket-type-assertion": 2,
-        "typescript/no-array-constructor": 2
+        "typescript/no-array-constructor": 2,
+        "no-useless-return": 0
     }
 }

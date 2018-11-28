@@ -561,6 +561,8 @@
   "title_enableAllUrlPreview": "Enable all URL preview",
   "title_onlyFromFavourites": "Only from Favourites",
   "title_EnableUrlPreviewWarning": "Enabling URL Preview may increase the chance of tracking by third party web services.",
+  "title_expandPreview": "Expand preview",
+  "title_collapsePreview": "Collapse preview",
   "title_learnMore": "<a-learnUrlTracking>Learn more.</>",
   "title_learnMoreLegacyFiles": "<a-learnLegacyFiles>Learn more</>",
   "button_learnMore": "Learn more",

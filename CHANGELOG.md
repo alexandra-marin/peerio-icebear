@@ -2,6 +2,67 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.32.3"></a>
+## [5.32.3](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.32.2...v5.32.3) (2018-11-28)
+
+
+### Bug Fixes
+
+* duplicated site_name and title are ok ([d5c8a87](https://github.com/PeerioTechnologies/peerio-icebear/commit/d5c8a87)), closes [/app.clubhouse.io/peerio/story/17377/desktop-url-preview#activity-17553](https://github.com//app.clubhouse.io/peerio/story/17377/desktop-url-preview/issues/activity-17553)
+
+
+
+<a name="5.32.2"></a>
+## [5.32.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.32.1...v5.32.2) (2018-11-28)
+
+
+### Bug Fixes
+
+* missing notif when kicked from a room ([df7736c](https://github.com/PeerioTechnologies/peerio-icebear/commit/df7736c))
+* remove failed uploads from the fileStore immediately ([6be8c48](https://github.com/PeerioTechnologies/peerio-icebear/commit/6be8c48))
+
+
+
+<a name="5.32.1"></a>
+## [5.32.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.32.0...v5.32.1) (2018-11-27)
+
+
+### Bug Fixes
+
+* don't try to fetch from IP or local domains; don't unfurl non-200 ([eaaadc0](https://github.com/PeerioTechnologies/peerio-icebear/commit/eaaadc0))
+* saving kegs in queue ([65e2e39](https://github.com/PeerioTechnologies/peerio-icebear/commit/65e2e39))
+
+
+### Reverts
+
+* lastSavingVersion in keg.js ([aaae314](https://github.com/PeerioTechnologies/peerio-icebear/commit/aaae314))
+
+
+
+<a name="5.32.0"></a>
+# [5.32.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.31.2...v5.32.0) (2018-11-27)
+
+
+### Bug Fixes
+
+* **unfurl:** resolve relative urls ([0cee748](https://github.com/PeerioTechnologies/peerio-icebear/commit/0cee748))
+* add image/vnd.microsoft.icon to image types ([aa981df](https://github.com/PeerioTechnologies/peerio-icebear/commit/aa981df))
+* don't add insecure images as favicon and image at all ([b17d7d2](https://github.com/PeerioTechnologies/peerio-icebear/commit/b17d7d2))
+* infinite fetches of favicon ([5d15278](https://github.com/PeerioTechnologies/peerio-icebear/commit/5d15278))
+* manually parse XHR headers; check for responseURL. ([f6a1428](https://github.com/PeerioTechnologies/peerio-icebear/commit/f6a1428))
+* properly resolve relative images for redirected urls ([6033b44](https://github.com/PeerioTechnologies/peerio-icebear/commit/6033b44))
+* siteName parse ([711dbd5](https://github.com/PeerioTechnologies/peerio-icebear/commit/711dbd5))
+* truncation of surrogate pairs ([b037e87](https://github.com/PeerioTechnologies/peerio-icebear/commit/b037e87))
+
+
+### Features
+
+* add siteName, title, description truncation ([b5f05c5](https://github.com/PeerioTechnologies/peerio-icebear/commit/b5f05c5))
+* ExternalWebsite.imageAlt; Twitter card parsing; fixes ([53f69a3](https://github.com/PeerioTechnologies/peerio-icebear/commit/53f69a3))
+* website unfurl ([8a09ffa](https://github.com/PeerioTechnologies/peerio-icebear/commit/8a09ffa))
+
+
+
 <a name="5.31.2"></a>
 ## [5.31.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.31.1...v5.31.2) (2018-11-26)
 

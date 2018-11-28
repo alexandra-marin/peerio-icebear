@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.32.3"></a>
+## [5.32.3](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.32.2...v5.32.3) (2018-11-28)
+
+
+### Bug Fixes
+
+* duplicated site_name and title are ok ([d5c8a87](https://github.com/PeerioTechnologies/peerio-icebear/commit/d5c8a87)), closes [/app.clubhouse.io/peerio/story/17377/desktop-url-preview#activity-17553](https://github.com//app.clubhouse.io/peerio/story/17377/desktop-url-preview/issues/activity-17553)
+
+
+
 <a name="5.32.2"></a>
 ## [5.32.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.32.1...v5.32.2) (2018-11-28)
 

@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.32.2"></a>
+## [5.32.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.32.1...v5.32.2) (2018-11-28)
+
+
+### Bug Fixes
+
+* missing notif when kicked from a room ([df7736c](https://github.com/PeerioTechnologies/peerio-icebear/commit/df7736c))
+* remove failed uploads from the fileStore immediately ([6be8c48](https://github.com/PeerioTechnologies/peerio-icebear/commit/6be8c48))
+
+
+
 <a name="5.32.1"></a>
 ## [5.32.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.32.0...v5.32.1) (2018-11-27)
 

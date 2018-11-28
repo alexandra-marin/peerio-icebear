@@ -106,7 +106,7 @@ export function parseHTML(url: string, data: string): HTMLParseResult | null {
         res.imageURL = trimOrUndefined(res.imageURL);
         res.faviconURL = trimOrUndefined(res.faviconURL);
 
-        if (!res.siteName || res.siteName === res.title) {
+        if (!res.siteName) {
             res.siteName = urlParser.parse(url).hostname;
         }
 

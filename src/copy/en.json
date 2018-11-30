@@ -216,8 +216,6 @@
   "title_oldVersionDescription1": "The file owner still needs to upgrade.",
   "title_oldVersionDescription2": "File actions are limited to <b>download</> and <b>delete</>.",
   "title_oldVersionTooltip": "Cannot be reshared until owner updates",
-  "title_previousSharedFilesTitle": "Files you have shared previously are now unshared.",
-  "title_previousSharedFilesLearnMore": "Learn more about updated file system from our help centre.",
   "title_fileUpdateProgressDescription": "This dialog will close when the update is complete",
   "title_sharedFilesUnshared": "All shared files were unshared.",
   "error_fieldRequired": "Required",

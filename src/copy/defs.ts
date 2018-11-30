@@ -218,6 +218,8 @@ export interface LocalizationStrings {
   'title_oldVersionDescription1': () => string;
   'title_oldVersionDescription2': () => React.ReactChild[];
   'title_oldVersionTooltip': () => string;
+  'title_previousSharedFilesTitle': () => string;
+  'title_previousSharedFilesLearnMore': () => string;
   'title_fileUpdateProgressDescription': () => string;
   'title_sharedFilesUnshared': () => string;
   'error_fieldRequired': () => string;

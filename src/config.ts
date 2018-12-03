@@ -148,7 +148,9 @@ export class Config {
     };
 
     beacons = {
-        dmCountBeforePinPrompt: 15
+        dmCountPinPrompt: 15,
+        fileCountFolderPrompt: 8,
+        messageCountSharePrompt: 6
     };
 
     /**

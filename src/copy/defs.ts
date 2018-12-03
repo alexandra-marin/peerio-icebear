@@ -549,6 +549,8 @@ export interface LocalizationStrings {
   'title_enableAllUrlPreview': () => string;
   'title_onlyFromFavourites': () => string;
   'title_EnableUrlPreviewWarning': () => string;
+  'title_expandPreview': () => string;
+  'title_collapsePreview': () => string;
   'title_learnMore': () => React.ReactChild[];
   'title_learnMoreLegacyFiles': () => React.ReactChild[];
   'button_learnMore': () => string;

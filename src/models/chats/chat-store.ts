@@ -404,12 +404,10 @@ export class ChatStore {
         }
 
         // waiting for most chats to load but up to a reasonable time
-        await Promise.map(
-            this.chats,
-            chat =>
-                chat.isChannel
-                    ? asPromise(chat, 'headLoaded', true)
-                    : asPromise(chat, 'metaLoaded', true)
+        await Promise.map(this.chats, chat =>
+            chat.isChannel
+                ? asPromise(chat, 'headLoaded', true)
+                : asPromise(chat, 'metaLoaded', true)
         )
             .timeout(5000)
             .catch(() => {
@@ -426,7 +424,9 @@ export class ChatStore {
 
         // TODO: remove when kegdb add/remove will make it's way to digest
         dbListProvider.onDbAdded(id => this.addChat(id));
-        dbListProvider.onDbRemoved(id => this.unloadChat(id));
+        dbListProvider.onDbRemoved(id => {
+            this.processChannelDeletedEvent({ kegDbId: id });
+        });
     }
 
     getSelflessParticipants(participants) {

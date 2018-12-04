@@ -564,9 +564,6 @@ export default class User {
 
     async _preAuth() {
         this.trustedDevice = undefined;
-        if (this._firstLoginInSession) {
-            return this._checkForPasscode();
-        }
         return false;
     }
 

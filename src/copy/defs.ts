@@ -1043,5 +1043,8 @@ export interface LocalizationStrings {
   'title_insecureImagePreviewWarning': () => string;
   'title_quit': () => string;
   'title_updateAndQuit': () => string;
+  'title_sentTo': () => string;
+  'title_seenBy': () => string;
+  'title_seenByAll': () => string;
   'title_removed': () => string;
 }

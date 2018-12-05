@@ -7,12 +7,12 @@ reaction(
         if (invites.length > 0) ice.chatInviteStore.acceptInvite(invites[0].kegDbId);
     }
 );
-
+let msgid = 0;
 when(
     () => ice.chatStore.activeChat,
     () => {
         const sendMsg = () => {
-            ice.chatStore.activeChat.sendMessage('Hello');
+            ice.chatStore.activeChat.sendMessage(String(msgid++));
             setTimeout(sendMsg, 3000);
         };
         setTimeout(sendMsg, Math.random() * 10000);

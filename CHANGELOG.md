@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.32.8"></a>
+## [5.32.8](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.32.7...v5.32.8) (2018-12-05)
+
+
+### Performance Improvements
+
+* BFG first working version ([e44d78c](https://github.com/PeerioTechnologies/peerio-icebear/commit/e44d78c))
+
+
+
 <a name="5.32.7"></a>
 ## [5.32.7](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.32.6...v5.32.7) (2018-12-04)
 

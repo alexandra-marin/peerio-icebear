@@ -28,7 +28,7 @@ export default function mixUserAuthModule(this: User) {
                 // eslint-disable-next-line default-case
                 switch (e.code) {
                     case serverErrorCodes.notFound:
-                        return this._authenticateConnection(); // user was very unlucky to have the socket reconnected after it was acquired
+                        return this._authenticateConnection(); // user was very unlucky to have the socket reconnected after token was acquired
                     case serverErrorCodes.sdkVersionDeprecated:
                     case serverErrorCodes.clientVersionDeprecated:
                         clientApp.clientVersionDeprecated = true;

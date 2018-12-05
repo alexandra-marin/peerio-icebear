@@ -11,3 +11,4 @@ build
 .nyc_output
 .opt-in
 .package.json.md5
+bfglogs

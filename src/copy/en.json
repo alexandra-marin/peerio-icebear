@@ -37,6 +37,7 @@
   "title_wait": "Working...",
   "title_error": "Error",
   "warning_deprecated": "We’ve made Peerio better! Please get the <a-download>latest version</> to sign in.",
+  "error_deprecated": "Please get the <a-download>latest version</> to sign in.",
   "title_search": "Search",
   "title_searchResults": "Search results",
   "title_networkLatency": "Latency",

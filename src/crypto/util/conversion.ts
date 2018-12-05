@@ -8,13 +8,13 @@
 // will explode and you'll lose hours to debugging weird errors (questioning
 // whether you've completely gone unhinged) if you omit the slash. Don't omit
 // the slash.
-import { Buffer } from 'buffer/';
+import { Buffer as BufferPolyfill } from 'buffer/';
 
-const HAS_TEXT_ENCODER = typeof TextEncoder !== 'undefined' && typeof TextDecoder !== 'undefined';
+const Buffer = global.Buffer || BufferPolyfill;
 
 // TextEncoder only supports UTF-8, so the constructor has no params
-const textEncoder = HAS_TEXT_ENCODER ? new TextEncoder() : null;
-const textDecoder = HAS_TEXT_ENCODER ? new TextDecoder('utf-8') : null;
+const textEncoder = typeof TextEncoder !== 'undefined' ? new TextEncoder() : null;
+const textDecoder = typeof TextDecoder !== 'undefined' ? new TextDecoder('utf-8') : null;
 
 /**
  * Converts UTF8 string to byte array.
@@ -23,11 +23,12 @@ const textDecoder = HAS_TEXT_ENCODER ? new TextDecoder('utf-8') : null;
  * @returns utf8 decoded bytes
  */
 export function strToBytes(str: string): Uint8Array {
-    if (HAS_TEXT_ENCODER) {
-        return textEncoder!.encode(str);
+    if (textEncoder) {
+        return textEncoder.encode(str);
     }
     // returning Buffer instance will break deep equality tests since Buffer modifies prototype
-    return new Uint8Array(Buffer.from(str, 'utf-8').buffer);
+    const bytes = Buffer.from(str, 'utf-8');
+    return new Uint8Array(bytes.buffer, bytes.byteOffset, bytes.byteLength);
 }
 
 /**
@@ -37,8 +38,8 @@ export function strToBytes(str: string): Uint8Array {
  * @returns encoded string
  */
 export function bytesToStr(bytes: Uint8Array): string {
-    if (HAS_TEXT_ENCODER) {
-        return textDecoder!.decode(bytes);
+    if (textDecoder) {
+        return textDecoder.decode(bytes);
     }
     return Buffer.from(bytes.buffer as ArrayBuffer, bytes.byteOffset, bytes.byteLength).toString(
         'utf-8'
@@ -50,7 +51,8 @@ export function bytesToStr(bytes: Uint8Array): string {
  * @param str B64 string to decode
  */
 export function b64ToBytes(str: string): Uint8Array {
-    return new Uint8Array(Buffer.from(str, 'base64').buffer);
+    const bytes = Buffer.from(str, 'base64');
+    return new Uint8Array(bytes.buffer, bytes.byteOffset, bytes.byteLength);
 }
 
 /**
@@ -88,7 +90,8 @@ export function bytesToHex(bytes: Uint8Array | ArrayBuffer): string {
  * @param str hex string to decode, no prefixes, just data
  */
 export function hexToBytes(str: string): Uint8Array {
-    return new Uint8Array(Buffer.from(str, 'hex').buffer);
+    const bytes = Buffer.from(str, 'hex');
+    return new Uint8Array(bytes.buffer, bytes.byteOffset, bytes.byteLength);
 }
 
 const converterDataView = new DataView(new ArrayBuffer(4));

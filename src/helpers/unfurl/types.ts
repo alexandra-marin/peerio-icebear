@@ -1,6 +1,7 @@
 export type ExternalImage = {
     type: 'image';
     url: string;
+    contentType?: string;
     length: number;
     isOverInlineSizeLimit: boolean;
     isOversizeCutoff: boolean;

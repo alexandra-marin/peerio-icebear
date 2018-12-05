@@ -1041,5 +1041,8 @@
   "title_insecureImagePreviewWarning": "Image is not displayed because the link is not secure (doesnʼt use https)",
   "title_quit": "Quit Peerio",
   "title_updateAndQuit": "Update & Quit Peerio",
+  "title_sentTo": "Sent to",
+  "title_seenBy": "Seen by",
+  "title_seenByAll": "Seen by all",
   "title_removed": "removed"
 }

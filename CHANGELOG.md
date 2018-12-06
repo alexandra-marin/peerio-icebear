@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.33.0"></a>
+# [5.33.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.32.8...v5.33.0) (2018-12-06)
+
+
+### Bug Fixes
+
+* optimize chat list loading [ch17654] ([#367](https://github.com/PeerioTechnologies/peerio-icebear/issues/367)) ([fb2782b](https://github.com/PeerioTechnologies/peerio-icebear/commit/fb2782b))
+* remove check for passcode [ch17758] ([ebf5dee](https://github.com/PeerioTechnologies/peerio-icebear/commit/ebf5dee))
+
+
+### Features
+
+* add contentType to ExternalImage ([db65248](https://github.com/PeerioTechnologies/peerio-icebear/commit/db65248))
+
+
+
 <a name="5.32.8"></a>
 ## [5.32.8](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.32.7...v5.32.8) (2018-12-05)
 

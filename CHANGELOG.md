@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.33.1"></a>
+## [5.33.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.33.0...v5.33.1) (2018-12-07)
+
+
+
 <a name="5.33.0"></a>
 # [5.33.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.32.8...v5.33.0) (2018-12-06)
 

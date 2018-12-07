@@ -10,6 +10,8 @@ global.XMLHttpRequest = XMLHttpRequest;
 global.WebSocket = w3cwebsocket;
 
 const os = require('os');
+const faker = require('faker');
+const fetch = require('cross-fetch');
 const { ipcSend, getRandomUsername } = require('./bullet_process_helpers');
 const { asPromise, asPromiseNegative } = require('../../dist/helpers/prombservable');
 
@@ -46,8 +48,8 @@ ice.socket.start();
     const u = new ice.User();
     u.username = getRandomUsername();
     u.email = `${u.username}@mailinator.com`;
-    u.firstName = 'Firstname';
-    u.lastName = 'Lastname';
+    u.firstName = faker.name.firstName();
+    u.lastName = faker.name.lastName();
     u.locale = 'en';
     u.passphrase = '123456';
     ice.User.current = u;
@@ -60,6 +62,9 @@ ice.socket.start();
     await asPromise(ice.contactStore.myContacts.loaded, true);
     await asPromise(ice.chatStore.loaded, true);
     await ice.contactStore.currentUser.ensureLoaded();
+    const resp = await fetch(faker.image.avatar());
+    const blob = await resp.arrayBuffer();
+    await u.saveAvatar([blob, blob]);
     // notifying parent
     ipcSend('ready', { username: u.username });
 })();

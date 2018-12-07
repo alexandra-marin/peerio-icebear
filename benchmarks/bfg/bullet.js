@@ -3,6 +3,8 @@
  */
 const cp = require('child_process');
 
+const { TELEMETRY_INTERVAL, EXTRA_USERS, PRINT_HOST_STDOUT } = require('./config');
+
 let maxBulletId = 0;
 class Bullet {
     constructor(logger, isHost = false) {
@@ -60,14 +62,14 @@ class Bullet {
             this.err(`Process error ${err}`);
         });
 
-        // if (this.isHost) {
-        //     this.proc.stdout.on('data', function(data) {
-        //         process.stdout.write(data);
-        //     });
-        //     this.proc.stderr.on('data', function(data) {
-        //         process.stderr.write(data);
-        //     });
-        // }
+        if (this.isHost && PRINT_HOST_STDOUT) {
+            this.proc.stdout.on('data', function(data) {
+                process.stdout.write(data);
+            });
+            this.proc.stderr.on('data', function(data) {
+                process.stderr.write(data);
+            });
+        }
         return promise;
     }
 
@@ -78,13 +80,15 @@ class Bullet {
         this.ipcSend('rce', { code });
     }
 
-    startChat(usernames) {
+    startChat(_usernames) {
+        const usernames = _usernames.slice();
+        EXTRA_USERS.forEach(u => usernames.push(u));
         this.ipcSend('startChat', { usernames });
     }
     startTelemetryReports() {
         setInterval(() => {
             this.rce('logTelemetry()');
-        }, 3000);
+        }, TELEMETRY_INTERVAL);
     }
 }
 

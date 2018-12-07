@@ -3,8 +3,7 @@
  */
 
 // never exit
-let keepAlive = 0;
-setInterval(() => console.log(`${keepAlive++} Still flying`), 5000);
+setInterval(() => {}, 5000);
 
 // configure all the stuff, sdk, start socket, create account, login, get ready to work
 require('./bullet_process_init');

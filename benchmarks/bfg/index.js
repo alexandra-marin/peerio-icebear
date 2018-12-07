@@ -1,8 +1,8 @@
-/* eslint-disable strict */
-/* eslint-disable import/no-extraneous-dependencies */
 const cp = require('child_process');
 const chalk = require('chalk');
 const makeBoom = require('./bfg');
+
+const { USER_COUNT } = require('./config');
 
 // creating log file that will be passed down to other actors in this process
 cp.execSync('mkdir -p bfglogs');
@@ -20,6 +20,6 @@ cp.execSync('npm run test-build');
 
 // fire the BFG
 console.log(chalk.green('## Firing the bfg...'));
-makeBoom(log, 10);
+makeBoom(log, USER_COUNT);
 
-setInterval(() => {}, 5000);
+setInterval(() => {}, 60000);

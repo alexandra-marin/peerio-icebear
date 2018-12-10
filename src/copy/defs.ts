@@ -253,6 +253,8 @@ export interface LocalizationStrings {
   'button_forward': () => string;
   'button_send': () => string;
   'button_upgrade': () => string;
+  'button_visit': () => string;
+  'button_chat': () => string;
   'title_upgradeMessage': () => string;
   'error_fileQuotaExceeded': () => React.ReactChild[];
   'error_fileUploadSizeExceeded': () => React.ReactChild[];
@@ -599,6 +601,9 @@ export interface LocalizationStrings {
   'title_help': () => string;
   'title_helpText': () => string;
   'button_HC': () => string;
+  'title_helpCenter': () => string;
+  'title_contactPeerioSupport': () => string;
+  'title_sendLogsToSupport': () => string;
   'title_support': () => string;
   'title_supportIntro': () => string;
   'button_supportChat': () => string;

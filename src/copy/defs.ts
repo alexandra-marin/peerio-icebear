@@ -1034,6 +1034,12 @@ export interface LocalizationStrings {
   'title_insecureImagePreviewWarning': () => string;
   'title_quit': () => string;
   'title_updateAndQuit': () => string;
+  'title_get_peerio_pro': () => string;
+  'description_peerio_pro': () => React.ReactChild[];
+  'title_upgrade': () => string;
+  'title_monthly': () => string;
+  'title_annual': () => string;
+  'title_manage': () => string;
   'title_sentTo': () => string;
   'title_seenBy': () => string;
   'title_seenByAll': () => string;

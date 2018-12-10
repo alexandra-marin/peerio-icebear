@@ -6,7 +6,8 @@ import {
     autorun,
     isObservableArray,
     when,
-    IObservableArray
+    IObservableArray,
+    runInAction
 } from 'mobx';
 import Chat from './chat';
 import ChatStorePending from './chat-store.pending.js';
@@ -145,6 +146,7 @@ export class ChatStore {
      */
     @computed
     get channels() {
+        if (!this.loaded) return [];
         return this.chats.filter(chat => chat.isChannel && chat.headLoaded);
     }
 
@@ -389,19 +391,22 @@ export class ChatStore {
 
         // loading all the channels
         const channels = await dbListProvider.getChannels();
-        channels.forEach(id => this.addChat(id));
-
-        // checking how many more chats we can load
-        let chatsLeft = config.chat.maxInitialChats - this.myChats.favorites.length;
         // loading the rest unhidden chats
         const dms = await dbListProvider.getDMs();
-        for (const id of dms) {
-            const d = tracker.getDigest(id, 'message');
-            if (chatsLeft <= 0 && d.maxUpdateId === d.knownUpdateId) continue;
-            if (this.myChats.favorites.includes(id)) continue;
-            this.addChat(id);
-            chatsLeft--;
-        }
+
+        // adding
+        runInAction(() => {
+            channels.forEach(id => this.addChat(id));
+            // checking how many more chats we can load
+            let chatsLeft = config.chat.maxInitialChats - this.myChats.favorites.length;
+            for (const id of dms) {
+                const d = tracker.getDigest(id, 'message');
+                if (chatsLeft <= 0 && d.maxUpdateId === d.knownUpdateId) continue;
+                if (this.myChats.favorites.includes(id)) continue;
+                this.addChat(id);
+                chatsLeft--;
+            }
+        });
 
         // waiting for most chats to load but up to a reasonable time
         await Promise.map(this.chats, chat =>

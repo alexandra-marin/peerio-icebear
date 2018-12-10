@@ -39,6 +39,7 @@ export interface LocalizationStrings {
   'title_wait': () => string;
   'title_error': () => string;
   'warning_deprecated': () => React.ReactChild[];
+  'error_deprecated': () => React.ReactChild[];
   'title_search': () => string;
   'title_searchResults': () => string;
   'title_networkLatency': () => string;
@@ -1028,5 +1029,8 @@ export interface LocalizationStrings {
   'title_insecureImagePreviewWarning': () => string;
   'title_quit': () => string;
   'title_updateAndQuit': () => string;
+  'title_sentTo': () => string;
+  'title_seenBy': () => string;
+  'title_seenByAll': () => string;
   'title_removed': () => string;
 }

@@ -2,6 +2,52 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.33.2"></a>
+## [5.33.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.33.1...v5.33.2) (2018-12-10)
+
+
+
+<a name="5.33.1"></a>
+## [5.33.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.33.0...v5.33.1) (2018-12-07)
+
+
+
+<a name="5.33.0"></a>
+# [5.33.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.32.8...v5.33.0) (2018-12-06)
+
+
+### Bug Fixes
+
+* optimize chat list loading [ch17654] ([#367](https://github.com/PeerioTechnologies/peerio-icebear/issues/367)) ([fb2782b](https://github.com/PeerioTechnologies/peerio-icebear/commit/fb2782b))
+* remove check for passcode [ch17758] ([ebf5dee](https://github.com/PeerioTechnologies/peerio-icebear/commit/ebf5dee))
+
+
+### Features
+
+* add contentType to ExternalImage ([db65248](https://github.com/PeerioTechnologies/peerio-icebear/commit/db65248))
+
+
+
+<a name="5.32.8"></a>
+## [5.32.8](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.32.7...v5.32.8) (2018-12-05)
+
+
+### Performance Improvements
+
+* BFG first working version ([e44d78c](https://github.com/PeerioTechnologies/peerio-icebear/commit/e44d78c))
+
+
+
+<a name="5.32.7"></a>
+## [5.32.7](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.32.6...v5.32.7) (2018-12-04)
+
+
+### Bug Fixes
+
+* unlucky auth case ([723fed0](https://github.com/PeerioTechnologies/peerio-icebear/commit/723fed0))
+
+
+
 <a name="5.32.6"></a>
 ## [5.32.6](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.32.5...v5.32.6) (2018-11-28)
 

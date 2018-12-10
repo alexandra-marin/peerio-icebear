@@ -90,6 +90,13 @@ export default class User {
         mixUserAuthModule.call(this);
         mixUserRegisterModule.call(this);
         mixUser2faModule.call(this);
+        socket.onceAuthenticated(async () => {
+            if (!(await TinyDb.user.getValue('legacyFilesAcknowledged'))) {
+                warnings.addSevere('dialog_legacyFiles', undefined, undefined, () => {
+                    TinyDb.user.setValue('legacyFilesAcknowledged', true);
+                });
+            }
+        });
     }
 
     kegDb: KegDb;

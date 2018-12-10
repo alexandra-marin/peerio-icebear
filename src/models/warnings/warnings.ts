@@ -82,7 +82,7 @@ class Warnings {
         title?: string,
         data?: unknown,
         level: WarningLevel = 'medium',
-        callback?: () => {}
+        callback?: () => void
     ) {
         this.queueItem(new SystemWarning(content, title, data, level, callback));
     }
@@ -96,7 +96,7 @@ class Warnings {
      * @param callback - executes when warning is dismissed
      */
     @action
-    addSevere(content: string, title?: string, data?: unknown, callback?: () => {}) {
+    addSevere(content: string, title?: string, data?: unknown, callback?: () => void) {
         this.add(content, title, data, 'severe', callback);
     }
 

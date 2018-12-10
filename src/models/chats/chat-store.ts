@@ -10,9 +10,9 @@ import {
     runInAction
 } from 'mobx';
 import Chat from './chat';
-import ChatStorePending from './chat-store.pending.js';
-import ChatStoreSpaces from './chat-store.spaces.js';
-import ChatStoreCache from './chat-store.cache.js';
+import ChatStorePending from './chat-store.pending';
+import ChatStoreSpaces from './chat-store.spaces';
+import ChatStoreCache from './chat-store.cache';
 import socket from '../../network/socket';
 import tracker from '../update-tracker';
 import EventEmitter from 'eventemitter3';

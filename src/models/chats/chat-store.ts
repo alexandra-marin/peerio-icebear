@@ -193,6 +193,23 @@ export class ChatStore {
     }
 
     /**
+     * List of recent files that have been received by current user in chats.
+     */
+    @computed
+    get recentReceivedFiles() {
+        const receivedFiles: File[] = [];
+        this.directMessages.forEach(c =>
+            c.recentFiles.forEach(f => {
+                if (f.owner !== getUser().username) {
+                    receivedFiles.push(f);
+                }
+            })
+        );
+
+        return receivedFiles;
+    }
+
+    /**
      * Does smart and efficient 'in-place' sorting of observable array.
      * Note that ObservableArray#sort creates copy of the array. This function sorts in place.
      */

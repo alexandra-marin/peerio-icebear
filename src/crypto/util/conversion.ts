@@ -9,8 +9,9 @@
 // whether you've completely gone unhinged) if you omit the slash. Don't omit
 // the slash.
 import { Buffer as BufferPolyfill } from 'buffer/';
+import globalContext from '../../helpers/global-context';
 
-const Buffer = global.Buffer || BufferPolyfill;
+const Buffer = globalContext.Buffer || BufferPolyfill;
 
 // TextEncoder only supports UTF-8, so the constructor has no params
 const textEncoder = typeof TextEncoder !== 'undefined' ? new TextEncoder() : null;

@@ -937,6 +937,7 @@ export interface LocalizationStrings {
   'title_contactAdded': (params: { 'name': string | number }) => string;
   'dialog_fileTypeForExtension': (params: { 'extension': string | number }) => string;
   'dialog_fileTypeAllFiles': () => string;
+  'dialog_legacyFiles': () => React.ReactChild[];
   'warning_sharingHistory': () => string;
   'dialog_unshareTitle': () => string;
   'dialog_unshareText': () => string;

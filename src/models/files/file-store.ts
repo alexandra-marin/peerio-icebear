@@ -36,6 +36,7 @@ export class FileStore extends FileStoreBase {
 
     isMainStore = true;
     knownDescriptorVersion: string;
+    migratedFilesInThisSession: boolean;
     descriptorsCache: CacheEngineBase<{
         key: string;
         value: string;
@@ -146,6 +147,7 @@ export class FileStore extends FileStoreBase {
                 file.format = file.latestFormat;
                 file.descriptorKey = file.blobKey;
                 console.log(`migrating file ${file.fileId}`);
+                this.migratedFilesInThisSession = true;
                 this.migrationQueue.addTask(() =>
                     retryUntilSuccess(
                         () => {

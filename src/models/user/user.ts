@@ -20,6 +20,7 @@ import {
     AccountCreationChallenge,
     AuthData
 } from '../../defs/interfaces';
+import AccountVersion from './account-version';
 import Settings from './settings';
 
 // @ts-ignore to support desktop declarations emit until monorepo
@@ -65,6 +66,7 @@ export default class User {
     validatePasscode: (passcode: string) => Promise<string>;
     hasPasscode: () => Promise<boolean>;
     signout: (untrust?: boolean) => Promise<void>;
+    accountVersionKeg: AccountVersion;
     settings: Settings;
     loadSettings: () => void;
     saveSettings: (updateFunction: (settingsKeg: Settings) => void) => Promise<void>;
@@ -90,13 +92,6 @@ export default class User {
         mixUserAuthModule.call(this);
         mixUserRegisterModule.call(this);
         mixUser2faModule.call(this);
-        socket.onceAuthenticated(async () => {
-            if (!(await TinyDb.user.getValue('legacyFilesAcknowledged'))) {
-                warnings.addSevere('dialog_legacyFiles', undefined, undefined, () => {
-                    TinyDb.user.setValue('legacyFilesAcknowledged', true);
-                });
-            }
-        });
     }
 
     kegDb: KegDb;

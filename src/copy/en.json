@@ -935,6 +935,7 @@
   "title_contactAdded": "{name} has been added",
   "dialog_fileTypeForExtension": "{extension} File",
   "dialog_fileTypeAllFiles": "All Files",
+  "dialog_legacyFiles": "Manual file migration required for pending files. Please download any files marked pending in your files tab. For more information, visit our <a-pendingFiles>help centre</>.",
   "warning_sharingHistory": "Your sharing history has been kept.",
   "dialog_unshareTitle": "Unshare all your files?",
   "dialog_unshareText": "You are about to unshare all files you have ever shared with others on Peerio. This action cannot be reversed. Are you sure you want to unshare all your files?",

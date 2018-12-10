@@ -1,8 +1,8 @@
 import socket from '../../network/socket';
-import mixUserProfileModule from './user.profile.js';
-import mixUserRegisterModule from './user.register.js';
-import mixUserAuthModule from './user.auth.js';
-import mixUser2faModule from './user.2fa.js';
+import mixUserProfileModule from './user.profile';
+import mixUserRegisterModule from './user.register';
+import mixUserAuthModule from './user.auth';
+import mixUser2faModule from './user.2fa';
 import KegDb from './../kegs/keg-db';
 import TinyDb from '../../db/tiny-db';
 import { observable, when, computed } from 'mobx';

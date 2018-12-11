@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="6.0.0"></a>
+# [6.0.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.33.3...v6.0.0) (2018-12-11)
+
+
+### Chores
+
+* bb file migration ([33d841f](https://github.com/PeerioTechnologies/peerio-icebear/commit/33d841f))
+
+
+### Features
+
+* new migration dialog ([960321f](https://github.com/PeerioTechnologies/peerio-icebear/commit/960321f))
+* warning dialog for pending files ([053d5d7](https://github.com/PeerioTechnologies/peerio-icebear/commit/053d5d7))
+
+
+### BREAKING CHANGES
+
+* fileStore.migration property removed
+
+
+
 <a name="5.33.3"></a>
 ## [5.33.3](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.33.2...v5.33.3) (2018-12-10)
 

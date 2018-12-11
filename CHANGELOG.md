@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="6.0.1"></a>
+## [6.0.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v6.0.0...v6.0.1) (2018-12-11)
+
+
+### Bug Fixes
+
+* duplicate messages under heavy load ([93b8398](https://github.com/PeerioTechnologies/peerio-icebear/commit/93b8398))
+
+
+
 <a name="6.0.0"></a>
 # [6.0.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.33.3...v6.0.0) (2018-12-11)
 

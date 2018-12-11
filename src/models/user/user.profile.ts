@@ -28,7 +28,18 @@ export default function mixUserProfileModule(this: User) {
         () => {
             // already migrated?
             if (this.accountVersionKeg.accountVersion === 1) return;
-            getFileStore().migration.migrateToAccountVersion1();
+            when(
+                () => getFileStore().loaded,
+                () => {
+                    if (getFileStore().migratedFilesInThisSession)
+                        warnings.addSevere('dialog_legacyFiles', undefined, undefined);
+
+                    this.accountVersionKeg.save(() => {
+                        this.accountVersionKeg.accountVersion = 1;
+                        return true;
+                    });
+                }
+            );
         }
     );
 

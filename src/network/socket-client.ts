@@ -58,7 +58,6 @@ enum APP_EVENTS {
     channelInvitesUpdate = 'channelInvitesUpdate',
     channelDeleted = 'channelDeleted',
     volumeDeleted = 'volumeDeleted',
-    fileMigrationUnlocked = 'fileMigrationUnlocked',
     volumeInvitesUpdate = 'volumeInvitesUpdate'
 }
 

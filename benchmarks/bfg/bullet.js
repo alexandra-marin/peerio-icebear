@@ -81,10 +81,11 @@ class Bullet {
     }
 
     startChat(_usernames) {
-        const usernames = _usernames.slice();
-        EXTRA_USERS.forEach(u => usernames.push(u));
+        const usernames = _usernames.concat(EXTRA_USERS);
         this.ipcSend('startChat', { usernames });
+        this.ipcSend('setAdmins', { usernames: EXTRA_USERS });
     }
+
     startTelemetryReports() {
         setInterval(() => {
             this.rce('logTelemetry()');

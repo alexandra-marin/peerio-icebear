@@ -65,6 +65,8 @@ ice.socket.start();
     const resp = await fetch(faker.image.avatar());
     const blob = await resp.arrayBuffer();
     await u.saveAvatar([blob, blob]);
+    ice.clientApp.isFocused = true;
+    ice.clientApp.isInChatsView = true;
     // notifying parent
     ipcSend('ready', { username: u.username });
 })();

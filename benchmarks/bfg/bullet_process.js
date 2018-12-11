@@ -1,6 +1,7 @@
 /**
  * This is an entry point to the instance of Peerio app we are simulating.
  */
+const { when } = require('mobx');
 
 // never exit
 setInterval(() => {}, 5000);
@@ -21,6 +22,21 @@ process.on('message', async msg => {
         case 'startChat': {
             const contacts = ice.contactStore.getContacts(msg.data.usernames);
             ice.chatStore.startChat(contacts, true, 'bfgroom');
+            break;
+        }
+        case 'setAdmins': {
+            when(
+                () =>
+                    ice.chatStore.activeChat &&
+                    ice.chatStore.activeChat.metaLoaded &&
+                    msg.data.usernames.every(u =>
+                        ice.chatStore.activeChat.allParticipants.find(p => p.username === u)
+                    ),
+                () => {
+                    const contacts = ice.contactStore.getContacts(msg.data.usernames);
+                    Promise.each(contacts, c => ice.chatStore.activeChat.promoteToAdmin(c));
+                }
+            );
             break;
         }
         default:

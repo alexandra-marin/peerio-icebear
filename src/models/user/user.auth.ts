@@ -12,6 +12,7 @@ import clientApp from '../client-app';
 import User from './user';
 import { AuthToken, AuthData } from '../../defs/interfaces';
 import { retryUntilSuccess } from '../../helpers/retry';
+import CacheEngineBase from '../../db/cache-engine-base';
 
 //
 // Authentication mixin for User model.
@@ -367,6 +368,10 @@ export default function mixUserAuthModule(this: User) {
                         // But that's the best we could do.
                         console.error(err);
                     });
+            })
+            .then(() => CacheEngineBase.clearAllCache())
+            .catch(err => {
+                console.error('Failed to clear cache', err);
             });
     };
 }

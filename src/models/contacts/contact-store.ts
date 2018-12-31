@@ -214,9 +214,8 @@ export class ContactStore {
                         return null;
                     });
                     this.invites.received.forEach(username => {
-                        const c = this.getContactAndSave(username);
-                        const email = c.addresses.length ? c.addresses[0] : null;
-                        getChatStore().pending.add(username, email, true);
+                        this.getContactAndSave(username);
+                        getChatStore().pending.add(username, null, true);
                     });
                 } catch (err) {
                     console.error('Error applying contact invites', err);

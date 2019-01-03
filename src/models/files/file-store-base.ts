@@ -100,12 +100,17 @@ class FileStoreBase {
         return ret;
     }
 
+    @computed
+    get allFilesSortedByDate() {
+        return this.allFiles.sort(FileFolder.kegUpdatedComparer);
+    }
+
     // Subset of files not currently hidden by any applied filters
     @computed
     get filesSearchResult() {
         if (!this.searchQuery) return [];
         const q = this.searchQuery.toUpperCase();
-        return this.allFiles.filter(f => f.normalizedName.includes(q));
+        return this.allFilesSortedByDate.filter(f => f.normalizedName.includes(q));
     }
 
     // Subset of folders not currently hidden by any applied filters

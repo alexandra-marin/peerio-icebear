@@ -2,6 +2,88 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="6.1.1"></a>
+## [6.1.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v6.1.0...v6.1.1) (2019-01-03)
+
+
+### Bug Fixes
+
+* send inviter email to new PendingDM ([6f507d9](https://github.com/PeerioTechnologies/peerio-icebear/commit/6f507d9))
+
+
+
+<a name="6.1.0"></a>
+# [6.1.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v6.0.1...v6.1.0) (2018-12-28)
+
+
+### Features
+
+* clear cache after sign out ([122c523](https://github.com/PeerioTechnologies/peerio-icebear/commit/122c523))
+
+
+
+<a name="6.0.1"></a>
+## [6.0.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v6.0.0...v6.0.1) (2018-12-11)
+
+
+### Bug Fixes
+
+* duplicate messages under heavy load ([93b8398](https://github.com/PeerioTechnologies/peerio-icebear/commit/93b8398))
+
+
+
+<a name="6.0.0"></a>
+# [6.0.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.33.3...v6.0.0) (2018-12-11)
+
+
+### Chores
+
+* bb file migration ([33d841f](https://github.com/PeerioTechnologies/peerio-icebear/commit/33d841f))
+
+
+### Features
+
+* new migration dialog ([960321f](https://github.com/PeerioTechnologies/peerio-icebear/commit/960321f))
+* warning dialog for pending files ([053d5d7](https://github.com/PeerioTechnologies/peerio-icebear/commit/053d5d7))
+
+
+### BREAKING CHANGES
+
+* fileStore.migration property removed
+
+
+
+<a name="5.33.3"></a>
+## [5.33.3](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.33.2...v5.33.3) (2018-12-10)
+
+
+
+<a name="5.33.2"></a>
+## [5.33.2](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.33.1...v5.33.2) (2018-12-10)
+
+
+
+<a name="5.33.1"></a>
+## [5.33.1](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.33.0...v5.33.1) (2018-12-07)
+
+
+
+<a name="5.33.0"></a>
+# [5.33.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.32.8...v5.33.0) (2018-12-06)
+
+
+### Bug Fixes
+
+* optimize chat list loading [ch17654] ([#367](https://github.com/PeerioTechnologies/peerio-icebear/issues/367)) ([fb2782b](https://github.com/PeerioTechnologies/peerio-icebear/commit/fb2782b))
+* remove check for passcode [ch17758] ([ebf5dee](https://github.com/PeerioTechnologies/peerio-icebear/commit/ebf5dee))
+
+
+### Features
+
+* add contentType to ExternalImage ([db65248](https://github.com/PeerioTechnologies/peerio-icebear/commit/db65248))
+
+
+
 <a name="5.32.8"></a>
 ## [5.32.8](https://github.com/PeerioTechnologies/peerio-icebear/compare/v5.32.7...v5.32.8) (2018-12-05)
 

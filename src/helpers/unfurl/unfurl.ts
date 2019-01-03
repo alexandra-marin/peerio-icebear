@@ -120,6 +120,7 @@ export async function getExternalContent(
             const image: ExternalImage = {
                 type: 'image',
                 url,
+                contentType: fetched.contentType,
                 length: fetched.contentLength,
                 isOverInlineSizeLimit:
                     clientApp.uiUserPrefs.limitInlineImageSize &&

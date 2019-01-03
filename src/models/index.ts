@@ -4,6 +4,9 @@ export { Chat };
 import ChatHead from './chats/chat-head';
 export { ChatHead };
 
+import ChatPendingDM from './chats/chat-pending-dm';
+export { ChatPendingDM };
+
 import MyChats from './chats/my-chats';
 export { MyChats };
 

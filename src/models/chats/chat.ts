@@ -573,6 +573,10 @@ export default class Chat {
             }
             // new message case
             this._messageMap[msg.id] = msg;
+            // under heavy load server can send us this message before the limbo message keg update
+            // resulting in 2 of the same message being rendered
+            const limboMessage = this.limboMessages.find(l => l.id === msg.id);
+            if (limboMessage) this.limboMessages.remove(limboMessage);
             this.messages.push(msg);
             addedCount++;
         }

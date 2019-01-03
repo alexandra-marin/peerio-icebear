@@ -5,7 +5,7 @@ async function makeBoom(log, bulletsCount = 2) {
     const bullets = [];
     const host = new Bullet(log, true);
     bullets.push(host);
-    for (let i = 0; i < bulletsCount; i++) {
+    for (let i = 1; i < bulletsCount; i++) {
         bullets.push(new Bullet(log));
     }
 

@@ -11,6 +11,7 @@ import clientApp from '../client-app';
 import { getChatStore } from '../../helpers/di-chat-store';
 import Chat from './chat';
 
+// const map = {};
 class ChatMessageHandler {
     /**
      * @param chat - chat creates instance and passes itself to the constructor.
@@ -104,6 +105,9 @@ class ChatMessageHandler {
         const msgDigest = tracker.getDigest(this.chat.id, 'message');
         this.chat.unreadCount = msgDigest.newKegsCount;
         this.maxUpdateId = msgDigest.maxUpdateId;
+        // if (map[this.maxUpdateId]) {
+        //     console.log('--------', Date.now() - map[this.maxUpdateId].updatedAt);
+        // }
         this.loadUpdates();
     };
 
@@ -147,6 +151,11 @@ class ChatMessageHandler {
             .then(
                 // TODO: response types
                 action(async (resp: any) => {
+                    // ////
+                    // resp.kegs.forEach(element => {
+                    //     map[element.collectionVersion] = element;
+                    // });
+                    // //
                     this._loadingUpdates = false;
                     // there's way more updates then we are allowed to load
                     // so we jump to most recent messages

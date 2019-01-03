@@ -147,6 +147,12 @@ export class Config {
         baseUrl: 'https://api.mixpanel.com/track/'
     };
 
+    beacons = {
+        dmCountPinPrompt: 15,
+        fileCountFolderPrompt: 8,
+        messageCountSharePrompt: 6
+    };
+
     /**
      * For reference. Amount of bytes added to every file chunk in encrypted state.
      * DO NOT change this value unless you really know what you're doing.

@@ -199,20 +199,6 @@ export interface LocalizationStrings {
   'title_fileUpdateProgress': () => string;
   'title_fileUpdateProgressPercent': (params: { 'progress': string | number }) => string;
   'title_fileUpdateComplete': () => string;
-  'title_migrationInProgressStaticMessage': () => React.ReactChild[];
-  'title_migrationInProgressMessage1': () => string;
-  'title_migrationInProgressMessage2': () => string;
-  'title_migrationInProgressMessage3': () => string;
-  'title_migrationInProgressMessage4a': () => string;
-  'title_migrationInProgressMessage4b': () => string;
-  'title_migrationInProgressMessage5': () => string;
-  'title_migrationInProgressMessage6': () => string;
-  'title_migrationInProgressMessage7': () => string;
-  'title_migrationInProgressMessage8': () => string;
-  'title_migrationInProgressMessage9': () => string;
-  'title_migrationInProgressMessage10': () => string;
-  'title_migrationInProgressMessage11': () => string;
-  'title_migrationInProgressMessage12': () => string;
   'title_newfsUpgradeImageError': () => string;
   'title_pending': () => string;
   'title_pending2': () => string;
@@ -253,6 +239,8 @@ export interface LocalizationStrings {
   'button_forward': () => string;
   'button_send': () => string;
   'button_upgrade': () => string;
+  'button_visit': () => string;
+  'button_chat': () => string;
   'title_upgradeMessage': () => string;
   'error_fileQuotaExceeded': () => React.ReactChild[];
   'error_fileUploadSizeExceeded': () => React.ReactChild[];
@@ -599,6 +587,9 @@ export interface LocalizationStrings {
   'title_help': () => string;
   'title_helpText': () => string;
   'button_HC': () => string;
+  'title_helpCenter': () => string;
+  'title_contactPeerioSupport': () => string;
+  'title_sendLogsToSupport': () => string;
   'title_support': () => string;
   'title_supportIntro': () => string;
   'button_supportChat': () => string;
@@ -946,6 +937,7 @@ export interface LocalizationStrings {
   'title_contactAdded': (params: { 'name': string | number }) => string;
   'dialog_fileTypeForExtension': (params: { 'extension': string | number }) => string;
   'dialog_fileTypeAllFiles': () => string;
+  'dialog_legacyFiles': () => React.ReactChild[];
   'warning_sharingHistory': () => string;
   'dialog_unshareTitle': () => string;
   'dialog_unshareText': () => string;
@@ -1043,5 +1035,14 @@ export interface LocalizationStrings {
   'title_insecureImagePreviewWarning': () => string;
   'title_quit': () => string;
   'title_updateAndQuit': () => string;
+  'title_get_peerio_pro': () => string;
+  'description_peerio_pro': () => React.ReactChild[];
+  'title_upgrade': () => string;
+  'title_monthly': () => string;
+  'title_annual': () => string;
+  'title_manage': () => string;
+  'title_sentTo': () => string;
+  'title_seenBy': () => string;
+  'title_seenByAll': () => string;
   'title_removed': () => string;
 }

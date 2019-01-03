@@ -1,9 +1,7 @@
 import { observable } from 'mobx';
 import SyncedKeg from '../kegs/synced-keg';
 
-interface IAccountVersionPayload {
-    migration: string;
-}
+interface IAccountVersionPayload {}
 interface IAccountVersionProps {
     accountVersion: number;
 }
@@ -16,19 +14,12 @@ class AccountVersion extends SyncedKeg<IAccountVersionPayload, IAccountVersionPr
 
     // current account version
     @observable accountVersion = 0;
-    // migration specific data
-    migration: { files?: string[] } = {};
-    confirmed: boolean;
 
     serializeKegPayload() {
-        return {
-            migration: JSON.stringify(this.migration)
-        };
+        return {};
     }
 
-    deserializeKegPayload(data) {
-        this.migration = JSON.parse(data.migration);
-    }
+    deserializeKegPayload(_data) {}
 
     serializeProps() {
         return {
@@ -42,7 +33,6 @@ class AccountVersion extends SyncedKeg<IAccountVersionPayload, IAccountVersionPr
 
     __reset() {
         this.accountVersion = 0;
-        this.migration = {};
         this.saveToServer();
     }
 }

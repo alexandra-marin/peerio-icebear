@@ -600,19 +600,25 @@ export default class File extends Keg<IFilePayload, IFileProps> {
         config.FileStream.delete(this.cachePath);
         this.cached = false;
     }
+
     /**
-     * Remove file from cloud and unshare with everyone.
+     * Remove file keg.
      */
-    remove() {
+    // eslint-disable-next-line
+    remove(flags: { noFileDeleteReaction?: boolean } = {}) {
         this._resetUploadState();
         this._resetDownloadState();
         if (!this.id) return Promise.resolve();
-        return retryUntilSuccess(() => super.remove(), {
-            id: `remove file ${this.id} from ${this.db.id}`,
+        return retryUntilSuccess(() => super.remove(flags), {
+            id: `remove keg for file ${this.id} from ${this.db.id}`,
             maxRetries: 5
         }).then(() => {
             this.deleted = true;
         });
+    }
+
+    removeWithoutTriggeringFileDelete() {
+        return this.remove({ noFileDeleteReaction: true });
     }
     // TODO: better way to do this. Optional, so tsc won't complain, but it will always be defined.
     _resetDownloadState?(stream?: FileStreamBase): void;

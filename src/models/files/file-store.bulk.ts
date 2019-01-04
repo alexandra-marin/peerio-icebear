@@ -56,7 +56,8 @@ class FileStoreBulk {
         if (i.isFolder && this.deleteFolderConfirmator) {
             if (!(await this.deleteFolderConfirmator(i))) return Promise.reject();
         }
-        return i.remove();
+        // this weirdness is to make TS happy while keeping it type safe
+        return i instanceof File ? i.remove() : i.remove();
     }
 
     @action.bound
@@ -116,7 +117,7 @@ class FileStoreBulk {
         item.selected = false;
         if (item.folderId === folder.id) return;
         if (item.isShared) return;
-        folder.attach(item);
+        folder.attach(item, { isMove: true });
         if (!bulk) {
             if (folder.isShared) {
                 warnings.add('title_itemMovedToFolder', null, {
@@ -145,7 +146,7 @@ class FileStoreBulk {
                 i.selected = false;
                 if (i.folderId === targetFolder.id) return;
                 if (i.isShared) return;
-                targetFolder.attach(i);
+                targetFolder.attach(i, { isMove: true });
                 targetFolder.progress++;
             });
         });

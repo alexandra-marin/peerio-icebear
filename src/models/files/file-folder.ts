@@ -272,16 +272,19 @@ export default class FileFolder {
     }
 
     // move file or folder
-    attach(fileOrFolder, ...rest) {
+    attach(
+        fileOrFolder: File | FileFolder,
+        { skipSave = false, skipRootFolder = false, isMove = false } = {}
+    ) {
         if (fileOrFolder.isFolder) {
-            return this.attachFolder(fileOrFolder, ...rest);
+            return this.attachFolder(fileOrFolder as FileFolder, skipSave, skipRootFolder);
         }
-        return this.attachFile(fileOrFolder);
+        return this.attachFile(fileOrFolder as File, isMove);
     }
 
     // move file to this folder
     @action.bound
-    async attachFile(file: File): Promise<void> {
+    async attachFile(file: File, isMove = false): Promise<void> {
         if (file.store !== this.store) {
             if (file.isLegacy) {
                 console.error('can not share legacy file', file.fileId);
@@ -294,7 +297,7 @@ export default class FileFolder {
             // if file was shared not from SELF - remove it
             // file kegs in SELF will get hidden by server
             if (!file.store.isMainStore) {
-                await file.remove();
+                (await isMove) ? file.removeWithoutTriggeringFileDelete() : file.remove();
             }
             // in any case we want this file to not be visible anymore,
             // there might be a slight delay until server hides the keg and the data will get updated
@@ -327,7 +330,7 @@ export default class FileFolder {
             await folder.copyFilesTo(this, map);
             // 3. we remove original folders, files have been removed individually already
             //    if user has added some files after process has started - they're safely in root now
-            folder.remove(true);
+            folder.remove({ keepFiles: true });
             return Promise.resolve();
         }
         folder.folderId = this.id;
@@ -393,10 +396,10 @@ export default class FileFolder {
     }
 
     // removed folder tree entirely, including files
-    remove(keepFiles = false, skipSave = false) {
+    async remove({ keepFiles = false, skipSave = false } = {}) {
         if (this.isRoot) return;
         if (!keepFiles) this.files.forEach(f => f.remove());
-        this.folders.forEach(f => f.remove(keepFiles, true));
+        this.folders.forEach(f => f.remove({ keepFiles, skipSave: true }));
         this.isDeleted = true;
         this.store.folderStore.folders.remove(this);
         if (skipSave) return;

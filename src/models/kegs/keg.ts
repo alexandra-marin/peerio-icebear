@@ -383,12 +383,13 @@ export default class Keg<TPayload, TProps extends {} = {}> {
     /**
      * Deletes the keg.
      */
-    protected remove() {
+    protected remove(flags?: object) {
         return socket.send(
             '/auth/kegs/delete',
             {
                 kegDbId: this.db.id,
-                kegId: this.id
+                kegId: this.id,
+                flags
             },
             false
         );

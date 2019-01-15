@@ -435,7 +435,7 @@ export default class Chat {
     @observable isNewUserFromInvite: boolean;
 
     /**
-     * UI flag for rooms created inside patient spaces.
+     * UI flag for rooms, currently only used for rooms in patient spaces.
      * They have a "new" badge if they have never been activated.
      */
     @observable isNew: boolean;

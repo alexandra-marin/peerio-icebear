@@ -10,7 +10,6 @@ import {
     runInAction
 } from 'mobx';
 import Chat from './chat';
-import ChatPendingDM from './chat-pending-dm';
 import ChatStorePending from './chat-store.pending';
 import ChatStoreSpaces from './chat-store.spaces';
 import ChatStoreCache from './chat-store.cache';
@@ -116,7 +115,7 @@ export class ChatStore {
     /**
      * currently selected/focused chat.
      */
-    @observable activeChat: Chat | ChatPendingDM = null;
+    @observable activeChat: Chat = null;
     /**
      * Chats set this flag and UI should use it to prevent user from spam-clicking the 'hide' button
      */

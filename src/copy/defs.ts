@@ -242,8 +242,8 @@ export interface LocalizationStrings {
   'button_visit': () => string;
   'button_chat': () => string;
   'title_upgradeMessage': () => string;
-  'error_fileQuotaExceeded': () => React.ReactChild[];
-  'error_fileUploadSizeExceeded': () => React.ReactChild[];
+  'error_fileQuotaExceeded': () => string;
+  'error_fileUploadSizeExceeded': () => string;
   'serverWarning_Welcome': () => React.ReactChild[];
   'serverWarning_Cancelled': () => string;
   'serverWarning_Expire': () => string;

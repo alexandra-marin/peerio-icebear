@@ -388,8 +388,7 @@ export default class Keg<TPayload, TProps extends {} = {}> {
             '/auth/kegs/delete',
             {
                 kegDbId: this.db.id,
-                kegId: this.id,
-                // flags
+                kegId: this.id
             },
             false
         );

@@ -242,8 +242,8 @@ export interface LocalizationStrings {
   'button_visit': () => string;
   'button_chat': () => string;
   'title_upgradeMessage': () => string;
-  'error_fileQuotaExceeded': () => React.ReactChild[];
-  'error_fileUploadSizeExceeded': () => React.ReactChild[];
+  'error_fileQuotaExceeded': () => string;
+  'error_fileUploadSizeExceeded': () => string;
   'serverWarning_Welcome': () => React.ReactChild[];
   'serverWarning_Cancelled': () => string;
   'serverWarning_Expire': () => string;
@@ -999,9 +999,9 @@ export interface LocalizationStrings {
   'mcr_title_patientUsernameOrEmail': () => string;
   'mcr_title_noParticipants': () => string;
   'mcr_title_chatHeaderPatientRoom': (params: { 'patientName': string | number }) => React.ReactChild[];
-  'mcr_title_patientRoomNotice': (params: { 'toAddMembers': (text: string) => JSX.Element }) => React.ReactChild[];
+  'mcr_title_patientRoomNotice': () => string;
   'mcr_title_chatHeaderInternalRoom': (params: { 'roomName': string | number }) => React.ReactChild[];
-  'mcr_title_internalRoomNotice': (params: { 'toAddMembers': (text: string) => JSX.Element }) => React.ReactChild[];
+  'mcr_title_internalRoomNotice': () => string;
   'mcr_title_consultation': () => string;
   'mcr_warning_addContact': () => React.ReactChild[];
   'mcr_title_practitionerDetails': () => string;

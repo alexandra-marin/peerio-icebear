@@ -389,7 +389,7 @@ export default class Keg<TPayload, TProps extends {} = {}> {
             {
                 kegDbId: this.db.id,
                 kegId: this.id,
-                flags
+                // flags
             },
             false
         );

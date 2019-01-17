@@ -383,7 +383,7 @@ export default class Keg<TPayload, TProps extends {} = {}> {
     /**
      * Deletes the keg.
      */
-    protected remove(flags?: object) {
+    protected remove(_flags?: object) {
         return socket.send(
             '/auth/kegs/delete',
             {

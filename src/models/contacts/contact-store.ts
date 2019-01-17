@@ -444,7 +444,7 @@ export class ContactStore {
     /**
      * Sends an invite
      */
-    invite(email: string, context: string, isAutoImport = false) {
+    invite(email: string, context?: string, isAutoImport = false) {
         return this.inviteNoWarning(email, context, isAutoImport)
             .then(() => {
                 warnings.add('snackbar_contactInvited');
@@ -457,7 +457,7 @@ export class ContactStore {
     /**
      * Sends an invite
      */
-    inviteNoWarning(email: string, context: string, isAutoImport = false) {
+    inviteNoWarning(email: string, context?: string, isAutoImport = false) {
         return socket.send('/auth/contacts/invite', {
             email,
             context,

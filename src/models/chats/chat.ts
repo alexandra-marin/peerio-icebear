@@ -434,6 +434,12 @@ export default class Chat {
      */
     @observable isNewUserFromInvite: boolean;
 
+    /**
+     * UI flag for rooms, currently only used for rooms in patient spaces.
+     * They have a "new" badge if they have never been activated.
+     */
+    @observable isNew: boolean;
+
     async loadMetadata() {
         if (this.metaLoaded) return null;
         if (this.loadingMeta) return asPromise(this, 'metaLoaded', true);

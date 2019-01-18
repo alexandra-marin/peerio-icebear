@@ -1042,5 +1042,6 @@
   "title_sentTo": "Sent to",
   "title_seenBy": "Seen by",
   "title_seenByAll": "Seen by all",
-  "title_removed": "removed"
+  "title_removed": "removed",
+  "title_peerioClosure": "Peerio Closure"
 }

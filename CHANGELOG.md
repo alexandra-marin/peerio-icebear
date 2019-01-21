@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="6.2.0"></a>
+# [6.2.0](https://github.com/PeerioTechnologies/peerio-icebear/compare/v6.1.4...v6.2.0) (2019-01-21)
+
+
+### Features
+
+* add keg remove flags to disable file remove reaction on server when needed ([8b994dc](https://github.com/PeerioTechnologies/peerio-icebear/commit/8b994dc))
+
+
+
 <a name="6.1.4"></a>
 ## [6.1.4](https://github.com/PeerioTechnologies/peerio-icebear/compare/v6.1.3...v6.1.4) (2019-01-17)
 

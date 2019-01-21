@@ -150,7 +150,7 @@ export class VolumeStore {
             const newFolder = await this.createVolume(participants, folder.name);
             folder.convertingToVolume = newFolder;
             newFolder.convertingFromFolder = folder;
-            await newFolder.attach(folder, false, true);
+            await newFolder.attach(folder, { skipRootFolder: true });
             folder.progress = newFolder.progress = folder.progressMax = newFolder.progressMax = 0;
             folder.convertingToVolume = null;
             newFolder.convertingFromFolder = null;

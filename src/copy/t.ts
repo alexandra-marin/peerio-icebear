@@ -2,7 +2,7 @@ import { t as t_internal } from 'peerio-translator'; // eslint-disable-line came
 
 import { LocalizationStrings } from './defs';
 
-type ParamsType<T> = T extends (...args: infer U) => any ? U : never;
+export type ParamsType<T> = T extends (...args: infer U) => any ? U : never;
 
 export function t<K extends keyof LocalizationStrings>(
     id: K,

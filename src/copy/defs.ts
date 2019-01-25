@@ -1045,4 +1045,5 @@ export interface LocalizationStrings {
   'title_seenBy': () => string;
   'title_seenByAll': () => string;
   'title_removed': () => string;
+  'title_peerioClosure': () => string;
 }

@@ -1046,4 +1046,5 @@ export interface LocalizationStrings {
   'title_seenByAll': () => string;
   'title_removed': () => string;
   'title_peerioClosure': () => string;
+  'title_noticeOfClosure': (params: { 'learnMoreClosure': (text: string) => JSX.Element }) => React.ReactChild[];
 }

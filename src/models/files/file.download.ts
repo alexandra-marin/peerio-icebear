@@ -63,6 +63,7 @@ export function download(
     isTmpCacheDownload = false,
     suppressSnackbar = false
 ) {
+    if (!this.readyForDownload) return Promise.reject(new Error('File is not ready to download'));
     // we need this check because resume process will pass temp file name
     if (!filePath.endsWith(tempExt)) {
         filePath = `${filePath}${tempExt}`; // eslint-disable-line no-param-reassign

@@ -159,17 +159,21 @@ class FileStoreBulk {
     /** Download the given `item` to the destination `path`. */
     @action.bound
     async downloadOne(item: File | FileFolder, path: string, suppressSnackbar?: boolean) {
-        item.selected = false;
-        // TODO: maybe run in parallel?
-        if (item.isFolder === true) {
-            await item.download(path, this.pickPathSelector, config.FileStream.createDir);
-        } else {
-            const downloadPath = await this.pickPathSelector(
-                path,
-                item.nameWithoutExtension || item.name,
-                item.ext || ''
-            );
-            await item.download(downloadPath, false, false, suppressSnackbar);
+        try {
+            item.selected = false;
+            // TODO: maybe run in parallel?
+            if (item.isFolder === true) {
+                await item.download(path, this.pickPathSelector, config.FileStream.createDir);
+            } else {
+                const downloadPath = await this.pickPathSelector(
+                    path,
+                    item.nameWithoutExtension || item.name,
+                    item.ext || ''
+                );
+                await item.download(downloadPath, false, false, suppressSnackbar);
+            }
+        } catch (err) {
+            console.log(err);
         }
     }
 

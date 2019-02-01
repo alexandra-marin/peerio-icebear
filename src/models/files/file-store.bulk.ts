@@ -196,7 +196,7 @@ class FileStoreBulk {
         items.forEach(item => {
             promise = promise.then(() => {
                 this.pickPathSelector = pickPathSelector; // don't ask..
-                this.downloadOne(item, path, true);
+                return this.downloadOne(item, path, true);
             });
         });
         await promise;

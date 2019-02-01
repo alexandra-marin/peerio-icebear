@@ -188,12 +188,16 @@ class FileStoreBulk {
             console.error(`pickPathSelector has not been set`);
             return;
         }
+        const pickPathSelector = this.pickPathSelector;
         const path = await this.downloadFolderSelector();
         if (!path) return;
         const items = getFileStore().selectedFilesOrFolders;
         let promise = Promise.resolve();
         items.forEach(item => {
-            promise = promise.then(() => this.downloadOne(item, path, true));
+            promise = promise.then(() => {
+                this.pickPathSelector = pickPathSelector; // don't ask..
+                this.downloadOne(item, path, true);
+            });
         });
         await promise;
         warnings.add('snackbar_downloadsComplete');
